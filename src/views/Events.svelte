@@ -1,0 +1,25 @@
+<script lang="ts">
+  import Collision from "../components/events/Collision.svelte";
+  import Click from "../components/events/Click.svelte";
+  import { events, hasEmptySlot } from "../store";
+</script>
+
+<section>
+  {#each Object.entries($events.collisions) as [id, obj]}
+    <Collision id={+id} />
+  {/each}
+  {#if !$hasEmptySlot || Object.keys($events.collisions).length == 0}
+    <button on:click={events.addCollision}>Add Collision</button>
+  {/if}
+  <Click />
+</section>
+
+<style>
+  section {
+    display: flex;
+    flex-direction: column;
+    gap: 1%;
+    padding: 1%;
+    box-sizing: border-box;
+  }
+</style>
