@@ -1,10 +1,7 @@
 <script lang="ts">
   import { currentEmoji, editableMap as map } from "../store";
 
-  export let editor = false;
-
   function clickedCell(index: number) {
-    if (!editor) return;
     if ($currentEmoji == "") {
       map.removeEmoji(index);
       return;

@@ -1,5 +1,5 @@
 <script>
-  import EditableMap from "src/components/EditableMap.svelte";
+  import EditableMap from "../components/EditableMap.svelte";
 </script>
 
 <section>

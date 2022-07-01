@@ -1,13 +1,5 @@
 import { writable } from "svelte/store";
 
-export function canMove(keyCode: number, index: number) {
-  if (keyCode == 37 && index % 16 == 0) return 0;
-  if (keyCode == 38 && index < 16) return 0;
-  if (keyCode == 39 && (index + 1) % 16 == 0) return 0;
-  if (keyCode == 40 && index >= 240) return 0;
-  return (keyCode % 2 == 0 ? 16 : 1) * (keyCode >= 39 ? 1 : -1);
-}
-
 interface CollisionObject {
   emoji: string | null;
   destroy?: boolean;
@@ -86,29 +78,34 @@ interface PlayableMap {
   items: {
     [id: number]: Emoji;
   };
+  canMoveEmoji: boolean;
 }
 
 function createPlayableMap() {
-  const map: PlayableMap = { items: {} };
+  const map: PlayableMap = { items: {}, canMoveEmoji: false };
   const { subscribe, update } = writable(map);
 
   return {
     subscribe,
-    // TODO: Add a movement mode switcher
-    moveEmoji: (keyCode: number, index: number) =>
+    switchMovementMode: () =>
+      update((state) => {
+        state.canMoveEmoji = !state.canMoveEmoji;
+        return state;
+      }),
+    loadItems: (_items: any) =>
+      update((state) => {
+        state.items = _items;
+        return state;
+      }),
+    moveEmoji: (index: number, operation: number) =>
       update((state: PlayableMap) => {
         if (state.items[index] == undefined) return state;
-
-        let { emoji } = state.items[index as keyof typeof state.items];
-        let operation = canMove(keyCode, index);
-        if (operation == 0) return state;
-
-        index += operation; // mutating arg
-        if (state.items[index]) {
+        let { emoji } = state.items[index];
+        if (state.items[index + operation]) {
           console.log("collision");
           // TODO: Collision
         }
-        state.items[index] = { index, emoji };
+        state.items[index + operation] = { index: index + operation, emoji };
         delete state.items[index];
         return state;
       }),

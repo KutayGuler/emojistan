@@ -25,6 +25,10 @@
   }
 
   function handleKeydown(e: KeyboardEvent) {
+    if (e.keyCode >= 49 && e.keyCode <= 51) {
+      viewIndex = e.keyCode % 49;
+    }
+
     if (e.keyCode == 27) {
       $currentEmoji = "";
     }
@@ -43,6 +47,10 @@
         <div>
           <h4>Shortcuts</h4>
           <p>Esc - Deselect emoji</p>
+          <!-- <p>1 - Play</p>
+          <p>2 - Editor</p>
+          <p>3 - Events</p>
+          <p>Space - ghost mode</p> -->
         </div>
         <h4>{views[viewIndex].title}</h4>
         <div class="view noselect">

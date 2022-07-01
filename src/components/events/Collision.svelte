@@ -7,7 +7,6 @@
   export let id: number;
 
   onMount(() => {
-    console.log($events.collisions);
     $hasEmptySlot = true;
   });
 
