@@ -6,7 +6,11 @@
       map.removeEmoji(index);
       return;
     }
-    map.addEmoji({ index, emoji: $currentEmoji });
+    map.addEmoji({
+      index,
+      emoji: $currentEmoji,
+      behavior: { "👽": "push", "👾": "💩" },
+    });
   }
 </script>
 

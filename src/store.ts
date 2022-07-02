@@ -16,10 +16,11 @@ interface Events {
   collisions: {
     [id: number]: Collision;
   };
+  bumpables: Array<String>;
 }
 
 function createEvents() {
-  const events: Events = { collisions: {} };
+  const events: Events = { collisions: {}, bumpables: ["🌲"] };
   const { subscribe, update, set } = writable(events);
 
   return {
@@ -47,6 +48,9 @@ function createEvents() {
 interface Emoji {
   index: number;
   emoji: string;
+  behavior: {
+    [emoji: string]: string;
+  };
 }
 
 interface EditableMap {
@@ -74,40 +78,80 @@ function createEditableMap() {
   };
 }
 
+function canMove(keyCode: number, index: number) {
+  if (keyCode == 37 && index % 16 == 0) return 0;
+  if (keyCode == 38 && index < 16) return 0;
+  if (keyCode == 39 && (index + 1) % 16 == 0) return 0;
+  if (keyCode == 40 && index >= 240) return 0;
+  return (keyCode % 2 == 0 ? 16 : 1) * (keyCode >= 39 ? 1 : -1);
+}
+
 interface PlayableMap {
   items: {
     [id: number]: Emoji;
   };
-  canMoveEmoji: boolean;
+  activeCell: number;
+  ghost: boolean;
 }
 
 function createPlayableMap() {
-  const map: PlayableMap = { items: {}, canMoveEmoji: false };
+  const map: PlayableMap = { items: {}, activeCell: 0, ghost: false };
   const { subscribe, update } = writable(map);
 
   return {
     subscribe,
-    switchMovementMode: () =>
-      update((state) => {
-        state.canMoveEmoji = !state.canMoveEmoji;
-        return state;
+    toggleGhost: () =>
+      update((_s) => {
+        _s.ghost = !_s.ghost;
+        return _s;
       }),
     loadItems: (_items: any) =>
       update((state) => {
         state.items = _items;
         return state;
       }),
-    moveEmoji: (index: number, operation: number) =>
-      update((state: PlayableMap) => {
-        if (state.items[index] == undefined) return state;
-        let { emoji } = state.items[index];
-        if (state.items[index + operation]) {
-          console.log("collision");
+    moveEmoji: (keyCode: number) =>
+      update((_s: PlayableMap) => {
+        // TODO: Ghost mode
+        let ac = _s.activeCell;
+        if (_s.items[_s.activeCell] == undefined) return _s;
+        let operation = canMove(keyCode, ac);
+        if (operation == 0) return _s;
+        _s.activeCell += operation;
+
+        let { emoji, behavior } = _s.items[ac];
+        if (_s.items[ac + operation] !== undefined) {
           // TODO: Collision
+          console.log("collision");
+
+          let behaviorKey = _s.items[ac + operation].emoji;
+          let collisionType = _s.items[ac].behavior[behaviorKey];
+          switch (collisionType) {
+            case "push":
+              // TODO: If there is wall or bumpable, return
+              // TODO: Cascade pushables
+              _s.items[ac + operation * 2] = _s.items[ac + operation];
+              _s.items[ac + operation] = _s.items[ac];
+              delete _s.items[ac];
+
+              console.log("push");
+              return _s;
+              break;
+            default:
+              // TODO: update behavior
+              _s.items[ac + operation].emoji = collisionType;
+              delete _s.items[ac];
+
+              return _s;
+          }
         }
-        state.items[index + operation] = { index: index + operation, emoji };
-        delete state.items[index];
-        return state;
+        _s.items[ac + operation] = {
+          index: ac + operation,
+          emoji,
+          behavior,
+        };
+        delete _s.items[ac];
+        return _s;
       }),
   };
 }

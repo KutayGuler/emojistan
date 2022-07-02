@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { editableMap, playableMap as map } from "../store";
+  import { derived } from "svelte/store";
+  import { events, editableMap, playableMap as map } from "../store";
 
   function canMove(keyCode: number, index: number) {
     if (keyCode == 37 && index % 16 == 0) return 0;
@@ -10,34 +11,33 @@
     return (keyCode % 2 == 0 ? 16 : 1) * (keyCode >= 39 ? 1 : -1);
   }
 
-  let ghost = true;
-  let activeCell = 0;
+  // let ghost = true;
+  // let activeCell = 0;
   let arrowKeys = [37, 38, 39, 40];
   function handle(e: KeyboardEvent) {
-    console.log($editableMap.items);
-
-    if (e.keyCode == 32) ghost = !ghost;
+    if (e.keyCode == 32) map.toggleGhost();
     if (!arrowKeys.includes(e.keyCode)) return;
-    let operation = canMove(e.keyCode, activeCell);
-    if (operation != 0) {
-      if (!ghost) map.moveEmoji(activeCell, operation);
-      console.log($editableMap.items);
-      activeCell += operation;
-    }
+    // let operation = canMove(e.keyCode, activeCell);
+    // if ($events.bumpables.includes($map.items[activeCell + operation]?.emoji)) {
+    //   return;
+    // }
+    map.moveEmoji(e.keyCode);
   }
 
   onMount(() => {
     map.loadItems(JSON.parse(JSON.stringify($editableMap.items)));
   });
+
+  let ghost = derived(map, ($map) => $map.ghost);
 </script>
 
 <svelte:window on:keydown={handle} />
 
 <section class="noselect">
-  <p title="ghost mode {ghost ? 'on' : 'off'}">👻 {ghost ? "✔️" : "❌"}</p>
+  <p title="ghost mode {$ghost ? 'on' : 'off'}">👻 {$ghost ? "✔️" : "❌"}</p>
   <div class="map">
     {#each { length: 256 } as _, i}
-      <div class:active={activeCell == i}>
+      <div class:active={$map.activeCell == i}>
         {$map?.items[i]?.emoji || ""}
         <!-- {"🌴"} -->
       </div>
