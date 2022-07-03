@@ -1,26 +1,15 @@
 import { writable } from "svelte/store";
 
-interface CollisionObject {
-  emoji: string | null;
-  destroy?: boolean;
-}
-
-// TODO: Use CollisionKey
-export type CollisionKey = "input1" | "input2" | "output";
-
-type Collision = {
-  [key: string]: CollisionObject;
-};
-
 interface Events {
   collisions: {
-    [id: number]: Collision;
+    [id: number]: string;
   };
   bumpables: Array<String>;
+  rules: [];
 }
 
 function createEvents() {
-  const events: Events = { collisions: {}, bumpables: ["🌲"] };
+  const events: Events = { collisions: {}, bumpables: ["🌲"], rules: [] };
   const { subscribe, update, set } = writable(events);
 
   return {
@@ -28,12 +17,13 @@ function createEvents() {
     subscribe,
     addCollision: () =>
       update((state: Events) => {
-        let id = Date.now();
-        state.collisions[id] = {
-          input1: { emoji: null, destroy: true },
-          input2: { emoji: null, destroy: true },
-          output: { emoji: null },
-        };
+        // let id = Date.now();
+        // state.collisions[id] = {
+        //   input1: { emoji: null, destroy: true },
+        //   input2: { emoji: null, destroy: true },
+        //   output: { emoji: null },
+        // };
+
         return state;
       }),
     removeCollision: (id: number) => {

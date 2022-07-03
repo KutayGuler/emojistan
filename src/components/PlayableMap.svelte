@@ -66,7 +66,7 @@
   }
 
   onMount(() => {
-    items = $editableMap.items;
+    items = JSON.parse(JSON.stringify($editableMap.items));
     console.log(items);
   });
 </script>

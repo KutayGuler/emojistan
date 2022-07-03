@@ -5,8 +5,8 @@
 </script>
 
 <section>
-  {#each Object.entries($events.collisions) as [id, obj]}
-    <Collision id={+id} />
+  {#each { length: 3 } as _}
+    <Collision />
   {/each}
   {#if !$hasEmptySlot || Object.keys($events.collisions).length == 0}
     <button on:click={events.addCollision}>Add Collision</button>
