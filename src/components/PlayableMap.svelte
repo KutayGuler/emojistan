@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { derived } from "svelte/store";
-  import { events, editableMap, playableMap as map } from "../store";
+  import type { Emoji } from "../store";
+  import { editableMap } from "../store";
 
   function canMove(keyCode: number, index: number) {
     if (keyCode == 37 && index % 16 == 0) return 0;
@@ -11,34 +11,74 @@
     return (keyCode % 2 == 0 ? 16 : 1) * (keyCode >= 39 ? 1 : -1);
   }
 
-  // let ghost = true;
-  // let activeCell = 0;
+  interface Items {
+    [id: number]: Emoji;
+  }
+
+  // ACTIVE CELL
+  let ac = 0;
+  let items: Items = {};
+  let ghost = true;
+
   let arrowKeys = [37, 38, 39, 40];
   function handle(e: KeyboardEvent) {
-    if (e.keyCode == 32) map.toggleGhost();
+    if (e.keyCode == 32) ghost = !ghost;
     if (!arrowKeys.includes(e.keyCode)) return;
-    // let operation = canMove(e.keyCode, activeCell);
-    // if ($events.bumpables.includes($map.items[activeCell + operation]?.emoji)) {
-    //   return;
-    // }
-    map.moveEmoji(e.keyCode);
+    let operation = canMove(e.keyCode, ac);
+    if (ghost) {
+      ac += operation;
+      return;
+    }
+    if (items[ac] == undefined) return;
+    if (operation == 0) return;
+    let { emoji, behavior } = items[ac];
+    if (items[ac + operation] !== undefined) {
+      // TODO: Collision
+      console.log("collision");
+
+      let behaviorKey = items[ac + operation].emoji;
+      let collisionType = items[ac].behavior[behaviorKey];
+      switch (collisionType) {
+        case "push":
+          // TODO: If there is wall or bumpable, return
+          // TODO: Cascade pushables
+          items[ac + operation * 2] = items[ac + operation];
+          items[ac + operation] = items[ac];
+          delete items[ac];
+
+          console.log("push");
+          break;
+        default:
+          // TODO: update behavior
+          items[ac + operation].emoji = collisionType;
+          delete items[ac];
+          break;
+      }
+    }
+    items[ac + operation] = {
+      index: ac + operation,
+      emoji,
+      behavior,
+    };
+
+    delete items[ac];
+    ac += operation;
   }
 
   onMount(() => {
-    map.loadItems(JSON.parse(JSON.stringify($editableMap.items)));
+    items = $editableMap.items;
+    console.log(items);
   });
-
-  let ghost = derived(map, ($map) => $map.ghost);
 </script>
 
 <svelte:window on:keydown={handle} />
 
 <section class="noselect">
-  <p title="ghost mode {$ghost ? 'on' : 'off'}">👻 {$ghost ? "✔️" : "❌"}</p>
+  <p title="ghost mode {ghost ? 'on' : 'off'}">👻 {ghost ? "✔️" : "❌"}</p>
   <div class="map">
     {#each { length: 256 } as _, i}
-      <div class:active={$map.activeCell == i}>
-        {$map?.items[i]?.emoji || ""}
+      <div class:active={ac == i}>
+        {items[i]?.emoji || ""}
         <!-- {"🌴"} -->
       </div>
     {/each}
