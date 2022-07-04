@@ -9,7 +9,7 @@
 
   let filter = "";
 
-  let viewIndex = 1;
+  let viewIndex = 2;
 
   let views = [
     { component: Play, emoji: "🎬", title: "Play" },

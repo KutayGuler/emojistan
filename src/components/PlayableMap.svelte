@@ -15,12 +15,21 @@
     [id: number]: Emoji;
   }
 
+  // TODO: Events and editor should be seperated
+  // TODO: When events or editor is updated, scene should apply the changes
+
   // ACTIVE CELL
   let ac = 0;
   let items: Items = {};
   let ghost = true;
 
   let arrowKeys = [37, 38, 39, 40];
+
+  onMount(() => {
+    items = JSON.parse(JSON.stringify($editableMap.items));
+    console.log(items);
+  });
+
   function handle(e: KeyboardEvent) {
     if (e.keyCode == 32) ghost = !ghost;
     if (!arrowKeys.includes(e.keyCode)) return;
@@ -38,6 +47,7 @@
 
       let behaviorKey = items[ac + operation].emoji;
       let collisionType = items[ac].behavior[behaviorKey];
+      console.log(collisionType);
       switch (collisionType) {
         case "push":
           // TODO: If there is wall or bumpable, return
@@ -47,14 +57,19 @@
           delete items[ac];
 
           console.log("push");
+          ac += operation;
           break;
         default:
-          // TODO: update behavior
+          // TODO: update behavior cuz emoji changes
           items[ac + operation].emoji = collisionType;
           delete items[ac];
+          ac += operation;
           break;
       }
+
+      return;
     }
+
     items[ac + operation] = {
       index: ac + operation,
       emoji,
@@ -64,11 +79,6 @@
     delete items[ac];
     ac += operation;
   }
-
-  onMount(() => {
-    items = JSON.parse(JSON.stringify($editableMap.items));
-    console.log(items);
-  });
 </script>
 
 <svelte:window on:keydown={handle} />

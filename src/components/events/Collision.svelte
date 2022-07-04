@@ -3,46 +3,98 @@
   import { slide } from "svelte/transition";
   import { events, currentEmoji, hasEmptySlot } from "../../store";
 
-  onMount(() => {
-    $hasEmptySlot = true;
-  });
-
-  function removeCollision() {
-    // events.removeCollision(id);
-  }
+  export let id: number;
+  export let rule: string;
 
   const types = ["bump", "push", "merge"];
-  let slots = ["", "", ""];
   let type = types[0];
+  let slots = ["", ""];
+  let mergeSlot = "";
+  let error = "";
 
-  let showError = false;
+  onMount(() => {
+    if (rule != "") {
+      $hasEmptySlot = false;
+      let [x, y, z] = rule.split(",");
+      slots = [x, y];
+      console.log(x, y, z);
+      if (types.includes(z)) {
+        type = z;
+        return;
+      }
+      type = "merge";
+      mergeSlot = z;
+    } else {
+      $hasEmptySlot = true;
+    }
+  });
+
+  function checkCollision(collision: string) {
+    console.log(collision);
+    if (Object.values($events.collisions).includes(collision)) {
+      [type, mergeSlot, slots] = [types[0], "", ["", ""]];
+      $hasEmptySlot = true;
+      error = "Can't have duplicate collisions";
+      setTimeout(() => (error = ""), 1500);
+      return;
+    }
+
+    $hasEmptySlot = false;
+    events.updateCollision(id, collision);
+    console.log($events.collisions);
+  }
+
+  function updateSlot(i: number) {
+    i == 2 ? (mergeSlot = $currentEmoji) : (slots[i] = $currentEmoji);
+
+    if (type == "merge") {
+      if ([...slots, mergeSlot].includes("")) return;
+      if (slots.includes(mergeSlot)) {
+        mergeSlot = "";
+        $hasEmptySlot = true;
+        error = "Inputs cannot be the same with output";
+        setTimeout(() => (error = ""), 1500);
+        return;
+      }
+
+      checkCollision(`${slots[0]},${slots[1]},${mergeSlot}`);
+      return;
+    }
+
+    if (slots.includes("")) {
+      $hasEmptySlot = true;
+      return;
+    }
+
+    checkCollision(`${slots[0]},${slots[1]},${type}`);
+  }
 </script>
 
 <section class="noselect">
-  <button class="close" on:click={removeCollision}>❌</button>
+  <button class="close" on:click={() => events.removeCollision(id)}>❌</button>
   <div class="slots">
     {#each { length: 3 } as _, i}
       {#if i == 2}
-        <select bind:value={type}>
+        <select bind:value={type} on:change={() => updateSlot(i)}>
           {#each types as type}
             <option value={type}>{type}</option>
           {/each}
         </select>
         {#if type == "merge"}
-          <div class="slot">
-            <div>{slots[2]}</div>
+          <div class="slot" on:click={() => updateSlot(2)}>
+            <div>{mergeSlot}</div>
           </div>
         {/if}
       {:else}
-        <div class="slot">
+        <div class="slot" on:click={() => updateSlot(i)}>
           <div>{slots[i]}</div>
         </div>
       {/if}
     {/each}
   </div>
-  {#if showError}
+  {#if error != ""}
     <div transition:slide class="error">
-      Inputs cannot be the same with output
+      {error}
     </div>
   {/if}
 </section>

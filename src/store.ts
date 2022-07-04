@@ -4,31 +4,33 @@ interface Events {
   collisions: {
     [id: number]: string;
   };
-  bumpables: Array<String>;
-  rules: [];
 }
 
 function createEvents() {
-  const events: Events = { collisions: {}, bumpables: ["🌲"], rules: [] };
+  const events: Events = { collisions: {} };
   const { subscribe, update, set } = writable(events);
 
   return {
     set,
     subscribe,
-    addCollision: () =>
+    addCollision: (rule: string) =>
       update((state: Events) => {
-        // let id = Date.now();
-        // state.collisions[id] = {
-        //   input1: { emoji: null, destroy: true },
-        //   input2: { emoji: null, destroy: true },
-        //   output: { emoji: null },
-        // };
-
+        let id = Date.now();
+        state.collisions[id] = rule;
         return state;
       }),
+    updateCollision: (id: number, rule: string) =>
+      update((state: Events) => {
+        state.collisions[id] = rule;
+        return state;
+      }),
+
     removeCollision: (id: number) => {
       update((state: Events) => {
+        console.log(state.collisions);
         delete state.collisions[id];
+        console.log(state.collisions);
+
         return state;
       });
     },
