@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { currentEmoji, events, editableMap as map } from "../store";
+  import { currentEmoji, editableMap as map } from "../store";
 
   function clickedCell(index: number) {
     if ($currentEmoji == "") {
@@ -7,18 +7,9 @@
       return;
     }
 
-    let rules = Object.values($events.collisions).filter(
-      (rule) => rule.split(",")[0] == $currentEmoji
-    );
-
-    let keyVals = rules.map((rule) => [rule.split(",")[1], rule.split(",")[2]]);
-    const behavior = Object.fromEntries(keyVals);
-    let emoji = $currentEmoji;
-
     map.addEmoji({
       index,
-      emoji,
-      behavior,
+      emoji: $currentEmoji,
     });
   }
 </script>

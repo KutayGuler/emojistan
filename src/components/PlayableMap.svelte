@@ -1,9 +1,9 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import type { Emoji } from "../store";
-  import { editableMap } from "../store";
+  import { editableMap, events } from "../store";
 
-  function canMove(keyCode: number, index: number) {
+  function calcOperation(keyCode: number, index: number) {
     if (keyCode == 37 && index % 16 == 0) return 0;
     if (keyCode == 38 && index < 16) return 0;
     if (keyCode == 39 && (index + 1) % 16 == 0) return 0;
@@ -15,65 +15,70 @@
     [id: number]: Emoji;
   }
 
-  // TODO: Events and editor should be seperated
-  // TODO: When events or editor is updated, scene should apply the changes
+  interface Behaviors {
+    [emoji: string]: {
+      [emoji: string]: string;
+    };
+  }
 
   // ACTIVE CELL
   let ac = 0;
   let items: Items = {};
+  let behaviors: Behaviors = {};
   let ghost = true;
 
   let arrowKeys = [37, 38, 39, 40];
 
   onMount(() => {
     items = JSON.parse(JSON.stringify($editableMap.items));
+    Object.values($events.collisions).forEach((rule) => {
+      let [key1, key2, val] = rule.split(",");
+      if (behaviors[key1] == undefined) behaviors[key1] = {};
+      behaviors[key1][key2] = val;
+    });
     console.log(items);
+    console.log(behaviors);
   });
 
   function handle(e: KeyboardEvent) {
     if (e.keyCode == 32) ghost = !ghost;
     if (!arrowKeys.includes(e.keyCode)) return;
-    let operation = canMove(e.keyCode, ac);
-    if (ghost) {
+    let operation = calcOperation(e.keyCode, ac);
+    if (operation == 0) return;
+    if (ghost || items[ac] == undefined) {
       ac += operation;
       return;
     }
-    if (items[ac] == undefined) return;
-    if (operation == 0) return;
-    let { emoji, behavior } = items[ac];
+    let { emoji } = items[ac];
     if (items[ac + operation] !== undefined) {
-      // TODO: Collision
-      console.log("collision");
-
-      let behaviorKey = items[ac + operation].emoji;
-      let collisionType = items[ac].behavior[behaviorKey];
+      let key1 = items[ac].emoji;
+      let key2 = items[ac + operation].emoji;
+      let collisionType =
+        behaviors[key1] == undefined ? undefined : behaviors[key1][key2];
       console.log(collisionType);
       switch (collisionType) {
         case "push":
-          // TODO: If there is wall or bumpable, return
           // TODO: Cascade pushables
           items[ac + operation * 2] = items[ac + operation];
           items[ac + operation] = items[ac];
           delete items[ac];
-
-          console.log("push");
           ac += operation;
-          break;
+          return;
+        case "bump":
+        case undefined:
+          return;
         default:
-          // TODO: update behavior cuz emoji changes
+          // MERGE
           items[ac + operation].emoji = collisionType;
           delete items[ac];
           ac += operation;
-          break;
+          return;
       }
-
-      return;
     }
 
     items[ac + operation] = {
       index: ac + operation,
       emoji,
-      behavior,
     };
 
     delete items[ac];
@@ -89,7 +94,6 @@
     {#each { length: 256 } as _, i}
       <div class:active={ac == i}>
         {items[i]?.emoji || ""}
-        <!-- {"🌴"} -->
       </div>
     {/each}
   </div>

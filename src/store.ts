@@ -40,9 +40,6 @@ function createEvents() {
 export interface Emoji {
   index: number;
   emoji: string;
-  behavior: {
-    [emoji: string]: string;
-  };
 }
 
 interface EditableMap {
