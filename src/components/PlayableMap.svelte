@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import type { Emoji } from "../store";
-  import { editableMap, events } from "../store";
+  import { editableMap as map, events } from "../store";
 
   function calcOperation(keyCode: number, index: number) {
     if (keyCode == 37 && index % 16 == 0) return 0;
@@ -26,11 +26,12 @@
   let items: Items = {};
   let behaviors: Behaviors = {};
   let ghost = true;
+  let collisionChain: Array<any> = [];
 
   let arrowKeys = [37, 38, 39, 40];
 
   onMount(() => {
-    items = JSON.parse(JSON.stringify($editableMap.items));
+    items = JSON.parse(JSON.stringify($map.items));
     Object.values($events.collisions).forEach((rule) => {
       let [key1, key2, val] = rule.split(",");
       if (behaviors[key1] == undefined) behaviors[key1] = {};
@@ -39,6 +40,19 @@
     console.log(items);
     console.log(behaviors);
   });
+
+  function getCollisionType(key1: string, key2: string): string | undefined {
+    if (behaviors[key1] !== undefined) return behaviors[key1][key2];
+    return undefined;
+  }
+
+  function executeCollisionChain(index?: number, operation?: number) {
+    while (collisionChain.length != 0) {
+      console.log(collisionChain);
+      collisionChain.pop();
+    }
+    console.log(collisionChain);
+  }
 
   function handle(e: KeyboardEvent) {
     if (e.keyCode == 32) ghost = !ghost;
@@ -49,16 +63,27 @@
       ac += operation;
       return;
     }
-    let { emoji } = items[ac];
     if (items[ac + operation] !== undefined) {
-      let key1 = items[ac].emoji;
-      let key2 = items[ac + operation].emoji;
-      let collisionType =
-        behaviors[key1] == undefined ? undefined : behaviors[key1][key2];
-      console.log(collisionType);
-      switch (collisionType) {
+      switch (getCollisionType(items[ac].emoji, items[ac + operation].emoji)) {
         case "push":
           // TODO: Cascade pushables
+          let i = 2;
+          collisionChain = [];
+
+          while (items[ac + operation * i] !== undefined) {
+            let _emoji = items[ac + operation * (i - 1)].emoji;
+            let _emoji2 = items[ac + operation * i]?.emoji;
+            collisionChain.push(getCollisionType(_emoji, _emoji2));
+            console.log(collisionChain);
+            i++;
+          }
+
+          if (i != 2) {
+            if (collisionChain.includes(undefined)) return;
+            executeCollisionChain();
+            return;
+          }
+
           items[ac + operation * 2] = items[ac + operation];
           items[ac + operation] = items[ac];
           delete items[ac];
@@ -69,7 +94,11 @@
           return;
         default:
           // MERGE
-          items[ac + operation].emoji = collisionType;
+          // @ts-ignore
+          items[ac + operation].emoji = getCollisionType(
+            items[ac].emoji,
+            items[ac + operation].emoji
+          );
           delete items[ac];
           ac += operation;
           return;
@@ -78,7 +107,7 @@
 
     items[ac + operation] = {
       index: ac + operation,
-      emoji,
+      emoji: items[ac].emoji,
     };
 
     delete items[ac];
@@ -92,7 +121,7 @@
   <p title="ghost mode {ghost ? 'on' : 'off'}">👻 {ghost ? "✔️" : "❌"}</p>
   <div class="map">
     {#each { length: 256 } as _, i}
-      <div class:active={ac == i}>
+      <div style:background={$map.backgrounds[i]} class:active={ac == i}>
         {items[i]?.emoji || ""}
       </div>
     {/each}

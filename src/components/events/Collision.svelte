@@ -6,7 +6,7 @@
   export let id: number;
   export let rule: string;
 
-  const types = ["bump", "push", "merge"];
+  const types = ["push", "merge"];
   let type = types[0];
   let slots = ["", ""];
   let mergeSlot = "";
@@ -20,10 +20,10 @@
       console.log(x, y, z);
       if (types.includes(z)) {
         type = z;
-        return;
+      } else {
+        type = "merge";
+        mergeSlot = z;
       }
-      type = "merge";
-      mergeSlot = z;
     } else {
       $hasEmptySlot = true;
     }

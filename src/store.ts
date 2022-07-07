@@ -10,6 +10,9 @@ function createEvents() {
   const events: Events = { collisions: {} };
   const { subscribe, update, set } = writable(events);
 
+  // TODO: merging should be both ways
+  // TODO: Conditions
+
   return {
     set,
     subscribe,
@@ -46,14 +49,22 @@ interface EditableMap {
   items: {
     [id: number]: Emoji;
   };
+  backgrounds: {
+    [index: number]: string;
+  };
 }
 
 function createEditableMap() {
-  const map: EditableMap = { items: {} };
+  const map: EditableMap = { items: {}, backgrounds: {} };
   const { subscribe, update } = writable(map);
 
   return {
     subscribe,
+    updateBackground: (index: number, color: string) =>
+      update((state) => {
+        state.backgrounds[index] = color;
+        return state;
+      }),
     addEmoji: (obj: Emoji) =>
       update((state: EditableMap) => {
         state.items[obj.index] = obj;

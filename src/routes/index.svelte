@@ -216,6 +216,4 @@
   .selected {
     border: 2px solid red;
   }
-
-  /* MAP */
 </style>

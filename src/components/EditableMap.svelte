@@ -1,7 +1,16 @@
 <script lang="ts">
   import { currentEmoji, editableMap as map } from "../store";
 
+  let showIndex = false;
+  let paintMode = false;
+  let color = "";
+
   function clickedCell(index: number) {
+    if (paintMode) {
+      map.updateBackground(index, color);
+      return;
+    }
+
     if ($currentEmoji == "") {
       map.removeEmoji(index);
       return;
@@ -17,10 +26,18 @@
 <svelte:window />
 
 <section class="noselect">
+  <p><input type="checkbox" bind:checked={showIndex} />Show Index</p>
+  <p><input type="checkbox" bind:checked={paintMode} />Paint Mode</p>
+  {#if paintMode}
+    <input type="color" bind:value={color} />
+  {/if}
   <div class="map">
     {#each { length: 256 } as _, i}
-      <div on:click={() => clickedCell(i)}>
-        {$map?.items[i]?.emoji || ""}
+      <div
+        style:background={$map.backgrounds[i]}
+        on:click={() => clickedCell(i)}
+      >
+        {$map?.items[i]?.emoji || (showIndex ? i : "")}
       </div>
     {/each}
   </div>

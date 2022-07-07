@@ -5,6 +5,7 @@
 </script>
 
 <section>
+  <p>The objects will bump into each other by default</p>
   {#each Object.entries($events.collisions) as [id, rule], i}
     <Collision id={+id} {rule} />
   {/each}
