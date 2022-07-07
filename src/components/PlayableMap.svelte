@@ -1,14 +1,16 @@
 <script lang="ts">
-  import { onMount } from "svelte";
   import type { Emoji } from "../store";
-  import { editableMap as map, events } from "../store";
+  import { editableMap as map, events, staticItems } from "../store";
 
-  function calcOperation(keyCode: number, index: number) {
-    if (keyCode == 37 && index % 16 == 0) return 0;
-    if (keyCode == 38 && index < 16) return 0;
-    if (keyCode == 39 && (index + 1) % 16 == 0) return 0;
-    if (keyCode == 40 && index >= 240) return 0;
-    return (keyCode % 2 == 0 ? 16 : 1) * (keyCode >= 39 ? 1 : -1);
+  function calcOperation(code: string, index: number) {
+    if (code == "ArrowLeft" && index % 16 == 0) return 0;
+    if (code == "ArrowUp" && index < 16) return 0;
+    if (code == "ArrowRight" && (index + 1) % 16 == 0) return 0;
+    if (code == "ArrowDown" && index >= 240) return 0;
+    return (
+      (["ArrowUp", "ArrowDown"].includes(code) ? 16 : 1) *
+      (["ArrowRight", "ArrowDown"].includes(code) ? 1 : -1)
+    );
   }
 
   interface Items {
@@ -21,24 +23,18 @@
     };
   }
 
-  // ACTIVE CELL
-  let ac = 0;
-  let items: Items = {};
-  let behaviors: Behaviors = {};
+  /* ## STATE ## */
+  let ac = 0; // ACTIVE CELL
   let ghost = true;
   let collisionChain: Array<any> = [];
 
-  let arrowKeys = [37, 38, 39, 40];
-
-  onMount(() => {
-    items = JSON.parse(JSON.stringify($map.items));
-    Object.values($events.collisions).forEach((rule) => {
-      let [key1, key2, val] = rule.split(",");
-      if (behaviors[key1] == undefined) behaviors[key1] = {};
-      behaviors[key1][key2] = val;
-    });
-    console.log(items);
-    console.log(behaviors);
+  /* ## DATA ## */
+  let items: Items = JSON.parse(JSON.stringify($map.items));
+  let behaviors: Behaviors = {};
+  Object.values($events.collisions).forEach((rule) => {
+    let [key1, key2, val] = rule.split(",");
+    if (behaviors[key1] == undefined) behaviors[key1] = {};
+    behaviors[key1][key2] = val;
   });
 
   function getCollisionType(key1: string, key2: string): string | undefined {
@@ -55,14 +51,15 @@
   }
 
   function handle(e: KeyboardEvent) {
-    if (e.keyCode == 32) ghost = !ghost;
-    if (!arrowKeys.includes(e.keyCode)) return;
-    let operation = calcOperation(e.keyCode, ac);
+    if (e.code == "Space") ghost = !ghost;
+    if (!e.code.includes("Arrow")) return;
+    let operation = calcOperation(e.code, ac);
     if (operation == 0) return;
     if (ghost || items[ac] == undefined) {
       ac += operation;
       return;
     }
+    if ($staticItems.includes(items[ac].emoji)) return;
     if (items[ac + operation] !== undefined) {
       switch (getCollisionType(items[ac].emoji, items[ac + operation].emoji)) {
         case "push":
@@ -118,6 +115,7 @@
 <svelte:window on:keydown={handle} />
 
 <section class="noselect">
+  <p><strong>Objective: </strong>{$map.objective}</p>
   <p title="ghost mode {ghost ? 'on' : 'off'}">👻 {ghost ? "✔️" : "❌"}</p>
   <div class="map">
     {#each { length: 256 } as _, i}

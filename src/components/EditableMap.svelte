@@ -26,6 +26,7 @@
 <svelte:window />
 
 <section class="noselect">
+  <input type="text" placeholder="Objective" bind:value={$map.objective} />
   <p><input type="checkbox" bind:checked={showIndex} />Show Index</p>
   <p><input type="checkbox" bind:checked={paintMode} />Paint Mode</p>
   {#if paintMode}
