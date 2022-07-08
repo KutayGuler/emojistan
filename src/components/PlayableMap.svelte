@@ -141,6 +141,8 @@
   }
 
   .active {
-    border: 1px solid red;
+    outline: 1px solid;
+    outline-color: red;
+    /* TODO: invert color */
   }
 </style>

@@ -37,7 +37,7 @@
 
 <svelte:window on:keydown={handleKeydown} />
 
-<div class="cursor" style="left: {x + 15}px; top: {y}px;">
+<div class="cursor" style="transform: translate({x + 15}px, {y}px);">
   {$currentEmoji || ""}
 </div>
 <main>
@@ -122,7 +122,7 @@
     align-items: center;
     width: var(--cell);
     height: var(--cell);
-    background-color: antiquewhite;
+    background-color: var(--default-background);
   }
 
   :root {
@@ -133,6 +133,7 @@
     -moz-osx-font-smoothing: grayscale;
     -webkit-text-size-adjust: 100%;
 
+    --default-background: antiquewhite;
     --primary: #f6fafd;
     --secondary: #40b3ff;
 

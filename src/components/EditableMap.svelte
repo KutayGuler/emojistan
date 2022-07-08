@@ -35,7 +35,7 @@
   <div class="map">
     {#each { length: 256 } as _, i}
       <div
-        style:background={$map.backgrounds[i]}
+        style:background={$map.backgrounds[i] || "var(--default-background)"}
         on:click={() => clickedCell(i)}
       >
         {$map?.items[i]?.emoji || (showIndex ? i : "")}

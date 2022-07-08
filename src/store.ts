@@ -100,25 +100,38 @@ function createStaticItems() {
         }
         return state;
       }),
-    addEmoji: (emoji: string) =>
+  };
+}
+
+interface ColorPalette {
+  colors: Array<string>;
+}
+
+function createColorPalette() {
+  const colors: ColorPalette = { colors: [] };
+  const { subscribe, update } = writable(colors);
+
+  return {
+    subscribe,
+    addColor: (color: string) =>
+      color != "" &&
       update((state) => {
-        if (state.includes(emoji)) return state;
-        state.push(emoji);
+        if (state.colors.includes(color)) return state;
+        state.colors.push(color);
         return state;
       }),
-    removeEmoji: (emoji: string) =>
+    removeColor: (color: string) =>
       update((state) => {
-        state.filter((el) => el != emoji);
+        state.colors = state.colors.filter((el) => el != color);
         console.log(state);
         return state;
       }),
   };
 }
 
-// TODO: Add color palette (default background etc)
-
 export const hasEmptySlot = writable(false);
 export const currentEmoji = writable("");
 export const staticItems = createStaticItems();
+export const colorPalette = createColorPalette();
 export const events = createEvents();
 export const editableMap = createEditableMap();
