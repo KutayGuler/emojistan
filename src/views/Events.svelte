@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte/internal";
+  import { invertColor } from "../invertColor";
   import Collision from "../components/events/Collision.svelte";
   import {
     events,
@@ -25,13 +26,17 @@
     // @ts-ignore
     if (color == defaultBackground) {
       r.style.setProperty("--default-background", "antiquewhite");
+      r.style.setProperty("--inverted", "var(--danger)");
       defaultBackground = "antiquewhite";
       return;
     }
 
     r.style.setProperty("--default-background", color);
+    r.style.setProperty("--inverted", invertColor(color));
     defaultBackground = color;
   }
+
+  $: invertColor(color);
 </script>
 
 <section class="noselect">

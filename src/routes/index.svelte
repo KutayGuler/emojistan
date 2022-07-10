@@ -140,6 +140,8 @@
     --dark: #676778;
     --danger: #ff3e00;
 
+    --inverted: var(--danger);
+
     background-color: var(--primary);
   }
 

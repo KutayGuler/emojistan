@@ -1,6 +1,14 @@
 <script lang="ts">
   import type { Emoji } from "../store";
+  import { onMount } from "svelte/internal";
   import { editableMap as map, events, staticItems } from "../store";
+  import { invertColor } from "../invertColor";
+
+  let r: any;
+
+  onMount(() => {
+    r = document.querySelector(":root");
+  });
 
   function calcOperation(code: string, index: number) {
     if (code == "ArrowLeft" && index % 16 == 0) return 0;
@@ -29,7 +37,10 @@
   let collisionChain: Array<any> = [];
 
   /* ## DATA ## */
-  let items: Items = JSON.parse(JSON.stringify($map.items));
+  const _map = JSON.parse(JSON.stringify($map));
+  let items: Items = _map.items;
+  let backgrounds = _map.backgrounds;
+  let objective = _map.objective;
   let behaviors: Behaviors = {};
   Object.values($events.collisions).forEach((rule) => {
     let [key1, key2, val] = rule.split(",");
@@ -50,13 +61,23 @@
     console.log(collisionChain);
   }
 
+  function moveActiveCell(operation: number, _delete?: boolean) {
+    if (_delete) delete items[ac];
+    ac += operation;
+    // @ts-ignore
+    r.style.setProperty(
+      "--inverted",
+      invertColor(backgrounds[ac] || "#faebd7")
+    );
+  }
+
   function handle(e: KeyboardEvent) {
     if (e.code == "Space") ghost = !ghost;
     if (!e.code.includes("Arrow")) return;
     let operation = calcOperation(e.code, ac);
     if (operation == 0) return;
     if (ghost || items[ac] == undefined) {
-      ac += operation;
+      moveActiveCell(operation);
       return;
     }
     if ($staticItems.includes(items[ac].emoji)) return;
@@ -83,8 +104,7 @@
 
           items[ac + operation * 2] = items[ac + operation];
           items[ac + operation] = items[ac];
-          delete items[ac];
-          ac += operation;
+          moveActiveCell(operation, true);
           return;
         case "bump":
         case undefined:
@@ -96,8 +116,7 @@
             items[ac].emoji,
             items[ac + operation].emoji
           );
-          delete items[ac];
-          ac += operation;
+          moveActiveCell(operation, true);
           return;
       }
     }
@@ -107,15 +126,14 @@
       emoji: items[ac].emoji,
     };
 
-    delete items[ac];
-    ac += operation;
+    moveActiveCell(operation, true);
   }
 </script>
 
 <svelte:window on:keydown={handle} />
 
 <section class="noselect">
-  <p><strong>Objective: </strong>{$map.objective}</p>
+  <p><strong>Objective: </strong>{objective}</p>
   <p title="ghost mode {ghost ? 'on' : 'off'}">👻 {ghost ? "✔️" : "❌"}</p>
   <div class="map">
     {#each { length: 256 } as _, i}
@@ -141,8 +159,6 @@
   }
 
   .active {
-    outline: 1px solid;
-    outline-color: red;
-    /* TODO: invert color */
+    outline: 2px solid var(--inverted);
   }
 </style>
