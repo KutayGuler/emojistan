@@ -5,9 +5,11 @@
   import { invertColor } from "../invertColor";
 
   let r: any;
+  let defaultBackground = "";
 
   onMount(() => {
     r = document.querySelector(":root");
+    defaultBackground = r.style.getPropertyValue("--default-background");
   });
 
   function calcOperation(code: string, index: number) {
@@ -67,7 +69,7 @@
     // @ts-ignore
     r.style.setProperty(
       "--inverted",
-      invertColor(backgrounds[ac] || "#faebd7")
+      invertColor(backgrounds[ac] || defaultBackground)
     );
   }
 

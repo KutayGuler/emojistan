@@ -103,12 +103,8 @@ function createStaticItems() {
   };
 }
 
-interface ColorPalette {
-  colors: Array<string>;
-}
-
 function createColorPalette() {
-  const colors: ColorPalette = { colors: [] };
+  const colors: Array<string> = [];
   const { subscribe, update } = writable(colors);
 
   return {
@@ -116,13 +112,13 @@ function createColorPalette() {
     addColor: (color: string) =>
       color != "" &&
       update((state) => {
-        if (state.colors.includes(color)) return state;
-        state.colors.push(color);
+        if (state.includes(color)) return state;
+        state.push(color);
         return state;
       }),
     removeColor: (color: string) =>
       update((state) => {
-        state.colors = state.colors.filter((el) => el != color);
+        state = state.filter((el) => el != color);
         console.log(state);
         return state;
       }),

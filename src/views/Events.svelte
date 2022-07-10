@@ -1,4 +1,5 @@
 <script lang="ts">
+  // import autoAnimate from "@formkit/auto-animate";
   import { onMount } from "svelte/internal";
   import { invertColor } from "../invertColor";
   import Collision from "../components/events/Collision.svelte";
@@ -36,7 +37,14 @@
     defaultBackground = color;
   }
 
-  $: invertColor(color);
+  function removeColor(color: string) {
+    colorPalette.removeColor(color);
+    if (!$colorPalette.includes(defaultBackground)) {
+      r.style.setProperty("--default-background", "antiquewhite");
+      r.style.setProperty("--inverted", "var(--danger)");
+      defaultBackground = "antiquewhite";
+    }
+  }
 </script>
 
 <section class="noselect">
@@ -61,27 +69,25 @@
       <p>Select an emoji and click here to set it as a static item</p>
     {/each}
   </div>
-  <p>Color Palette</p>
+  <p>🎨</p>
   <input type="color" bind:value={color} />
-  <button on:click={() => colorPalette.addColor(color)}>Add to palette</button>
-  {#each $colorPalette.colors as color}
-    <div class="color-container">
-      <div
-        class="color"
-        style="background-color: {color};"
-        on:click={() => setDefaultBackground(color)}
-      >
-        {color == defaultBackground ? "Default Background" : ""}
-      </div>
+  <button on:click={() => colorPalette.addColor(color)}>Add to 🎨</button>
+  <div class="palette">
+    {#each $colorPalette as color}
+      <div class="color-container">
+        <div
+          class="color"
+          class:isDefault={color == defaultBackground}
+          style="background-color: {color};"
+          on:click={() => setDefaultBackground(color)}
+        />
 
-      <button
-        class="remove-color"
-        on:click={() => colorPalette.removeColor(color)}
-      >
-        ❌
-      </button>
-    </div>
-  {/each}
+        <button class="remove-color" on:click={() => removeColor(color)}>
+          ❌
+        </button>
+      </div>
+    {/each}
+  </div>
 </section>
 
 <style>
@@ -113,11 +119,22 @@
     width: 100%;
   }
 
+  .palette {
+    display: flex;
+    flex-direction: row;
+  }
+
   .color-container,
   .color {
     position: relative;
     width: 10vw;
     height: 10vw;
+  }
+
+  .isDefault::after {
+    content: "🌍";
+    color: white;
+    mix-blend-mode: difference;
   }
 
   .remove-color {
