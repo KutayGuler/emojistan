@@ -9,7 +9,10 @@
 
   onMount(() => {
     r = document.querySelector(":root");
+    console.log(r.style);
     defaultBackground = r.style.getPropertyValue("--default-background");
+    console.log(defaultBackground);
+    if (defaultBackground == "") defaultBackground = "#faebd7";
   });
 
   function calcOperation(code: string, index: number) {
@@ -33,10 +36,26 @@
     };
   }
 
+  interface Dirs {
+    [key: string]: {
+      style: string;
+      emoji: string;
+      operation: number;
+    };
+  }
+
   /* ## STATE ## */
   let ac = 0; // ACTIVE CELL
+  let adc = 1; // ADJACENT CELL
   let ghost = true;
   let collisionChain: Array<any> = [];
+  let dirs: Dirs = {
+    KeyW: { style: `top: -25%;`, emoji: "⬆️", operation: -16 },
+    KeyA: { style: `left: -25%;`, emoji: "⬅️", operation: -1 },
+    KeyS: { style: `bottom: -25%;`, emoji: "⬇️", operation: 16 },
+    KeyD: { style: `right: -25%;`, emoji: "➡️", operation: 1 },
+  };
+  let dirKey = "KeyD";
 
   /* ## DATA ## */
   const _map = JSON.parse(JSON.stringify($map));
@@ -66,6 +85,7 @@
   function moveActiveCell(operation: number, _delete?: boolean) {
     if (_delete) delete items[ac];
     ac += operation;
+    adc = ac + dirs[dirKey].operation;
     // @ts-ignore
     r.style.setProperty(
       "--inverted",
@@ -75,6 +95,11 @@
 
   function handle(e: KeyboardEvent) {
     if (e.code == "Space") ghost = !ghost;
+    if (e.code.includes("Key")) {
+      dirKey = e.code;
+      adc = ac + dirs[dirKey].operation;
+      return;
+    }
     if (!e.code.includes("Arrow")) return;
     let operation = calcOperation(e.code, ac);
     if (operation == 0) return;
@@ -111,6 +136,9 @@
         case "bump":
         case undefined:
           return;
+        case "equip": // TODO: equip item
+        // could be in conditions rather than collisions
+        // each emoji should have it's own inventory
         default:
           // MERGE
           // @ts-ignore
@@ -139,7 +167,16 @@
   <p title="ghost mode {ghost ? 'on' : 'off'}">👻 {ghost ? "✔️" : "❌"}</p>
   <div class="map">
     {#each { length: 256 } as _, i}
-      <div style:background={$map.backgrounds[i]} class:active={ac == i}>
+      <div
+        style:background={$map.backgrounds[i]}
+        class:adc={adc == i}
+        class:active={ac == i}
+      >
+        {#if ac == i}
+          <div class="direction" style={dirs[dirKey].style}>
+            {dirs[dirKey].emoji}
+          </div>
+        {/if}
         {items[i]?.emoji || ""}
       </div>
     {/each}
@@ -162,5 +199,9 @@
 
   .active {
     outline: 2px solid var(--inverted);
+  }
+
+  .adc {
+    background-color: red;
   }
 </style>

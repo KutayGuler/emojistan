@@ -26,9 +26,9 @@
     if (color == "") return;
     // @ts-ignore
     if (color == defaultBackground) {
-      r.style.setProperty("--default-background", "antiquewhite");
-      r.style.setProperty("--inverted", "var(--danger)");
-      defaultBackground = "antiquewhite";
+      r.style.setProperty("--default-background", "#faebd7");
+      r.style.setProperty("--inverted", "#ff3e00");
+      defaultBackground = "#faebd7";
       return;
     }
 
@@ -40,14 +40,15 @@
   function removeColor(color: string) {
     colorPalette.removeColor(color);
     if (!$colorPalette.includes(defaultBackground)) {
-      r.style.setProperty("--default-background", "antiquewhite");
-      r.style.setProperty("--inverted", "var(--danger)");
-      defaultBackground = "antiquewhite";
+      r.style.setProperty("--default-background", "#faebd7");
+      r.style.setProperty("--inverted", "#ff3e00");
+      defaultBackground = "#faebd7";
     }
   }
 </script>
 
 <section class="noselect">
+  <h4>Collisions 💥</h4>
   <p>Objects will bump into each other by default</p>
   {#each Object.entries($events.collisions) as [id, rule], i}
     <Collision id={+id} {rule} />
@@ -55,7 +56,11 @@
   {#if !$hasEmptySlot || Object.keys($events.collisions).length == 0}
     <button on:click={() => events.addCollision("")}>Add Collision</button>
   {/if}
-  <p>Static items cannot be moved by players</p>
+  <h4>Conditions ❓</h4>
+  <button on:click={() => events.addCollision("")}>Add Condition</button>
+
+  <h4>Static Objects 🗿</h4>
+  <p>Static objects cannot be moved by players</p>
   <div
     class="statics noselect"
     on:click={() => staticItems.toggleEmoji($currentEmoji, "add")}
@@ -69,9 +74,9 @@
       <p>Select an emoji and click here to set it as a static item</p>
     {/each}
   </div>
-  <p>🎨</p>
+  <h4>Color Palette 🎨</h4>
   <input type="color" bind:value={color} />
-  <button on:click={() => colorPalette.addColor(color)}>Add to 🎨</button>
+  <button on:click={() => colorPalette.addColor(color)}>Add Color</button>
   <div class="palette">
     {#each $colorPalette as color}
       <div class="color-container">
@@ -132,6 +137,7 @@
   }
 
   .isDefault::after {
+    font-size: 2rem;
     content: "🌍";
     color: white;
     mix-blend-mode: difference;

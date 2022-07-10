@@ -9,7 +9,7 @@
 
   let filter = "";
 
-  let viewIndex = 2;
+  let viewIndex = 0;
 
   let views = [
     { component: Play, emoji: "🎬", title: "Play" },
@@ -91,6 +91,25 @@
 </main>
 
 <style>
+  :root {
+    font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-text-size-adjust: 100%;
+
+    --default-background: antiquewhite;
+    --primary: #f6fafd;
+    --secondary: #40b3ff;
+
+    --dark: #676778;
+    --danger: #ff3e00;
+
+    --inverted: var(--danger);
+    background-color: var(--primary);
+  }
+
   :global(html, body) {
     margin: 0;
     padding: 0;
@@ -115,7 +134,9 @@
     gap: var(--cell-gap);
     border: 5px solid black;
   }
+
   :global(.map > div) {
+    position: relative;
     display: flex;
     flex-direction: row;
     justify-content: center;
@@ -125,24 +146,9 @@
     background-color: var(--default-background);
   }
 
-  :root {
-    font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
-    font-synthesis: none;
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    -webkit-text-size-adjust: 100%;
-
-    --default-background: antiquewhite;
-    --primary: #f6fafd;
-    --secondary: #40b3ff;
-
-    --dark: #676778;
-    --danger: #ff3e00;
-
-    --inverted: var(--danger);
-
-    background-color: var(--primary);
+  :global(.map > div > .direction) {
+    position: absolute;
+    z-index: 100;
   }
 
   .cursor {
