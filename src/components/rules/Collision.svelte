@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { slide } from "svelte/transition";
-  import { events, currentEmoji, hasEmptySlot } from "../../store";
+  import { collisions, currentEmoji, hasEmptySlot } from "../../store";
 
   export let id: number;
   export let rule: string;
@@ -31,7 +31,7 @@
 
   function checkCollision(collision: string) {
     console.log(collision);
-    if (Object.values($events.collisions).includes(collision)) {
+    if (Object.values($collisions).includes(collision)) {
       [type, mergeSlot, slots] = [types[0], "", ["", ""]];
       $hasEmptySlot = true;
       error = "Can't have duplicate collisions";
@@ -40,8 +40,7 @@
     }
 
     $hasEmptySlot = false;
-    events.updateCollision(id, collision);
-    console.log($events.collisions);
+    collisions.updateCollision(id, collision);
   }
 
   function updateSlot(i: number) {
@@ -70,8 +69,11 @@
   }
 </script>
 
-<section class="noselect">
-  <button class="close" on:click={() => events.removeCollision(id)}>❌</button>
+<section class="noselect rule-card">
+  <button
+    class="rule-card-close"
+    on:click={() => collisions.removeCollision(id)}>❌</button
+  >
   <div class="slots">
     {#each { length: 3 } as _, i}
       {#if i == 2}
@@ -100,27 +102,6 @@
 </section>
 
 <style>
-  section {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: flex-start;
-    width: 25%;
-    height: 3vh;
-    padding: 5% 3%;
-    background-color: var(--dark);
-    border: 2px solid black;
-
-    color: white;
-  }
-
-  .close {
-    position: absolute;
-    top: -5px;
-    right: -5px;
-  }
-
   .slots {
     position: relative;
     display: flex;
@@ -129,6 +110,7 @@
     align-items: center;
     width: 100%;
     height: 100%;
+    gap: 5%;
   }
 
   .slots > :not(.slot) {

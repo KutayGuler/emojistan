@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Emoji } from "../store";
   import { onMount } from "svelte/internal";
-  import { editableMap as map, events, staticItems } from "../store";
+  import { editableMap as map, collisions, staticItems } from "../store";
   import { invertColor } from "../invertColor";
 
   let r: any;
@@ -57,13 +57,22 @@
   };
   let dirKey = "KeyD";
 
+  const mutations = {
+    setBackground: (index: number, color: string) => {
+      $map.backgrounds[index] = color;
+    },
+    spawnEmoji: (emoji: Emoji) => {
+      items[emoji.index] = emoji;
+    },
+  };
+
   /* ## DATA ## */
   const _map = JSON.parse(JSON.stringify($map));
   let items: Items = _map.items;
   let backgrounds = _map.backgrounds;
   let objective = _map.objective;
   let behaviors: Behaviors = {};
-  Object.values($events.collisions).forEach((rule) => {
+  Object.values($collisions).forEach((rule) => {
     let [key1, key2, val] = rule.split(",");
     if (behaviors[key1] == undefined) behaviors[key1] = {};
     behaviors[key1][key2] = val;
@@ -93,9 +102,11 @@
     );
   }
 
+  let wasd = ["KeyW", "KeyA", "KeyS", "KeyD"];
+
   function handle(e: KeyboardEvent) {
     if (e.code == "Space") ghost = !ghost;
-    if (e.code.includes("Key")) {
+    if (wasd.includes(e.code)) {
       dirKey = e.code;
       adc = ac + dirs[dirKey].operation;
       return;
@@ -163,6 +174,9 @@
 <svelte:window on:keydown={handle} />
 
 <section class="noselect">
+  <button on:click={() => mutations["spawnEmoji"]({ index: 0, emoji: "XD" })}
+    >TEST</button
+  >
   <p><strong>Objective: </strong>{objective}</p>
   <p title="ghost mode {ghost ? 'on' : 'off'}">👻 {ghost ? "✔️" : "❌"}</p>
   <div class="map">
@@ -202,6 +216,6 @@
   }
 
   .adc {
-    background-color: red;
+    outline: 1px dotted var(--inverted);
   }
 </style>

@@ -2,14 +2,16 @@
   // import autoAnimate from "@formkit/auto-animate";
   import { onMount } from "svelte/internal";
   import { invertColor } from "../invertColor";
-  import Collision from "../components/events/Collision.svelte";
+  import Collision from "../components/rules/Collision.svelte";
   import {
-    events,
+    collisions,
     colorPalette,
     hasEmptySlot,
     staticItems,
     currentEmoji,
   } from "../store";
+  import Condition from "../components/rules/Condition.svelte";
+  import Event from "../components/rules/Event.svelte";
 
   let color = "";
   let r: any, defaultBackground: string;
@@ -48,16 +50,23 @@
 </script>
 
 <section class="noselect">
-  <h4>Collisions 💥</h4>
+  <h4>Collisions 🤼</h4>
   <p>Objects will bump into each other by default</p>
-  {#each Object.entries($events.collisions) as [id, rule], i}
+  {#each Object.entries($collisions) as [id, rule], i}
     <Collision id={+id} {rule} />
   {/each}
-  {#if !$hasEmptySlot || Object.keys($events.collisions).length == 0}
-    <button on:click={() => events.addCollision("")}>Add Collision</button>
+  {#if !$hasEmptySlot || Object.keys($collisions).length == 0}
+    <button on:click={() => collisions.addCollision("")}>Add Collision</button>
   {/if}
+  <h4>Events 🧨</h4>
+  <Event />
+  <!-- TODO: events.addEvent -->
+  <!-- <button on:click={() => events.addCollision("")}>Add Event</button> -->
+
   <h4>Conditions ❓</h4>
-  <button on:click={() => events.addCollision("")}>Add Condition</button>
+  <Condition />
+  <!-- TODO: events.addCondition -->
+  <!-- <button on:click={() => events.addCollision("")}>Add Condition</button> -->
 
   <h4>Static Objects 🗿</h4>
   <p>Static objects cannot be moved by players</p>
@@ -86,7 +95,6 @@
           style="background-color: {color};"
           on:click={() => setDefaultBackground(color)}
         />
-
         <button class="remove-color" on:click={() => removeColor(color)}>
           ❌
         </button>
@@ -101,6 +109,8 @@
     flex-direction: column;
     gap: 1%;
     padding: 1%;
+    overflow-y: auto;
+    height: 94vh;
     box-sizing: border-box;
   }
 

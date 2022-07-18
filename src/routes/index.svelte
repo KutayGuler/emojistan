@@ -2,19 +2,18 @@
   // VIEWS
   import Play from "../views/Play.svelte";
   import Editor from "../views/Editor.svelte";
-  import Events from "../views/Events.svelte";
+  import Rules from "../views/Rules.svelte";
 
   import { emojis } from "../emojis";
   import { currentEmoji } from "../store";
 
   let filter = "";
-
-  let viewIndex = 0;
+  let viewIndex = 2;
 
   let views = [
     { component: Play, emoji: "🎬", title: "Play" },
     { component: Editor, emoji: "🏗️", title: "Editor" },
-    { component: Events, emoji: "📜", title: "Events" },
+    { component: Rules, emoji: "📜", title: "Rules" },
   ];
 
   let [x, y] = [0, 0];
@@ -25,11 +24,13 @@
   }
 
   function handleKeydown(e: KeyboardEvent) {
-    if (e.keyCode >= 49 && e.keyCode <= 51) {
-      viewIndex = e.keyCode % 49;
+    if (e.code.includes("Digit")) {
+      let replaced = +e.code.replace("Digit", "");
+      if (replaced > 3) return;
+      viewIndex = replaced - 1;
     }
 
-    if (e.keyCode == 27) {
+    if (e.code == "Escape") {
       $currentEmoji = "";
     }
   }
@@ -91,66 +92,6 @@
 </main>
 
 <style>
-  :root {
-    font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
-    font-synthesis: none;
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    -webkit-text-size-adjust: 100%;
-
-    --default-background: antiquewhite;
-    --primary: #f6fafd;
-    --secondary: #40b3ff;
-
-    --dark: #676778;
-    --danger: #ff3e00;
-
-    --inverted: var(--danger);
-    background-color: var(--primary);
-  }
-
-  :global(html, body) {
-    margin: 0;
-    padding: 0;
-  }
-
-  :global(.noselect) {
-    -webkit-touch-callout: none; /* iOS Safari */
-    -webkit-user-select: none; /* Safari */
-    -khtml-user-select: none; /* Konqueror HTML */
-    -moz-user-select: none; /* Old versions of Firefox */
-    -ms-user-select: none; /* Internet Explorer/Edge */
-    user-select: none;
-  }
-
-  :global(.map) {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-    width: 64vw;
-    height: 64vw;
-    gap: var(--cell-gap);
-    border: 5px solid black;
-  }
-
-  :global(.map > div) {
-    position: relative;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    width: var(--cell);
-    height: var(--cell);
-    background-color: var(--default-background);
-  }
-
-  :global(.map > div > .direction) {
-    position: absolute;
-    z-index: 100;
-  }
-
   .cursor {
     position: absolute;
     z-index: 99;

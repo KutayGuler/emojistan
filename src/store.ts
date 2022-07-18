@@ -1,42 +1,63 @@
 import { writable } from "svelte/store";
 
-interface Events {
-  collisions: {
-    [id: number]: string;
-  };
-  conditions: {
-    [id: number]: string;
-  };
+interface Collisions {
+  [id: number]: string;
 }
 
-function createEvents() {
-  const events: Events = { collisions: {}, conditions: {} };
-  const { subscribe, update, set } = writable(events);
+function createCollisions() {
+  const collisions: Collisions = {};
+  const { subscribe, update, set } = writable(collisions);
 
   // TODO: merging should be both ways
-  // TODO: Conditions
 
   return {
     set,
     subscribe,
     addCollision: (rule: string) =>
-      update((state: Events) => {
+      update((state: Collisions) => {
         let id = Date.now();
-        state.collisions[id] = rule;
+        state[id] = rule;
         return state;
       }),
     updateCollision: (id: number, rule: string) =>
-      update((state: Events) => {
-        state.collisions[id] = rule;
+      update((state: Collisions) => {
+        state[id] = rule;
         return state;
       }),
-
     removeCollision: (id: number) => {
-      update((state: Events) => {
-        console.log(state.collisions);
-        delete state.collisions[id];
-        console.log(state.collisions);
+      update((state: Collisions) => {
+        delete state[id];
+        return state;
+      });
+    },
+  };
+}
 
+interface Conditions {
+  [id: number]: string;
+}
+
+function createConditions() {
+  const conditions: Conditions = {};
+  const { subscribe, update, set } = writable(conditions);
+
+  return {
+    set,
+    subscribe,
+    addCondition: (rule: string) =>
+      update((state) => {
+        let id = Date.now();
+        state[id] = rule;
+        return state;
+      }),
+    updateCondition: (id: number, rule: string) =>
+      update((state) => {
+        state[id] = rule;
+        return state;
+      }),
+    removeCondition: (id: number) => {
+      update((state) => {
+        delete state[id];
         return state;
       });
     },
@@ -46,6 +67,11 @@ function createEvents() {
 export interface Emoji {
   index: number;
   emoji: string;
+  inventory?: Array<any>;
+}
+
+export interface Interactable extends Emoji {
+  interact: Function;
 }
 
 interface EditableMap {
@@ -68,6 +94,11 @@ function createEditableMap() {
     updateBackground: (index: number, color: string) =>
       update((state) => {
         state.backgrounds[index] = color;
+        return state;
+      }),
+    deleteBackground: (index: number) =>
+      update((state) => {
+        delete state.backgrounds[index];
         return state;
       }),
     addEmoji: (obj: Emoji) =>
@@ -127,7 +158,8 @@ function createColorPalette() {
 
 export const hasEmptySlot = writable(false);
 export const currentEmoji = writable("");
+export const editableMap = createEditableMap();
+export const collisions = createCollisions();
+export const conditions = createConditions();
 export const staticItems = createStaticItems();
 export const colorPalette = createColorPalette();
-export const events = createEvents();
-export const editableMap = createEditableMap();

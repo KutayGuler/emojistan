@@ -1,0 +1,86 @@
+:root {
+  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+
+  --default-background: antiquewhite;
+  --primary: #f6fafd;
+  --secondary: #40b3ff;
+
+  --dark: #676778;
+  --danger: #ff3e00;
+
+  --inverted: var(--danger);
+  background-color: var(--primary);
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+/* MAP */
+
+.map {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  width: 64vw;
+  height: 64vw;
+  gap: var(--cell-gap);
+  border: 5px solid black;
+}
+
+.map > div {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  width: var(--cell);
+  height: var(--cell);
+  background-color: var(--default-background);
+}
+
+.map > div > .direction {
+  position: absolute;
+  z-index: 100;
+}
+
+/* CARDS */
+
+.rule-card {
+  position: relative;
+  display: inline-block;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: fit-content;
+  height: fit-content;
+  padding: 5%;
+  background-color: var(--dark);
+  border: 2px solid black;
+  color: white;
+}
+
+.rule-card-close {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+}
+
+/* UTILS */
+
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Old versions of Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none;
+}

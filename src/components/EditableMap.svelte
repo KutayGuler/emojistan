@@ -10,6 +10,8 @@
     if (paintMode) {
       map.updateBackground(index, color);
       return;
+    } else if ($currentEmoji == "") {
+      map.deleteBackground(index);
     }
 
     if ($currentEmoji == "") {
