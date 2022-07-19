@@ -36,7 +36,7 @@
   }
 </script>
 
-<section class="noselect">
+<section class="noselect editable-map">
   <input type="text" placeholder="Objective" bind:value={$map.objective} />
   <p><input type="checkbox" bind:checked={showIndex} />🔢</p>
   <div class="palette">
@@ -69,13 +69,7 @@
 </section>
 
 <style>
-  :root {
-    --cell-size: 4vw;
-    --cell: 3.8vw;
-    --cell-gap: calc(var(--cell-size) - var(--cell));
-  }
-
-  section {
+  .editable-map {
     display: flex;
     flex-direction: column;
     justify-content: center;

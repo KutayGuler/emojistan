@@ -24,12 +24,6 @@
   }
 
   function handleKeydown(e: KeyboardEvent) {
-    if (e.code.includes("Digit")) {
-      let replaced = +e.code.replace("Digit", "");
-      if (replaced > 3) return;
-      viewIndex = replaced - 1;
-    }
-
     if (e.code == "Escape") {
       $currentEmoji = "";
     }

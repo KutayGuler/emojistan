@@ -2,12 +2,12 @@
   import EditableMap from "../components/EditableMap.svelte";
 </script>
 
-<section>
+<section class="editor">
   <EditableMap />
 </section>
 
 <style>
-  section {
+  .editor {
     display: flex;
     flex-direction: row;
     justify-content: center;

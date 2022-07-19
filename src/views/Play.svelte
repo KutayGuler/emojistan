@@ -2,10 +2,10 @@
   import PlayableMap from "../components/PlayableMap.svelte";
 </script>
 
-<section><PlayableMap /></section>
+<section class="playable-map"><PlayableMap /></section>
 
 <style>
-  section {
+  .playable-map {
     display: flex;
     flex-direction: row;
     justify-content: center;

@@ -5,6 +5,8 @@
   import Collision from "../components/rules/Collision.svelte";
   import {
     collisions,
+    events,
+    conditions,
     colorPalette,
     hasEmptySlot,
     staticItems,
@@ -15,6 +17,7 @@
 
   let color = "";
   let r: any, defaultBackground: string;
+  let eventIndex = 0;
 
   onMount(() => {
     r = document.querySelector(":root");
@@ -49,23 +52,36 @@
   }
 </script>
 
-<section class="noselect">
+<section class="noselect rules">
   <h4>Collisions 🤼</h4>
   <p>Objects will bump into each other by default</p>
-  {#each Object.entries($collisions) as [id, rule], i}
+  {#each Object.entries($collisions) as [id, rule]}
     <Collision id={+id} {rule} />
   {/each}
   {#if !$hasEmptySlot || Object.keys($collisions).length == 0}
     <button on:click={() => collisions.addCollision("")}>Add Collision</button>
   {/if}
   <h4>Events 🧨</h4>
-  <Event />
-  <!-- TODO: events.addEvent -->
-  <!-- <button on:click={() => events.addCollision("")}>Add Event</button> -->
+  {#each Object.entries($events) as [id, { name, queue }]}
+    <Event id={+id} {name} {queue} />
+  {/each}
+  <button
+    on:click={() =>
+      events.addEvent({
+        name: `Event${eventIndex++}`,
+        queue: [{ type: "setBackgroundOf", index: 0, background: "" }],
+      })}>Add Event</button
+  >
 
   <h4>Conditions ❓</h4>
-  <Condition />
+  {#each Object.entries($conditions) as [id, { a, b, eventID }]}
+    <Condition {eventID} />
+  {/each}
+  <button on:click={() => conditions.addCondition({ a: "", b: "", eventID: 0 })}
+    >Add Condition</button
+  >
   <!-- TODO: events.addCondition -->
+  <!-- component and parsed versions are different -->
   <!-- <button on:click={() => events.addCollision("")}>Add Condition</button> -->
 
   <h4>Static Objects 🗿</h4>
@@ -104,7 +120,7 @@
 </section>
 
 <style>
-  section {
+  .rules {
     display: flex;
     flex-direction: column;
     gap: 1%;

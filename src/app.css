@@ -6,6 +6,10 @@
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
 
+  --cell-size: 4vw;
+  --cell: 3.8vw;
+  --cell-gap: calc(var(--cell-size) - var(--cell));
+
   --default-background: antiquewhite;
   --primary: #f6fafd;
   --secondary: #40b3ff;
@@ -13,7 +17,7 @@
   --dark: #676778;
   --danger: #ff3e00;
 
-  --inverted: var(--danger);
+  --inverted: var(--dark);
   background-color: var(--primary);
 }
 
@@ -56,7 +60,7 @@ body {
 
 .rule-card {
   position: relative;
-  display: inline-block;
+  display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: flex-start;

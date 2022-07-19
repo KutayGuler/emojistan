@@ -1,16 +1,13 @@
 <script lang="ts">
-  import { editableMap as map, colorPalette } from "../../store";
+  import { colorPalette, events } from "../../store";
+  import type { Condition } from "../../store";
 
-  const props = ["self", ""];
+  const props = ["player", ""];
   const subprops = ["background", ""];
-  const triggers = [() => map.updateBackground(0, "#ff00ff")];
 
-  let trigger: Function;
-  let [propIndex, subPropIndex] = [0, 0];
   let prop: string, subprop: string;
   let value: any;
-
-  let colors = ["red", "green", "blue"];
+  export let eventID: number;
 </script>
 
 <section class="noselect rule-card">
@@ -36,9 +33,9 @@
   </div>
   <div class="then">
     <h4>then trigger</h4>
-    <select>
-      {#each triggers as t}
-        <option value={t.toString()} />
+    <select bind:value={eventID}>
+      {#each Object.entries($events) as [id, { name }]}
+        <option value={id}>{name}</option>
       {/each}
     </select>
   </div>

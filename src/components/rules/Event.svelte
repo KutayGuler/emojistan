@@ -1,30 +1,24 @@
 <script lang="ts">
-  import { colorPalette } from "../../store";
+  import { colorPalette, events } from "../../store";
+  import type { QueueItem } from "../../store";
 
-  export let name = "Event0";
-  let types = ["setBackgroundOf", "setBackgroundOfPlayer", "spawn", "wait"];
+  export let id: number;
+  export let name: string;
+  export let queue: Array<QueueItem> = [];
+
+  let types = [
+    "setPlayerTo",
+    "setBackgroundOf",
+    "setBackgroundOfPlayerTo",
+    "spawn",
+    "waitFor",
+  ];
 
   let type = types[0];
   let duration = 0;
   let index = 0;
   let background = "";
   let emoji = "";
-
-  interface QueueItem {
-    type: string;
-    background?: string;
-    index?: number;
-    duration?: number;
-    emoji?: string;
-  }
-
-  let queue: Array<QueueItem> = [];
-
-  // TODO: Create a function from queue on each change
-  // can use onBeforeUpdate
-  function createEvent() {
-    let fn = () => {};
-  }
 
   function addToQueue() {
     let newItem: QueueItem = { type };
@@ -33,51 +27,72 @@
       case "setBackgroundOfPlayer":
         Object.assign(newItem, { index, background });
         break;
-      case "emoji":
+      case "setPlayer":
+        break;
+      case "spawn":
         Object.assign(newItem, { index, emoji });
         break;
-      case "wait":
+      case "waitFor":
         Object.assign(newItem, { duration });
         break;
     }
     queue = [...queue, newItem];
-    createEvent();
+    events.updateEvent(id, name, queue);
     [type, duration, index, background] = [types[0], 0, 0, ""];
   }
 
   function removeFromQueue(i: number) {
     queue.splice(i, 1);
     queue = queue;
+    if (queue.length == 0) events.removeEvent(id);
   }
+
+  const update = () => events.updateEvent(id, name, queue);
+
+  function setChildrenInputEvent(node: any) {
+    for (let child of node.children) {
+      if (child.id == "remove") continue;
+      child.addEventListener("input", update);
+    }
+  }
+  // TODO: Fix styles not being applied
 </script>
 
 <section style="noselect rule-card">
-  <strong>{name}</strong>
-  <button class="rule-card-close" on:click={() => {}}>❌</button>
+  <input type="text" bind:value={name} on:input={update} />
+  <button class="rule-card-close" on:click={() => events.removeEvent(id)}
+    >❌</button
+  >
   {#each queue as q, i}
-    <div>
+    <div use:setChildrenInputEvent>
       <select bind:value={q.type}>
         {#each types as t}
           <option value={t}>{t}</option>
         {/each}
       </select>
-      {#if q.type == "setBackgroundOf"}
-        <input type="number" bind:value={q.index} min={0} max={256} /> to
+      {#if q.type == "setPlayerTo"}
+        <input type="text" bind:value={q.emoji} />
+        <!-- TODO: Emoji cell -->
+      {:else if q.type == "spawn"}
+        <!-- TODO: add index of spawn point -->
+      {:else if q.type == "waitFor"}
+        <input type="number" bind:value={q.duration} max={10000} /> ms
+      {:else if q.type == "setBackgroundOf"}
+        <input type="number" bind:value={q.index} min={0} max={256} />
+        to
         <select bind:value={q.background} style:background={q.background}>
           {#each $colorPalette as color}
             <option value={color} style:background={color} />
           {/each}
         </select>
-      {:else if q.type == "setBackgroundOfPlayer"}
-        to <select bind:value={q.background} style:background={q.background}>
+      {:else if q.type == "setBackgroundOfPlayerTo"}
+        <select bind:value={q.background} style:background={q.background}>
           {#each $colorPalette as color}
             <option value={color} style:background={color} />
           {/each}
         </select>
-      {:else if q.type == "wait"}
-        <input type="number" bind:value={q.duration} max={10000} /> ms
       {/if}
-      <button on:click={() => removeFromQueue(i)}>❌</button>
+      <button id="remove" on:click={() => removeFromQueue(i)}>❌</button>
     </div>
   {/each}
   <select bind:value={type}>
@@ -85,15 +100,5 @@
       <option value={t}>{t}</option>
     {/each}
   </select>
-  {#if type == "setBackgroundOf"}
-    <input type="number" bind:value={index} min={0} max={256} /> to
-    <select bind:value={background} style:background>
-      {#each $colorPalette as color}
-        <option value={color} style:background={color} />
-      {/each}
-    </select>
-  {:else if type == "wait"}
-    <input type="number" bind:value={duration} max={10000} /> ms
-  {/if}
   <button on:click={addToQueue}>➕</button>
 </section>

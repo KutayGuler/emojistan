@@ -9,9 +9,7 @@
 
   onMount(() => {
     r = document.querySelector(":root");
-    console.log(r.style);
     defaultBackground = r.style.getPropertyValue("--default-background");
-    console.log(defaultBackground);
     if (defaultBackground == "") defaultBackground = "#faebd7";
   });
 
@@ -43,6 +41,8 @@
       operation: number;
     };
   }
+
+  // TODO: Create event functions here
 
   /* ## STATE ## */
   let ac = 0; // ACTIVE CELL
@@ -100,6 +100,7 @@
       "--inverted",
       invertColor(backgrounds[ac] || defaultBackground)
     );
+    // TODO: Check conditions here and execute events based on that
   }
 
   let wasd = ["KeyW", "KeyA", "KeyS", "KeyD"];
@@ -198,12 +199,6 @@
 </section>
 
 <style>
-  :root {
-    --cell-size: 4vw;
-    --cell: 3.8vw;
-    --cell-gap: calc(var(--cell-size) - var(--cell));
-  }
-
   section {
     display: flex;
     flex-direction: column;

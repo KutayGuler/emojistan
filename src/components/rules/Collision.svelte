@@ -30,7 +30,6 @@
   });
 
   function checkCollision(collision: string) {
-    console.log(collision);
     if (Object.values($collisions).includes(collision)) {
       [type, mergeSlot, slots] = [types[0], "", ["", ""]];
       $hasEmptySlot = true;

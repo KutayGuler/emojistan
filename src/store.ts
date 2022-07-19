@@ -6,12 +6,11 @@ interface Collisions {
 
 function createCollisions() {
   const collisions: Collisions = {};
-  const { subscribe, update, set } = writable(collisions);
+  const { subscribe, update } = writable(collisions);
 
   // TODO: merging should be both ways
 
   return {
-    set,
     subscribe,
     addCollision: (rule: string) =>
       update((state: Collisions) => {
@@ -33,34 +32,71 @@ function createCollisions() {
   };
 }
 
+export interface QueueItem {
+  type: string;
+  background?: string;
+  index?: number;
+  duration?: number;
+  emoji?: string;
+}
+
+export interface Event {
+  name: string;
+  queue: Array<QueueItem>;
+}
+
+export interface Events {
+  [id: number]: Event;
+}
+
+function createEvents() {
+  const events: Events = {};
+  const { subscribe, update } = writable(events);
+
+  return {
+    subscribe,
+    addEvent: (event: Event) =>
+      update((state) => {
+        let id = Date.now();
+        state[id] = event;
+        return state;
+      }),
+    updateEvent: (id: number, name: string, queue: Array<QueueItem>) =>
+      update((state) => {
+        state[id].queue = queue;
+        state[id].name = name;
+        return state;
+      }),
+    removeEvent: (id: number) =>
+      update((state) => {
+        delete state[id];
+        return state;
+      }),
+  };
+}
+
+export interface Condition {
+  a: string;
+  b: string;
+  eventID: number;
+}
+
 interface Conditions {
-  [id: number]: string;
+  [id: number]: Condition;
 }
 
 function createConditions() {
   const conditions: Conditions = {};
-  const { subscribe, update, set } = writable(conditions);
+  const { subscribe, update } = writable(conditions);
 
   return {
-    set,
     subscribe,
-    addCondition: (rule: string) =>
+    addCondition: (condition: Condition) =>
       update((state) => {
         let id = Date.now();
-        state[id] = rule;
+        state[id] = condition;
         return state;
       }),
-    updateCondition: (id: number, rule: string) =>
-      update((state) => {
-        state[id] = rule;
-        return state;
-      }),
-    removeCondition: (id: number) => {
-      update((state) => {
-        delete state[id];
-        return state;
-      });
-    },
   };
 }
 
@@ -86,10 +122,9 @@ interface EditableMap {
 
 function createEditableMap() {
   const map: EditableMap = { items: {}, backgrounds: {}, objective: "" };
-  const { subscribe, update, set } = writable(map);
+  const { subscribe, update } = writable(map);
 
   return {
-    set,
     subscribe,
     updateBackground: (index: number, color: string) =>
       update((state) => {
@@ -160,6 +195,7 @@ export const hasEmptySlot = writable(false);
 export const currentEmoji = writable("");
 export const editableMap = createEditableMap();
 export const collisions = createCollisions();
+export const events = createEvents();
 export const conditions = createConditions();
 export const staticItems = createStaticItems();
 export const colorPalette = createColorPalette();
