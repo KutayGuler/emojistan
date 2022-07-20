@@ -6,10 +6,10 @@
   export let name: string;
   export let queue: Array<QueueItem> = [];
 
-  let types = [
+  const types = [
     "setPlayerTo",
+    "setPlayerBackgroundTo",
     "setBackgroundOf",
-    "setBackgroundOfPlayerTo",
     "spawn",
     "waitFor",
   ];
@@ -24,7 +24,7 @@
     let newItem: QueueItem = { type };
     switch (type) {
       case "setBackgroundOf":
-      case "setBackgroundOfPlayer":
+      case "setPlayerBackground":
         Object.assign(newItem, { index, background });
         break;
       case "setPlayer":
@@ -37,7 +37,7 @@
         break;
     }
     queue = [...queue, newItem];
-    events.updateEvent(id, name, queue);
+    events.updateEvent(id, { name, queue });
     [type, duration, index, background] = [types[0], 0, 0, ""];
   }
 
@@ -47,11 +47,14 @@
     if (queue.length == 0) events.removeEvent(id);
   }
 
-  const update = () => events.updateEvent(id, name, queue);
+  const update = () => events.updateEvent(id, { name, queue });
 
   function setChildrenInputEvent(node: any) {
     for (let child of node.children) {
-      if (child.id == "remove") continue;
+      if (child.id == "remove") {
+        child.addEventListener("click", update);
+        continue;
+      }
       child.addEventListener("input", update);
     }
   }
@@ -85,7 +88,7 @@
             <option value={color} style:background={color} />
           {/each}
         </select>
-      {:else if q.type == "setBackgroundOfPlayerTo"}
+      {:else if q.type == "setPlayerBackgroundTo"}
         <select bind:value={q.background} style:background={q.background}>
           {#each $colorPalette as color}
             <option value={color} style:background={color} />

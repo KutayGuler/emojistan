@@ -1,7 +1,13 @@
 <script lang="ts">
-  import type { Emoji } from "../store";
+  import type { Emoji, Condition } from "../store";
   import { onMount } from "svelte/internal";
-  import { editableMap as map, collisions, staticItems } from "../store";
+  import {
+    editableMap as map,
+    collisions,
+    conditions,
+    events,
+    staticItems,
+  } from "../store";
   import { invertColor } from "../invertColor";
 
   let r: any;
@@ -42,8 +48,6 @@
     };
   }
 
-  // TODO: Create event functions here
-
   /* ## STATE ## */
   let ac = 0; // ACTIVE CELL
   let adc = 1; // ADJACENT CELL
@@ -57,17 +61,9 @@
   };
   let dirKey = "KeyD";
 
-  const mutations = {
-    setBackground: (index: number, color: string) => {
-      $map.backgrounds[index] = color;
-    },
-    spawnEmoji: (emoji: Emoji) => {
-      items[emoji.index] = emoji;
-    },
-  };
-
   /* ## DATA ## */
-  const _map = JSON.parse(JSON.stringify($map));
+  let _events = JSON.parse(JSON.stringify($events));
+  let _map = JSON.parse(JSON.stringify($map));
   let items: Items = _map.items;
   let backgrounds = _map.backgrounds;
   let objective = _map.objective;
@@ -76,6 +72,52 @@
     let [key1, key2, val] = rule.split(",");
     if (behaviors[key1] == undefined) behaviors[key1] = {};
     behaviors[key1][key2] = val;
+  });
+
+  const mutations = {
+    // @ts-ignore
+    setBackgroundOf: ({ index, background }) => {
+      _map.backgrounds[index] = background;
+    },
+    spawn: (emoji: Emoji) => {
+      items[emoji.index] = emoji;
+    },
+  };
+
+  interface _Conditions {
+    [id: number]: any;
+  }
+
+  let _conditions: _Conditions = {};
+
+  Object.entries($conditions).forEach(([id, condition]) => {
+    let a: any;
+    let b: any = condition.b;
+    switch (condition.a) {
+      case "playerBackground":
+        a = () => _map.backgrounds[ac];
+        break;
+    }
+
+    let eventQueue: Array<Function> = [];
+
+    // @ts-ignore
+    _events[condition.eventID].queue.forEach(({ type, ...args }) => {
+      // @ts-ignore
+      console.log(args);
+      // @ts-ignore
+      eventQueue.push(() => mutations[type](args));
+    });
+
+    console.log(eventQueue);
+
+    _conditions[+id] = {};
+    _conditions[+id].condition = () => a() == b;
+    _conditions[+id].event = () => {
+      for (let event of eventQueue) {
+        event();
+      }
+    };
   });
 
   function getCollisionType(key1: string, key2: string): string | undefined {
@@ -100,7 +142,9 @@
       "--inverted",
       invertColor(backgrounds[ac] || defaultBackground)
     );
-    // TODO: Check conditions here and execute events based on that
+    Object.values(_conditions).forEach((c) => {
+      if (c.condition()) c.event();
+    });
   }
 
   let wasd = ["KeyW", "KeyA", "KeyS", "KeyD"];
@@ -175,15 +219,12 @@
 <svelte:window on:keydown={handle} />
 
 <section class="noselect">
-  <button on:click={() => mutations["spawnEmoji"]({ index: 0, emoji: "XD" })}
-    >TEST</button
-  >
   <p><strong>Objective: </strong>{objective}</p>
   <p title="ghost mode {ghost ? 'on' : 'off'}">👻 {ghost ? "✔️" : "❌"}</p>
   <div class="map">
     {#each { length: 256 } as _, i}
       <div
-        style:background={$map.backgrounds[i]}
+        style:background={_map.backgrounds[i]}
         class:adc={adc == i}
         class:active={ac == i}
       >

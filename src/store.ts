@@ -61,10 +61,9 @@ function createEvents() {
         state[id] = event;
         return state;
       }),
-    updateEvent: (id: number, name: string, queue: Array<QueueItem>) =>
+    updateEvent: (id: number, event: Event) =>
       update((state) => {
-        state[id].queue = queue;
-        state[id].name = name;
+        state[id] = event;
         return state;
       }),
     removeEvent: (id: number) =>
@@ -95,6 +94,18 @@ function createConditions() {
       update((state) => {
         let id = Date.now();
         state[id] = condition;
+        return state;
+      }),
+    updateCondition: (id: number, condition: Condition) =>
+      update((state) => {
+        console.log("updated condition");
+        console.log(condition);
+        state[id] = condition;
+        return state;
+      }),
+    removeCondition: (id: number) =>
+      update((state) => {
+        delete state[id];
         return state;
       }),
   };

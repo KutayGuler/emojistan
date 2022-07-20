@@ -72,10 +72,9 @@
         queue: [{ type: "setBackgroundOf", index: 0, background: "" }],
       })}>Add Event</button
   >
-
   <h4>Conditions ❓</h4>
   {#each Object.entries($conditions) as [id, { a, b, eventID }]}
-    <Condition {eventID} />
+    <Condition id={+id} {a} {b} {eventID} />
   {/each}
   <button on:click={() => conditions.addCondition({ a: "", b: "", eventID: 0 })}
     >Add Condition</button

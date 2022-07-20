@@ -1,37 +1,43 @@
 <script lang="ts">
-  import { colorPalette, events } from "../../store";
+  import { colorPalette, events, conditions } from "../../store";
   import type { Condition } from "../../store";
 
-  const props = ["player", ""];
-  const subprops = ["background", ""];
+  const props = ["playerBackground"];
 
-  let prop: string, subprop: string;
-  let value: any;
+  export let id: number;
+  export let a: string;
+  export let b: string;
   export let eventID: number;
+
+  const update = () => conditions.updateCondition(id, { a, b, eventID });
+
+  function setChildrenInputEvent(node: any) {
+    for (let child of node.children) {
+      child.addEventListener("change", update);
+    }
+  }
 </script>
 
 <section class="noselect rule-card">
-  <button class="rule-card-close" on:click={() => {}}>❌</button>
-  <div class="if">
+  <button
+    class="rule-card-close"
+    on:click={() => conditions.removeCondition(id)}>❌</button
+  >
+  <div class="if" use:setChildrenInputEvent>
     <h4>if</h4>
-    <select bind:value={prop} on:change={() => {}}>
+    <select bind:value={a}>
       {#each props as _prop}
         <option value={_prop}>{_prop}</option>
       {/each}
     </select>
-    <select bind:value={subprop}>
-      {#each subprops as sub}
-        <option value={sub}>{sub}</option>
-      {/each}
-    </select>
     <h4>is</h4>
-    <select bind:value style:background={value}>
+    <select bind:value={b} style:background={b}>
       {#each $colorPalette as color}
         <option value={color} style:background={color} />
       {/each}
     </select>
   </div>
-  <div class="then">
+  <div class="then" use:setChildrenInputEvent>
     <h4>then trigger</h4>
     <select bind:value={eventID}>
       {#each Object.entries($events) as [id, { name }]}
