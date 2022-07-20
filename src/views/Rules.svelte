@@ -63,6 +63,7 @@
   {/if}
   <h4>Events 🧨</h4>
   {#each Object.entries($events) as [id, { name, queue }]}
+    <p>Event</p>
     <Event id={+id} {name} {queue} />
   {/each}
   <button

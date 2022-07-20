@@ -69,6 +69,8 @@ function createEvents() {
     removeEvent: (id: number) =>
       update((state) => {
         delete state[id];
+        // TODO: Fix not removing
+        console.log(state);
         return state;
       }),
   };

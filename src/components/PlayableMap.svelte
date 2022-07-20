@@ -62,11 +62,9 @@
   let dirKey = "KeyD";
 
   /* ## DATA ## */
-  let _events = JSON.parse(JSON.stringify($events));
-  let _map = JSON.parse(JSON.stringify($map));
+  let _events = structuredClone($events);
+  let _map = structuredClone($map);
   let items: Items = _map.items;
-  let backgrounds = _map.backgrounds;
-  let objective = _map.objective;
   let behaviors: Behaviors = {};
   Object.values($collisions).forEach((rule) => {
     let [key1, key2, val] = rule.split(",");
@@ -79,8 +77,8 @@
     setBackgroundOf: ({ index, background }) => {
       _map.backgrounds[index] = background;
     },
-    spawn: (emoji: Emoji) => {
-      items[emoji.index] = emoji;
+    spawn: ({ index, emoji }: Emoji) => {
+      items[index] = { index, emoji };
     },
   };
 
@@ -140,7 +138,7 @@
     // @ts-ignore
     r.style.setProperty(
       "--inverted",
-      invertColor(backgrounds[ac] || defaultBackground)
+      invertColor(_map.backgrounds[ac] || defaultBackground)
     );
     Object.values(_conditions).forEach((c) => {
       if (c.condition()) c.event();
@@ -219,7 +217,7 @@
 <svelte:window on:keydown={handle} />
 
 <section class="noselect">
-  <p><strong>Objective: </strong>{objective}</p>
+  <p><strong>Objective: </strong>{_map.objective}</p>
   <p title="ghost mode {ghost ? 'on' : 'off'}">👻 {ghost ? "✔️" : "❌"}</p>
   <div class="map">
     {#each { length: 256 } as _, i}

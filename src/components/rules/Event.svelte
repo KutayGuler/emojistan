@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { colorPalette, events } from "../../store";
+  import { colorPalette, events, currentEmoji } from "../../store";
   import type { QueueItem } from "../../store";
 
   export let id: number;
@@ -7,8 +7,8 @@
   export let queue: Array<QueueItem> = [];
 
   const types = [
-    "setPlayerTo",
-    "setPlayerBackgroundTo",
+    "setPlayer",
+    "setPlayerBackground",
     "setBackgroundOf",
     "spawn",
     "waitFor",
@@ -28,7 +28,6 @@
         Object.assign(newItem, { index, background });
         break;
       case "setPlayer":
-        break;
       case "spawn":
         Object.assign(newItem, { index, emoji });
         break;
@@ -47,22 +46,26 @@
     if (queue.length == 0) events.removeEvent(id);
   }
 
-  const update = () => events.updateEvent(id, { name, queue });
+  const updateEvent = () => events.updateEvent(id, { name, queue });
 
   function setChildrenInputEvent(node: any) {
     for (let child of node.children) {
       if (child.id == "remove") {
-        child.addEventListener("click", update);
-        continue;
+        child.addEventListener("click", updateEvent);
+      } else {
+        child.addEventListener("input", updateEvent);
       }
-      child.addEventListener("input", update);
     }
+  }
+
+  function updateSlot(i: number) {
+    queue[i].emoji = $currentEmoji;
   }
   // TODO: Fix styles not being applied
 </script>
 
 <section style="noselect rule-card">
-  <input type="text" bind:value={name} on:input={update} />
+  <input type="text" bind:value={name} on:input={updateEvent} />
   <button class="rule-card-close" on:click={() => events.removeEvent(id)}
     >❌</button
   >
@@ -73,11 +76,12 @@
           <option value={t}>{t}</option>
         {/each}
       </select>
-      {#if q.type == "setPlayerTo"}
-        <input type="text" bind:value={q.emoji} />
-        <!-- TODO: Emoji cell -->
+      {#if q.type == "setPlayer"}
+        <div class="slot" on:click={() => updateSlot(i)}>{q.emoji || ""}</div>
       {:else if q.type == "spawn"}
-        <!-- TODO: add index of spawn point -->
+        <div class="slot" on:click={() => updateSlot(i)}>{q.emoji || ""}</div>
+        at
+        <input type="number" bind:value={q.index} min={0} max={256} />
       {:else if q.type == "waitFor"}
         <input type="number" bind:value={q.duration} max={10000} /> ms
       {:else if q.type == "setBackgroundOf"}
@@ -88,12 +92,16 @@
             <option value={color} style:background={color} />
           {/each}
         </select>
-      {:else if q.type == "setPlayerBackgroundTo"}
-        <select bind:value={q.background} style:background={q.background}>
-          {#each $colorPalette as color}
-            <option value={color} style:background={color} />
-          {/each}
-        </select>
+      {:else if q.type == "setPlayerBackground"}
+        {#if $colorPalette.length == 0}
+          <p>Color palette is empty</p>
+        {:else}
+          <select bind:value={q.background} style:background={q.background}>
+            {#each $colorPalette as color}
+              <option value={color} style:background={color} />
+            {/each}
+          </select>
+        {/if}
       {/if}
       <button id="remove" on:click={() => removeFromQueue(i)}>❌</button>
     </div>
@@ -105,3 +113,14 @@
   </select>
   <button on:click={addToQueue}>➕</button>
 </section>
+
+<style>
+  .slot {
+    display: inline-block;
+    aspect-ratio: 1;
+    width: 2.5vw;
+    height: 2.5vw;
+    background-color: var(--primary);
+    border: 2px solid black;
+  }
+</style>
