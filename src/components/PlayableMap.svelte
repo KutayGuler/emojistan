@@ -54,17 +54,18 @@
   let ghost = true;
   let collisionChain: Array<any> = [];
   let dirs: Dirs = {
-    KeyW: { style: `top: -25%;`, emoji: "⬆️", operation: -16 },
-    KeyA: { style: `left: -25%;`, emoji: "⬅️", operation: -1 },
-    KeyS: { style: `bottom: -25%;`, emoji: "⬇️", operation: 16 },
-    KeyD: { style: `right: -25%;`, emoji: "➡️", operation: 1 },
+    KeyW: { style: `top: -30%;`, emoji: "⬆️", operation: -16 },
+    KeyA: { style: `left: -30%;`, emoji: "⬅️", operation: -1 },
+    KeyS: { style: `bottom: -30%;`, emoji: "⬇️", operation: 16 },
+    KeyD: { style: `right: -30%;`, emoji: "➡️", operation: 1 },
   };
   let dirKey = "KeyD";
 
   /* ## DATA ## */
   let _events = structuredClone($events);
   let _map = structuredClone($map);
-  let items: Items = _map.items;
+  let items: Items = structuredClone(_map.items);
+  let backgrounds = structuredClone(_map.backgrounds);
   let behaviors: Behaviors = {};
   Object.values($collisions).forEach((rule) => {
     let [key1, key2, val] = rule.split(",");
@@ -73,12 +74,27 @@
   });
 
   const mutations = {
+    setPlayer: ({ index, emoji }: Emoji) => {
+      if (items[ac]) {
+        items[ac].emoji = emoji;
+      } else {
+        items[ac] = { index: ac, emoji };
+      }
+    },
     // @ts-ignore
     setBackgroundOf: ({ index, background }) => {
-      _map.backgrounds[index] = background;
+      backgrounds[index] = background;
     },
     spawn: ({ index, emoji }: Emoji) => {
       items[index] = { index, emoji };
+    },
+    // @ts-ignore
+    wait: async ({ duration }) => {
+      setTimeout(() => {}, duration);
+    },
+    reset: () => {
+      backgrounds = structuredClone(_map.backgrounds);
+      items = structuredClone(_map.items);
     },
   };
 
@@ -93,7 +109,7 @@
     let b: any = condition.b;
     switch (condition.a) {
       case "playerBackground":
-        a = () => _map.backgrounds[ac];
+        a = () => backgrounds[ac];
         break;
     }
 
@@ -103,11 +119,22 @@
     _events[condition.eventID].queue.forEach(({ type, ...args }) => {
       // @ts-ignore
       console.log(args);
-      // @ts-ignore
-      eventQueue.push(() => mutations[type](args));
+      if (type == "wait") {
+        // @ts-ignore
+        eventQueue.push(async () => await mutations[type](args));
+      } else {
+        // @ts-ignore
+        eventQueue.push(() => mutations[type](args));
+      }
     });
 
     console.log(eventQueue);
+
+    if (condition.once) {
+      eventQueue.push(() => (eventQueue = []));
+    }
+
+    // TODO: might use generators
 
     _conditions[+id] = {};
     _conditions[+id].condition = () => a() == b;
@@ -138,7 +165,7 @@
     // @ts-ignore
     r.style.setProperty(
       "--inverted",
-      invertColor(_map.backgrounds[ac] || defaultBackground)
+      invertColor(backgrounds[ac] || defaultBackground)
     );
     Object.values(_conditions).forEach((c) => {
       if (c.condition()) c.event();
@@ -222,7 +249,7 @@
   <div class="map">
     {#each { length: 256 } as _, i}
       <div
-        style:background={_map.backgrounds[i]}
+        style:background={backgrounds[i]}
         class:adc={adc == i}
         class:active={ac == i}
       >

@@ -80,6 +80,7 @@ export interface Condition {
   a: string;
   b: string;
   eventID: number;
+  once: boolean;
 }
 
 interface Conditions {

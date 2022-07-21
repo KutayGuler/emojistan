@@ -1,6 +1,5 @@
 <script lang="ts">
   import { colorPalette, events, conditions } from "../../store";
-  import type { Condition } from "../../store";
 
   const props = ["playerBackground"];
 
@@ -8,8 +7,9 @@
   export let a: string;
   export let b: string;
   export let eventID: number;
+  export let once: boolean;
 
-  const update = () => conditions.updateCondition(id, { a, b, eventID });
+  const update = () => conditions.updateCondition(id, { a, b, eventID, once });
 
   function setChildrenInputEvent(node: any) {
     for (let child of node.children) {
@@ -45,6 +45,13 @@
       {/each}
     </select>
   </div>
+  <p>
+    Trigger once <input
+      type="checkbox"
+      bind:checked={once}
+      on:change={update}
+    />
+  </p>
 </section>
 
 <style>

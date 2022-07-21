@@ -74,10 +74,12 @@
       })}>Add Event</button
   >
   <h4>Conditions ❓</h4>
-  {#each Object.entries($conditions) as [id, { a, b, eventID }]}
-    <Condition id={+id} {a} {b} {eventID} />
+  {#each Object.entries($conditions) as [id, { a, b, eventID, once }]}
+    <Condition id={+id} {a} {b} {eventID} {once} />
   {/each}
-  <button on:click={() => conditions.addCondition({ a: "", b: "", eventID: 0 })}
+  <button
+    on:click={() =>
+      conditions.addCondition({ a: "", b: "", eventID: 0, once: false })}
     >Add Condition</button
   >
   <!-- TODO: events.addCondition -->

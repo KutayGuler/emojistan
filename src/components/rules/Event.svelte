@@ -6,13 +6,7 @@
   export let name: string;
   export let queue: Array<QueueItem> = [];
 
-  const types = [
-    "setPlayer",
-    "setPlayerBackground",
-    "setBackgroundOf",
-    "spawn",
-    "waitFor",
-  ];
+  const types = ["setBackgroundOf", "spawn", "wait", "reset"];
 
   let type = types[0];
   let duration = 0;
@@ -24,18 +18,20 @@
     let newItem: QueueItem = { type };
     switch (type) {
       case "setBackgroundOf":
-      case "setPlayerBackground":
         Object.assign(newItem, { index, background });
         break;
-      case "setPlayer":
       case "spawn":
         Object.assign(newItem, { index, emoji });
         break;
-      case "waitFor":
+      case "wait":
         Object.assign(newItem, { duration });
         break;
+      case "reset":
+        Object.assign(newItem);
+        break;
     }
-    queue = [...queue, newItem];
+    console.log(newItem);
+    queue = [...queue, structuredClone(newItem)];
     events.updateEvent(id, { name, queue });
     [type, duration, index, background] = [types[0], 0, 0, ""];
   }
@@ -46,7 +42,11 @@
     if (queue.length == 0) events.removeEvent(id);
   }
 
-  const updateEvent = () => events.updateEvent(id, { name, queue });
+  function updateEvent() {
+    console.log(arguments);
+    // TODO: remove unnecessary object props
+    events.updateEvent(id, { name, queue });
+  }
 
   function setChildrenInputEvent(node: any) {
     for (let child of node.children) {
@@ -76,13 +76,11 @@
           <option value={t}>{t}</option>
         {/each}
       </select>
-      {#if q.type == "setPlayer"}
-        <div class="slot" on:click={() => updateSlot(i)}>{q.emoji || ""}</div>
-      {:else if q.type == "spawn"}
+      {#if q.type == "spawn"}
         <div class="slot" on:click={() => updateSlot(i)}>{q.emoji || ""}</div>
         at
         <input type="number" bind:value={q.index} min={0} max={256} />
-      {:else if q.type == "waitFor"}
+      {:else if q.type == "wait"}
         <input type="number" bind:value={q.duration} max={10000} /> ms
       {:else if q.type == "setBackgroundOf"}
         <input type="number" bind:value={q.index} min={0} max={256} />
@@ -92,16 +90,6 @@
             <option value={color} style:background={color} />
           {/each}
         </select>
-      {:else if q.type == "setPlayerBackground"}
-        {#if $colorPalette.length == 0}
-          <p>Color palette is empty</p>
-        {:else}
-          <select bind:value={q.background} style:background={q.background}>
-            {#each $colorPalette as color}
-              <option value={color} style:background={color} />
-            {/each}
-          </select>
-        {/if}
       {/if}
       <button id="remove" on:click={() => removeFromQueue(i)}>❌</button>
     </div>
