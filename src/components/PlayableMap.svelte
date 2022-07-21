@@ -90,7 +90,12 @@
     },
     // @ts-ignore
     wait: async ({ duration }) => {
-      setTimeout(() => {}, duration);
+      return new Promise((resolve: any) => {
+        setTimeout(() => {
+          console.log("resolved");
+          resolve();
+        }, duration);
+      });
     },
     reset: () => {
       backgrounds = structuredClone(_map.backgrounds);
@@ -134,14 +139,17 @@
       eventQueue.push(() => (eventQueue = []));
     }
 
-    // TODO: might use generators
+    async function execute(i: number) {
+      await eventQueue[i]();
+      if (i + 1 == eventQueue.length) return;
+      execute(i + 1);
+    }
 
     _conditions[+id] = {};
     _conditions[+id].condition = () => a() == b;
     _conditions[+id].event = () => {
-      for (let event of eventQueue) {
-        event();
-      }
+      if (eventQueue.length == 0) return;
+      execute(0);
     };
   });
 
