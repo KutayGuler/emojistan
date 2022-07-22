@@ -10,6 +10,11 @@
   --cell: 3.8vw;
   --cell-gap: calc(var(--cell-size) - var(--cell));
 
+  /* COLOR PALETTE */
+  --collision: #f03a17;
+  --condition: #644292;
+  --event: #ffc83d;
+
   --default-background: antiquewhite;
   --primary: #f6fafd;
   --secondary: #40b3ff;
@@ -64,18 +69,16 @@ body {
   flex-direction: column;
   align-items: flex-start;
   justify-content: flex-start;
-  width: fit-content;
-  height: fit-content;
   padding: 5%;
-  background-color: var(--dark);
-  border: 2px solid black;
-  color: white;
+  border-radius: 5px;
+  border-width: 3px;
+  border-style: solid;
 }
 
 .rule-card-close {
   position: absolute;
-  top: -5px;
-  right: -5px;
+  top: -10%;
+  right: 2%;
 }
 
 /* UTILS */

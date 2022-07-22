@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { onDestroy } from "svelte";
+
   import { colorPalette, events, conditions } from "../../store";
 
   const props = ["playerBackground"];
@@ -16,6 +18,12 @@
       child.addEventListener("change", update);
     }
   }
+
+  onDestroy(() => {
+    if ([a, b].includes("") || eventID == 0) {
+      conditions.removeCondition(id);
+    }
+  });
 </script>
 
 <section class="noselect rule-card">
@@ -55,6 +63,14 @@
 </section>
 
 <style>
+  p {
+    margin: 0;
+  }
+
+  section {
+    border-color: var(--condition);
+  }
+
   .if,
   .then {
     gap: 5%;

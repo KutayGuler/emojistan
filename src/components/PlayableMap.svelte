@@ -69,8 +69,18 @@
   let behaviors: Behaviors = {};
   Object.values($collisions).forEach((rule) => {
     let [key1, key2, val] = rule.split(",");
-    if (behaviors[key1] == undefined) behaviors[key1] = {};
+    if (behaviors[key1] == undefined) {
+      behaviors[key1] = {};
+    }
     behaviors[key1][key2] = val;
+    if (/\p{Extended_Pictographic}/gu.test(val)) {
+      if (key1 != key2) {
+        if (behaviors[key2] == undefined) {
+          behaviors[key2] = {};
+        }
+        behaviors[key2][key1] = val;
+      }
+    }
   });
 
   const mutations = {
@@ -90,11 +100,8 @@
     },
     // @ts-ignore
     wait: async ({ duration }) => {
-      return new Promise((resolve: any) => {
-        setTimeout(() => {
-          console.log("resolved");
-          resolve();
-        }, duration);
+      return new Promise((resolve: Function) => {
+        setTimeout(resolve, duration);
       });
     },
     reset: () => {
@@ -175,9 +182,11 @@
       "--inverted",
       invertColor(backgrounds[ac] || defaultBackground)
     );
-    Object.values(_conditions).forEach((c) => {
-      if (c.condition()) c.event();
-    });
+    if (items[ac] != undefined) {
+      Object.values(_conditions).forEach((c) => {
+        if (c.condition()) c.event();
+      });
+    }
   }
 
   let wasd = ["KeyW", "KeyA", "KeyS", "KeyD"];
@@ -252,7 +261,7 @@
 <svelte:window on:keydown={handle} />
 
 <section class="noselect">
-  <p><strong>Objective: </strong>{_map.objective}</p>
+  <p><strong>Objective: </strong>{_map.objective || "❓"}</p>
   <p title="ghost mode {ghost ? 'on' : 'off'}">👻 {ghost ? "✔️" : "❌"}</p>
   <div class="map">
     {#each { length: 256 } as _, i}

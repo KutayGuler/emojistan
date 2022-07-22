@@ -8,23 +8,21 @@ function createCollisions() {
   const collisions: Collisions = {};
   const { subscribe, update } = writable(collisions);
 
-  // TODO: merging should be both ways
-
   return {
     subscribe,
     addCollision: (rule: string) =>
-      update((state: Collisions) => {
+      update((state) => {
         let id = Date.now();
         state[id] = rule;
         return state;
       }),
     updateCollision: (id: number, rule: string) =>
-      update((state: Collisions) => {
+      update((state) => {
         state[id] = rule;
         return state;
       }),
     removeCollision: (id: number) => {
-      update((state: Collisions) => {
+      update((state) => {
         delete state[id];
         return state;
       });

@@ -17,7 +17,6 @@
       $hasEmptySlot = false;
       let [x, y, z] = rule.split(",");
       slots = [x, y];
-      console.log(x, y, z);
       if (types.includes(z)) {
         type = z;
       } else {
@@ -101,6 +100,10 @@
 </section>
 
 <style>
+  section {
+    border-color: var(--collision);
+  }
+
   .slots {
     position: relative;
     display: flex;

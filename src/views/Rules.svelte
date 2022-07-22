@@ -53,83 +53,106 @@
 </script>
 
 <section class="noselect rules">
-  <h4>Collisions 🤼</h4>
-  <p>Objects will bump into each other by default</p>
-  {#each Object.entries($collisions) as [id, rule]}
-    <Collision id={+id} {rule} />
-  {/each}
-  {#if !$hasEmptySlot || Object.keys($collisions).length == 0}
-    <button on:click={() => collisions.addCollision("")}>Add Collision</button>
-  {/if}
-  <h4>Events 🧨</h4>
-  {#each Object.entries($events) as [id, { name, queue }]}
-    <p>Event</p>
-    <Event id={+id} {name} {queue} />
-  {/each}
-  <button
-    on:click={() =>
-      events.addEvent({
-        name: `Event${eventIndex++}`,
-        queue: [{ type: "setBackgroundOf", index: 0, background: "" }],
-      })}>Add Event</button
-  >
-  <h4>Conditions ❓</h4>
-  {#each Object.entries($conditions) as [id, { a, b, eventID, once }]}
-    <Condition id={+id} {a} {b} {eventID} {once} />
-  {/each}
-  <button
-    on:click={() =>
-      conditions.addCondition({ a: "", b: "", eventID: 0, once: false })}
-    >Add Condition</button
-  >
-  <!-- TODO: events.addCondition -->
-  <!-- component and parsed versions are different -->
-  <!-- <button on:click={() => events.addCollision("")}>Add Condition</button> -->
-
-  <h4>Static Objects 🗿</h4>
-  <p>Static objects cannot be moved by players</p>
-  <div
-    class="statics noselect"
-    on:click={() => staticItems.toggleEmoji($currentEmoji, "add")}
-  >
-    {#each $staticItems as item}
-      <div>
-        <div>{item}</div>
-        <button on:click={() => staticItems.toggleEmoji(item)}>❌</button>
-      </div>
-    {:else}
-      <p>Select an emoji and click here to set it as a static item</p>
+  <div id="collisions">
+    <h4>Collisions 🤼</h4>
+    <p>Objects will bump into each other by default</p>
+    {#each Object.entries($collisions) as [id, rule]}
+      <Collision id={+id} {rule} />
     {/each}
+    {#if !$hasEmptySlot || Object.keys($collisions).length == 0}
+      <button on:click={() => collisions.addCollision("")}>Add Collision</button
+      >
+    {/if}
   </div>
-  <h4>Color Palette 🎨</h4>
-  <input type="color" bind:value={color} />
-  <button on:click={() => colorPalette.addColor(color)}>Add Color</button>
-  <div class="palette">
-    {#each $colorPalette as color}
-      <div class="color-container">
-        <div
-          class="color"
-          class:isDefault={color == defaultBackground}
-          style="background-color: {color};"
-          on:click={() => setDefaultBackground(color)}
-        />
-        <button class="remove-color" on:click={() => removeColor(color)}>
-          ❌
-        </button>
-      </div>
+  <div id="statics">
+    <h4>Static Objects 🗿</h4>
+    <p>Static objects cannot be moved by players</p>
+    <div
+      class="statics noselect"
+      on:click={() => staticItems.toggleEmoji($currentEmoji, "add")}
+    >
+      {#each $staticItems as item}
+        <div>
+          <div>{item}</div>
+          <button on:click={() => staticItems.toggleEmoji(item)}>❌</button>
+        </div>
+      {:else}
+        <p>Select an emoji and click here to set it as a static item</p>
+      {/each}
+    </div>
+  </div>
+  <div id="conditions">
+    <h4>Conditions ❓</h4>
+    {#each Object.entries($conditions) as [id, { a, b, eventID, once }]}
+      <Condition id={+id} {a} {b} {eventID} {once} />
     {/each}
+    <button
+      on:click={() =>
+        conditions.addCondition({ a: "", b: "", eventID: 0, once: false })}
+      >Add Condition</button
+    >
+  </div>
+  <div id="events">
+    <h4>Events 🧨</h4>
+    {#each Object.entries($events) as [id, { name, queue }]}
+      <Event id={+id} {name} {queue} />
+    {/each}
+    <button
+      on:click={() =>
+        events.addEvent({
+          name: `Event${eventIndex++}`,
+          queue: [{ type: "setBackgroundOf", index: 0, background: "" }],
+        })}>Add Event</button
+    >
+  </div>
+  <div id="palette">
+    <h4>Color Palette 🎨</h4>
+    <input type="color" bind:value={color} />
+    <button on:click={() => colorPalette.addColor(color)}>Add Color</button>
+    <div class="palette">
+      {#each $colorPalette as color}
+        <div class="color-container">
+          <div
+            class="color"
+            class:isDefault={color == defaultBackground}
+            style="background-color: {color};"
+            on:click={() => setDefaultBackground(color)}
+          />
+          <button class="remove-color" on:click={() => removeColor(color)}>
+            ❌
+          </button>
+        </div>
+      {/each}
+    </div>
   </div>
 </section>
 
 <style>
   .rules {
-    display: flex;
-    flex-direction: column;
-    gap: 1%;
-    padding: 1%;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 2%;
+    padding: 2%;
     overflow-y: auto;
     height: 94vh;
     box-sizing: border-box;
+  }
+
+  #collisions {
+    grid-area: 1 / 1 / 2 / 2;
+  }
+  #statics {
+    grid-area: 1 / 2 / 2 / 3;
+  }
+  #conditions {
+    grid-area: 2 / 1 / 3 / 2;
+  }
+  #events {
+    grid-area: 2 / 2 / 3 / 3;
+  }
+  #palette {
+    grid-area: 3 / 1 / 4 / 3;
   }
 
   .statics {

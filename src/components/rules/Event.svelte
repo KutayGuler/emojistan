@@ -103,6 +103,10 @@
 </section>
 
 <style>
+  section {
+    border-color: var(--event);
+  }
+
   .slot {
     display: inline-block;
     aspect-ratio: 1;
