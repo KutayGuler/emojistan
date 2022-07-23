@@ -86,16 +86,9 @@
   });
 
   const mutations = {
-    setPlayer: ({ index, emoji }: Emoji) => {
-      if (items[ac]) {
-        items[ac].emoji = emoji;
-      } else {
-        items[ac] = { index: ac, emoji };
-      }
-    },
     // @ts-ignore
-    setBackgroundOf: ({ index, background }) => {
-      backgrounds[index] = background;
+    setBackgroundOf: ({ index, background }, _start?: number) => {
+      backgrounds[_start || index] = background;
     },
     spawn: ({ index, emoji }: Emoji) => {
       items[index] = { index, emoji };
@@ -130,12 +123,12 @@
 
     let eventQueue: Array<Function> = [];
 
-    // if (_events[condition.eventID].isLoop) {
-
-    // } else {
-
-    // }
     let event = _events[condition.eventID];
+    let loop = structuredClone(event.loop);
+    let start = loop.start;
+    let end = loop.end;
+    let op =
+      loop.iterationNumber * (loop.iterationType == "increment" ? 1 : -1);
 
     // @ts-ignore
     event.queue.forEach(({ type, ...args }) => {
@@ -146,7 +139,7 @@
         eventQueue.push(async () => await mutations[type](args));
       } else {
         // @ts-ignore
-        eventQueue.push(() => mutations[type](args));
+        eventQueue.push((_start?) => mutations[type](args, _start));
       }
     });
 
@@ -160,13 +153,21 @@
       eventQueue.push(() => (eventQueue = []));
     }
 
-    async function execute(i: number) {
-      await eventQueue[i]();
+    async function execute(i: number, _start?: number) {
+      console.log("execute");
+      console.log(eventQueue[i]);
+      await eventQueue[i](_start);
       if (i + 1 == eventQueue.length) {
         if (!_events[condition.eventID].isLoop) return;
-        execute(0);
+        start += op;
+        if (start == end) {
+          start = loop.start;
+          return;
+        }
+        execute(0, start);
+      } else {
+        execute(i + 1);
       }
-      execute(i + 1);
     }
 
     _conditions[+id] = {};
@@ -283,7 +284,7 @@
   <div class="map">
     {#each { length: 256 } as _, i}
       <div
-        style:background={backgrounds[i]}
+        style:background-color={backgrounds[i] || ""}
         class:adc={adc == i}
         class:active={ac == i}
       >

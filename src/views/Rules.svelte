@@ -94,8 +94,8 @@
   </div>
   <div id="events">
     <h4>Events 🧨</h4>
-    {#each Object.entries($events) as [id, { name, queue, loop }]}
-      <Event id={+id} {name} {queue} {loop} />
+    {#each Object.entries($events) as [id, { name, queue, isLoop, loop }]}
+      <Event id={+id} {name} {queue} {isLoop} {loop} />
     {/each}
     <button
       on:click={() =>
