@@ -73,6 +73,8 @@
       behaviors[key1] = {};
     }
     behaviors[key1][key2] = val;
+
+    // making emoji merge both ways
     if (/\p{Extended_Pictographic}/gu.test(val)) {
       if (key1 != key2) {
         if (behaviors[key2] == undefined) {
@@ -104,6 +106,7 @@
         setTimeout(resolve, duration);
       });
     },
+    // TODO: Clear interval in case player logs off mid game
     reset: () => {
       backgrounds = structuredClone(_map.backgrounds);
       items = structuredClone(_map.items);
@@ -127,8 +130,15 @@
 
     let eventQueue: Array<Function> = [];
 
+    // if (_events[condition.eventID].isLoop) {
+
+    // } else {
+
+    // }
+    let event = _events[condition.eventID];
+
     // @ts-ignore
-    _events[condition.eventID].queue.forEach(({ type, ...args }) => {
+    event.queue.forEach(({ type, ...args }) => {
       // @ts-ignore
       console.log(args);
       if (type == "wait") {
@@ -140,15 +150,22 @@
       }
     });
 
-    console.log(eventQueue);
-
-    if (condition.once) {
+    if (event.isLoop) {
+      let duration = event.loop.timeGap;
+      eventQueue.push(
+        async () =>
+          await new Promise((resolve) => setTimeout(resolve, duration))
+      );
+    } else if (condition.once) {
       eventQueue.push(() => (eventQueue = []));
     }
 
     async function execute(i: number) {
       await eventQueue[i]();
-      if (i + 1 == eventQueue.length) return;
+      if (i + 1 == eventQueue.length) {
+        if (!_events[condition.eventID].isLoop) return;
+        execute(0);
+      }
       execute(i + 1);
     }
 

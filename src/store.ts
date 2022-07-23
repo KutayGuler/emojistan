@@ -38,9 +38,20 @@ export interface QueueItem {
   emoji?: string;
 }
 
+export interface Loop {
+  start: number;
+  end: number;
+  iterationNumber: number;
+  iterationType: "increment" | "decrement";
+  timeGap: number;
+  reverse: boolean;
+}
+
 export interface Event {
   name: string;
   queue: Array<QueueItem>;
+  isLoop: boolean;
+  loop: Loop;
 }
 
 export interface Events {

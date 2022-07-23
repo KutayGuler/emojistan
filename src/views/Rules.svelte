@@ -94,14 +94,23 @@
   </div>
   <div id="events">
     <h4>Events 🧨</h4>
-    {#each Object.entries($events) as [id, { name, queue }]}
-      <Event id={+id} {name} {queue} />
+    {#each Object.entries($events) as [id, { name, queue, loop }]}
+      <Event id={+id} {name} {queue} {loop} />
     {/each}
     <button
       on:click={() =>
         events.addEvent({
           name: `Event${eventIndex++}`,
           queue: [{ type: "setBackgroundOf", index: 0, background: "" }],
+          isLoop: false,
+          loop: {
+            start: 0,
+            end: 0,
+            iterationNumber: 0,
+            iterationType: "increment",
+            timeGap: 50,
+            reverse: false,
+          },
         })}>Add Event</button
     >
   </div>

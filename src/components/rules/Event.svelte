@@ -1,18 +1,36 @@
 <script lang="ts">
   import { colorPalette, events, currentEmoji } from "../../store";
-  import type { QueueItem } from "../../store";
+  import type { QueueItem, Loop } from "../../store";
 
   export let id: number;
   export let name: string;
   export let queue: Array<QueueItem> = [];
+  export let isLoop = false;
+  export let loop: Loop;
 
   const types = ["setBackgroundOf", "spawn", "wait", "reset"];
+  const loopTypes = ["setBackgroundOf", "spawn"];
+
+  const MIN_DURATION = 50;
+  const MAX_DURATION = 10000;
+  const MIN_NUMBER = 0;
 
   let type = types[0];
   let duration = 0;
   let index = 0;
   let background = "";
   let emoji = "";
+
+  // LOOP PARAMETERS
+
+  // let loop = {
+  //   start: 0,
+  //   end: 0,
+  //   iterationNumber: 0,
+  //   iterationType: "increment",
+  //   timeGap: MIN_DURATION,
+  //   reverse: false,
+  // };
 
   function addToQueue() {
     let newItem: QueueItem = { type };
@@ -31,8 +49,8 @@
         break;
     }
     console.log(newItem);
-    queue = [...queue, structuredClone(newItem)];
-    events.updateEvent(id, { name, queue });
+    queue = [...queue, newItem];
+    events.updateEvent(id, { name, queue, isLoop, loop });
     [type, duration, index, background] = [types[0], 0, 0, ""];
   }
 
@@ -43,9 +61,17 @@
   }
 
   function updateEvent() {
-    console.log(arguments);
     // TODO: remove unnecessary object props
-    events.updateEvent(id, { name, queue });
+
+    if (isLoop) {
+      if (loop.timeGap < MIN_DURATION) loop.timeGap = MIN_DURATION;
+      for (let i = 0; i < queue.length; i++) {
+        if (!loopTypes.includes(queue[i].type)) {
+          removeFromQueue(i);
+        }
+      }
+    }
+    events.updateEvent(id, { name, queue, isLoop, loop });
   }
 
   function setChildrenInputEvent(node: any) {
@@ -69,21 +95,64 @@
   <button class="rule-card-close" on:click={() => events.removeEvent(id)}
     >❌</button
   >
+  <p>
+    Loop <input type="checkbox" bind:checked={isLoop} on:change={updateEvent} />
+  </p>
+  {#if isLoop}
+    <p>
+      start <strong>i</strong> from
+      <input type="number" bind:value={loop.start} min={MIN_NUMBER} />
+    </p>
+    <select bind:value={loop.iterationType}>
+      {#each ["increment", "decrement"] as operation}
+        <option value={operation}>{operation}</option>
+      {/each}
+    </select>
+    <input type="number" bind:value={loop.iterationNumber} min={MIN_NUMBER} />
+    <p>
+      end <strong>i</strong> at
+      <input type="number" bind:value={loop.end} min={MIN_NUMBER} />
+    </p>
+    <p>
+      Reverse <input
+        type="checkbox"
+        bind:checked={loop.reverse}
+        on:change={updateEvent}
+      />
+    </p>
+    <p>
+      Time gap: <input
+        type="number"
+        bind:value={loop.timeGap}
+        on:change={updateEvent}
+        min={MIN_DURATION}
+        max={MAX_DURATION}
+      /> ms
+    </p>
+  {/if}
   {#each queue as q, i}
     <div use:setChildrenInputEvent>
-      <select bind:value={q.type}>
-        {#each types as t}
+      <select id="type" bind:value={q.type}>
+        {#each isLoop ? loopTypes : types as t}
           <option value={t}>{t}</option>
         {/each}
       </select>
       {#if q.type == "spawn"}
         <div class="slot" on:click={() => updateSlot(i)}>{q.emoji || ""}</div>
         at
-        <input type="number" bind:value={q.index} min={0} max={256} />
-      {:else if q.type == "wait"}
-        <input type="number" bind:value={q.duration} max={10000} /> ms
+        {#if isLoop}
+          <strong>i</strong>
+        {:else}
+          <input type="number" bind:value={q.index} min={0} max={256} />
+        {/if}
+      {:else if q.type == "wait" && !isLoop}
+        <input type="number" bind:value={q.duration} max={MAX_DURATION} /> ms
       {:else if q.type == "setBackgroundOf"}
-        <input type="number" bind:value={q.index} min={0} max={256} />
+        {#if isLoop}
+          <strong>i</strong>
+        {:else}
+          <input type="number" bind:value={q.index} min={0} max={256} />
+        {/if}
         to
         <select bind:value={q.background} style:background={q.background}>
           {#each $colorPalette as color}
@@ -109,7 +178,6 @@
 
   .slot {
     display: inline-block;
-    aspect-ratio: 1;
     width: 2.5vw;
     height: 2.5vw;
     background-color: var(--primary);
