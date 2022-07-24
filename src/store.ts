@@ -110,8 +110,6 @@ function createConditions() {
       }),
     updateCondition: (id: number, condition: Condition) =>
       update((state) => {
-        console.log("updated condition");
-        console.log(condition);
         state[id] = condition;
         return state;
       }),

@@ -11,16 +11,19 @@
   export let eventID: number;
   export let once: boolean;
 
-  const update = () => conditions.updateCondition(id, { a, b, eventID, once });
+  const update = () => {
+    console.log("change");
+    conditions.updateCondition(id, { a, b, eventID, once });
+  };
 
-  function setChildrenInputEvent(node: any) {
-    for (let child of node.children) {
-      child.addEventListener("change", update);
-    }
-  }
+  // TODO: Research typescript documentation
 
   onDestroy(() => {
-    if ([a, b].includes("") || eventID == 0) {
+    /*
+      0 is the default eventID value, which means
+      no event has been assigned for the condition
+    */
+    if ([a, b].includes("") || eventID == 0 || $events[eventID] == undefined) {
       conditions.removeCondition(id);
     }
   });
@@ -31,23 +34,23 @@
     class="rule-card-close"
     on:click={() => conditions.removeCondition(id)}>❌</button
   >
-  <div class="if" use:setChildrenInputEvent>
+  <div class="if">
     <h4>if</h4>
-    <select bind:value={a}>
+    <select bind:value={a} on:change={update}>
       {#each props as _prop}
         <option value={_prop}>{_prop}</option>
       {/each}
     </select>
     <h4>is</h4>
-    <select bind:value={b} style:background={b}>
+    <select bind:value={b} style:background={b} on:change={update}>
       {#each $colorPalette as color}
         <option value={color} style:background={color} />
       {/each}
     </select>
   </div>
-  <div class="then" use:setChildrenInputEvent>
+  <div class="then">
     <h4>then trigger</h4>
-    <select bind:value={eventID}>
+    <select bind:value={eventID} on:change={update}>
       {#each Object.entries($events) as [id, { name }]}
         <option value={id}>{name}</option>
       {/each}

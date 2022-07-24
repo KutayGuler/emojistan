@@ -14,23 +14,13 @@
   const MIN_DURATION = 50;
   const MAX_DURATION = 10000;
   const MIN_NUMBER = 0;
+  const MIN_ITERATION = 1;
 
   let type = types[0];
   let duration = 0;
   let index = 0;
   let background = "";
   let emoji = "";
-
-  // LOOP PARAMETERS
-
-  // let loop = {
-  //   start: 0,
-  //   end: 0,
-  //   iterationNumber: 0,
-  //   iterationType: "increment",
-  //   timeGap: MIN_DURATION,
-  //   reverse: false,
-  // };
 
   function addToQueue() {
     let newItem: QueueItem = { type };
@@ -48,7 +38,6 @@
         Object.assign(newItem);
         break;
     }
-    console.log(newItem);
     queue = [...queue, newItem];
     events.updateEvent(id, { name, queue, isLoop, loop });
     [type, duration, index, background] = [types[0], 0, 0, ""];
@@ -57,7 +46,11 @@
   function removeFromQueue(i: number) {
     queue.splice(i, 1);
     queue = queue;
-    if (queue.length == 0) events.removeEvent(id);
+    if (queue.length == 0) {
+      events.removeEvent(id);
+    } else {
+      events.updateEvent(id, { name, queue, isLoop, loop });
+    }
   }
 
   function updateEvent() {
@@ -65,6 +58,8 @@
 
     if (isLoop) {
       if (loop.timeGap < MIN_DURATION) loop.timeGap = MIN_DURATION;
+      if (loop.iterationNumber < MIN_ITERATION)
+        loop.iterationNumber = MIN_ITERATION;
       for (let i = 0; i < queue.length; i++) {
         if (!loopTypes.includes(queue[i].type)) {
           removeFromQueue(i);
@@ -72,16 +67,6 @@
       }
     }
     events.updateEvent(id, { name, queue, isLoop, loop });
-  }
-
-  function setChildrenInputEvent(node: any) {
-    for (let child of node.children) {
-      if (child.id == "remove") {
-        child.addEventListener("click", updateEvent);
-      } else {
-        child.addEventListener("input", updateEvent);
-      }
-    }
   }
 
   function updateSlot(i: number) {
@@ -108,7 +93,11 @@
         <option value={operation}>{operation}</option>
       {/each}
     </select>
-    <input type="number" bind:value={loop.iterationNumber} min={MIN_NUMBER} />
+    <input
+      type="number"
+      bind:value={loop.iterationNumber}
+      min={MIN_ITERATION}
+    />
     <p>
       end <strong>i</strong> at
       <input type="number" bind:value={loop.end} min={MIN_NUMBER} />
@@ -131,8 +120,8 @@
     </p>
   {/if}
   {#each queue as q, i}
-    <div use:setChildrenInputEvent>
-      <select id="type" bind:value={q.type}>
+    <div>
+      <select id="type" bind:value={q.type} on:input={updateEvent}>
         {#each isLoop ? loopTypes : types as t}
           <option value={t}>{t}</option>
         {/each}
@@ -143,18 +132,39 @@
         {#if isLoop}
           <strong>i</strong>
         {:else}
-          <input type="number" bind:value={q.index} min={0} max={256} />
+          <input
+            type="number"
+            bind:value={q.index}
+            min={0}
+            max={256}
+            on:input={updateEvent}
+          />
         {/if}
       {:else if q.type == "wait" && !isLoop}
-        <input type="number" bind:value={q.duration} max={MAX_DURATION} /> ms
+        <input
+          type="number"
+          bind:value={q.duration}
+          max={MAX_DURATION}
+          on:input={updateEvent}
+        /> ms
       {:else if q.type == "setBackgroundOf"}
         {#if isLoop}
           <strong>i</strong>
         {:else}
-          <input type="number" bind:value={q.index} min={0} max={256} />
+          <input
+            type="number"
+            bind:value={q.index}
+            min={0}
+            max={256}
+            on:input={updateEvent}
+          />
         {/if}
         to
-        <select bind:value={q.background} style:background={q.background}>
+        <select
+          bind:value={q.background}
+          style:background={q.background}
+          on:input={updateEvent}
+        >
           {#each $colorPalette as color}
             <option value={color} style:background={color} />
           {/each}

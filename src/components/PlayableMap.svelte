@@ -67,7 +67,8 @@
   let items: Items = structuredClone(_map.items);
   let backgrounds = structuredClone(_map.backgrounds);
   let behaviors: Behaviors = {};
-  Object.values($collisions).forEach((rule) => {
+
+  for (let rule of Object.values($collisions)) {
     let [key1, key2, val] = rule.split(",");
     if (behaviors[key1] == undefined) {
       behaviors[key1] = {};
@@ -83,7 +84,7 @@
         behaviors[key2][key1] = val;
       }
     }
-  });
+  }
 
   const mutations = {
     // @ts-ignore
@@ -99,7 +100,6 @@
         setTimeout(resolve, duration);
       });
     },
-    // TODO: Clear interval in case player logs off mid game
     reset: () => {
       backgrounds = structuredClone(_map.backgrounds);
       items = structuredClone(_map.items);
@@ -112,7 +112,7 @@
 
   let _conditions: _Conditions = {};
 
-  Object.entries($conditions).forEach(([id, condition]) => {
+  for (let [id, condition] of Object.entries($conditions)) {
     let a: any;
     let b: any = condition.b;
     switch (condition.a) {
@@ -123,15 +123,17 @@
 
     let eventQueue: Array<Function> = [];
 
+    console.log(condition.eventID);
     let event = _events[condition.eventID];
+    let queue = event.queue;
+
     let loop = structuredClone(event.loop);
     let start = loop.start;
     let end = loop.end;
     let op =
       loop.iterationNumber * (loop.iterationType == "increment" ? 1 : -1);
 
-    // @ts-ignore
-    event.queue.forEach(({ type, ...args }) => {
+    for (let { type, ...args } of queue) {
       // @ts-ignore
       console.log(args);
       if (type == "wait") {
@@ -141,7 +143,7 @@
         // @ts-ignore
         eventQueue.push((_start?) => mutations[type](args, _start));
       }
-    });
+    }
 
     if (event.isLoop) {
       let duration = event.loop.timeGap;
@@ -176,7 +178,7 @@
       if (eventQueue.length == 0) return;
       execute(0);
     };
-  });
+  }
 
   function getCollisionType(key1: string, key2: string): string | undefined {
     if (behaviors[key1] !== undefined) return behaviors[key1][key2];
@@ -201,9 +203,9 @@
       invertColor(backgrounds[ac] || defaultBackground)
     );
     if (items[ac] != undefined) {
-      Object.values(_conditions).forEach((c) => {
+      for (let c of Object.values(_conditions)) {
         if (c.condition()) c.event();
-      });
+      }
     }
   }
 
