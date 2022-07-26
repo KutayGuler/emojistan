@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onDestroy } from "svelte/internal";
+  import { slide } from "svelte/transition";
   import { colorPalette, events, currentEmoji } from "../../store";
   import type { QueueItem, Loop } from "../../store";
 
@@ -7,6 +8,8 @@
   export let name: string;
   export let queue: Array<QueueItem> = [];
   export let loop: Loop;
+
+  let error = "";
 
   const types = ["setBackgroundOf", "spawn"];
 
@@ -48,9 +51,15 @@
     }
   }
 
-  function updateEvent() {
+  function update() {
     // TODO: remove unnecessary object props
 
+    console.log(loop);
+    if (loop.start == loop.end) {
+      loop.start = 0;
+      error = "starting index and ending index cannot be the same";
+      setTimeout(() => (error = ""), 2000);
+    }
     if (loop.timeGap < MIN_DURATION) loop.timeGap = MIN_DURATION;
     if (loop.iterationNumber < MIN_ITERATION)
       loop.iterationNumber = MIN_ITERATION;
@@ -62,6 +71,8 @@
     queue[i].emoji = $currentEmoji;
   }
 
+  // TODO: Test on input changes
+
   onDestroy(() => {
     if (queue.some((item) => Object.values(item).includes(""))) {
       events.removeEvent(id);
@@ -70,21 +81,26 @@
 </script>
 
 <section class="noselect rule-card">
-  <input type="text" bind:value={name} on:input={updateEvent} />
+  <input type="text" bind:value={name} on:input={update} />
   <button class="rule-card-close" on:click={() => events.removeEvent(id)}
     >❌</button
   >
-  <p>
+  <div class="inline">
     start <strong>i</strong> from
-    <input type="number" bind:value={loop.start} min={MIN_NUMBER} />
-  </p>
+    <input
+      type="number"
+      bind:value={loop.start}
+      min={MIN_NUMBER}
+      on:input={update}
+    />
+  </div>
   <div class="step">
     <p>
       <strong>On each step:</strong>
     </p>
     {#each queue as q, i}
       <div>
-        <select id="type" bind:value={q.type} on:input={updateEvent}>
+        <select id="type" bind:value={q.type} on:input={update}>
           {#each types as t}
             <option value={t}>{t}</option>
           {/each}
@@ -97,7 +113,7 @@
           <select
             bind:value={q.background}
             style:background={q.background}
-            on:input={updateEvent}
+            on:input={update}
           >
             {#each $colorPalette as color}
               <option value={color} style:background={color} />
@@ -113,8 +129,8 @@
       {/each}
     </select>
     <button on:click={addToQueue}>➕</button>
-    <p>
-      <select bind:value={loop.iterationType}>
+    <div class="inline">
+      <select bind:value={loop.iterationType} on:input={update}>
         {#each ["increment", "decrement"] as operation}
           <option value={operation}>{operation}</option>
         {/each}
@@ -124,32 +140,47 @@
         type="number"
         bind:value={loop.iterationNumber}
         min={MIN_ITERATION}
+        on:input={update}
       />
-    </p>
-    <p>
+    </div>
+    <div class="inline">
       Wait <input
         type="number"
         bind:value={loop.timeGap}
-        on:change={updateEvent}
+        on:change={update}
         min={MIN_DURATION}
         max={MAX_DURATION}
       /> ms
-    </p>
+    </div>
   </div>
-  <p>
+  <div class="inline">
     end <strong>i</strong> at
-    <input type="number" bind:value={loop.end} min={MIN_NUMBER} />
-  </p>
-  <p>
+    <input
+      type="number"
+      bind:value={loop.end}
+      min={MIN_NUMBER}
+      on:input={update}
+    />
+  </div>
+  <!-- <div class="inline">
     Reverse <input
       type="checkbox"
       bind:checked={loop.reverse}
-      on:change={updateEvent}
+      on:change={update}
     />
-  </p>
+  </div> -->
+  {#if error != ""}
+    <div transition:slide class="error">
+      {error}
+    </div>
+  {/if}
 </section>
 
 <style>
+  .inline {
+    display: inline-block;
+  }
+
   section {
     border-color: var(--event);
   }

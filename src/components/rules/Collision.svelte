@@ -33,7 +33,7 @@
       [type, mergeSlot, slots] = [types[0], "", ["", ""]];
       $hasEmptySlot = true;
       error = "Can't have duplicate collisions";
-      setTimeout(() => (error = ""), 1500);
+      setTimeout(() => (error = ""), 2000);
       return;
     }
 
@@ -50,7 +50,7 @@
         mergeSlot = "";
         $hasEmptySlot = true;
         error = "Inputs cannot be the same with output";
-        setTimeout(() => (error = ""), 1500);
+        setTimeout(() => (error = ""), 2000);
         return;
       }
 
@@ -133,18 +133,5 @@
     align-items: center;
     width: 100%;
     height: 100%;
-  }
-
-  .error {
-    position: absolute;
-    background-color: var(--danger);
-    width: 100%;
-    height: 5vh;
-    bottom: -5vh;
-    left: 0;
-    border: 2px solid black;
-    padding: 2%;
-    box-sizing: border-box;
-    z-index: 90;
   }
 </style>

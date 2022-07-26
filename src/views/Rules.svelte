@@ -20,6 +20,7 @@
   let color = "";
   let r: any, defaultBackground: string;
   let eventIndex = 0;
+  let loopEventIndex = 0;
 
   onMount(() => {
     r = document.querySelector(":root");
@@ -60,8 +61,7 @@
       <Collision id={+id} {rule} />
     {/each}
     {#if !$hasEmptySlot || Object.keys($collisions).length == 0}
-      <button on:click={() => collisions.addCollision("")}>Add Collision</button
-      >
+      <button on:click={() => collisions.addCollision("")}>🤼</button>
     {/if}
   </div>
   <div id="statics">
@@ -80,8 +80,7 @@
         <p>Select an emoji and click here to set it as a static item</p>
       {/each}
     </div>
-    <h4>Interactable Objects 🗿</h4>
-
+    <h4>Interactable Objects ♟️</h4>
     <div
       class="statics noselect"
       on:click={() => interactables.toggleEmoji($currentEmoji, "add")}
@@ -108,12 +107,12 @@
           b: "",
           eventID: 0,
           once: false,
-        })}>Add Condition</button
+        })}>❓</button
     >
   </div>
   <div id="events">
     <h4>Events 🧨</h4>
-    {#each Object.entries($events) as [id, { name, queue, isLoop, loop }]}
+    {#each Object.entries($events) as [id, { name, queue, loop }]}
       {#if loop != undefined}
         <LoopEvent id={+id} {name} {queue} {loop} />
       {:else}
@@ -125,12 +124,12 @@
         events.addEvent({
           name: `Event${eventIndex++}`,
           queue: [{ type: "setBackgroundOf", index: 0, background: "" }],
-        })}>Add Event</button
+        })}>🧨</button
     >
     <button
       on:click={() =>
         events.addEvent({
-          name: `Event${eventIndex++}`,
+          name: `LoopEvent${loopEventIndex++}`,
           queue: [{ type: "setBackgroundOf", index: 0, background: "" }],
           loop: {
             start: 0,
@@ -140,7 +139,7 @@
             timeGap: 50,
             reverse: false,
           },
-        })}>Add Loop Event</button
+        })}>➰🧨</button
     >
   </div>
   <div id="palette">

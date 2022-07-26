@@ -52,6 +52,7 @@
 
   /* ## STATE ## */
   let dialog: HTMLDialogElement;
+  let interact = false;
   let levelCompleted = false;
   let ac = 0; // ACTIVE CELL
   let adc = 1; // ADJACENT CELL
@@ -226,6 +227,7 @@
   let wasd = ["KeyW", "KeyA", "KeyS", "KeyD"];
 
   function handle(e: KeyboardEvent) {
+    if (ac == 3) interact = true;
     if (e.code == "Space") ghost = !ghost;
     if (wasd.includes(e.code)) {
       dirKey = e.code;
@@ -300,14 +302,16 @@
   <p title="ghost mode {ghost ? 'on' : 'off'}">👻 {ghost ? "✔️" : "❌"}</p>
   <div class="map">
     {#each { length: 256 } as _, i}
+      {@const isControlling = !ghost && items[ac] != undefined}
+      {@const isActive = ac == i}
       <div
         style:background-color={backgrounds[i] || ""}
-        class:adc={adc == i}
-        class:active={ac == i}
+        class:adc={adc == i && isControlling}
+        class:active={isActive}
       >
-        {#if ac == i}
+        {#if isActive && isControlling}
           <div class="direction" style={dirs[dirKey].style}>
-            {dirs[dirKey].emoji}
+            {interact ? "⚔️" : dirs[dirKey].emoji}
           </div>
         {/if}
         {items[i]?.emoji || ""}
