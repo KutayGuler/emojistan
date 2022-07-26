@@ -1,9 +1,9 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
 
-  import { colorPalette, events, conditions } from "../../store";
+  import { colorPalette, events, interactables, conditions } from "../../store";
 
-  const props = ["playerBackground"];
+  const props = ["playerBackground", "playerInteractedWith"];
 
   export let id: number;
   export let a: string;
@@ -15,8 +15,6 @@
     console.log("change");
     conditions.updateCondition(id, { a, b, eventID, once });
   };
-
-  // TODO: Research typescript documentation
 
   onDestroy(() => {
     /*
@@ -41,12 +39,20 @@
         <option value={_prop}>{_prop}</option>
       {/each}
     </select>
-    <h4>is</h4>
-    <select bind:value={b} style:background={b} on:change={update}>
-      {#each $colorPalette as color}
-        <option value={color} style:background={color} />
-      {/each}
-    </select>
+    {#if a == "playerBackground"}
+      <h4>is</h4>
+      <select bind:value={b} style:background={b} on:change={update}>
+        {#each $colorPalette as color}
+          <option value={color} style:background={color} />
+        {/each}
+      </select>
+    {:else if a == "playerInteractedWith"}
+      <select bind:value={b} on:change={update}>
+        {#each $interactables as interactable}
+          <option value={interactable}>{interactable}</option>
+        {/each}
+      </select>
+    {/if}
   </div>
   <div class="then">
     <h4>then trigger</h4>

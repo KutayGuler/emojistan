@@ -9,11 +9,13 @@
     conditions,
     colorPalette,
     hasEmptySlot,
-    staticItems,
+    statics,
+    interactables,
     currentEmoji,
   } from "../store";
   import Condition from "../components/rules/Condition.svelte";
   import Event from "../components/rules/Event.svelte";
+  import LoopEvent from "../components/rules/LoopEvent.svelte";
 
   let color = "";
   let r: any, defaultBackground: string;
@@ -21,7 +23,6 @@
 
   onMount(() => {
     r = document.querySelector(":root");
-    // @ts-ignore
     defaultBackground = getComputedStyle(r).getPropertyValue(
       "--default-background"
     );
@@ -29,7 +30,6 @@
 
   function setDefaultBackground(color: string) {
     if (color == "") return;
-    // @ts-ignore
     if (color == defaultBackground) {
       r.style.setProperty("--default-background", "#faebd7");
       r.style.setProperty("--inverted", "#ff3e00");
@@ -69,12 +69,27 @@
     <p>Static objects cannot be moved by players</p>
     <div
       class="statics noselect"
-      on:click={() => staticItems.toggleEmoji($currentEmoji, "add")}
+      on:click={() => statics.toggleEmoji($currentEmoji, "add")}
     >
-      {#each $staticItems as item}
+      {#each $statics as item}
         <div>
           <div>{item}</div>
-          <button on:click={() => staticItems.toggleEmoji(item)}>❌</button>
+          <button on:click={() => statics.toggleEmoji(item)}>❌</button>
+        </div>
+      {:else}
+        <p>Select an emoji and click here to set it as a static item</p>
+      {/each}
+    </div>
+    <h4>Interactable Objects 🗿</h4>
+
+    <div
+      class="statics noselect"
+      on:click={() => interactables.toggleEmoji($currentEmoji, "add")}
+    >
+      {#each $interactables as item}
+        <div>
+          <div>{item}</div>
+          <button on:click={() => interactables.toggleEmoji(item)}>❌</button>
         </div>
       {:else}
         <p>Select an emoji and click here to set it as a static item</p>
@@ -88,30 +103,44 @@
     {/each}
     <button
       on:click={() =>
-        conditions.addCondition({ a: "", b: "", eventID: 0, once: false })}
-      >Add Condition</button
+        conditions.addCondition({
+          a: "playerBackground",
+          b: "",
+          eventID: 0,
+          once: false,
+        })}>Add Condition</button
     >
   </div>
   <div id="events">
     <h4>Events 🧨</h4>
     {#each Object.entries($events) as [id, { name, queue, isLoop, loop }]}
-      <Event id={+id} {name} {queue} {isLoop} {loop} />
+      {#if loop != undefined}
+        <LoopEvent id={+id} {name} {queue} {loop} />
+      {:else}
+        <Event id={+id} {name} {queue} />
+      {/if}
     {/each}
     <button
       on:click={() =>
         events.addEvent({
           name: `Event${eventIndex++}`,
           queue: [{ type: "setBackgroundOf", index: 0, background: "" }],
-          isLoop: false,
+        })}>Add Event</button
+    >
+    <button
+      on:click={() =>
+        events.addEvent({
+          name: `Event${eventIndex++}`,
+          queue: [{ type: "setBackgroundOf", index: 0, background: "" }],
           loop: {
             start: 0,
-            end: 0,
-            iterationNumber: 0,
+            end: 16,
+            iterationNumber: 1,
             iterationType: "increment",
             timeGap: 50,
             reverse: false,
           },
-        })}>Add Event</button
+        })}>Add Loop Event</button
     >
   </div>
   <div id="palette">

@@ -1,20 +1,16 @@
 <script lang="ts">
+  import { onDestroy } from "svelte/internal";
   import { colorPalette, events, currentEmoji } from "../../store";
   import type { QueueItem, Loop } from "../../store";
 
   export let id: number;
   export let name: string;
   export let queue: Array<QueueItem> = [];
-  export let isLoop = false;
-  export let loop: Loop;
 
-  const types = ["setBackgroundOf", "spawn", "wait", "reset"];
-  const loopTypes = ["setBackgroundOf", "spawn"];
+  const types = ["setBackgroundOf", "spawn", "wait", "reset", "completeLevel"];
 
   const MIN_DURATION = 50;
   const MAX_DURATION = 10000;
-  const MIN_NUMBER = 0;
-  const MIN_ITERATION = 1;
 
   let type = types[0];
   let duration = 0;
@@ -34,12 +30,13 @@
       case "wait":
         Object.assign(newItem, { duration });
         break;
+      case "completeLevel":
       case "reset":
         Object.assign(newItem);
         break;
     }
     queue = [...queue, newItem];
-    events.updateEvent(id, { name, queue, isLoop, loop });
+    events.updateEvent(id, { name, queue });
     [type, duration, index, background] = [types[0], 0, 0, ""];
   }
 
@@ -49,98 +46,49 @@
     if (queue.length == 0) {
       events.removeEvent(id);
     } else {
-      events.updateEvent(id, { name, queue, isLoop, loop });
+      events.updateEvent(id, { name, queue });
     }
   }
 
   function updateEvent() {
     // TODO: remove unnecessary object props
-
-    if (isLoop) {
-      if (loop.timeGap < MIN_DURATION) loop.timeGap = MIN_DURATION;
-      if (loop.iterationNumber < MIN_ITERATION)
-        loop.iterationNumber = MIN_ITERATION;
-      for (let i = 0; i < queue.length; i++) {
-        if (!loopTypes.includes(queue[i].type)) {
-          removeFromQueue(i);
-        }
-      }
-    }
-    events.updateEvent(id, { name, queue, isLoop, loop });
+    events.updateEvent(id, { name, queue });
   }
 
   function updateSlot(i: number) {
     queue[i].emoji = $currentEmoji;
   }
-  // TODO: Fix styles not being applied
+
+  onDestroy(() => {
+    if (queue.some((item) => Object.values(item).includes(""))) {
+      events.removeEvent(id);
+    }
+  });
 </script>
 
-<section style="noselect rule-card">
+<section class="noselect rule-card">
   <input type="text" bind:value={name} on:input={updateEvent} />
   <button class="rule-card-close" on:click={() => events.removeEvent(id)}
     >❌</button
   >
-  <p>
-    Loop <input type="checkbox" bind:checked={isLoop} on:change={updateEvent} />
-  </p>
-  {#if isLoop}
-    <p>
-      start <strong>i</strong> from
-      <input type="number" bind:value={loop.start} min={MIN_NUMBER} />
-    </p>
-    <select bind:value={loop.iterationType}>
-      {#each ["increment", "decrement"] as operation}
-        <option value={operation}>{operation}</option>
-      {/each}
-    </select>
-    <input
-      type="number"
-      bind:value={loop.iterationNumber}
-      min={MIN_ITERATION}
-    />
-    <p>
-      end <strong>i</strong> at
-      <input type="number" bind:value={loop.end} min={MIN_NUMBER} />
-    </p>
-    <p>
-      Reverse <input
-        type="checkbox"
-        bind:checked={loop.reverse}
-        on:change={updateEvent}
-      />
-    </p>
-    <p>
-      Time gap: <input
-        type="number"
-        bind:value={loop.timeGap}
-        on:change={updateEvent}
-        min={MIN_DURATION}
-        max={MAX_DURATION}
-      /> ms
-    </p>
-  {/if}
   {#each queue as q, i}
     <div>
       <select id="type" bind:value={q.type} on:input={updateEvent}>
-        {#each isLoop ? loopTypes : types as t}
+        {#each types as t}
           <option value={t}>{t}</option>
         {/each}
       </select>
       {#if q.type == "spawn"}
         <div class="slot" on:click={() => updateSlot(i)}>{q.emoji || ""}</div>
         at
-        {#if isLoop}
-          <strong>i</strong>
-        {:else}
-          <input
-            type="number"
-            bind:value={q.index}
-            min={0}
-            max={256}
-            on:input={updateEvent}
-          />
-        {/if}
-      {:else if q.type == "wait" && !isLoop}
+        <input
+          type="number"
+          bind:value={q.index}
+          min={0}
+          max={256}
+          on:input={updateEvent}
+        />
+      {:else if q.type == "wait"}
         <input
           type="number"
           bind:value={q.duration}
@@ -148,17 +96,13 @@
           on:input={updateEvent}
         /> ms
       {:else if q.type == "setBackgroundOf"}
-        {#if isLoop}
-          <strong>i</strong>
-        {:else}
-          <input
-            type="number"
-            bind:value={q.index}
-            min={0}
-            max={256}
-            on:input={updateEvent}
-          />
-        {/if}
+        <input
+          type="number"
+          bind:value={q.index}
+          min={0}
+          max={256}
+          on:input={updateEvent}
+        />
         to
         <select
           bind:value={q.background}

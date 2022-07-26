@@ -1,12 +1,14 @@
 <script lang="ts">
-  import type { Emoji, Condition } from "../store";
+  import type { Emoji } from "../store";
+  import { scale } from "svelte/transition";
   import { onMount } from "svelte/internal";
   import {
     editableMap as map,
     collisions,
     conditions,
     events,
-    staticItems,
+    statics,
+    interactables,
   } from "../store";
   import { invertColor } from "../invertColor";
 
@@ -49,6 +51,8 @@
   }
 
   /* ## STATE ## */
+  let dialog: HTMLDialogElement;
+  let levelCompleted = false;
   let ac = 0; // ACTIVE CELL
   let adc = 1; // ADJACENT CELL
   let ghost = true;
@@ -87,14 +91,14 @@
   }
 
   const mutations = {
-    // @ts-ignore
+    // @ts-expect-error
     setBackgroundOf: ({ index, background }, _start?: number) => {
       backgrounds[_start || index] = background;
     },
     spawn: ({ index, emoji }: Emoji) => {
       items[index] = { index, emoji };
     },
-    // @ts-ignore
+    // @ts-expect-error
     wait: async ({ duration }) => {
       return new Promise((resolve: Function) => {
         setTimeout(resolve, duration);
@@ -103,18 +107,27 @@
     reset: () => {
       backgrounds = structuredClone(_map.backgrounds);
       items = structuredClone(_map.items);
+      ac = 0;
+      adc = 1;
+      dirKey = "KeyD";
+      levelCompleted = false;
+      ghost = true;
     },
+    completeLevel: () => (levelCompleted = true),
   };
 
   interface _Conditions {
-    [id: number]: any;
+    [id: number]: {
+      condition: Function;
+      event: Function;
+    };
   }
 
   let _conditions: _Conditions = {};
 
   for (let [id, condition] of Object.entries($conditions)) {
-    let a: any;
-    let b: any = condition.b;
+    let a: Function;
+    let b: string = condition.b;
     switch (condition.a) {
       case "playerBackground":
         a = () => backgrounds[ac];
@@ -128,24 +141,24 @@
     let queue = event.queue;
 
     let loop = structuredClone(event.loop);
-    let start = loop.start;
-    let end = loop.end;
-    let op =
-      loop.iterationNumber * (loop.iterationType == "increment" ? 1 : -1);
+    let start: number, end: number, op: number;
+    if (loop != undefined) {
+      start = loop.start;
+      end = loop.end;
+      op = loop.iterationNumber * (loop.iterationType == "increment" ? 1 : -1);
+    }
 
     for (let { type, ...args } of queue) {
-      // @ts-ignore
-      console.log(args);
       if (type == "wait") {
-        // @ts-ignore
+        // @ts-expect-error
         eventQueue.push(async () => await mutations[type](args));
       } else {
-        // @ts-ignore
+        // @ts-expect-error
         eventQueue.push((_start?) => mutations[type](args, _start));
       }
     }
 
-    if (event.isLoop) {
+    if (event.loop != undefined) {
       let duration = event.loop.timeGap;
       eventQueue.push(
         async () =>
@@ -160,9 +173,10 @@
       console.log(eventQueue[i]);
       await eventQueue[i](_start);
       if (i + 1 == eventQueue.length) {
-        if (!_events[condition.eventID].isLoop) return;
+        if (_events[condition.eventID].loop == undefined) return;
         start += op;
         if (start == end) {
+          // @ts-expect-error
           start = loop.start;
           return;
         }
@@ -172,11 +186,12 @@
       }
     }
 
-    _conditions[+id] = {};
-    _conditions[+id].condition = () => a() == b;
-    _conditions[+id].event = () => {
-      if (eventQueue.length == 0) return;
-      execute(0);
+    _conditions[+id] = {
+      condition: () => a() == b,
+      event: () => {
+        if (eventQueue.length == 0) return;
+        execute(0);
+      },
     };
   }
 
@@ -197,7 +212,6 @@
     if (_delete) delete items[ac];
     ac += operation;
     adc = ac + dirs[dirKey].operation;
-    // @ts-ignore
     r.style.setProperty(
       "--inverted",
       invertColor(backgrounds[ac] || defaultBackground)
@@ -225,7 +239,7 @@
       moveActiveCell(operation);
       return;
     }
-    if ($staticItems.includes(items[ac].emoji)) return;
+    if ($statics.includes(items[ac].emoji)) return;
     if (items[ac + operation] !== undefined) {
       switch (getCollisionType(items[ac].emoji, items[ac + operation].emoji)) {
         case "push":
@@ -259,7 +273,7 @@
         // each emoji should have it's own inventory
         default:
           // MERGE
-          // @ts-ignore
+          // @ts-expect-error
           items[ac + operation].emoji = getCollisionType(
             items[ac].emoji,
             items[ac + operation].emoji
@@ -281,6 +295,7 @@
 <svelte:window on:keydown={handle} />
 
 <section class="noselect">
+  <button on:click={() => (levelCompleted = !levelCompleted)}>TEST</button>
   <p><strong>Objective: </strong>{_map.objective || "❓"}</p>
   <p title="ghost mode {ghost ? 'on' : 'off'}">👻 {ghost ? "✔️" : "❌"}</p>
   <div class="map">
@@ -298,6 +313,13 @@
         {items[i]?.emoji || ""}
       </div>
     {/each}
+    {#if levelCompleted}
+      <dialog open bind:this={dialog} transition:scale>
+        LEVEL COMPLETED!
+        <button on:click={() => (levelCompleted = !levelCompleted)}>OK</button>
+        <button on:click={mutations.reset}>REPLAY</button>
+      </dialog>
+    {/if}
   </div>
 </section>
 

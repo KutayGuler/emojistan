@@ -50,8 +50,7 @@ export interface Loop {
 export interface Event {
   name: string;
   queue: Array<QueueItem>;
-  isLoop: boolean;
-  loop: Loop;
+  loop?: Loop;
 }
 
 export interface Events {
@@ -78,7 +77,6 @@ function createEvents() {
     removeEvent: (id: number) =>
       update((state) => {
         delete state[id];
-        // TODO: Fix not removing
         console.log(state);
         return state;
       }),
@@ -170,9 +168,29 @@ function createEditableMap() {
   };
 }
 
-function createStaticItems() {
+function createStatics() {
   const statics: Array<string> = [];
   const { subscribe, update } = writable(statics);
+
+  return {
+    subscribe,
+    toggleEmoji: (emoji: string, operation?: string) =>
+      update((state) => {
+        if (emoji == "") return state;
+        if (operation == "add") {
+          if (state.includes(emoji)) return state;
+          state.push(emoji);
+        } else if (state.includes(emoji)) {
+          state = state.filter((el) => el != emoji);
+        }
+        return state;
+      }),
+  };
+}
+
+function createInteractables() {
+  const interactables: Array<string> = [];
+  const { subscribe, update } = writable(interactables);
 
   return {
     subscribe,
@@ -218,5 +236,6 @@ export const editableMap = createEditableMap();
 export const collisions = createCollisions();
 export const events = createEvents();
 export const conditions = createConditions();
-export const staticItems = createStaticItems();
+export const statics = createStatics();
+export const interactables = createInteractables();
 export const colorPalette = createColorPalette();
