@@ -1,7 +1,7 @@
 import { writable } from "svelte/store";
 
 interface Collisions {
-  [id: number]: string;
+  [id: string]: string;
 }
 
 function createCollisions() {
@@ -12,16 +12,16 @@ function createCollisions() {
     subscribe,
     addCollision: (rule: string) =>
       update((state) => {
-        let id = Date.now();
+        let id = Date.now().toString();
         state[id] = rule;
         return state;
       }),
-    updateCollision: (id: number, rule: string) =>
+    updateCollision: (id: string, rule: string) =>
       update((state) => {
         state[id] = rule;
         return state;
       }),
-    removeCollision: (id: number) => {
+    removeCollision: (id: string) => {
       update((state) => {
         delete state[id];
         return state;
@@ -54,7 +54,7 @@ export interface Event {
 }
 
 export interface Events {
-  [id: number]: Event;
+  [id: string]: Event;
 }
 
 function createEvents() {
@@ -65,16 +65,16 @@ function createEvents() {
     subscribe,
     addEvent: (event: Event) =>
       update((state) => {
-        let id = Date.now();
+        let id = Date.now().toString();
         state[id] = event;
         return state;
       }),
-    updateEvent: (id: number, event: Event) =>
+    updateEvent: (id: string, event: Event) =>
       update((state) => {
         state[id] = event;
         return state;
       }),
-    removeEvent: (id: number) =>
+    removeEvent: (id: string) =>
       update((state) => {
         delete state[id];
         console.log(state);
@@ -86,12 +86,12 @@ function createEvents() {
 export interface Condition {
   a: string;
   b: string;
-  eventID: number;
+  eventID: string;
   once: boolean;
 }
 
 interface Conditions {
-  [id: number]: Condition;
+  [id: string]: Condition;
 }
 
 function createConditions() {
@@ -102,16 +102,16 @@ function createConditions() {
     subscribe,
     addCondition: (condition: Condition) =>
       update((state) => {
-        let id = Date.now();
+        let id = Date.now().toString();
         state[id] = condition;
         return state;
       }),
-    updateCondition: (id: number, condition: Condition) =>
+    updateCondition: (id: string, condition: Condition) =>
       update((state) => {
         state[id] = condition;
         return state;
       }),
-    removeCondition: (id: number) =>
+    removeCondition: (id: string) =>
       update((state) => {
         delete state[id];
         return state;

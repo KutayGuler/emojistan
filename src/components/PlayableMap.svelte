@@ -176,7 +176,7 @@
       if (i + 1 == eventQueue.length) {
         if (_events[condition.eventID].loop == undefined) return;
         start += op;
-        if (start == end) {
+        if (start >= end) {
           // @ts-expect-error
           start = loop.start;
           return;

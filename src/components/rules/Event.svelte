@@ -3,9 +3,10 @@
   import { colorPalette, events, currentEmoji } from "../../store";
   import type { QueueItem, Loop } from "../../store";
 
-  export let id: number;
+  export let id: string;
   export let name: string;
   export let queue: Array<QueueItem> = [];
+  let onEndID = 0;
 
   const types = ["setBackgroundOf", "spawn", "wait", "reset", "completeLevel"];
 
@@ -19,6 +20,7 @@
   let index = 0;
   let background = "";
   let emoji = "";
+  let trigger = false;
 
   function addToQueue() {
     let newItem: QueueItem = { type };
@@ -149,6 +151,19 @@
     {/each}
   </select>
   <button on:click={addToQueue}>➕</button>
+  <div class="inline">
+    <strong>Trigger on complete</strong>
+    <input type="checkbox" bind:checked={trigger} />
+  </div>
+  {#if trigger}
+    <select bind:value={onEndID}>
+      {#each Object.entries($events) as [_id, { name }]}
+        {#if id != _id}
+          <option value={_id}>{name}</option>
+        {/if}
+      {/each}
+    </select>
+  {/if}
 </section>
 
 <style>

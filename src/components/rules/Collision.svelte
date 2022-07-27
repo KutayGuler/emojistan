@@ -3,7 +3,7 @@
   import { slide } from "svelte/transition";
   import { collisions, currentEmoji, hasEmptySlot } from "../../store";
 
-  export let id: number;
+  export let id: string;
   export let rule: string;
 
   const types = ["push", "merge"];

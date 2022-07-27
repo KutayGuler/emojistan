@@ -58,7 +58,7 @@
     <h4>Collisions 🤼</h4>
     <p>Objects will bump into each other by default</p>
     {#each Object.entries($collisions) as [id, rule]}
-      <Collision id={+id} {rule} />
+      <Collision {id} {rule} />
     {/each}
     {#if !$hasEmptySlot || Object.keys($collisions).length == 0}
       <button on:click={() => collisions.addCollision("")}>🤼</button>
@@ -98,14 +98,15 @@
   <div id="conditions">
     <h4>Conditions ❓</h4>
     {#each Object.entries($conditions) as [id, { a, b, eventID, once }]}
-      <Condition id={+id} {a} {b} {eventID} {once} />
+      <Condition {id} {a} {b} {eventID} {once} />
     {/each}
     <button
+      title="Add Condition"
       on:click={() =>
         conditions.addCondition({
           a: "playerBackground",
           b: "",
-          eventID: 0,
+          eventID: "",
           once: false,
         })}>❓</button
     >
@@ -114,12 +115,13 @@
     <h4>Events 🧨</h4>
     {#each Object.entries($events) as [id, { name, queue, loop }]}
       {#if loop != undefined}
-        <LoopEvent id={+id} {name} {queue} {loop} />
+        <LoopEvent {id} {name} {queue} {loop} />
       {:else}
-        <Event id={+id} {name} {queue} />
+        <Event {id} {name} {queue} />
       {/if}
     {/each}
     <button
+      title="Add Event"
       on:click={() =>
         events.addEvent({
           name: `Event${eventIndex++}`,
@@ -127,6 +129,7 @@
         })}>🧨</button
     >
     <button
+      title="Add Loop Event"
       on:click={() =>
         events.addEvent({
           name: `LoopEvent${loopEventIndex++}`,
@@ -145,7 +148,9 @@
   <div id="palette">
     <h4>Color Palette 🎨</h4>
     <input type="color" bind:value={color} />
-    <button on:click={() => colorPalette.addColor(color)}>Add Color</button>
+    <button on:click={() => colorPalette.addColor(color)} title="Add Color"
+      >🎨</button
+    >
     <div class="palette">
       {#each $colorPalette as color}
         <div class="color-container">

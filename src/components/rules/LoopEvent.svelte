@@ -4,7 +4,7 @@
   import { colorPalette, events, currentEmoji } from "../../store";
   import type { QueueItem, Loop } from "../../store";
 
-  export let id: number;
+  export let id: string;
   export let name: string;
   export let queue: Array<QueueItem> = [];
   export let loop: Loop;
@@ -15,16 +15,15 @@
 
   const MIN_DURATION = 50;
   const MAX_DURATION = 10000;
-  const MIN_NUMBER = 0;
+  const MIN_INDEX = 0;
+  const MAX_INDEX = 256;
   const MIN_ITERATION = 1;
+  const MAX_ITERATION = 16;
 
   let type = types[0];
   let index = 0;
   let background = "";
   let emoji = "";
-
-  // TODO: Show alert on:
-  // end and start is same
 
   function addToQueue() {
     let newItem: QueueItem = { type };
@@ -60,9 +59,21 @@
       error = "starting index and ending index cannot be the same";
       setTimeout(() => (error = ""), 2000);
     }
-    if (loop.timeGap < MIN_DURATION) loop.timeGap = MIN_DURATION;
-    if (loop.iterationNumber < MIN_ITERATION)
+    if (loop.start < MIN_INDEX || loop.start > MAX_INDEX) {
+      loop.start = MIN_INDEX;
+    }
+    if (loop.end < MIN_INDEX || loop.end > MAX_INDEX) {
+      loop.end = MIN_INDEX;
+    }
+    if (loop.timeGap < MIN_DURATION || loop.timeGap > MAX_DURATION) {
+      loop.timeGap = MIN_DURATION;
+    }
+    if (
+      loop.iterationNumber < MIN_ITERATION ||
+      loop.iterationNumber > MAX_ITERATION
+    ) {
       loop.iterationNumber = MIN_ITERATION;
+    }
 
     events.updateEvent(id, { name, queue, loop });
   }
@@ -90,7 +101,8 @@
     <input
       type="number"
       bind:value={loop.start}
-      min={MIN_NUMBER}
+      min={MIN_INDEX}
+      max={MAX_INDEX}
       on:input={update}
     />
   </div>
@@ -140,6 +152,7 @@
         type="number"
         bind:value={loop.iterationNumber}
         min={MIN_ITERATION}
+        max={MAX_ITERATION}
         on:input={update}
       />
     </div>
@@ -158,7 +171,8 @@
     <input
       type="number"
       bind:value={loop.end}
-      min={MIN_NUMBER}
+      min={MIN_INDEX}
+      max={MAX_INDEX}
       on:input={update}
     />
   </div>

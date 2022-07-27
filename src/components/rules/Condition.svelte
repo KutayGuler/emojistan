@@ -5,10 +5,10 @@
 
   const props = ["playerBackground", "playerInteractedWith"];
 
-  export let id: number;
+  export let id: string;
   export let a: string;
   export let b: string;
-  export let eventID: number;
+  export let eventID: string;
   export let once: boolean;
 
   const update = () => {
@@ -21,7 +21,7 @@
       0 is the default eventID value, which means
       no event has been assigned for the condition
     */
-    if ([a, b].includes("") || eventID == 0 || $events[eventID] == undefined) {
+    if ([a, b].includes("") || eventID == "" || $events[eventID] == undefined) {
       conditions.removeCondition(id);
     }
   });
