@@ -127,7 +127,7 @@
             style:background={q.background}
             on:input={update}
           >
-            {#each $colorPalette as color}
+            {#each [...$colorPalette] as color}
               <option value={color} style:background={color} />
             {/each}
           </select>

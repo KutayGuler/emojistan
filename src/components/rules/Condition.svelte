@@ -21,7 +21,11 @@
       0 is the default eventID value, which means
       no event has been assigned for the condition
     */
-    if ([a, b].includes("") || eventID == "" || $events[eventID] == undefined) {
+    if (
+      [a, b].includes("") ||
+      eventID == "" ||
+      $events.get(eventID) == undefined
+    ) {
       conditions.removeCondition(id);
     }
   });
@@ -42,7 +46,7 @@
     {#if a == "playerBackground"}
       <h4>is</h4>
       <select bind:value={b} style:background={b} on:change={update}>
-        {#each $colorPalette as color}
+        {#each [...$colorPalette] as color}
           <option value={color} style:background={color} />
         {/each}
       </select>
@@ -57,7 +61,7 @@
   <div class="then">
     <h4>then trigger</h4>
     <select bind:value={eventID} on:change={update}>
-      {#each Object.entries($events) as [id, { name }]}
+      {#each [...$events] as [id, { name }]}
         <option value={id}>{name}</option>
       {/each}
     </select>

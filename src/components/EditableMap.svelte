@@ -42,16 +42,15 @@
   <div class="palette">
     <p
       on:click={() => togglePaintMode(color)}
-      style:opacity={cp.length == 0 ? "50%" : "100%"}
+      style:opacity={cp.size == 0 ? "50%" : "100%"}
     >
-      🎨{cp.includes(color) ? "" : "🖌️"}
+      🎨{cp.has(color) ? "" : "🖌️"}
     </p>
-    {#each cp as c}
-      {@const selected = c == color}
+    {#each [...cp] as c}
       <div
         class="color"
-        class:selected
-        style="background-color: {c};"
+        class:selected={c == color}
+        style:background={c}
         on:click={() => togglePaintMode(c)}
       />
     {/each}
@@ -59,10 +58,11 @@
   <div class="map">
     {#each { length: 256 } as _, i}
       <div
-        style:background={$map.backgrounds[i] || "var(--default-background)"}
+        style:background={$map.backgrounds.get(i) ||
+          "var(--default-background)"}
         on:click={() => clickedCell(i)}
       >
-        {$map?.items[i]?.emoji || (showIndex ? i : "")}
+        {$map?.items.get(i)?.emoji || (showIndex ? i : "")}
       </div>
     {/each}
   </div>

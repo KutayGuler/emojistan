@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Emoji } from "../store";
   import { scale } from "svelte/transition";
-  import { onMount } from "svelte/internal";
+  import { hasContext, onMount } from "svelte/internal";
   import {
     editableMap as map,
     collisions,
@@ -32,24 +32,6 @@
     );
   }
 
-  interface Items {
-    [id: number]: Emoji;
-  }
-
-  interface Behaviors {
-    [emoji: string]: {
-      [emoji: string]: string;
-    };
-  }
-
-  interface Dirs {
-    [key: string]: {
-      style: string;
-      emoji: string;
-      operation: number;
-    };
-  }
-
   /* ## STATE ## */
   let dialog: HTMLDialogElement;
   let interact = false;
@@ -58,7 +40,9 @@
   let adc = 1; // ADJACENT CELL
   let ghost = true;
   let collisionChain: Array<any> = [];
-  let dirs: Dirs = {
+  let dirs: {
+    [key: string]: { style: string; emoji: string; operation: number };
+  } = {
     KeyW: { style: `top: -30%;`, emoji: "⬆️", operation: -16 },
     KeyA: { style: `left: -30%;`, emoji: "⬅️", operation: -1 },
     KeyS: { style: `bottom: -30%;`, emoji: "⬇️", operation: 16 },
@@ -67,26 +51,26 @@
   let dirKey = "KeyD";
 
   /* ## DATA ## */
-  let _events = structuredClone($events);
+  let _events = new Map($events);
   let _map = structuredClone($map);
-  let items: Items = structuredClone(_map.items);
-  let backgrounds = structuredClone(_map.backgrounds);
-  let behaviors: Behaviors = {};
+  let items = new Map(_map.items);
+  let backgrounds = new Map(_map.backgrounds);
+  let behaviors = new Map<string, Map<string, string>>();
 
-  for (let rule of Object.values($collisions)) {
+  for (let rule of $collisions.values()) {
     let [key1, key2, val] = rule.split(",");
-    if (behaviors[key1] == undefined) {
-      behaviors[key1] = {};
+    if (!behaviors.has(key1)) {
+      behaviors.set(key1, new Map());
     }
-    behaviors[key1][key2] = val;
+    behaviors.get(key1)?.set(key2, val);
 
     // making emoji merge both ways
     if (/\p{Extended_Pictographic}/gu.test(val)) {
       if (key1 != key2) {
-        if (behaviors[key2] == undefined) {
-          behaviors[key2] = {};
+        if (!behaviors.has(key2)) {
+          behaviors.set(key2, new Map());
         }
-        behaviors[key2][key1] = val;
+        behaviors.get(key2)?.set(key1, val);
       }
     }
   }
@@ -94,20 +78,19 @@
   const mutations = {
     // @ts-expect-error
     setBackgroundOf: ({ index, background }, _start?: number) => {
-      backgrounds[_start || index] = background;
+      backgrounds.set(_start || index, background);
     },
     spawn: ({ index, emoji }: Emoji) => {
-      items[index] = { index, emoji };
+      items.set(index, { index, emoji });
     },
-    // @ts-expect-error
-    wait: async ({ duration }) => {
+    wait: async (duration: number) => {
       return new Promise((resolve: Function) => {
         setTimeout(resolve, duration);
       });
     },
     reset: () => {
-      backgrounds = structuredClone(_map.backgrounds);
-      items = structuredClone(_map.items);
+      backgrounds = new Map(_map.backgrounds);
+      items = new Map(_map.items);
       ac = 0;
       adc = 1;
       dirKey = "KeyD";
@@ -117,28 +100,21 @@
     completeLevel: () => (levelCompleted = true),
   };
 
-  interface _Conditions {
-    [id: number]: {
-      condition: Function;
-      event: Function;
-    };
-  }
+  let _conditions = new Map<number, { condition: Function; event: Function }>();
 
-  let _conditions: _Conditions = {};
-
-  for (let [id, condition] of Object.entries($conditions)) {
+  for (let [id, condition] of $conditions.entries()) {
     let a: Function;
     let b: string = condition.b;
     switch (condition.a) {
       case "playerBackground":
-        a = () => backgrounds[ac];
+        a = () => backgrounds.get(ac);
         break;
     }
 
     let eventQueue: Array<Function> = [];
 
-    console.log(condition.eventID);
-    let event = _events[condition.eventID];
+    let event = _events.get(condition.eventID);
+    if (event == undefined) continue;
     let queue = event.queue;
 
     let loop = structuredClone(event.loop);
@@ -151,8 +127,7 @@
 
     for (let { type, ...args } of queue) {
       if (type == "wait") {
-        // @ts-expect-error
-        eventQueue.push(async () => await mutations[type](args));
+        eventQueue.push(async () => await mutations.wait(args.duration || 50)); // MAGIC NUMBER
       } else {
         // @ts-expect-error
         eventQueue.push((_start?) => mutations[type](args, _start));
@@ -173,8 +148,10 @@
       console.log("execute");
       console.log(eventQueue[i]);
       await eventQueue[i](_start);
+      // MAGIC UPDATE
+      backgrounds = backgrounds;
       if (i + 1 == eventQueue.length) {
-        if (_events[condition.eventID].loop == undefined) return;
+        if (event && event.loop == undefined) return;
         start += op;
         if (start >= end) {
           // @ts-expect-error
@@ -187,18 +164,18 @@
       }
     }
 
-    _conditions[+id] = {
+    _conditions.set(+id, {
       condition: () => a() == b,
       event: () => {
         if (eventQueue.length == 0) return;
         execute(0);
       },
-    };
+    });
   }
 
-  function getCollisionType(key1: string, key2: string): string | undefined {
-    if (behaviors[key1] !== undefined) return behaviors[key1][key2];
-    return undefined;
+  function getCollisionType(key1: string, key2: string): string {
+    if (behaviors.has(key1)) return behaviors.get(key1)?.get(key2) || "bump";
+    return "bump";
   }
 
   function executeCollisionChain(index?: number, operation?: number) {
@@ -210,18 +187,20 @@
   }
 
   function moveActiveCell(operation: number, _delete?: boolean) {
-    if (_delete) delete items[ac];
+    if (_delete) items.delete(ac);
     ac += operation;
     adc = ac + dirs[dirKey].operation;
     r.style.setProperty(
       "--inverted",
-      invertColor(backgrounds[ac] || defaultBackground)
+      invertColor(backgrounds.get(ac) || defaultBackground)
     );
-    if (items[ac] != undefined) {
-      for (let c of Object.values(_conditions)) {
+    if (items.has(ac)) {
+      for (let c of _conditions.values()) {
         if (c.condition()) c.event();
       }
     }
+    // MAGIC UPDATE
+    items = items;
   }
 
   let wasd = ["KeyW", "KeyA", "KeyS", "KeyD"];
@@ -237,60 +216,74 @@
     if (!e.code.includes("Arrow")) return;
     let operation = calcOperation(e.code, ac);
     if (operation == 0) return;
-    if (ghost || items[ac] == undefined) {
+    if (ghost || !items.has(ac)) {
       moveActiveCell(operation);
       return;
     }
-    if ($statics.includes(items[ac].emoji)) return;
-    if (items[ac + operation] !== undefined) {
-      switch (getCollisionType(items[ac].emoji, items[ac + operation].emoji)) {
+    let item = items.get(ac);
+    if (item == undefined || $statics.includes(item.emoji)) return;
+    let postOpItem = items.get(ac + operation);
+    if (postOpItem != undefined) {
+      switch (getCollisionType(item.emoji, postOpItem.emoji)) {
         case "push":
           // TODO: Cascade pushables
           let i = 2;
           collisionChain = [];
 
-          while (items[ac + operation * i] !== undefined) {
-            let _emoji = items[ac + operation * (i - 1)].emoji;
-            let _emoji2 = items[ac + operation * i]?.emoji;
+          while (items.get(ac + operation * i) !== undefined) {
+            let _emoji = items.get(ac + operation * (i - 1))?.emoji;
+            let _emoji2 = items.get(ac + operation * i)?.emoji;
+            if (_emoji == undefined || _emoji2 == undefined) continue;
             collisionChain.push(getCollisionType(_emoji, _emoji2));
             console.log(collisionChain);
             i++;
           }
 
           if (i != 2) {
-            if (collisionChain.includes(undefined)) return;
+            if (collisionChain.includes(undefined)) break;
             executeCollisionChain();
-            return;
+            break;
           }
 
-          items[ac + operation * 2] = items[ac + operation];
-          items[ac + operation] = items[ac];
+          items.set(ac + operation * 2, postOpItem);
+          items.set(ac + operation, item);
           moveActiveCell(operation, true);
-          return;
+          break;
         case "bump":
-        case undefined:
-          return;
+          break;
         case "equip": // TODO: equip item
         // could be in conditions rather than collisions
         // each emoji should have it's own inventory
         default:
           // MERGE
-          // @ts-expect-error
-          items[ac + operation].emoji = getCollisionType(
-            items[ac].emoji,
-            items[ac + operation].emoji
-          );
+          postOpItem.emoji = getCollisionType(item.emoji, postOpItem.emoji);
+          items.set(ac + operation, postOpItem);
+          // items[ac + operation].emoji = getCollisionType(
+          //   items[ac].emoji,
+          //   items[ac + operation].emoji
+          // );
           moveActiveCell(operation, true);
-          return;
+          break;
       }
+    } else {
+      console.log("else");
+      postOpItem = {
+        index: ac + operation,
+        emoji: item.emoji,
+      };
+      items.set(ac + operation, postOpItem);
+      console.log(items);
+
+      moveActiveCell(operation, true);
     }
+  }
 
-    items[ac + operation] = {
-      index: ac + operation,
-      emoji: items[ac].emoji,
-    };
+  let testMap = new Map<string, number>();
+  testMap.set("test", 10);
 
-    moveActiveCell(operation, true);
+  function assign() {
+    testMap.set("test", 20);
+    testMap = testMap;
   }
 </script>
 
@@ -298,14 +291,15 @@
 
 <section class="noselect">
   <button on:click={() => (levelCompleted = !levelCompleted)}>TEST</button>
+  <button on:click={assign}>TEST2</button>
   <p><strong>Objective: </strong>{_map.objective || "❓"}</p>
   <p title="ghost mode {ghost ? 'on' : 'off'}">👻 {ghost ? "✔️" : "❌"}</p>
   <div class="map">
     {#each { length: 256 } as _, i}
-      {@const isControlling = !ghost && items[ac] != undefined}
+      {@const isControlling = !ghost && items.has(ac)}
       {@const isActive = ac == i}
       <div
-        style:background-color={backgrounds[i] || ""}
+        style:background={backgrounds.get(i) || ""}
         class:adc={adc == i && isControlling}
         class:active={isActive}
       >
@@ -314,7 +308,10 @@
             {interact ? "⚔️" : dirs[dirKey].emoji}
           </div>
         {/if}
-        {items[i]?.emoji || ""}
+        {items.get(i)?.emoji || ""}
+        {#if i == 30}
+          {testMap.get("test")}
+        {/if}
       </div>
     {/each}
     {#if levelCompleted}

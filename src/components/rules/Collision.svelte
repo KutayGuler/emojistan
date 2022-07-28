@@ -29,7 +29,7 @@
   });
 
   function checkCollision(collision: string) {
-    if (Object.values($collisions).includes(collision)) {
+    if ([...$collisions.values()].includes(collision)) {
       [type, mergeSlot, slots] = [types[0], "", ["", ""]];
       $hasEmptySlot = true;
       error = "Can't have duplicate collisions";

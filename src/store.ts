@@ -1,29 +1,27 @@
 import { writable } from "svelte/store";
 
-interface Collisions {
-  [id: string]: string;
-}
+// TODO: Convert objects to maps
+// TODO: Convert the necessary arrays to sets
 
 function createCollisions() {
-  const collisions: Collisions = {};
-  const { subscribe, update } = writable(collisions);
+  const { subscribe, update } = writable(new Map<string, string>());
 
   return {
     subscribe,
     addCollision: (rule: string) =>
       update((state) => {
         let id = Date.now().toString();
-        state[id] = rule;
+        state.set(id, rule);
         return state;
       }),
     updateCollision: (id: string, rule: string) =>
       update((state) => {
-        state[id] = rule;
+        state.set(id, rule);
         return state;
       }),
     removeCollision: (id: string) => {
       update((state) => {
-        delete state[id];
+        state.delete(id);
         return state;
       });
     },
@@ -36,6 +34,20 @@ export interface QueueItem {
   index?: number;
   duration?: number;
   emoji?: string;
+}
+
+export interface SetBackgroundOf extends QueueItem {
+  index?: number;
+  background?: string;
+}
+
+export interface Spawn extends QueueItem {
+  index?: number;
+  emoji?: string;
+}
+
+export interface Spawn extends QueueItem {
+  duration?: number;
 }
 
 export interface Loop {
@@ -53,31 +65,29 @@ export interface Event {
   loop?: Loop;
 }
 
-export interface Events {
-  [id: string]: Event;
-}
-
 function createEvents() {
-  const events: Events = {};
-  const { subscribe, update } = writable(events);
+  const { subscribe, update } = writable(new Map<string, Event>());
 
   return {
     subscribe,
     addEvent: (event: Event) =>
       update((state) => {
         let id = Date.now().toString();
-        state[id] = event;
+        // state[id] = event;
+        state.set(id, event);
         return state;
       }),
     updateEvent: (id: string, event: Event) =>
       update((state) => {
-        state[id] = event;
+        // state[id] = event;
+        state.set(id, event);
+        console.log(state);
         return state;
       }),
     removeEvent: (id: string) =>
       update((state) => {
-        delete state[id];
-        console.log(state);
+        // delete state[id];
+        state.delete(id);
         return state;
       }),
   };
@@ -90,30 +100,28 @@ export interface Condition {
   once: boolean;
 }
 
-interface Conditions {
-  [id: string]: Condition;
-}
-
 function createConditions() {
-  const conditions: Conditions = {};
-  const { subscribe, update } = writable(conditions);
+  const { subscribe, update } = writable(new Map<string, Condition>());
 
   return {
     subscribe,
     addCondition: (condition: Condition) =>
       update((state) => {
         let id = Date.now().toString();
-        state[id] = condition;
+        // state[id] = condition;
+        state.set(id, condition);
         return state;
       }),
     updateCondition: (id: string, condition: Condition) =>
       update((state) => {
-        state[id] = condition;
+        // state[id] = condition;
+        state.set(id, condition);
         return state;
       }),
     removeCondition: (id: string) =>
       update((state) => {
-        delete state[id];
+        // delete state[id];
+        state.delete(id);
         return state;
       }),
   };
@@ -130,39 +138,39 @@ export interface Interactable extends Emoji {
 }
 
 interface EditableMap {
-  items: {
-    [id: number]: Emoji;
-  };
-  backgrounds: {
-    [index: number]: string;
-  };
+  items: Map<number, Emoji>;
+  backgrounds: Map<number, string>;
   objective: string;
 }
 
 function createEditableMap() {
-  const map: EditableMap = { items: {}, backgrounds: {}, objective: "" };
+  const map: EditableMap = {
+    items: new Map(),
+    backgrounds: new Map(),
+    objective: "",
+  };
   const { subscribe, update } = writable(map);
 
   return {
     subscribe,
     updateBackground: (index: number, color: string) =>
       update((state) => {
-        state.backgrounds[index] = color;
+        state.backgrounds.set(index, color);
         return state;
       }),
     deleteBackground: (index: number) =>
       update((state) => {
-        delete state.backgrounds[index];
+        state.backgrounds.delete(index);
         return state;
       }),
     addEmoji: (obj: Emoji) =>
       update((state: EditableMap) => {
-        state.items[obj.index] = obj;
+        state.items.set(obj.index, obj);
         return state;
       }),
     removeEmoji: (index: number) =>
       update((state: EditableMap) => {
-        delete state.items[index];
+        state.items.delete(index);
         return state;
       }),
   };
@@ -209,22 +217,20 @@ function createInteractables() {
 }
 
 function createColorPalette() {
-  const colors: Array<string> = [];
-  const { subscribe, update } = writable(colors);
+  const { subscribe, update } = writable(new Set<string>());
 
   return {
     subscribe,
     addColor: (color: string) =>
       color != "" &&
       update((state) => {
-        if (state.includes(color)) return state;
-        state.push(color);
+        if (state.has(color)) return state;
+        state.add(color);
         return state;
       }),
     removeColor: (color: string) =>
       update((state) => {
-        state = state.filter((el) => el != color);
-        console.log(state);
+        state.delete(color);
         return state;
       }),
   };

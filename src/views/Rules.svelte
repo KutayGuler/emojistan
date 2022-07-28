@@ -45,7 +45,7 @@
 
   function removeColor(color: string) {
     colorPalette.removeColor(color);
-    if (!$colorPalette.includes(defaultBackground)) {
+    if (!$colorPalette.has(defaultBackground)) {
       r.style.setProperty("--default-background", "#faebd7");
       r.style.setProperty("--inverted", "#ff3e00");
       defaultBackground = "#faebd7";
@@ -57,10 +57,10 @@
   <div id="collisions">
     <h4>Collisions 🤼</h4>
     <p>Objects will bump into each other by default</p>
-    {#each Object.entries($collisions) as [id, rule]}
+    {#each [...$collisions] as [id, rule]}
       <Collision {id} {rule} />
     {/each}
-    {#if !$hasEmptySlot || Object.keys($collisions).length == 0}
+    {#if !$hasEmptySlot || $collisions.size == 0}
       <button on:click={() => collisions.addCollision("")}>🤼</button>
     {/if}
   </div>
@@ -97,7 +97,7 @@
   </div>
   <div id="conditions">
     <h4>Conditions ❓</h4>
-    {#each Object.entries($conditions) as [id, { a, b, eventID, once }]}
+    {#each [...$conditions] as [id, { a, b, eventID, once }]}
       <Condition {id} {a} {b} {eventID} {once} />
     {/each}
     <button
@@ -113,7 +113,7 @@
   </div>
   <div id="events">
     <h4>Events 🧨</h4>
-    {#each Object.entries($events) as [id, { name, queue, loop }]}
+    {#each [...$events] as [id, { name, queue, loop }]}
       {#if loop != undefined}
         <LoopEvent {id} {name} {queue} {loop} />
       {:else}
@@ -125,7 +125,7 @@
       on:click={() =>
         events.addEvent({
           name: `Event${eventIndex++}`,
-          queue: [{ type: "setBackgroundOf", index: 0, background: "" }],
+          queue: [],
         })}>🧨</button
     >
     <button
@@ -133,7 +133,7 @@
       on:click={() =>
         events.addEvent({
           name: `LoopEvent${loopEventIndex++}`,
-          queue: [{ type: "setBackgroundOf", index: 0, background: "" }],
+          queue: [],
           loop: {
             start: 0,
             end: 16,
@@ -152,7 +152,7 @@
       >🎨</button
     >
     <div class="palette">
-      {#each $colorPalette as color}
+      {#each [...$colorPalette] as color}
         <div class="color-container">
           <div
             class="color"

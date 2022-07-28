@@ -1,6 +1,7 @@
 <script>
   // TODO: Implement this
   // TODO: Remove interaction from condition
+  // TODO: Change the position of this component's container
 
   export let emoji;
   export let eventID;
