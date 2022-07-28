@@ -80,20 +80,6 @@
         <p>Select an emoji and click here to set it as a static item</p>
       {/each}
     </div>
-    <h4>Interactable Objects ♟️</h4>
-    <div
-      class="statics noselect"
-      on:click={() => interactables.toggleEmoji($currentEmoji, "add")}
-    >
-      {#each $interactables as item}
-        <div>
-          <div>{item}</div>
-          <button on:click={() => interactables.toggleEmoji(item)}>❌</button>
-        </div>
-      {:else}
-        <p>Select an emoji and click here to set it as a static item</p>
-      {/each}
-    </div>
   </div>
   <div id="conditions">
     <h4>Conditions ❓</h4>
@@ -113,11 +99,11 @@
   </div>
   <div id="events">
     <h4>Events 🧨</h4>
-    {#each [...$events] as [id, { name, queue, loop }]}
+    {#each [...$events] as [id, { name, sequence, loop }]}
       {#if loop != undefined}
-        <LoopEvent {id} {name} {queue} {loop} />
+        <LoopEvent {id} {name} {sequence} {loop} />
       {:else}
-        <Event {id} {name} {queue} />
+        <Event {id} {name} {sequence} />
       {/if}
     {/each}
     <button
@@ -125,7 +111,7 @@
       on:click={() =>
         events.addEvent({
           name: `Event${eventIndex++}`,
-          queue: [],
+          sequence: [],
         })}>🧨</button
     >
     <button
@@ -133,7 +119,7 @@
       on:click={() =>
         events.addEvent({
           name: `LoopEvent${loopEventIndex++}`,
-          queue: [],
+          sequence: [],
           loop: {
             start: 0,
             end: 16,
@@ -142,8 +128,24 @@
             timeGap: 50,
             reverse: false,
           },
-        })}>➰🧨</button
+        })}>🔄🧨</button
     >
+  </div>
+  <div id="interactables">
+    <h4>Interactable Objects ♟️</h4>
+    <div
+      class="statics noselect"
+      on:click={() => interactables.toggleEmoji($currentEmoji, "add")}
+    >
+      {#each $interactables as item}
+        <div>
+          <div>{item}</div>
+          <button on:click={() => interactables.toggleEmoji(item)}>❌</button>
+        </div>
+      {:else}
+        <p>Select an emoji and click here to set it as a static item</p>
+      {/each}
+    </div>
   </div>
   <div id="palette">
     <h4>Color Palette 🎨</h4>
@@ -173,7 +175,7 @@
   .rules {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(3, 1fr);
+    grid-template-rows: repeat(4, 1fr);
     gap: 2%;
     padding: 2%;
     overflow-y: auto;
@@ -193,8 +195,11 @@
   #events {
     grid-area: 2 / 2 / 3 / 3;
   }
-  #palette {
+  #interactables {
     grid-area: 3 / 1 / 4 / 3;
+  }
+  #palette {
+    grid-area: 4 / 1 / 5 / 3;
   }
 
   .statics {

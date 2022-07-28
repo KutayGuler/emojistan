@@ -1,17 +1,25 @@
 <script lang="ts">
   import { onDestroy } from "svelte/internal";
   import { colorPalette, events, currentEmoji } from "../../store";
-  import type { QueueItem, Loop } from "../../store";
+  import type { SequenceItem, Loop } from "../../store";
 
   export let id: string;
   export let name: string;
-  export let queue: Array<QueueItem> = [];
+  export let sequence: Array<SequenceItem> = [];
   let onEndID = 0;
 
-  const types = ["setBackgroundOf", "spawn", "wait", "reset", "completeLevel"];
+  // TODO: Implement destroy
+  const types = [
+    "setBackgroundOf",
+    "spawn",
+    "destroy",
+    "wait",
+    "reset",
+    "completeLevel",
+  ];
 
   const MIN_INDEX = 0;
-  const MAX_INDEX = 255;
+  const MAX_INDEX = 256;
   const MIN_DURATION = 50;
   const MAX_DURATION = 10000;
 
@@ -22,10 +30,10 @@
   let emoji = "";
   let trigger = false;
 
-  function generateQueueItem(_type: string, vals?: any) {
-    // TODO: Fix update bug
-    let newItem: QueueItem = { type: _type };
-    if (vals && !Object.values(vals).includes(undefined)) {
+  function generateSequenceItem(_type: string, vals?: any) {
+    // TODO: Migrate this solution to loop event
+    let newItem: SequenceItem = { type: _type };
+    if (vals) {
       let { index, background, emoji, duration } = vals;
       switch (_type) {
         case "setBackgroundOf":
@@ -78,86 +86,97 @@
   }
 
   function addToQueue() {
-    queue = [...queue, generateQueueItem(type)];
-    events.updateEvent(id, { name, queue });
+    sequence = [...sequence, generateSequenceItem(type)];
+    events.updateEvent(id, { name, sequence });
     [type, duration, index, background] = [types[0], 0, 0, ""];
   }
 
   function removeFromQueue(i: number) {
-    queue.splice(i, 1);
-    queue = queue;
-    if (queue.length == 0) {
+    sequence.splice(i, 1);
+    sequence = sequence;
+    if (sequence.length == 0) {
       events.removeEvent(id);
     } else {
-      events.updateEvent(id, { name, queue });
+      events.updateEvent(id, { name, sequence });
     }
   }
 
-  function update(i: number, extra: any) {
-    console.log(extra);
-    // TODO: remove unnecessary object props
-    if (i != undefined || i != -1) {
-      console.log(queue[i].type);
-      queue[i] = generateQueueItem(queue[i].type, { ...queue });
+  function update(i: number | "name") {
+    if (i != undefined && i != "name") {
+      console.log(sequence[i].type);
+      sequence[i] = generateSequenceItem(sequence[i].type, { ...sequence[i] });
     }
-    if (type) events.updateEvent(id, { name, queue });
+    if (type) events.updateEvent(id, { name, sequence });
   }
 
   function updateSlot(i: number) {
-    queue[i].emoji = $currentEmoji;
+    sequence[i].emoji = $currentEmoji;
   }
 
   onDestroy(() => {
-    if (queue.some((item) => Object.values(item).includes(""))) {
+    console.log(sequence);
+    if (sequence.length == 0) {
+      events.removeEvent(id);
+    } else if (
+      sequence.some((item) => {
+        let vals = Object.values(item);
+        return vals.includes("") || vals.includes(undefined);
+      })
+    ) {
       events.removeEvent(id);
     }
   });
-  console.log(queue);
+  console.log(sequence);
 </script>
 
 <section class="noselect rule-card">
-  <input type="text" bind:value={name} on:input={() => update(-1, "")} />
+  <input
+    type="text"
+    bind:value={name}
+    on:input={() => update("name")}
+    placeholder="Event Name"
+  />
   <button class="rule-card-close" on:click={() => events.removeEvent(id)}
     >❌</button
   >
-  {#each queue as q, i}
+  {#each sequence as s, i}
     <div>
-      <select id="type" bind:value={q.type} on:change={() => update(i, q.type)}>
+      <select id="type" bind:value={s.type} on:change={() => update(i)}>
         {#each types as t}
           <option value={t}>{t}</option>
         {/each}
       </select>
-      {#if q.type == "spawn"}
-        <div class="slot" on:click={() => updateSlot(i)}>{q.emoji || ""}</div>
+      {#if s.type == "spawn"}
+        <div class="slot" on:click={() => updateSlot(i)}>{s.emoji || ""}</div>
         at
         <input
           type="number"
-          bind:value={q.index}
+          bind:value={s.index}
           min={MIN_INDEX}
           max={MAX_INDEX}
-          on:change={() => update(i, q.type)}
+          on:change={() => update(i)}
         />
-      {:else if q.type == "wait"}
+      {:else if s.type == "wait"}
         <input
           type="number"
-          bind:value={q.duration}
+          bind:value={s.duration}
           min={MIN_DURATION}
           max={MAX_DURATION}
-          on:change={() => update(i, q.type)}
+          on:change={() => update(i)}
         /> ms
-      {:else if q.type == "setBackgroundOf"}
+      {:else if s.type == "setBackgroundOf"}
         <input
           type="number"
-          bind:value={q.index}
+          bind:value={s.index}
           min={MIN_INDEX}
           max={MAX_INDEX}
-          on:change={() => update(i, q.type)}
+          on:change={() => update(i)}
         />
         to
         <select
-          bind:value={q.background}
-          style:background={q.background}
-          on:change={() => update(i, q.type)}
+          bind:value={s.background}
+          style:background={s.background}
+          on:change={() => update(i)}
         >
           {#each [...$colorPalette] as color}
             <option value={color} style:background={color} />
@@ -167,12 +186,14 @@
       <button id="remove" on:click={() => removeFromQueue(i)}>❌</button>
     </div>
   {/each}
-  <select bind:value={type}>
-    {#each types as t}
-      <option value={t}>{t}</option>
-    {/each}
-  </select>
-  <button on:click={addToQueue}>➕</button>
+  <div class="inline">
+    <select bind:value={type}>
+      {#each types as t}
+        <option value={t}>{t}</option>
+      {/each}
+    </select>
+    <button on:click={addToQueue}>➕</button>
+  </div>
   <div class="inline">
     <strong>Trigger on complete</strong>
     <input type="checkbox" bind:checked={trigger} />

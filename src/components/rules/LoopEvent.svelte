@@ -2,11 +2,11 @@
   import { onDestroy } from "svelte/internal";
   import { slide } from "svelte/transition";
   import { colorPalette, events, currentEmoji } from "../../store";
-  import type { QueueItem, Loop } from "../../store";
+  import type { SequenceItem, Loop } from "../../store";
 
   export let id: string;
   export let name: string;
-  export let queue: Array<QueueItem> = [];
+  export let sequence: Array<SequenceItem> = [];
   export let loop: Loop;
 
   let error = "";
@@ -25,8 +25,8 @@
   let background = "";
   let emoji = "";
 
-  function addToQueue() {
-    let newItem: QueueItem = { type };
+  function addToSequence() {
+    let newItem: SequenceItem = { type };
     switch (type) {
       case "setBackgroundOf":
         Object.assign(newItem, { index, background });
@@ -35,24 +35,22 @@
         Object.assign(newItem, { index, emoji });
         break;
     }
-    queue = [...queue, newItem];
-    events.updateEvent(id, { name, queue, loop });
+    sequence = [...sequence, newItem];
+    events.updateEvent(id, { name, sequence, loop });
     [type, index, background] = [types[0], 0, ""];
   }
 
-  function removeFromQueue(i: number) {
-    queue.splice(i, 1);
-    queue = queue;
-    if (queue.length == 0) {
+  function removeFromSequence(i: number) {
+    sequence.splice(i, 1);
+    sequence = sequence;
+    if (sequence.length == 0) {
       events.removeEvent(id);
     } else {
-      events.updateEvent(id, { name, queue, loop });
+      events.updateEvent(id, { name, sequence, loop });
     }
   }
 
   function update() {
-    // TODO: remove unnecessary object props
-
     console.log(loop);
     if (loop.start == loop.end) {
       loop.start = 0;
@@ -75,24 +73,31 @@
       loop.iterationNumber = MIN_ITERATION;
     }
 
-    events.updateEvent(id, { name, queue, loop });
+    events.updateEvent(id, { name, sequence, loop });
   }
 
   function updateSlot(i: number) {
-    queue[i].emoji = $currentEmoji;
+    sequence[i].emoji = $currentEmoji;
   }
 
   // TODO: Test on input changes
 
   onDestroy(() => {
-    if (queue.some((item) => Object.values(item).includes(""))) {
+    if (sequence.length == 0) {
+      events.removeEvent(id);
+    } else if (sequence.some((item) => Object.values(item).includes(""))) {
       events.removeEvent(id);
     }
   });
 </script>
 
 <section class="noselect rule-card">
-  <input type="text" bind:value={name} on:input={update} />
+  <input
+    type="text"
+    bind:value={name}
+    on:input={update}
+    placeholder="Loop Event Name"
+  />
   <button class="rule-card-close" on:click={() => events.removeEvent(id)}
     >❌</button
   >
@@ -110,7 +115,7 @@
     <p>
       <strong>On each step:</strong>
     </p>
-    {#each queue as q, i}
+    {#each sequence as q, i}
       <div>
         <select id="type" bind:value={q.type} on:input={update}>
           {#each types as t}
@@ -132,7 +137,7 @@
             {/each}
           </select>
         {/if}
-        <button id="remove" on:click={() => removeFromQueue(i)}>❌</button>
+        <button id="remove" on:click={() => removeFromSequence(i)}>❌</button>
       </div>
     {/each}
     <select bind:value={type}>
@@ -140,7 +145,7 @@
         <option value={t}>{t}</option>
       {/each}
     </select>
-    <button on:click={addToQueue}>➕</button>
+    <button on:click={addToSequence}>➕</button>
     <div class="inline">
       <select bind:value={loop.iterationType} on:input={update}>
         {#each ["increment", "decrement"] as operation}

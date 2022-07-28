@@ -76,8 +76,10 @@
   }
 
   const mutations = {
-    // @ts-expect-error
-    setBackgroundOf: ({ index, background }, _start?: number) => {
+    setBackgroundOf: (
+      { index, background }: { index: number; background: string },
+      _start?: number
+    ) => {
       backgrounds.set(_start || index, background);
     },
     spawn: ({ index, emoji }: Emoji) => {
@@ -115,7 +117,7 @@
 
     let event = _events.get(condition.eventID);
     if (event == undefined) continue;
-    let queue = event.queue;
+    let sequence = event.sequence;
 
     let loop = structuredClone(event.loop);
     let start: number, end: number, op: number;
@@ -125,12 +127,12 @@
       op = loop.iterationNumber * (loop.iterationType == "increment" ? 1 : -1);
     }
 
-    for (let { type, ...args } of queue) {
+    for (let { type, ...args } of sequence) {
       if (type == "wait") {
         eventQueue.push(async () => await mutations.wait(args.duration || 50)); // MAGIC NUMBER
       } else {
         // @ts-expect-error
-        eventQueue.push((_start?) => mutations[type](args, _start));
+        eventQueue.push((_start?: number) => mutations[type](args, _start));
       }
     }
 
@@ -156,9 +158,9 @@
         if (start >= end) {
           // @ts-expect-error
           start = loop.start;
-          return;
+        } else {
+          execute(0, start);
         }
-        execute(0, start);
       } else {
         execute(i + 1);
       }
@@ -277,21 +279,14 @@
       moveActiveCell(operation, true);
     }
   }
-
-  let testMap = new Map<string, number>();
-  testMap.set("test", 10);
-
-  function assign() {
-    testMap.set("test", 20);
-    testMap = testMap;
-  }
 </script>
 
 <svelte:window on:keydown={handle} />
 
 <section class="noselect">
-  <button on:click={() => (levelCompleted = !levelCompleted)}>TEST</button>
-  <button on:click={assign}>TEST2</button>
+  <button on:click={() => (levelCompleted = !levelCompleted)}
+    >SHOW DIALOG</button
+  >
   <p><strong>Objective: </strong>{_map.objective || "❓"}</p>
   <p title="ghost mode {ghost ? 'on' : 'off'}">👻 {ghost ? "✔️" : "❌"}</p>
   <div class="map">
@@ -309,9 +304,6 @@
           </div>
         {/if}
         {items.get(i)?.emoji || ""}
-        {#if i == 30}
-          {testMap.get("test")}
-        {/if}
       </div>
     {/each}
     {#if levelCompleted}

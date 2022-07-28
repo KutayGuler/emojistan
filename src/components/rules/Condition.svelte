@@ -1,9 +1,8 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
+  import { colorPalette, events, conditions } from "../../store";
 
-  import { colorPalette, events, interactables, conditions } from "../../store";
-
-  const props = ["playerBackground", "playerInteractedWith"];
+  const props = ["playerBackground"];
 
   export let id: string;
   export let a: string;
@@ -48,12 +47,6 @@
       <select bind:value={b} style:background={b} on:change={update}>
         {#each [...$colorPalette] as color}
           <option value={color} style:background={color} />
-        {/each}
-      </select>
-    {:else if a == "playerInteractedWith"}
-      <select bind:value={b} on:change={update}>
-        {#each $interactables as interactable}
-          <option value={interactable}>{interactable}</option>
         {/each}
       </select>
     {/if}

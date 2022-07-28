@@ -1,8 +1,5 @@
 import { writable } from "svelte/store";
 
-// TODO: Convert objects to maps
-// TODO: Convert the necessary arrays to sets
-
 function createCollisions() {
   const { subscribe, update } = writable(new Map<string, string>());
 
@@ -28,7 +25,7 @@ function createCollisions() {
   };
 }
 
-export interface QueueItem {
+export interface SequenceItem {
   type: string;
   background?: string;
   index?: number;
@@ -36,19 +33,19 @@ export interface QueueItem {
   emoji?: string;
 }
 
-export interface SetBackgroundOf extends QueueItem {
-  index?: number;
-  background?: string;
-}
+// export interface SetBackgroundOf extends QueueItem {
+//   index?: number;
+//   background?: string;
+// }
 
-export interface Spawn extends QueueItem {
-  index?: number;
-  emoji?: string;
-}
+// export interface Spawn extends QueueItem {
+//   index?: number;
+//   emoji?: string;
+// }
 
-export interface Spawn extends QueueItem {
-  duration?: number;
-}
+// export interface Spawn extends QueueItem {
+//   duration?: number;
+// }
 
 export interface Loop {
   start: number;
@@ -61,7 +58,7 @@ export interface Loop {
 
 export interface Event {
   name: string;
-  queue: Array<QueueItem>;
+  sequence: Array<SequenceItem>;
   loop?: Loop;
 }
 
