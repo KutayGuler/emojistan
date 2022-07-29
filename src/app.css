@@ -81,6 +81,14 @@ body {
   right: 2%;
 }
 
+.slot {
+  display: inline-block;
+  width: 2.5vw;
+  height: 2.5vw;
+  background-color: var(--primary);
+  border: 2px solid black;
+}
+
 /* UTILS */
 
 .noselect {

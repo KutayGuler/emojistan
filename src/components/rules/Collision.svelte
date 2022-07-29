@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import { slide } from "svelte/transition";
   import { collisions, currentEmoji, hasEmptySlot } from "../../store";
 
@@ -38,7 +38,7 @@
     }
 
     $hasEmptySlot = false;
-    collisions.updateCollision(id, collision);
+    collisions.update(id, collision);
   }
 
   function updateSlot(i: number) {
@@ -65,12 +65,17 @@
 
     checkCollision(`${slots[0]},${slots[1]},${type}`);
   }
+
+  onDestroy(() => {
+    if (slots.includes("") || (type == "merge" && mergeSlot == "")) {
+      collisions.remove(id);
+    }
+  });
 </script>
 
 <section class="noselect rule-card">
-  <button
-    class="rule-card-close"
-    on:click={() => collisions.removeCollision(id)}>❌</button
+  <button class="rule-card-close" on:click={() => collisions.remove(id)}
+    >❌</button
   >
   <div class="slots">
     {#each { length: 3 } as _, i}

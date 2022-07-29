@@ -12,7 +12,7 @@
 
   const update = () => {
     console.log("change");
-    conditions.updateCondition(id, { a, b, eventID, once });
+    conditions.update(id, { a, b, eventID, once });
   };
 
   onDestroy(() => {
@@ -25,7 +25,7 @@
       eventID == "" ||
       $events.get(eventID) == undefined
     ) {
-      conditions.removeCondition(id);
+      conditions.remove(id);
     }
   });
 </script>
@@ -33,7 +33,7 @@
 <section class="noselect rule-card">
   <button
     class="rule-card-close"
-    on:click={() => conditions.removeCondition(id)}>❌</button
+    on:click={() => conditions.remove(id)}>❌</button
   >
   <div class="if">
     <h4>if</h4>

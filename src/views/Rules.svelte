@@ -16,6 +16,7 @@
   import Condition from "../components/rules/Condition.svelte";
   import Event from "../components/rules/Event.svelte";
   import LoopEvent from "../components/rules/LoopEvent.svelte";
+  import Interactable from "../components/rules/Interactable.svelte";
 
   let color = "";
   let r: any, defaultBackground: string;
@@ -61,7 +62,9 @@
       <Collision {id} {rule} />
     {/each}
     {#if !$hasEmptySlot || $collisions.size == 0}
-      <button on:click={() => collisions.addCollision("")}>🤼</button>
+      <button title="Add Collision" on:click={() => collisions.add("")}
+        >🤼</button
+      >
     {/if}
   </div>
   <div id="statics">
@@ -71,7 +74,7 @@
       class="statics noselect"
       on:click={() => statics.toggleEmoji($currentEmoji, "add")}
     >
-      {#each $statics as item}
+      {#each [...$statics] as item}
         <div>
           <div>{item}</div>
           <button on:click={() => statics.toggleEmoji(item)}>❌</button>
@@ -89,7 +92,7 @@
     <button
       title="Add Condition"
       on:click={() =>
-        conditions.addCondition({
+        conditions.add({
           a: "playerBackground",
           b: "",
           eventID: "",
@@ -109,7 +112,7 @@
     <button
       title="Add Event"
       on:click={() =>
-        events.addEvent({
+        events.add({
           name: `Event${eventIndex++}`,
           sequence: [],
         })}>🧨</button
@@ -117,7 +120,7 @@
     <button
       title="Add Loop Event"
       on:click={() =>
-        events.addEvent({
+        events.add({
           name: `LoopEvent${loopEventIndex++}`,
           sequence: [],
           loop: {
@@ -132,20 +135,16 @@
     >
   </div>
   <div id="interactables">
-    <h4>Interactable Objects ♟️</h4>
-    <div
-      class="statics noselect"
-      on:click={() => interactables.toggleEmoji($currentEmoji, "add")}
-    >
-      {#each $interactables as item}
-        <div>
-          <div>{item}</div>
-          <button on:click={() => interactables.toggleEmoji(item)}>❌</button>
-        </div>
-      {:else}
-        <p>Select an emoji and click here to set it as a static item</p>
-      {/each}
-    </div>
+    <h4>Interactable Objects 🕹️</h4>
+    <!-- <button title="Add Interactable" on:click={() => interactables.add("")}
+      >🕹️</button
+    > -->
+    <!-- {#each $interactables as item}
+      <Interactable />
+    {:else}
+      <p>Select an emoji and click here to set it as a static item</p>
+    {/each} -->
+    <Interactable />
   </div>
   <div id="palette">
     <h4>Color Palette 🎨</h4>

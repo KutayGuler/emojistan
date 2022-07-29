@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Emoji } from "../store";
   import { scale } from "svelte/transition";
-  import { hasContext, onMount } from "svelte/internal";
+  import { onMount } from "svelte/internal";
   import {
     editableMap as map,
     collisions,
@@ -84,6 +84,9 @@
     },
     spawn: ({ index, emoji }: Emoji) => {
       items.set(index, { index, emoji });
+    },
+    destroy: ({ index }: { index: number }) => {
+      items.delete(index);
     },
     wait: async (duration: number) => {
       return new Promise((resolve: Function) => {

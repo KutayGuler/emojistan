@@ -11,7 +11,7 @@
 
   let error = "";
 
-  const types = ["setBackgroundOf", "spawn"];
+  const types = ["setBackgroundOf", "spawn", "destroy"];
 
   const MIN_DURATION = 50;
   const MAX_DURATION = 10000;
@@ -36,7 +36,7 @@
         break;
     }
     sequence = [...sequence, newItem];
-    events.updateEvent(id, { name, sequence, loop });
+    events.update(id, { name, sequence, loop });
     [type, index, background] = [types[0], 0, ""];
   }
 
@@ -44,9 +44,9 @@
     sequence.splice(i, 1);
     sequence = sequence;
     if (sequence.length == 0) {
-      events.removeEvent(id);
+      events.remove(id);
     } else {
-      events.updateEvent(id, { name, sequence, loop });
+      events.update(id, { name, sequence, loop });
     }
   }
 
@@ -73,20 +73,22 @@
       loop.iterationNumber = MIN_ITERATION;
     }
 
-    events.updateEvent(id, { name, sequence, loop });
+    events.update(id, { name, sequence, loop });
   }
 
   function updateSlot(i: number) {
     sequence[i].emoji = $currentEmoji;
   }
 
+  // TODO: Implement destroy
+
   // TODO: Test on input changes
 
   onDestroy(() => {
     if (sequence.length == 0) {
-      events.removeEvent(id);
+      events.remove(id);
     } else if (sequence.some((item) => Object.values(item).includes(""))) {
-      events.removeEvent(id);
+      events.remove(id);
     }
   });
 </script>
@@ -98,9 +100,7 @@
     on:input={update}
     placeholder="Loop Event Name"
   />
-  <button class="rule-card-close" on:click={() => events.removeEvent(id)}
-    >❌</button
-  >
+  <button class="rule-card-close" on:click={() => events.remove(id)}>❌</button>
   <div class="inline">
     start <strong>i</strong> from
     <input
@@ -202,14 +202,6 @@
 
   section {
     border-color: var(--event);
-  }
-
-  .slot {
-    display: inline-block;
-    width: 2.5vw;
-    height: 2.5vw;
-    background-color: var(--primary);
-    border: 2px solid black;
   }
 
   .step {

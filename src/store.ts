@@ -1,28 +1,8 @@
 import { writable } from "svelte/store";
 
-function createCollisions() {
-  const { subscribe, update } = writable(new Map<string, string>());
-
-  return {
-    subscribe,
-    addCollision: (rule: string) =>
-      update((state) => {
-        let id = Date.now().toString();
-        state.set(id, rule);
-        return state;
-      }),
-    updateCollision: (id: string, rule: string) =>
-      update((state) => {
-        state.set(id, rule);
-        return state;
-      }),
-    removeCollision: (id: string) => {
-      update((state) => {
-        state.delete(id);
-        return state;
-      });
-    },
-  };
+export interface Interactable {
+  eventID: string;
+  interacts: string;
 }
 
 export interface SequenceItem {
@@ -32,20 +12,6 @@ export interface SequenceItem {
   duration?: number;
   emoji?: string;
 }
-
-// export interface SetBackgroundOf extends QueueItem {
-//   index?: number;
-//   background?: string;
-// }
-
-// export interface Spawn extends QueueItem {
-//   index?: number;
-//   emoji?: string;
-// }
-
-// export interface Spawn extends QueueItem {
-//   duration?: number;
-// }
 
 export interface Loop {
   start: number;
@@ -62,66 +28,11 @@ export interface Event {
   loop?: Loop;
 }
 
-function createEvents() {
-  const { subscribe, update } = writable(new Map<string, Event>());
-
-  return {
-    subscribe,
-    addEvent: (event: Event) =>
-      update((state) => {
-        let id = Date.now().toString();
-        // state[id] = event;
-        state.set(id, event);
-        return state;
-      }),
-    updateEvent: (id: string, event: Event) =>
-      update((state) => {
-        // state[id] = event;
-        state.set(id, event);
-        console.log(state);
-        return state;
-      }),
-    removeEvent: (id: string) =>
-      update((state) => {
-        // delete state[id];
-        state.delete(id);
-        return state;
-      }),
-  };
-}
-
 export interface Condition {
   a: string;
   b: string;
   eventID: string;
   once: boolean;
-}
-
-function createConditions() {
-  const { subscribe, update } = writable(new Map<string, Condition>());
-
-  return {
-    subscribe,
-    addCondition: (condition: Condition) =>
-      update((state) => {
-        let id = Date.now().toString();
-        // state[id] = condition;
-        state.set(id, condition);
-        return state;
-      }),
-    updateCondition: (id: string, condition: Condition) =>
-      update((state) => {
-        // state[id] = condition;
-        state.set(id, condition);
-        return state;
-      }),
-    removeCondition: (id: string) =>
-      update((state) => {
-        // delete state[id];
-        state.delete(id);
-        return state;
-      }),
-  };
 }
 
 export interface Emoji {
@@ -130,15 +41,44 @@ export interface Emoji {
   inventory?: Array<any>;
 }
 
-export interface Interactable extends Emoji {
-  interact: Function;
-}
-
 interface EditableMap {
   items: Map<number, Emoji>;
   backgrounds: Map<number, string>;
   objective: string;
 }
+
+function createMapStore<T>(_state: Map<string, T>) {
+  const { subscribe, update } = writable(_state);
+
+  return {
+    subscribe,
+    add: (value: T) =>
+      update((state) => {
+        let id = Date.now().toString();
+        state.set(id, value);
+        return state;
+      }),
+    update: (id: string, value: T) =>
+      update((state) => {
+        state.set(id, value);
+        return state;
+      }),
+    remove: (id: string) =>
+      update((state) => {
+        state.delete(id);
+        return state;
+      }),
+  };
+}
+
+export const collisions = createMapStore<string>(new Map<string, string>());
+export const events = createMapStore<Event>(new Map<string, Event>());
+export const conditions = createMapStore<Condition>(
+  new Map<string, Condition>()
+);
+export const interactables = createMapStore<Interactable>(
+  new Map<string, Interactable>()
+);
 
 function createEditableMap() {
   const map: EditableMap = {
@@ -173,45 +113,27 @@ function createEditableMap() {
   };
 }
 
+export const editableMap = createEditableMap();
+
 function createStatics() {
-  const statics: Array<string> = [];
-  const { subscribe, update } = writable(statics);
+  const { subscribe, update } = writable(new Set<string>());
 
   return {
     subscribe,
     toggleEmoji: (emoji: string, operation?: string) =>
+      emoji != "" &&
       update((state) => {
-        if (emoji == "") return state;
         if (operation == "add") {
-          if (state.includes(emoji)) return state;
-          state.push(emoji);
-        } else if (state.includes(emoji)) {
-          state = state.filter((el) => el != emoji);
+          state.add(emoji);
+        } else {
+          state.delete(emoji);
         }
         return state;
       }),
   };
 }
 
-function createInteractables() {
-  const interactables: Array<string> = [];
-  const { subscribe, update } = writable(interactables);
-
-  return {
-    subscribe,
-    toggleEmoji: (emoji: string, operation?: string) =>
-      update((state) => {
-        if (emoji == "") return state;
-        if (operation == "add") {
-          if (state.includes(emoji)) return state;
-          state.push(emoji);
-        } else if (state.includes(emoji)) {
-          state = state.filter((el) => el != emoji);
-        }
-        return state;
-      }),
-  };
-}
+export const statics = createStatics();
 
 function createColorPalette() {
   const { subscribe, update } = writable(new Set<string>());
@@ -221,7 +143,6 @@ function createColorPalette() {
     addColor: (color: string) =>
       color != "" &&
       update((state) => {
-        if (state.has(color)) return state;
         state.add(color);
         return state;
       }),
@@ -233,12 +154,8 @@ function createColorPalette() {
   };
 }
 
+export const colorPalette = createColorPalette();
+
+// TODO: Investigate this store
 export const hasEmptySlot = writable(false);
 export const currentEmoji = writable("");
-export const editableMap = createEditableMap();
-export const collisions = createCollisions();
-export const events = createEvents();
-export const conditions = createConditions();
-export const statics = createStatics();
-export const interactables = createInteractables();
-export const colorPalette = createColorPalette();

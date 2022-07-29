@@ -8,7 +8,6 @@
   export let sequence: Array<SequenceItem> = [];
   let onEndID = 0;
 
-  // TODO: Implement destroy
   const types = [
     "setBackgroundOf",
     "spawn",
@@ -30,31 +29,39 @@
   let emoji = "";
   let trigger = false;
 
+  function validateInput(
+    input: number,
+    min: number,
+    max: number
+  ): number | undefined {
+    if (input == undefined) return input;
+    if (input > max) {
+      return max;
+    } else if (input < min) {
+      return min;
+    } else {
+      return input;
+    }
+  }
+
   function generateSequenceItem(_type: string, vals?: any) {
     // TODO: Migrate this solution to loop event
     let newItem: SequenceItem = { type: _type };
     if (vals) {
       let { index, background, emoji, duration } = vals;
+      index = validateInput(index, MIN_INDEX, MAX_INDEX);
+      duration = validateInput(duration, MIN_DURATION, MAX_DURATION);
       switch (_type) {
         case "setBackgroundOf":
+          Object.assign(newItem, { index, background });
+          break;
         case "spawn":
-          if (index > MAX_INDEX) {
-            index = MAX_INDEX;
-          } else if (index < MIN_INDEX) {
-            index = MIN_INDEX;
-          }
-          if (_type == "spawn") {
-            Object.assign(newItem, { index, emoji });
-          } else {
-            Object.assign(newItem, { index, background });
-          }
+          Object.assign(newItem, { index, emoji });
+          break;
+        case "destroy":
+          Object.assign(newItem, { index });
           break;
         case "wait":
-          if (duration > MAX_DURATION) {
-            duration = MAX_DURATION;
-          } else if (duration < MIN_DURATION) {
-            duration = MIN_DURATION;
-          }
           Object.assign(newItem, { duration });
           break;
         case "completeLevel":
@@ -70,6 +77,9 @@
           break;
         case "spawn":
           Object.assign(newItem, { index, emoji });
+          break;
+        case "destroy":
+          Object.assign(newItem, { index });
           break;
         case "wait":
           Object.assign(newItem, { duration });
@@ -87,7 +97,7 @@
 
   function addToQueue() {
     sequence = [...sequence, generateSequenceItem(type)];
-    events.updateEvent(id, { name, sequence });
+    events.update(id, { name, sequence });
     [type, duration, index, background] = [types[0], 0, 0, ""];
   }
 
@@ -95,9 +105,9 @@
     sequence.splice(i, 1);
     sequence = sequence;
     if (sequence.length == 0) {
-      events.removeEvent(id);
+      events.remove(id);
     } else {
-      events.updateEvent(id, { name, sequence });
+      events.update(id, { name, sequence });
     }
   }
 
@@ -106,7 +116,7 @@
       console.log(sequence[i].type);
       sequence[i] = generateSequenceItem(sequence[i].type, { ...sequence[i] });
     }
-    if (type) events.updateEvent(id, { name, sequence });
+    if (type) events.update(id, { name, sequence });
   }
 
   function updateSlot(i: number) {
@@ -116,14 +126,14 @@
   onDestroy(() => {
     console.log(sequence);
     if (sequence.length == 0) {
-      events.removeEvent(id);
+      events.remove(id);
     } else if (
       sequence.some((item) => {
         let vals = Object.values(item);
         return vals.includes("") || vals.includes(undefined);
       })
     ) {
-      events.removeEvent(id);
+      events.remove(id);
     }
   });
   console.log(sequence);
@@ -136,7 +146,7 @@
     on:input={() => update("name")}
     placeholder="Event Name"
   />
-  <button class="rule-card-close" on:click={() => events.removeEvent(id)}
+  <button class="rule-card-close" on:click={() => events.remove(id)}
     >❌</button
   >
   {#each sequence as s, i}
@@ -149,6 +159,14 @@
       {#if s.type == "spawn"}
         <div class="slot" on:click={() => updateSlot(i)}>{s.emoji || ""}</div>
         at
+        <input
+          type="number"
+          bind:value={s.index}
+          min={MIN_INDEX}
+          max={MAX_INDEX}
+          on:change={() => update(i)}
+        />
+      {:else if s.type == "destroy"}
         <input
           type="number"
           bind:value={s.index}
@@ -212,13 +230,5 @@
 <style>
   section {
     border-color: var(--event);
-  }
-
-  .slot {
-    display: inline-block;
-    width: 2.5vw;
-    height: 2.5vw;
-    background-color: var(--primary);
-    border: 2px solid black;
   }
 </style>
