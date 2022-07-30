@@ -1,6 +1,7 @@
 import { writable } from "svelte/store";
 
 export interface Interactable {
+  emoji: string;
   eventID: string;
   interacts: string;
 }
@@ -54,7 +55,8 @@ function createMapStore<T>(_state: Map<string, T>) {
     subscribe,
     add: (value: T) =>
       update((state) => {
-        let id = Date.now().toString();
+        let id = Date.now().toString().slice(7);
+        console.log(id);
         state.set(id, value);
         return state;
       }),
@@ -70,15 +72,6 @@ function createMapStore<T>(_state: Map<string, T>) {
       }),
   };
 }
-
-export const collisions = createMapStore<string>(new Map<string, string>());
-export const events = createMapStore<Event>(new Map<string, Event>());
-export const conditions = createMapStore<Condition>(
-  new Map<string, Condition>()
-);
-export const interactables = createMapStore<Interactable>(
-  new Map<string, Interactable>()
-);
 
 function createEditableMap() {
   const map: EditableMap = {
@@ -113,8 +106,6 @@ function createEditableMap() {
   };
 }
 
-export const editableMap = createEditableMap();
-
 function createStatics() {
   const { subscribe, update } = writable(new Set<string>());
 
@@ -132,8 +123,6 @@ function createStatics() {
       }),
   };
 }
-
-export const statics = createStatics();
 
 function createColorPalette() {
   const { subscribe, update } = writable(new Set<string>());
@@ -154,8 +143,38 @@ function createColorPalette() {
   };
 }
 
-export const colorPalette = createColorPalette();
+function createInventory() {
+  const { subscribe, update } = writable(["🎮", "", "🎮", ""]);
 
-// TODO: Investigate this store
-export const hasEmptySlot = writable(false);
+  return {
+    subscribe,
+    addItem: (item: string) =>
+      update((state) => {
+        if (!state.includes("")) {
+          console.log(state.indexOf(""));
+          state[state.indexOf("")] = item;
+        }
+        return state;
+      }),
+    removeItemAt: (index: number) =>
+      update((state) => {
+        state[index] = "";
+        return state;
+      }),
+  };
+}
+
+export const inventory = createInventory();
+
+export const colorPalette = createColorPalette();
 export const currentEmoji = writable("");
+export const editableMap = createEditableMap();
+export const statics = createStatics();
+export const collisions = createMapStore<string>(new Map<string, string>());
+export const events = createMapStore<Event>(new Map<string, Event>());
+export const conditions = createMapStore<Condition>(
+  new Map<string, Condition>()
+);
+export const interactables = createMapStore<Interactable>(
+  new Map<string, Interactable>()
+);

@@ -146,9 +146,7 @@
     on:input={() => update("name")}
     placeholder="Event Name"
   />
-  <button class="rule-card-close" on:click={() => events.remove(id)}
-    >❌</button
-  >
+  <button class="rule-card-close" on:click={() => events.remove(id)}>❌</button>
   {#each sequence as s, i}
     <div>
       <select id="type" bind:value={s.type} on:change={() => update(i)}>
@@ -204,27 +202,27 @@
       <button id="remove" on:click={() => removeFromQueue(i)}>❌</button>
     </div>
   {/each}
-  <div class="inline">
+  <label>
     <select bind:value={type}>
       {#each types as t}
         <option value={t}>{t}</option>
       {/each}
     </select>
     <button on:click={addToQueue}>➕</button>
-  </div>
-  <div class="inline">
+  </label>
+  <label>
     <strong>Trigger on complete</strong>
     <input type="checkbox" bind:checked={trigger} />
-  </div>
-  {#if trigger}
-    <select bind:value={onEndID}>
-      {#each [...$events] as [_id, { name }]}
-        {#if id != _id}
-          <option value={_id}>{name}</option>
-        {/if}
-      {/each}
-    </select>
-  {/if}
+    {#if trigger}
+      <select bind:value={onEndID}>
+        {#each [...$events] as [_id, { name }]}
+          {#if id != _id}
+            <option value={_id}>{name}</option>
+          {/if}
+        {/each}
+      </select>
+    {/if}
+  </label>
 </section>
 
 <style>

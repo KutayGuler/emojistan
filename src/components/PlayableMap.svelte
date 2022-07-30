@@ -34,7 +34,7 @@
 
   /* ## STATE ## */
   let dialog: HTMLDialogElement;
-  let interact = false;
+  let interactItem = "🕹️";
   let levelCompleted = false;
   let ac = 0; // ACTIVE CELL
   let adc = 1; // ADJACENT CELL
@@ -51,28 +51,40 @@
   let dirKey = "KeyD";
 
   /* ## DATA ## */
+  // let _interactables = new Map($interactables);
   let _events = new Map($events);
-  let _map = structuredClone($map);
+  // let _map = structuredClone($map);
+  let _map = $map;
   let items = new Map(_map.items);
   let backgrounds = new Map(_map.backgrounds);
-  let behaviors = new Map<string, Map<string, string>>();
+  let _collisions = new Map<string, Map<string, string>>();
+  let _interactables: any;
+
+  for (let interactable of $interactables.values()) {
+    console.log(interactable);
+  }
 
   for (let rule of $collisions.values()) {
+    console.log(rule);
     let [key1, key2, val] = rule.split(",");
-    if (!behaviors.has(key1)) {
-      behaviors.set(key1, new Map());
+    if (!_collisions.has(key1)) {
+      _collisions.set(key1, new Map());
     }
-    behaviors.get(key1)?.set(key2, val);
+    _collisions.get(key1)?.set(key2, val);
 
     // making emoji merge both ways
     if (/\p{Extended_Pictographic}/gu.test(val)) {
       if (key1 != key2) {
-        if (!behaviors.has(key2)) {
-          behaviors.set(key2, new Map());
+        if (!_collisions.has(key2)) {
+          _collisions.set(key2, new Map());
         }
-        behaviors.get(key2)?.set(key1, val);
+        _collisions.get(key2)?.set(key1, val);
       }
     }
+  }
+
+  function interact() {
+    console.log("interact");
   }
 
   const mutations = {
@@ -179,7 +191,8 @@
   }
 
   function getCollisionType(key1: string, key2: string): string {
-    if (behaviors.has(key1)) return behaviors.get(key1)?.get(key2) || "bump";
+    if (_collisions.has(key1))
+      return _collisions.get(key1)?.get(key2) || "bump";
     return "bump";
   }
 
@@ -211,8 +224,17 @@
   let wasd = ["KeyW", "KeyA", "KeyS", "KeyD"];
 
   function handle(e: KeyboardEvent) {
-    if (ac == 3) interact = true;
-    if (e.code == "Space") ghost = !ghost;
+    if (e.code == "KeyE") {
+      if (interactItem == "") return;
+      interact();
+      return;
+    }
+    if (e.code == "Space") {
+      ghost = !ghost;
+      if (ghost) interactItem = "";
+      console.log(interactItem);
+      return;
+    }
     if (wasd.includes(e.code)) {
       dirKey = e.code;
       adc = ac + dirs[dirKey].operation;
@@ -226,7 +248,7 @@
       return;
     }
     let item = items.get(ac);
-    if (item == undefined || $statics.includes(item.emoji)) return;
+    if (item == undefined || $statics.has(item.emoji)) return;
     let postOpItem = items.get(ac + operation);
     if (postOpItem != undefined) {
       switch (getCollisionType(item.emoji, postOpItem.emoji)) {
@@ -303,7 +325,7 @@
       >
         {#if isActive && isControlling}
           <div class="direction" style={dirs[dirKey].style}>
-            {interact ? "⚔️" : dirs[dirKey].emoji}
+            {interactItem || dirs[dirKey].emoji}
           </div>
         {/if}
         {items.get(i)?.emoji || ""}

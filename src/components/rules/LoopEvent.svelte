@@ -80,8 +80,6 @@
     sequence[i].emoji = $currentEmoji;
   }
 
-  // TODO: Implement destroy
-
   // TODO: Test on input changes
 
   onDestroy(() => {
@@ -101,7 +99,7 @@
     placeholder="Loop Event Name"
   />
   <button class="rule-card-close" on:click={() => events.remove(id)}>❌</button>
-  <div class="inline">
+  <label>
     start <strong>i</strong> from
     <input
       type="number"
@@ -110,7 +108,7 @@
       max={MAX_INDEX}
       on:input={update}
     />
-  </div>
+  </label>
   <div class="step">
     <p>
       <strong>On each step:</strong>
@@ -171,7 +169,7 @@
       /> ms
     </div>
   </div>
-  <div class="inline">
+  <label>
     end <strong>i</strong> at
     <input
       type="number"
@@ -180,14 +178,7 @@
       max={MAX_INDEX}
       on:input={update}
     />
-  </div>
-  <!-- <div class="inline">
-    Reverse <input
-      type="checkbox"
-      bind:checked={loop.reverse}
-      on:change={update}
-    />
-  </div> -->
+  </label>
   {#if error != ""}
     <div transition:slide class="error">
       {error}

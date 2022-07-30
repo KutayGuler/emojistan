@@ -8,7 +8,6 @@
     events,
     conditions,
     colorPalette,
-    hasEmptySlot,
     statics,
     interactables,
     currentEmoji,
@@ -61,11 +60,8 @@
     {#each [...$collisions] as [id, rule]}
       <Collision {id} {rule} />
     {/each}
-    {#if !$hasEmptySlot || $collisions.size == 0}
-      <button title="Add Collision" on:click={() => collisions.add("")}
-        >🤼</button
-      >
-    {/if}
+    <button title="Add Collision" on:click={() => collisions.add("")}>🤼</button
+    >
   </div>
   <div id="statics">
     <h4>Static Objects 🗿</h4>
@@ -136,15 +132,18 @@
   </div>
   <div id="interactables">
     <h4>Interactable Objects 🕹️</h4>
-    <!-- <button title="Add Interactable" on:click={() => interactables.add("")}
-      >🕹️</button
-    > -->
-    <!-- {#each $interactables as item}
-      <Interactable />
-    {:else}
-      <p>Select an emoji and click here to set it as a static item</p>
-    {/each} -->
-    <Interactable />
+    {#each [...$interactables] as [id, { emoji, eventID, interacts }]}
+      <Interactable {id} {emoji} {eventID} {interacts} />
+    {/each}
+    <button
+      title="Add Interactable"
+      on:click={() =>
+        interactables.add({
+          emoji: "",
+          eventID: "",
+          interacts: "",
+        })}>🕹️</button
+    >
   </div>
   <div id="palette">
     <h4>Color Palette 🎨</h4>

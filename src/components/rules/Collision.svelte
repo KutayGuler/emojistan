@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
   import { slide } from "svelte/transition";
-  import { collisions, currentEmoji, hasEmptySlot } from "../../store";
+  import { collisions, currentEmoji } from "../../store";
 
   export let id: string;
   export let rule: string;
@@ -14,7 +14,6 @@
 
   onMount(() => {
     if (rule != "") {
-      $hasEmptySlot = false;
       let [x, y, z] = rule.split(",");
       slots = [x, y];
       if (types.includes(z)) {
@@ -23,21 +22,17 @@
         type = "merge";
         mergeSlot = z;
       }
-    } else {
-      $hasEmptySlot = true;
     }
   });
 
   function checkCollision(collision: string) {
     if ([...$collisions.values()].includes(collision)) {
       [type, mergeSlot, slots] = [types[0], "", ["", ""]];
-      $hasEmptySlot = true;
       error = "Can't have duplicate collisions";
       setTimeout(() => (error = ""), 2000);
       return;
     }
 
-    $hasEmptySlot = false;
     collisions.update(id, collision);
   }
 
@@ -48,18 +43,12 @@
       if ([...slots, mergeSlot].includes("")) return;
       if (slots.includes(mergeSlot)) {
         mergeSlot = "";
-        $hasEmptySlot = true;
         error = "Inputs cannot be the same with output";
         setTimeout(() => (error = ""), 2000);
         return;
       }
 
       checkCollision(`${slots[0]},${slots[1]},${mergeSlot}`);
-      return;
-    }
-
-    if (slots.includes("")) {
-      $hasEmptySlot = true;
       return;
     }
 

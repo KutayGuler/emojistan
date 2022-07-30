@@ -5,10 +5,12 @@
   import Rules from "../views/Rules.svelte";
 
   import { emojis } from "../emojis";
-  import { currentEmoji } from "../store";
+  import { currentEmoji, inventory } from "../store";
 
   let filter = "";
-  let viewIndex = 2;
+  let viewIndex = 0;
+  let inventoryIndex = 0;
+  let hidden = viewIndex == 0;
 
   let views = [
     { component: Play, emoji: "🎬", title: "Play" },
@@ -26,7 +28,14 @@
   function handleKeydown(e: KeyboardEvent) {
     if (e.code == "Escape") {
       $currentEmoji = "";
+    } else if (viewIndex == 0 && +e.key >= 1 && +e.key <= 4) {
+      inventoryIndex = +e.key - 1;
     }
+  }
+
+  function changeView(i: number) {
+    viewIndex = i;
+    hidden = i == 0;
   }
 </script>
 
@@ -51,7 +60,7 @@
         <div class="view noselect">
           {#each views as view, i}
             <div
-              on:click={() => (viewIndex = i)}
+              on:click={() => changeView(i)}
               class:currentView={viewIndex == i}
             >
               {view.emoji}
@@ -61,26 +70,38 @@
       </div>
       <svelte:component this={views[viewIndex].component} />
     </div>
-    <div id="emoji-container" class="noselect">
-      <input type="text" placeholder="search" bind:value={filter} />
-      {#each Object.keys(emojis) as category}
-        {#if emojis[category].some((item) => item.name.includes(filter))}
-          <h4>{category}</h4>
-        {/if}
-        <div class="flex">
-          {#each emojis[category] as { emoji, unicode_version, name }}
-            {#if name.includes(filter) && +unicode_version < 13}
-              <div
-                class:selected={$currentEmoji == emoji}
-                on:click={() => ($currentEmoji = emoji)}
-                title={name}
-              >
-                {emoji}
-              </div>
-            {/if}
+
+    <div id="aside-container" class="noselect">
+      {#if viewIndex == 0}
+        <div id="inventory" class="noselect">
+          {#each $inventory as item, i}
+            <div style:border-color={i == inventoryIndex ? "red" : "black"}>
+              {item}
+            </div>
           {/each}
         </div>
-      {/each}
+      {/if}
+      <input {hidden} type="text" placeholder="search" bind:value={filter} />
+      <div {hidden} id="emoji-container">
+        {#each Object.keys(emojis) as category}
+          {#if emojis[category].some((item) => item.name.includes(filter))}
+            <h4>{category}</h4>
+          {/if}
+          <div class="flex">
+            {#each emojis[category] as { emoji, unicode_version, name }}
+              {#if name.includes(filter) && +unicode_version < 13}
+                <div
+                  class:selected={$currentEmoji == emoji}
+                  on:click={() => ($currentEmoji = emoji)}
+                  title={name}
+                >
+                  {emoji}
+                </div>
+              {/if}
+            {/each}
+          </div>
+        {/each}
+      </div>
     </div>
   </div>
 </main>
@@ -143,7 +164,7 @@
     border: 2px solid black;
   }
 
-  #emoji-container {
+  #aside-container {
     background-color: var(--secondary);
     width: 25%;
     font-size: 1.4rem;
@@ -152,9 +173,25 @@
     overflow-y: auto;
   }
 
-  #emoji-container .flex {
+  #aside-container .flex,
+  #inventory {
     display: flex;
     flex-wrap: wrap;
+  }
+
+  #inventory {
+    justify-content: center;
+  }
+
+  #inventory > div {
+    margin: 5px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid black;
+    width: 10vw;
+    height: 10vw;
   }
 
   .selected {
