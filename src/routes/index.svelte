@@ -5,10 +5,16 @@
   import Rules from "../views/Rules.svelte";
 
   import { emojis } from "../emojis";
-  import { currentEmoji, inventory } from "../store";
+  import {
+    currentEmoji,
+    inventory,
+    currentItem,
+    currentColor,
+    colorPalette,
+  } from "../store";
 
   let filter = "";
-  let viewIndex = 0;
+  let viewIndex = 1;
   let inventoryIndex = 0;
   let hidden = viewIndex == 0;
 
@@ -28,8 +34,10 @@
   function handleKeydown(e: KeyboardEvent) {
     if (e.code == "Escape") {
       $currentEmoji = "";
+      $currentColor = "";
     } else if (viewIndex == 0 && +e.key >= 1 && +e.key <= 4) {
       inventoryIndex = +e.key - 1;
+      $currentItem = $inventory[inventoryIndex];
     }
   }
 
@@ -37,12 +45,23 @@
     viewIndex = i;
     hidden = i == 0;
   }
+
+  function pickEmoji(emoji: string) {
+    $currentEmoji = emoji == $currentEmoji ? "" : emoji;
+  }
+
+  function pickColor(color: string) {
+    $currentColor = color == $currentColor ? "" : color;
+  }
 </script>
 
 <svelte:window on:keydown={handleKeydown} />
-
-<div class="cursor" style="transform: translate({x + 15}px, {y}px);">
-  {$currentEmoji || ""}
+<div
+  class="cursor"
+  style="transform: translate({x + 15}px, {y}px);"
+  style:background={$currentColor}
+>
+  {$currentEmoji}
 </div>
 <main>
   <div class="playground" on:mousemove={setCursorEmoji}>
@@ -50,11 +69,7 @@
       <div id="toolbox">
         <div>
           <h4>Shortcuts</h4>
-          <p>Esc - Deselect emoji</p>
-          <!-- <p>1 - Play</p>
-          <p>2 - Editor</p>
-          <p>3 - Events</p>
-          <p>Space - ghost mode</p> -->
+          <p>Esc - Deselect emoji/color</p>
         </div>
         <h4>{views[viewIndex].title}</h4>
         <div class="view noselect">
@@ -68,7 +83,28 @@
           {/each}
         </div>
       </div>
-      <svelte:component this={views[viewIndex].component} />
+      {#if viewIndex == 1}
+        <Editor>
+          <div class="palette">
+            <p
+              on:click={() => ($currentColor = "")}
+              style:opacity={$colorPalette.size == 0 ? "50%" : "100%"}
+            >
+              🎨{$colorPalette.has($currentColor) ? "" : "🖌️"}
+            </p>
+            {#each [...$colorPalette] as c}
+              <div
+                class="color"
+                class:currentColor={c == $currentColor}
+                style:background={c}
+                on:click={() => pickColor(c)}
+              />
+            {/each}
+          </div>
+        </Editor>
+      {:else}
+        <svelte:component this={views[viewIndex].component} />
+      {/if}
     </div>
 
     <div id="aside-container" class="noselect">
@@ -92,7 +128,7 @@
               {#if name.includes(filter) && +unicode_version < 13}
                 <div
                   class:selected={$currentEmoji == emoji}
-                  on:click={() => ($currentEmoji = emoji)}
+                  on:click={() => pickEmoji(emoji)}
                   title={name}
                 >
                   {emoji}
@@ -108,6 +144,8 @@
 
 <style>
   .cursor {
+    width: 2.5vw;
+    height: 2.5vw;
     position: absolute;
     z-index: 99;
   }
@@ -140,10 +178,11 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    font-size: 2rem;
+    font-size: 1.5rem;
     background-color: antiquewhite;
     border-bottom: 2px solid black;
     box-sizing: border-box;
+    transition: 500ms ease-out;
   }
 
   .view {
@@ -161,7 +200,7 @@
   }
 
   .currentView {
-    border: 2px solid black;
+    font-size: 2rem;
   }
 
   #aside-container {
@@ -196,5 +235,23 @@
 
   .selected {
     border: 2px solid red;
+  }
+
+  .color {
+    width: 50px;
+    height: 50px;
+  }
+
+  .palette {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .currentColor::after {
+    content: "🖌️";
+    color: white;
+    mix-blend-mode: difference;
   }
 </style>

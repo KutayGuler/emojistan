@@ -33,7 +33,6 @@ export interface Condition {
   a: string;
   b: string;
   eventID: string;
-  once: boolean;
 }
 
 export interface Emoji {
@@ -165,6 +164,8 @@ function createInventory() {
 }
 
 export const inventory = createInventory();
+export const currentItem = writable("");
+export const currentColor = writable("")
 
 export const colorPalette = createColorPalette();
 export const currentEmoji = writable("");

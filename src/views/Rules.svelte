@@ -82,8 +82,8 @@
   </div>
   <div id="conditions">
     <h4>Conditions ❓</h4>
-    {#each [...$conditions] as [id, { a, b, eventID, once }]}
-      <Condition {id} {a} {b} {eventID} {once} />
+    {#each [...$conditions] as [id, { a, b, eventID }]}
+      <Condition {id} {a} {b} {eventID} />
     {/each}
     <button
       title="Add Condition"
@@ -92,7 +92,6 @@
           a: "playerBackground",
           b: "",
           eventID: "",
-          once: false,
         })}>❓</button
     >
   </div>

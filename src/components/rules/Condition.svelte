@@ -8,11 +8,10 @@
   export let a: string;
   export let b: string;
   export let eventID: string;
-  export let once: boolean;
 
   const update = () => {
     console.log("change");
-    conditions.update(id, { a, b, eventID, once });
+    conditions.update(id, { a, b, eventID });
   };
 
   onDestroy(() => {
@@ -31,9 +30,8 @@
 </script>
 
 <section class="noselect rule-card">
-  <button
-    class="rule-card-close"
-    on:click={() => conditions.remove(id)}>❌</button
+  <button class="rule-card-close" on:click={() => conditions.remove(id)}
+    >❌</button
   >
   <div class="if">
     <h4>if</h4>
@@ -59,13 +57,6 @@
       {/each}
     </select>
   </div>
-  <p>
-    Trigger once <input
-      type="checkbox"
-      bind:checked={once}
-      on:change={update}
-    />
-  </p>
 </section>
 
 <style>

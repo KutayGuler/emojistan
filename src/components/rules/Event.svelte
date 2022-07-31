@@ -10,6 +10,7 @@
 
   const types = [
     "setBackgroundOf",
+    "removeBackgroundOf",
     "spawn",
     "destroy",
     "wait",
@@ -59,6 +60,7 @@
           Object.assign(newItem, { index, emoji });
           break;
         case "destroy":
+        case "removeBackgroundOf":
           Object.assign(newItem, { index });
           break;
         case "wait":
@@ -78,6 +80,7 @@
         case "spawn":
           Object.assign(newItem, { index, emoji });
           break;
+        case "removeBackgroundOf":
         case "destroy":
           Object.assign(newItem, { index });
           break;
@@ -180,7 +183,7 @@
           max={MAX_DURATION}
           on:change={() => update(i)}
         /> ms
-      {:else if s.type == "setBackgroundOf"}
+      {:else if s.type == "setBackgroundOf" || s.type == "removeBackgroundOf"}
         <input
           type="number"
           bind:value={s.index}
@@ -188,16 +191,18 @@
           max={MAX_INDEX}
           on:change={() => update(i)}
         />
-        to
-        <select
-          bind:value={s.background}
-          style:background={s.background}
-          on:change={() => update(i)}
-        >
-          {#each [...$colorPalette] as color}
-            <option value={color} style:background={color} />
-          {/each}
-        </select>
+        {#if s.type == "setBackgroundOf"}
+          to
+          <select
+            bind:value={s.background}
+            style:background={s.background}
+            on:change={() => update(i)}
+          >
+            {#each [...$colorPalette] as color}
+              <option value={color} style:background={color} />
+            {/each}
+          </select>
+        {/if}
       {/if}
       <button id="remove" on:click={() => removeFromQueue(i)}>❌</button>
     </div>
