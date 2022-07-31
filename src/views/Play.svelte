@@ -8,7 +8,6 @@
     conditions,
     events,
     statics,
-    interactables,
     currentItem,
   } from "../store";
   import { invertColor } from "../invertColor";
@@ -51,14 +50,11 @@
   let dirKey = "KeyD";
 
   /* ## DATA ## */
-  // let _interactables = new Map($interactables);
   let _events = new Map($events);
-  // let _map = structuredClone($map);
-  let _map = $map;
+  let _map = structuredClone($map);
   let items = new Map(_map.items);
   let backgrounds = new Map(_map.backgrounds);
   let _collisions = new Map<string, Map<string, string>>();
-  let _interactables: any;
 
   for (let rule of $collisions.values()) {
     let [key1, key2, val] = rule.split(",");
@@ -116,9 +112,27 @@
   for (let [id, condition] of $conditions.entries()) {
     let a: Function;
     let b: string = condition.b;
+    let _b: string = condition._b;
+
     switch (condition.a) {
       case "playerBackground":
         a = () => backgrounds.get(ac);
+        break;
+      case "playerInteractedWith":
+        a = () => {
+          // TODO: check if items.get(adc) is interactable
+          let interactedItem = items.get(adc);
+          if (playerInteracted) {
+            console.log(interactedItem?.emoji + "," + $currentItem);
+            return [
+              interactedItem?.emoji + "," + $currentItem,
+              interactedItem?.emoji + ",any",
+            ];
+          } else {
+            console.log("else");
+            return "";
+          }
+        };
         break;
     }
 
@@ -174,7 +188,9 @@
     }
 
     _conditions.set(+id, {
-      condition: () => a() == b,
+      condition: () => {
+        return a() == b || a().includes(`${b},${_b}`);
+      },
       event: () => {
         if (eventQueue.length == 0) return;
         execute(0);
@@ -214,13 +230,21 @@
   }
 
   let wasd = ["KeyW", "KeyA", "KeyS", "KeyD"];
+  let playerInteracted = false;
 
   function handle(e: KeyboardEvent) {
     if (e.code == "Space") {
-      if ($currentItem == "") return;
+      // if ($currentItem == "") return;
       // interact();
+      playerInteracted = true;
+      if (items.has(ac)) {
+        for (let c of _conditions.values()) {
+          if (c.condition()) c.event();
+        }
+      }
       return;
     }
+    playerInteracted = false;
     if (e.code == "KeyG") {
       ghost = !ghost;
       return;

@@ -14,9 +14,10 @@
   } from "../store";
 
   let filter = "";
-  let viewIndex = 1;
+  let viewIndex = 2;
   let inventoryIndex = 0;
   let hidden = viewIndex == 0;
+  $currentItem = $inventory[inventoryIndex];
 
   let views = [
     { component: Play, emoji: "🎬", title: "Play" },
@@ -53,6 +54,8 @@
   function pickColor(color: string) {
     $currentColor = color == $currentColor ? "" : color;
   }
+
+  // TODO: Find what is causing the jank
 </script>
 
 <svelte:window on:keydown={handleKeydown} />

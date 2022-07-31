@@ -9,13 +9,11 @@
     conditions,
     colorPalette,
     statics,
-    interactables,
     currentEmoji,
   } from "../store";
   import Condition from "../components/rules/Condition.svelte";
   import Event from "../components/rules/Event.svelte";
   import LoopEvent from "../components/rules/LoopEvent.svelte";
-  import Interactable from "../components/rules/Interactable.svelte";
 
   let color = "";
   let r: any, defaultBackground: string;
@@ -82,8 +80,8 @@
   </div>
   <div id="conditions">
     <h4>Conditions ❓</h4>
-    {#each [...$conditions] as [id, { a, b, eventID }]}
-      <Condition {id} {a} {b} {eventID} />
+    {#each [...$conditions] as [id, { a, b, _b, eventID }]}
+      <Condition {id} {a} {b} {_b} {eventID} />
     {/each}
     <button
       title="Add Condition"
@@ -91,6 +89,7 @@
         conditions.add({
           a: "playerBackground",
           b: "",
+          _b: "any",
           eventID: "",
         })}>❓</button
     >
@@ -129,21 +128,6 @@
         })}>🔄🧨</button
     >
   </div>
-  <div id="interactables">
-    <h4>Interactable Objects 🕹️</h4>
-    {#each [...$interactables] as [id, { emoji, eventID, interacts }]}
-      <Interactable {id} {emoji} {eventID} {interacts} />
-    {/each}
-    <button
-      title="Add Interactable"
-      on:click={() =>
-        interactables.add({
-          emoji: "",
-          eventID: "",
-          interacts: "",
-        })}>🕹️</button
-    >
-  </div>
   <div id="palette">
     <h4>Color Palette 🎨</h4>
     <input type="color" bind:value={color} />
@@ -172,7 +156,7 @@
   .rules {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(4, 1fr);
+    grid-template-rows: repeat(3, 1fr);
     gap: 2%;
     padding: 2%;
     overflow-y: auto;
@@ -192,11 +176,8 @@
   #events {
     grid-area: 2 / 2 / 3 / 3;
   }
-  #interactables {
-    grid-area: 3 / 1 / 4 / 3;
-  }
   #palette {
-    grid-area: 4 / 1 / 5 / 3;
+    grid-area: 3 / 1 / 4 / 3;
   }
 
   .statics {

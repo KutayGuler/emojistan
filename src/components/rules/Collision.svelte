@@ -1,6 +1,7 @@
 <script lang="ts">
+  import Error from "./Error.svelte";
+  import type { SvelteComponent } from "svelte";
   import { onDestroy, onMount } from "svelte";
-  import { slide } from "svelte/transition";
   import { collisions, currentEmoji } from "../../store";
 
   export let id: string;
@@ -10,7 +11,7 @@
   let type = types[0];
   let slots = ["", ""];
   let mergeSlot = "";
-  let error = "";
+  let error: SvelteComponent;
 
   onMount(() => {
     if (rule != "") {
@@ -28,8 +29,7 @@
   function checkCollision(collision: string) {
     if ([...$collisions.values()].includes(collision)) {
       [type, mergeSlot, slots] = [types[0], "", ["", ""]];
-      error = "Can't have duplicate collisions";
-      setTimeout(() => (error = ""), 2000);
+      error.display("Can't have duplicate collisions");
       return;
     }
 
@@ -43,8 +43,7 @@
       if ([...slots, mergeSlot].includes("")) return;
       if (slots.includes(mergeSlot)) {
         mergeSlot = "";
-        error = "Inputs cannot be the same with output";
-        setTimeout(() => (error = ""), 2000);
+        error.display("Inputs cannot be the same with output");
         return;
       }
 
@@ -86,11 +85,7 @@
       {/if}
     {/each}
   </div>
-  {#if error != ""}
-    <div transition:slide class="error">
-      {error}
-    </div>
-  {/if}
+  <Error bind:this={error} />
 </section>
 
 <style>

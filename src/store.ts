@@ -32,6 +32,7 @@ export interface Event {
 export interface Condition {
   a: string;
   b: string;
+  _b: string | "any";
   eventID: string;
 }
 
@@ -163,19 +164,18 @@ function createInventory() {
   };
 }
 
-export const inventory = createInventory();
 export const currentItem = writable("");
-export const currentColor = writable("")
-
-export const colorPalette = createColorPalette();
+export const currentColor = writable("");
 export const currentEmoji = writable("");
+// TODO: Make sure interactables are trackable
+export const interactables = writable(new Set<string>());
+
+export const inventory = createInventory();
+export const colorPalette = createColorPalette();
 export const editableMap = createEditableMap();
 export const statics = createStatics();
 export const collisions = createMapStore<string>(new Map<string, string>());
 export const events = createMapStore<Event>(new Map<string, Event>());
 export const conditions = createMapStore<Condition>(
   new Map<string, Condition>()
-);
-export const interactables = createMapStore<Interactable>(
-  new Map<string, Interactable>()
 );

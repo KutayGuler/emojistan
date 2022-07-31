@@ -1,6 +1,7 @@
 <script lang="ts">
+  import Error from "./Error.svelte";
+  import type { SvelteComponent } from "svelte";
   import { onDestroy } from "svelte/internal";
-  import { slide } from "svelte/transition";
   import { colorPalette, events, currentEmoji } from "../../store";
   import type { SequenceItem, Loop } from "../../store";
 
@@ -9,7 +10,7 @@
   export let sequence: Array<SequenceItem> = [];
   export let loop: Loop;
 
-  let error = "";
+  let error: SvelteComponent;
 
   const types = ["setBackgroundOf", "spawn", "destroy"];
 
@@ -54,8 +55,7 @@
     console.log(loop);
     if (loop.start == loop.end) {
       loop.start = 0;
-      error = "starting index and ending index cannot be the same";
-      setTimeout(() => (error = ""), 2000);
+      error.display("starting index and ending index cannot be the same");
     }
     if (loop.start < MIN_INDEX || loop.start > MAX_INDEX) {
       loop.start = MIN_INDEX;
@@ -179,11 +179,7 @@
       on:input={update}
     />
   </label>
-  {#if error != ""}
-    <div transition:slide class="error">
-      {error}
-    </div>
-  {/if}
+  <Error bind:this={error} />
 </section>
 
 <style>
