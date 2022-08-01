@@ -1,29 +1,33 @@
 <script lang="ts">
+  import { getContext } from "svelte";
+
   import { currentEmoji, currentColor, editableMap as map } from "../store";
 
   let showIndex = false;
-  let paintMode = false;
-
-  // TODO: State machine for delete mode
-
-  function resetBackgrounds() {
-    // TODO
-  }
-
-  function resetObjects() {
-    // TODO
-  }
 
   function clickedCell(index: number) {
-    if ($currentColor == "") {
-      map.deleteBackground(index);
-    } else {
+    if ($currentColor == "" && $currentEmoji == "") {
+      switch (getContext("deleteMode")) {
+        case "Emoji":
+          map.removeEmoji(index);
+          break;
+        case "Background":
+          map.deleteBackground(index);
+          break;
+        default:
+        case "Both":
+          map.removeEmoji(index);
+          map.deleteBackground(index);
+          break;
+      }
+      return;
+    }
+
+    if ($currentColor != "") {
       map.updateBackground(index, $currentColor);
     }
 
-    if ($currentEmoji == "") {
-      map.removeEmoji(index);
-    } else {
+    if ($currentEmoji != "") {
       map.addEmoji({
         index,
         emoji: $currentEmoji,
@@ -48,6 +52,8 @@
         </div>
       {/each}
     </div>
+    <button on:click={map.resetObjects}>Reset Objects</button>
+    <button on:click={map.resetBackgrounds}>Reset Backgrounds</button>
   </section>
 </section>
 

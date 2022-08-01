@@ -15,20 +15,24 @@
   let error: SvelteComponent;
 
   const update = () => {
-    console.log([...$conditions.values()]);
-    if ([...$conditions.values()].includes({ a, b, _b, eventID })) {
-      console.log("nibba this exists");
-      error.display("Cannot have duplicate conditions");
-      return;
+    let obj = generateCondition();
+    conditions.update(id, obj);
+    console.log(obj);
+    for (let [_id, _obj] of $conditions.entries()) {
+      if (_id == id) continue;
+      if (JSON.stringify(obj) == JSON.stringify(_obj)) {
+        error.display("Cannot have duplicate conditions");
+        eventID = "";
+        obj.eventID = "";
+        conditions.update(id, obj);
+        return;
+      }
     }
-    conditions.update(id, { a, b, _b, eventID });
   };
 
   function generateCondition() {
-    // TODO: Create a object and only then update conditions
+    return { a, b, _b, eventID };
   }
-
-  // TODO: remove duplicated if statements
 
   onDestroy(() => {
     /*
@@ -38,7 +42,8 @@
     if (
       [a, b].includes("") ||
       eventID == "" ||
-      $events.get(eventID) == undefined
+      $events.get(eventID) == undefined ||
+      $events.get(eventID)?.sequence.length == 0
     ) {
       conditions.remove(id);
     }
@@ -51,14 +56,14 @@
   >
   <div class="if">
     <h4>if</h4>
-    <select bind:value={a} on:input={update}>
+    <select bind:value={a} on:change={update}>
       {#each props as _prop}
         <option value={_prop}>{_prop}</option>
       {/each}
     </select>
     {#if a == "playerBackground"}
       <h4>is</h4>
-      <select bind:value={b} style:background={b} on:input={update}>
+      <select bind:value={b} style:background={b} on:change={update}>
         {#each [...$colorPalette] as color}
           <option value={color} style:background={color} />
         {/each}
@@ -77,7 +82,7 @@
   {/if}
   <div class="then">
     <h4>then trigger</h4>
-    <select bind:value={eventID} on:input={update}>
+    <select bind:value={eventID} on:change={update}>
       {#each [...$events] as [id, { name }]}
         <option value={id}>{name}</option>
       {/each}

@@ -80,12 +80,15 @@
       _start?: number
     ) => {
       backgrounds.set(_start || index, background);
+      backgrounds = backgrounds;
     },
     removeBackgroundOf: ({ index }: { index: number }) => {
       backgrounds.delete(index);
     },
-    spawn: ({ index, emoji }: Emoji) => {
-      items.set(index, { index, emoji });
+    spawn: ({ index, emoji }: Emoji, _start?: number) => {
+      console.log(_start);
+      items.set(_start || index, { index: _start || index, emoji });
+      items = items;
     },
     destroy: ({ index }: { index: number }) => {
       items.delete(index);
@@ -108,11 +111,17 @@
   };
 
   let _conditions = new Map<number, { condition: Function; event: Function }>();
+  let _interactables = new Set<string>();
 
   for (let [id, condition] of $conditions.entries()) {
     let a: Function;
     let b: string = condition.b;
     let _b: string = condition._b;
+    // if not hex string, add as interactable
+    // EDGE interactable
+    if (b[0] != "#") {
+      _interactables.add(b);
+    }
 
     switch (condition.a) {
       case "playerBackground":
@@ -120,17 +129,17 @@
         break;
       case "playerInteractedWith":
         a = () => {
-          // TODO: check if items.get(adc) is interactable
           let interactedItem = items.get(adc);
-          if (playerInteracted) {
-            console.log(interactedItem?.emoji + "," + $currentItem);
-            return [
-              interactedItem?.emoji + "," + $currentItem,
-              interactedItem?.emoji + ",any",
-            ];
-          } else {
-            console.log("else");
-            return "";
+          if (interactedItem != undefined) {
+            if (!_interactables.has(interactedItem.emoji)) return;
+            if (playerInteracted) {
+              return [
+                interactedItem.emoji + "," + $currentItem,
+                interactedItem.emoji + ",any",
+              ];
+            } else {
+              return "";
+            }
           }
         };
         break;
@@ -171,8 +180,6 @@
       console.log("execute");
       console.log(eventQueue[i]);
       await eventQueue[i](_start);
-      // MAGIC UPDATE
-      backgrounds = backgrounds;
       if (i + 1 == eventQueue.length) {
         if (event && event.loop == undefined) return;
         start += op;
@@ -189,7 +196,11 @@
 
     _conditions.set(+id, {
       condition: () => {
-        return a() == b || a().includes(`${b},${_b}`);
+        if (condition.a == "playerBackground") {
+          return a() == b;
+        } else {
+          return a().includes(`${b},${_b}`);
+        }
       },
       event: () => {
         if (eventQueue.length == 0) return;
@@ -234,8 +245,6 @@
 
   function handle(e: KeyboardEvent) {
     if (e.code == "Space") {
-      // if ($currentItem == "") return;
-      // interact();
       playerInteracted = true;
       if (items.has(ac)) {
         for (let c of _conditions.values()) {
@@ -288,6 +297,7 @@
 
           items.set(ac + operation * 2, postOpItem);
           items.set(ac + operation, item);
+          items = items;
           moveActiveCell(operation, true);
           break;
         case "bump":
@@ -296,6 +306,7 @@
           // MERGE
           postOpItem.emoji = getCollisionType(item.emoji, postOpItem.emoji);
           items.set(ac + operation, postOpItem);
+          items = items;
           // items[ac + operation].emoji = getCollisionType(
           //   items[ac].emoji,
           //   items[ac + operation].emoji
@@ -310,7 +321,7 @@
         emoji: item.emoji,
       };
       items.set(ac + operation, postOpItem);
-      console.log(items);
+      items = items;
 
       moveActiveCell(operation, true);
     }

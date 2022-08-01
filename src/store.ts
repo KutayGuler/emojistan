@@ -93,14 +93,24 @@ function createEditableMap() {
         state.backgrounds.delete(index);
         return state;
       }),
+    resetBackgrounds: () =>
+      update((state) => {
+        state.backgrounds.clear();
+        return state;
+      }),
     addEmoji: (obj: Emoji) =>
-      update((state: EditableMap) => {
+      update((state) => {
         state.items.set(obj.index, obj);
         return state;
       }),
     removeEmoji: (index: number) =>
-      update((state: EditableMap) => {
+      update((state) => {
         state.items.delete(index);
+        return state;
+      }),
+    resetObjects: () =>
+      update((state) => {
+        state.items.clear();
         return state;
       }),
   };
@@ -167,9 +177,6 @@ function createInventory() {
 export const currentItem = writable("");
 export const currentColor = writable("");
 export const currentEmoji = writable("");
-// TODO: Make sure interactables are trackable
-export const interactables = writable(new Set<string>());
-
 export const inventory = createInventory();
 export const colorPalette = createColorPalette();
 export const editableMap = createEditableMap();
