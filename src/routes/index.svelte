@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { setContext } from "svelte";
-
   // VIEWS
   import Play from "../views/Play.svelte";
   import Editor from "../views/Editor.svelte";
@@ -16,9 +14,8 @@
   } from "../store";
 
   let filter = "";
-  let deleteMode = "Both";
 
-  let viewIndex = 1;
+  let viewIndex = 2;
   let inventoryIndex = 0;
   let hidden = viewIndex == 0;
   $currentItem = $inventory[inventoryIndex];
@@ -60,13 +57,16 @@
   }
 
   // TODO: Find what is causing the jank
-  $: setContext("deleteMode", deleteMode);
+
+  let innerWidth: number;
 </script>
 
-<svelte:window on:keydown={handleKeydown} />
+<svelte:window on:keydown={handleKeydown} bind:innerWidth />
 <div
   class="cursor"
-  style="transform: translate({x + 15}px, {y}px);"
+  style="transform: translate({x + 75 >= innerWidth
+    ? x - 30
+    : x + 15}px, {y}px);"
   style:background={$currentColor}
 >
   {$currentEmoji}
@@ -108,38 +108,6 @@
                 on:click={() => pickColor(c)}
               />
             {/each}
-          </div>
-          <div>
-            <h4>Delete mode</h4>
-            <label>
-              <input
-                type="radio"
-                bind:group={deleteMode}
-                name="delete-mode"
-                value={"Emoji"}
-              />
-              Emoji
-            </label>
-
-            <label>
-              <input
-                type="radio"
-                bind:group={deleteMode}
-                name="delete-mode"
-                value={"Background"}
-              />
-              Background
-            </label>
-
-            <label>
-              <input
-                type="radio"
-                bind:group={deleteMode}
-                name="delete-mode"
-                value={"Both"}
-              />
-              Both
-            </label>
           </div>
         </Editor>
       {:else}

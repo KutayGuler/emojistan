@@ -4,7 +4,7 @@
   import { onDestroy } from "svelte";
   import { colorPalette, events, conditions, currentEmoji } from "../../store";
 
-  const props = ["playerBackground", "playerInteractedWith"];
+  const props = ["playerBackground", "playerInteractsWith"];
 
   export let id: string;
   export let a: string;
@@ -17,7 +17,7 @@
   const update = () => {
     let obj = generateCondition();
     conditions.update(id, obj);
-    console.log(obj);
+
     for (let [_id, _obj] of $conditions.entries()) {
       if (_id == id) continue;
       if (JSON.stringify(obj) == JSON.stringify(_obj)) {
@@ -68,11 +68,11 @@
           <option value={color} style:background={color} />
         {/each}
       </select>
-    {:else if a == "playerInteractedWith"}
+    {:else if a == "playerInteractsWith"}
       <div class="slot" on:click={() => (b = $currentEmoji)}>{b}</div>
     {/if}
   </div>
-  {#if a == "playerInteractedWith"}
+  {#if a == "playerInteractsWith"}
     <div class="while">
       <h4>while equipped with</h4>
       <div class="slot" on:click={() => (_b = $currentEmoji || "any")}>

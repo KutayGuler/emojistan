@@ -46,7 +46,6 @@
   }
 
   function generateSequenceItem(_type: string, vals?: any) {
-    // TODO: Migrate this solution to loop event
     let newItem: SequenceItem = { type: _type };
     if (vals) {
       let { index, background, emoji, duration } = vals;
@@ -94,17 +93,17 @@
           break;
       }
     }
-    console.log(newItem);
+
     return newItem;
   }
 
-  function addToQueue() {
+  function addToSequence() {
     sequence = [...sequence, generateSequenceItem(type)];
     events.update(id, { name, sequence });
     [type, duration, index, background] = [types[0], 0, 0, ""];
   }
 
-  function removeFromQueue(i: number) {
+  function removeFromSequence(i: number) {
     sequence.splice(i, 1);
     sequence = sequence;
     if (sequence.length == 0) {
@@ -116,7 +115,6 @@
 
   function update(i: number | "name") {
     if (i != undefined && i != "name") {
-      console.log(sequence[i].type);
       sequence[i] = generateSequenceItem(sequence[i].type, { ...sequence[i] });
     }
     if (type) events.update(id, { name, sequence });
@@ -127,7 +125,6 @@
   }
 
   onDestroy(() => {
-    console.log(sequence);
     if (sequence.length == 0) {
       events.remove(id);
     } else if (
@@ -139,7 +136,6 @@
       events.remove(id);
     }
   });
-  console.log(sequence);
 </script>
 
 <section class="noselect rule-card">
@@ -204,7 +200,7 @@
           </select>
         {/if}
       {/if}
-      <button id="remove" on:click={() => removeFromQueue(i)}>❌</button>
+      <button id="remove" on:click={() => removeFromSequence(i)}>❌</button>
     </div>
   {/each}
   <label>
@@ -213,7 +209,7 @@
         <option value={t}>{t}</option>
       {/each}
     </select>
-    <button on:click={addToQueue}>➕</button>
+    <button on:click={addToSequence}>➕</button>
   </label>
   <label>
     <strong>Trigger on complete</strong>

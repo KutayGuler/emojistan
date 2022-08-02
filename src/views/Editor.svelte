@@ -1,13 +1,12 @@
 <script lang="ts">
-  import { getContext } from "svelte";
-
   import { currentEmoji, currentColor, editableMap as map } from "../store";
 
   let showIndex = false;
+  let deleteMode = "Both";
 
   function clickedCell(index: number) {
     if ($currentColor == "" && $currentEmoji == "") {
-      switch (getContext("deleteMode")) {
+      switch (deleteMode) {
         case "Emoji":
           map.removeEmoji(index);
           break;
@@ -41,6 +40,20 @@
     <input type="text" placeholder="Objective" bind:value={$map.objective} />
     <p><input type="checkbox" bind:checked={showIndex} />🔢</p>
     <slot />
+    <div>
+      <h4>Delete mode</h4>
+      {#each ["Emoji", "Background", "Both"] as mode}
+        <label>
+          <input
+            type="radio"
+            bind:group={deleteMode}
+            name="delete-mode"
+            value={mode}
+          />
+          {mode}
+        </label>
+      {/each}
+    </div>
     <div class="map">
       {#each { length: 256 } as _, i}
         <div

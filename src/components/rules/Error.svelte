@@ -12,7 +12,7 @@
 </script>
 
 {#if show}
-  <div transition:slide>{error}</div>
+  <div transition:slide|local>{error}</div>
 {/if}
 
 <style>

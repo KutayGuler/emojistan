@@ -12,7 +12,7 @@
 
   let error: SvelteComponent;
 
-  const types = ["setBackgroundOf", "spawn", "destroy"];
+  const types = ["setBackgroundOf", "removeBackgroundOf", "spawn", "destroy"];
 
   const MIN_DURATION = 50;
   const MAX_DURATION = 10000;
@@ -26,17 +26,120 @@
   let background = "";
   let emoji = "";
 
-  function addToSequence() {
-    let newItem: SequenceItem = { type };
-    switch (type) {
-      case "setBackgroundOf":
-        Object.assign(newItem, { index, background });
-        break;
-      case "spawn":
-        Object.assign(newItem, { index, emoji });
-        break;
+  function validateInput(input: number, min: number, max: number) {
+    if (input == undefined) return input;
+    if (input > max) {
+      return max;
+    } else if (input < min) {
+      return min;
     }
-    sequence = [...sequence, newItem];
+  }
+
+  function validateLoop() {
+    if (loop.start == loop.end) {
+      if (loop.iterationType == "increment") {
+        loop.start = 0;
+        loop.end = 16;
+      } else {
+        loop.start = 16;
+        loop.end = 0;
+      }
+      error.display("starting index and ending index cannot be the same");
+    }
+
+    if (loop.iterationType == "increment") {
+      if (loop.start > loop.end) {
+        error.display(
+          "starting index cannot be bigger than ending index on increment"
+        );
+        loop.start = 0;
+        loop.end = 16;
+      }
+
+      if (loop.iterationNumber > loop.end) {
+        loop.iterationNumber = MIN_ITERATION;
+      }
+    } else if (loop.iterationType == "decrement") {
+      if (loop.end > loop.start) {
+        error.display(
+          "ending index cannot be bigger than starting index on decrement"
+        );
+        loop.start = 16;
+        loop.end = 0;
+      }
+
+      if (loop.iterationNumber > loop.start) {
+        loop.iterationNumber = MIN_ITERATION;
+      }
+    }
+
+    if (loop.start < MIN_INDEX) loop.start = MIN_INDEX;
+    if (loop.start > MAX_INDEX) loop.start = MAX_INDEX;
+
+    if (loop.end < MIN_INDEX) loop.end = MIN_INDEX;
+    if (loop.end > MAX_INDEX) loop.end = MAX_INDEX;
+
+    if (loop.timeGap < MIN_DURATION) loop.timeGap = MIN_DURATION;
+    if (loop.timeGap > MAX_DURATION) loop.timeGap = MAX_DURATION;
+
+    if (loop.iterationNumber < MIN_ITERATION) {
+      loop.iterationNumber = MIN_ITERATION;
+    }
+
+    if (loop.iterationNumber > MAX_ITERATION) {
+      loop.iterationNumber = MAX_ITERATION;
+    }
+    // TODO: Out of bounds
+    // if increment, start(i) cannot be bigger than end(i)
+    // and vice versa for decrement
+    events.update(id, { name, sequence, loop });
+  }
+
+  function generateSequenceItem(_type: string, vals?: any) {
+    let newItem: SequenceItem = { type: _type };
+    if (vals) {
+      let { index, background, emoji } = vals;
+      index = validateInput(index, MIN_INDEX, MAX_INDEX);
+      switch (_type) {
+        case "setBackgroundOf":
+          Object.assign(newItem, { index, background });
+          break;
+        case "spawn":
+          console.log("here");
+          Object.assign(newItem, { index, emoji });
+          break;
+        case "destroy":
+        case "removeBackgroundOf":
+          Object.assign(newItem, { index });
+          break;
+        default:
+          Object.assign(newItem);
+          break;
+      }
+    } else {
+      switch (_type) {
+        case "setBackgroundOf":
+          Object.assign(newItem, { index, background });
+          break;
+        case "spawn":
+          Object.assign(newItem, { index, emoji });
+          break;
+        case "destroy":
+        case "removeBackgroundOf":
+          Object.assign(newItem, { index });
+          break;
+        default:
+          Object.assign(newItem);
+          break;
+      }
+    }
+
+    return newItem;
+  }
+
+  function addToSequence() {
+    sequence = [...sequence, generateSequenceItem(type)];
+    validateLoop();
     events.update(id, { name, sequence, loop });
     [type, index, background] = [types[0], 0, ""];
   }
@@ -51,29 +154,14 @@
     }
   }
 
-  function update() {
-    console.log(loop);
-    if (loop.start == loop.end) {
-      loop.start = 0;
-      error.display("starting index and ending index cannot be the same");
+  function update(i?: number | "name") {
+    console.log("update");
+    if (i != undefined && i != "name") {
+      sequence[i] = generateSequenceItem(sequence[i].type, { ...sequence[i] });
     }
-    if (loop.start < MIN_INDEX || loop.start > MAX_INDEX) {
-      loop.start = MIN_INDEX;
+    if (type) {
+      validateLoop();
     }
-    if (loop.end < MIN_INDEX || loop.end > MAX_INDEX) {
-      loop.end = MIN_INDEX;
-    }
-    if (loop.timeGap < MIN_DURATION || loop.timeGap > MAX_DURATION) {
-      loop.timeGap = MIN_DURATION;
-    }
-    if (
-      loop.iterationNumber < MIN_ITERATION ||
-      loop.iterationNumber > MAX_ITERATION
-    ) {
-      loop.iterationNumber = MIN_ITERATION;
-    }
-
-    events.update(id, { name, sequence, loop });
   }
 
   function updateSlot(i: number) {
@@ -95,7 +183,7 @@
   <input
     type="text"
     bind:value={name}
-    on:input={update}
+    on:input={() => update("name")}
     placeholder="Loop Event Name"
   />
   <button class="rule-card-close" on:click={() => events.remove(id)}>❌</button>
@@ -106,7 +194,7 @@
       bind:value={loop.start}
       min={MIN_INDEX}
       max={MAX_INDEX}
-      on:input={update}
+      on:input={() => update()}
     />
   </label>
   <div class="step">
@@ -115,7 +203,7 @@
     </p>
     {#each sequence as q, i}
       <div>
-        <select id="type" bind:value={q.type} on:input={update}>
+        <select id="type" bind:value={q.type} on:input={() => update(i)}>
           {#each types as t}
             <option value={t}>{t}</option>
           {/each}
@@ -123,12 +211,16 @@
         {#if q.type == "spawn"}
           <div class="slot" on:click={() => updateSlot(i)}>{q.emoji || ""}</div>
           at<strong>i</strong>
+        {:else if q.type == "destroy"}
+          <p>destroy</p>
+        {:else if q.type == "removeBackgroundOf"}
+          <p>background</p>
         {:else if q.type == "setBackgroundOf"}
           <strong>i</strong> to
           <select
             bind:value={q.background}
             style:background={q.background}
-            on:input={update}
+            on:input={() => update(i)}
           >
             {#each [...$colorPalette] as color}
               <option value={color} style:background={color} />
@@ -145,7 +237,7 @@
     </select>
     <button on:click={addToSequence}>➕</button>
     <div class="inline">
-      <select bind:value={loop.iterationType} on:input={update}>
+      <select bind:value={loop.iterationType} on:change={() => update()}>
         {#each ["increment", "decrement"] as operation}
           <option value={operation}>{operation}</option>
         {/each}
@@ -156,14 +248,14 @@
         bind:value={loop.iterationNumber}
         min={MIN_ITERATION}
         max={MAX_ITERATION}
-        on:input={update}
+        on:input={() => update()}
       />
     </div>
     <div class="inline">
       Wait <input
         type="number"
         bind:value={loop.timeGap}
-        on:change={update}
+        on:change={() => update()}
         min={MIN_DURATION}
         max={MAX_DURATION}
       /> ms
@@ -176,7 +268,7 @@
       bind:value={loop.end}
       min={MIN_INDEX}
       max={MAX_INDEX}
-      on:input={update}
+      on:input={() => update()}
     />
   </label>
   <Error bind:this={error} />

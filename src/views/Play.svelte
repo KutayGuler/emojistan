@@ -86,7 +86,6 @@
       backgrounds.delete(index);
     },
     spawn: ({ index, emoji }: Emoji, _start?: number) => {
-      console.log(_start);
       items.set(_start || index, { index: _start || index, emoji });
       items = items;
     },
@@ -95,7 +94,8 @@
     },
     wait: async (duration: number) => {
       return new Promise((resolve: Function) => {
-        setTimeout(resolve, duration);
+        let timer = setTimeout(resolve, duration);
+        clearTimeout(timer);
       });
     },
     reset: () => {
@@ -127,7 +127,7 @@
       case "playerBackground":
         a = () => backgrounds.get(ac);
         break;
-      case "playerInteractedWith":
+      case "playerInteractsWith":
         a = () => {
           let interactedItem = items.get(adc);
           if (interactedItem != undefined) {
@@ -172,13 +172,14 @@
       let duration = event.loop.timeGap;
       eventQueue.push(
         async () =>
-          await new Promise((resolve) => setTimeout(resolve, duration))
+          await new Promise((resolve) => {
+            let timer = setTimeout(resolve, duration);
+            clearTimeout(timer);
+          })
       );
     }
 
     async function execute(i: number, _start?: number) {
-      console.log("execute");
-      console.log(eventQueue[i]);
       await eventQueue[i](_start);
       if (i + 1 == eventQueue.length) {
         if (event && event.loop == undefined) return;
@@ -217,10 +218,8 @@
 
   function executeCollisionChain(index?: number, operation?: number) {
     while (collisionChain.length != 0) {
-      console.log(collisionChain);
       collisionChain.pop();
     }
-    console.log(collisionChain);
   }
 
   function moveActiveCell(operation: number, _delete?: boolean) {
@@ -285,7 +284,7 @@
             let _emoji2 = items.get(ac + operation * i)?.emoji;
             if (_emoji == undefined || _emoji2 == undefined) continue;
             collisionChain.push(getCollisionType(_emoji, _emoji2));
-            console.log(collisionChain);
+
             i++;
           }
 
@@ -315,7 +314,6 @@
           break;
       }
     } else {
-      console.log("else");
       postOpItem = {
         index: ac + operation,
         emoji: item.emoji,

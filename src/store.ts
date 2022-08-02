@@ -56,7 +56,7 @@ function createMapStore<T>(_state: Map<string, T>) {
     add: (value: T) =>
       update((state) => {
         let id = Date.now().toString().slice(7);
-        console.log(id);
+
         state.set(id, value);
         return state;
       }),
@@ -161,7 +161,6 @@ function createInventory() {
     addItem: (item: string) =>
       update((state) => {
         if (!state.includes("")) {
-          console.log(state.indexOf(""));
           state[state.indexOf("")] = item;
         }
         return state;
