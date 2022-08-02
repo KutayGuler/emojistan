@@ -52,9 +52,9 @@
 </script>
 
 <section class="noselect rules">
+  <!-- TODO: Add tooltip to collisions -->
   <div id="collisions">
-    <h4>Collisions 🤼</h4>
-    <p>Objects will bump into each other by default</p>
+    <h4 title="Objects will bump into each other by default">Collisions 🤼</h4>
     {#each [...$collisions] as [id, rule]}
       <Collision {id} {rule} />
     {/each}
@@ -62,8 +62,9 @@
     >
   </div>
   <div id="statics">
-    <h4>Static Objects 🗿</h4>
-    <p>Static objects cannot be moved by players</p>
+    <!-- TODO: Add tooltip to statics -->
+    <h4>Static Items 🗿</h4>
+    <p>Static items cannot be moved by players</p>
     <div
       class="statics noselect"
       on:click={() => statics.toggleEmoji($currentEmoji, "add")}
@@ -130,6 +131,7 @@
   </div>
   <div id="palette">
     <h4>Color Palette 🎨</h4>
+    <!-- TODO: Warn the player to pick the color first -->
     <input type="color" bind:value={color} />
     <button on:click={() => colorPalette.addColor(color)} title="Add Color"
       >🎨</button
@@ -143,6 +145,7 @@
             style="background-color: {color};"
             on:click={() => setDefaultBackground(color)}
           />
+          <!-- TODO: Change all ❌'s to something appropriate  -->
           <button class="remove-color" on:click={() => removeColor(color)}>
             ❌
           </button>

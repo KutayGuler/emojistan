@@ -3,6 +3,7 @@
   import type { SvelteComponent } from "svelte";
   import { onDestroy, onMount } from "svelte";
   import { collisions, currentEmoji } from "../../store";
+  import Base from "./Base.svelte";
 
   export let id: string;
   export let rule: string;
@@ -61,10 +62,11 @@
   });
 </script>
 
-<section class="noselect rule-card">
-  <button class="rule-card-close" on:click={() => collisions.remove(id)}
-    >❌</button
-  >
+<Base
+  on:remove={() => collisions.remove(id)}
+  --border-color="#3a96dd"
+  --background="#e9f3fb"
+>
   <div class="slots">
     {#each { length: 3 } as _, i}
       {#if i == 2}
@@ -86,13 +88,10 @@
     {/each}
   </div>
   <Error bind:this={error} />
-</section>
+</Base>
 
+<!-- </section> -->
 <style>
-  section {
-    border-color: var(--collision);
-  }
-
   .slots {
     position: relative;
     display: flex;

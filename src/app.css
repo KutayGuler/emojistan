@@ -1,3 +1,8 @@
+@font-face {
+  font-family: regular;
+  src: url("/fonts/MouseMemoirs.ttf") format("truetype");
+}
+
 :root {
   font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
   font-synthesis: none;
@@ -9,11 +14,11 @@
   --cell-size: 4vw;
   --cell: 3.8vw;
   --cell-gap: calc(var(--cell-size) - var(--cell));
+  --cell-br: calc(var(--cell-size) / 2);
+
+  --card-br: 5px;
 
   /* COLOR PALETTE */
-  --collision: #f03a17;
-  --condition: #644292;
-  --event: #ffc83d;
 
   --default-background: antiquewhite;
   --primary: #f6fafd;
@@ -24,6 +29,10 @@
 
   --inverted: var(--dark);
   background-color: var(--primary);
+}
+
+* {
+  font-family: regular;
 }
 
 html,
@@ -70,9 +79,12 @@ body {
   align-items: flex-start;
   justify-content: flex-start;
   padding: 5%;
-  border-radius: 5px;
+  margin: 5%;
+  border-radius: var(--card-br);
   border-width: 3px;
   border-style: solid;
+  /* box-shadow: rgba(0, 0, 0, 0.08) 0px 4px 12px; */
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 4px 12px;
 }
 
 .rule-card-close {

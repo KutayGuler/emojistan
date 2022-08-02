@@ -4,6 +4,7 @@
   import { onDestroy } from "svelte/internal";
   import { colorPalette, events, currentEmoji } from "../../store";
   import type { SequenceItem, Loop } from "../../store";
+  import Base from "./Base.svelte";
 
   export let id: string;
   export let name: string;
@@ -89,9 +90,7 @@
     if (loop.iterationNumber > MAX_ITERATION) {
       loop.iterationNumber = MAX_ITERATION;
     }
-    // TODO: Out of bounds
-    // if increment, start(i) cannot be bigger than end(i)
-    // and vice versa for decrement
+
     events.update(id, { name, sequence, loop });
   }
 
@@ -168,8 +167,6 @@
     sequence[i].emoji = $currentEmoji;
   }
 
-  // TODO: Test on input changes
-
   onDestroy(() => {
     if (sequence.length == 0) {
       events.remove(id);
@@ -179,14 +176,17 @@
   });
 </script>
 
-<section class="noselect rule-card">
+<Base
+  on:remove={() => events.remove(id)}
+  --border-color="#ffc83d"
+  --background="#fff3d6"
+>
   <input
     type="text"
     bind:value={name}
     on:input={() => update("name")}
     placeholder="Loop Event Name"
   />
-  <button class="rule-card-close" on:click={() => events.remove(id)}>❌</button>
   <label>
     start <strong>i</strong> from
     <input
@@ -198,9 +198,6 @@
     />
   </label>
   <div class="step">
-    <p>
-      <strong>On each step:</strong>
-    </p>
     {#each sequence as q, i}
       <div>
         <select id="type" bind:value={q.type} on:input={() => update(i)}>
@@ -230,12 +227,15 @@
         <button id="remove" on:click={() => removeFromSequence(i)}>❌</button>
       </div>
     {/each}
-    <select bind:value={type}>
-      {#each types as t}
-        <option value={t}>{t}</option>
-      {/each}
-    </select>
-    <button on:click={addToSequence}>➕</button>
+    <div class="inline">
+      <select bind:value={type}>
+        {#each types as t}
+          <option value={t}>{t}</option>
+        {/each}
+      </select>
+      <button on:click={addToSequence}>➕</button>
+    </div>
+    <br />
     <div class="inline">
       <select bind:value={loop.iterationType} on:change={() => update()}>
         {#each ["increment", "decrement"] as operation}
@@ -251,6 +251,7 @@
         on:input={() => update()}
       />
     </div>
+    <br />
     <div class="inline">
       Wait <input
         type="number"
@@ -272,15 +273,11 @@
     />
   </label>
   <Error bind:this={error} />
-</section>
+</Base>
 
 <style>
   .inline {
     display: inline-block;
-  }
-
-  section {
-    border-color: var(--event);
   }
 
   .step {

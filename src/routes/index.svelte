@@ -17,7 +17,6 @@
 
   let viewIndex = 2;
   let inventoryIndex = 0;
-  let hidden = viewIndex == 0;
   $currentItem = $inventory[inventoryIndex];
 
   let views = [
@@ -43,9 +42,18 @@
     }
   }
 
+  let asideStyle = "";
+  let interactiveStyle = "";
+
   function changeView(i: number) {
     viewIndex = i;
-    hidden = i == 0;
+    if (i == 0) {
+      interactiveStyle = "width: 100vw;";
+      asideStyle = "width: 0; padding: 0; border-left: 0;";
+    } else {
+      asideStyle = "";
+      interactiveStyle = "";
+    }
   }
 
   function pickEmoji(emoji: string) {
@@ -71,14 +79,16 @@
 >
   {$currentEmoji}
 </div>
+
 <main>
   <div class="playground" on:mousemove={setCursorEmoji}>
-    <div id="interactive">
+    <div id="interactive" style={interactiveStyle}>
       <div id="toolbox">
-        <div>
+        <!-- TODO: Tooltip for shortcuts -->
+        <!-- <div>
           <h4>Shortcuts</h4>
           <p>Esc - Deselect emoji/color</p>
-        </div>
+        </div> -->
         <h4>{views[viewIndex].title}</h4>
         <div class="view noselect">
           {#each views as view, i}
@@ -95,6 +105,9 @@
         <Editor>
           <div class="palette">
             <p
+              title={$colorPalette.size == 0
+                ? "Create a palette in Rules tab color your map!"
+                : ""}
               on:click={() => ($currentColor = "")}
               style:opacity={$colorPalette.size == 0 ? "50%" : "100%"}
             >
@@ -114,19 +127,9 @@
         <svelte:component this={views[viewIndex].component} />
       {/if}
     </div>
-
-    <div id="aside-container" class="noselect">
-      {#if viewIndex == 0}
-        <div id="inventory" class="noselect">
-          {#each $inventory as item, i}
-            <div style:border-color={i == inventoryIndex ? "red" : "black"}>
-              {item}
-            </div>
-          {/each}
-        </div>
-      {/if}
-      <input {hidden} type="text" placeholder="search" bind:value={filter} />
-      <div {hidden} id="emoji-container">
+    <div id="aside-container" class="noselect" style={asideStyle}>
+      <input type="text" placeholder="search" bind:value={filter} />
+      <div id="emoji-container">
         {#each Object.keys(emojis) as category}
           {#if emojis[category].some((item) => item.name.includes(filter))}
             <h4>{category}</h4>
@@ -211,34 +214,22 @@
     font-size: 2rem;
   }
 
+  #interactive,
+  #aside-container {
+    transition: 200ms ease-out;
+  }
+
   #aside-container {
     background-color: var(--secondary);
     width: 25%;
-    font-size: 1.4rem;
     padding: 0.5rem;
     border-left: 2px solid black;
     overflow-y: auto;
   }
 
-  #aside-container .flex,
-  #inventory {
+  #aside-container .flex {
     display: flex;
     flex-wrap: wrap;
-  }
-
-  #inventory {
-    justify-content: center;
-  }
-
-  #inventory > div {
-    margin: 5px;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    border: 1px solid black;
-    width: 10vw;
-    height: 10vw;
   }
 
   .selected {

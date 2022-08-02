@@ -9,6 +9,8 @@
     events,
     statics,
     currentItem,
+    currentColor,
+    currentEmoji,
   } from "../store";
   import { invertColor } from "../invertColor";
 
@@ -19,6 +21,7 @@
     r = document.querySelector(":root");
     defaultBackground = r.style.getPropertyValue("--default-background");
     if (defaultBackground == "") defaultBackground = "#faebd7";
+    [$currentColor, $currentEmoji] = ["", ""];
   });
 
   function calcOperation(code: string, index: number) {
@@ -328,12 +331,14 @@
 
 <svelte:window on:keydown={handle} />
 
+<!-- TODO: Add how to play modal with kbd elements -->
+
 <section class="playable-map">
   <section class="noselect">
     <button on:click={() => (levelCompleted = !levelCompleted)}
       >SHOW DIALOG</button
     >
-    <p><strong>Objective: </strong>{_map.objective || "❓"}</p>
+    <p><strong>Objective: </strong>{_map.objective || "?"}</p>
     <p title="ghost mode {ghost ? 'on' : 'off'}">👻 {ghost ? "✔️" : "❌"}</p>
     <div class="map">
       {#each { length: 256 } as _, i}

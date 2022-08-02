@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Base from "./Base.svelte";
   import { onDestroy } from "svelte/internal";
   import { colorPalette, events, currentEmoji } from "../../store";
   import type { SequenceItem, Loop } from "../../store";
@@ -138,14 +139,17 @@
   });
 </script>
 
-<section class="noselect rule-card">
+<Base
+  on:remove={() => events.remove(id)}
+  --border-color="#ffc83d"
+  --background="#fff3d6"
+>
   <input
     type="text"
     bind:value={name}
     on:input={() => update("name")}
     placeholder="Event Name"
   />
-  <button class="rule-card-close" on:click={() => events.remove(id)}>❌</button>
   {#each sequence as s, i}
     <div>
       <select id="type" bind:value={s.type} on:change={() => update(i)}>
@@ -224,10 +228,4 @@
       </select>
     {/if}
   </label>
-</section>
-
-<style>
-  section {
-    border-color: var(--event);
-  }
-</style>
+</Base>

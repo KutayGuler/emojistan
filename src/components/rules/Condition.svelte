@@ -1,5 +1,6 @@
 <script lang="ts">
   import Error from "./Error.svelte";
+  import Base from "./Base.svelte";
   import type { SvelteComponent } from "svelte";
   import { onDestroy } from "svelte";
   import { colorPalette, events, conditions, currentEmoji } from "../../store";
@@ -50,10 +51,11 @@
   });
 </script>
 
-<section class="noselect rule-card">
-  <button class="rule-card-close" on:click={() => conditions.remove(id)}
-    >❌</button
-  >
+<Base
+  on:remove={() => conditions.remove(id)}
+  --border-color="#644292"
+  --background="#cfc0e3"
+>
   <div class="if">
     <h4>if</h4>
     <select bind:value={a} on:change={update}>
@@ -89,13 +91,9 @@
     </select>
   </div>
   <Error bind:this={error} />
-</section>
+</Base>
 
 <style>
-  section {
-    border-color: var(--condition);
-  }
-
   .if,
   .then {
     gap: 5%;
