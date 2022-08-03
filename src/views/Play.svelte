@@ -331,13 +331,10 @@
 
 <svelte:window on:keydown={handle} />
 
-<!-- TODO: Add how to play modal with kbd elements -->
-
 <section class="playable-map">
+  <!-- TODO: Add how to play modal with kbd elements -->
+  <button class="guide">❔</button>
   <section class="noselect">
-    <button on:click={() => (levelCompleted = !levelCompleted)}
-      >SHOW DIALOG</button
-    >
     <p><strong>Objective: </strong>{_map.objective || "?"}</p>
     <p title="ghost mode {ghost ? 'on' : 'off'}">👻 {ghost ? "✔️" : "❌"}</p>
     <div class="map">
@@ -393,5 +390,11 @@
 
   .adc {
     outline: 1px dotted var(--inverted);
+  }
+
+  .guide {
+    position: absolute;
+    top: 2%;
+    right: 2%;
   }
 </style>

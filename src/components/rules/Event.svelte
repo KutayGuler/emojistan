@@ -137,6 +137,8 @@
       events.remove(id);
     }
   });
+
+  // TODO: Fix colors not being shown on update
 </script>
 
 <Base

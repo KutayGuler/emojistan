@@ -8,7 +8,7 @@
   function clickedCell(index: number) {
     if ($currentColor == "" && $currentEmoji == "") {
       switch (deleteMode) {
-        case "Emoji":
+        case "Item":
           map.removeEmoji(index);
           break;
         case "Background":
@@ -52,27 +52,30 @@
         </div>
       {/each}
     </div>
-    <div>
-      Delete Mode:
-      {#each ["Emoji", "Background", "Both"] as mode}
-        <label>
-          <input
-            type="radio"
-            bind:group={deleteMode}
-            name="delete-mode"
-            value={mode}
-          />
-          {mode}
-        </label>
-      {/each}
+    <div class="remove-actions">
+      <div>
+        Delete Mode:
+        {#each ["Item", "Background", "Both"] as mode}
+          <label>
+            <input
+              type="radio"
+              bind:group={deleteMode}
+              name="delete-mode"
+              value={mode}
+            />
+            {mode}
+          </label>
+        {/each}
+      </div>
+      <div class="clear">
+        Clear:
+        <button use:longpress on:longpress={map.clearObjects}> Items </button>
+        <button use:longpress on:longpress={map.clearBackgrounds}>
+          Backgrounds
+        </button>
+        <button use:longpress on:longpress={map.clearAll}> All </button>
+      </div>
     </div>
-    <!-- TODO: change styling-->
-    <button class="reset" use:longpress on:longpress={map.resetObjects}
-      >Reset Objects</button
-    >
-    <button class="reset" use:longpress on:longpress={map.resetBackgrounds}
-      >Reset Backgrounds</button
-    >
   </section>
 </section>
 
@@ -98,39 +101,50 @@
     align-items: flex-start;
   }
 
-  .reset {
+  .clear > button {
     border-radius: 3px;
     text-decoration: none;
     position: relative;
-    padding: 16px;
-    border: 1px solid white;
+    border: 1px solid var(--primary);
     z-index: 20;
+    width: 7vw;
     transition: var(--transition);
-    border-color: pink;
-    color: pink;
+    border-color: var(--danger);
+    color: var(--danger);
   }
 
-  .reset:active {
-    color: white;
+  label,
+  .clear > button {
+    cursor: pointer;
   }
 
-  .reset::before,
-  .reset::after {
-    background: pink;
+  .clear > button:active {
+    color: var(--primary);
+  }
+
+  .clear > button::before,
+  .clear > button::after {
+    background: var(--danger);
     content: "";
     position: absolute;
     z-index: -1;
     transition: var(--transition);
   }
 
-  .reset::after {
+  .clear > button::after {
     height: 100%;
     width: 0;
     top: 0;
     left: 0;
   }
 
-  .reset:active::after {
+  .clear > button:active::after {
+    width: 100%;
+  }
+
+  .remove-actions {
+    display: flex;
+    justify-content: space-between;
     width: 100%;
   }
 </style>

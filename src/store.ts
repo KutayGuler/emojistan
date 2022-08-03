@@ -93,7 +93,7 @@ function createEditableMap() {
         state.backgrounds.delete(index);
         return state;
       }),
-    resetBackgrounds: () =>
+    clearBackgrounds: () =>
       update((state) => {
         state.backgrounds.clear();
         return state;
@@ -108,8 +108,14 @@ function createEditableMap() {
         state.items.delete(index);
         return state;
       }),
-    resetObjects: () =>
+    clearObjects: () =>
       update((state) => {
+        state.items.clear();
+        return state;
+      }),
+    clearAll: () =>
+      update((state) => {
+        state.backgrounds.clear();
         state.items.clear();
         return state;
       }),

@@ -152,7 +152,9 @@
     {/each}
   </div>
   <div id="palette">
-    <p>Color Palette 🎨</p>
+    <p title="Click on any color to set it as the default background color">
+      Color Palette 🎨
+    </p>
     <input type="color" bind:value={color} />
     <button on:click={addColor} title="Add Color">🎨</button>
     <div class="palette">
@@ -165,7 +167,6 @@
             on:click={() => setDefaultBackground(color)}
           />
           <!-- TODO: Figure out how to keep X's position same while the component is getting longer -->
-          <!-- TODO: Change all ❌'s to something appropriate  -->
           <button class="remove-color" on:click={() => removeColor(color)}>
             ❌
           </button>

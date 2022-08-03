@@ -67,14 +67,14 @@
   // TODO: Find what is causing the jank
 
   let innerWidth: number;
+  let innerHeight: number;
 </script>
 
-<svelte:window on:keydown={handleKeydown} bind:innerWidth />
+<svelte:window on:keydown={handleKeydown} bind:innerWidth bind:innerHeight />
 <div
   class="cursor"
-  style="transform: translate({x + 75 >= innerWidth
-    ? x - 30
-    : x + 15}px, {y}px);"
+  style="transform: translate({x + 75 >= innerWidth ? x - 30 : x + 15}px,
+   {y + 30 >= innerHeight ? y - 30 : y}px);"
   style:background={$currentColor}
 >
   {$currentEmoji}
