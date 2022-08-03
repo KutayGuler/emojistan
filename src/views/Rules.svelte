@@ -1,7 +1,9 @@
 <script lang="ts">
   // import autoAnimate from "@formkit/auto-animate";
+  import { flip } from "svelte/animate";
+  import { scale } from "svelte/transition";
   import { onMount } from "svelte/internal";
-  import { invertColor } from "../invertColor";
+  import { invertColor } from "../utils/invertColor";
   import Collision from "../components/rules/Collision.svelte";
   import {
     collisions,
@@ -41,6 +43,14 @@
     defaultBackground = color;
   }
 
+  function addColor() {
+    if (color == "") {
+      // TODO: Warn the player to pick the color first
+    } else {
+      colorPalette.addColor(color);
+    }
+  }
+
   function removeColor(color: string) {
     colorPalette.removeColor(color);
     if (!$colorPalette.has(defaultBackground)) {
@@ -54,16 +64,21 @@
 <section class="noselect rules">
   <!-- TODO: Add tooltip to collisions -->
   <div id="collisions">
-    <h4 title="Objects will bump into each other by default">Collisions 🤼</h4>
-    {#each [...$collisions] as [id, rule]}
-      <Collision {id} {rule} />
+    <p title="Objects will bump into each other by default">
+      Collisions <button
+        title="Add Collision"
+        on:click={() => collisions.add("")}>🤼</button
+      >
+    </p>
+    {#each [...$collisions] as [id, rule] (id)}
+      <div transition:scale|local animate:flip>
+        <Collision {id} {rule} />
+      </div>
     {/each}
-    <button title="Add Collision" on:click={() => collisions.add("")}>🤼</button
-    >
   </div>
   <div id="statics">
     <!-- TODO: Add tooltip to statics -->
-    <h4>Static Items 🗿</h4>
+    <p>Static Items 🗿</p>
     <p>Static items cannot be moved by players</p>
     <div
       class="statics noselect"
@@ -80,62 +95,66 @@
     </div>
   </div>
   <div id="conditions">
-    <h4>Conditions ❓</h4>
-    {#each [...$conditions] as [id, { a, b, _b, eventID }]}
-      <Condition {id} {a} {b} {_b} {eventID} />
+    <p>
+      Conditions <button
+        title="Add Condition"
+        on:click={() =>
+          conditions.add({
+            a: "playerBackground",
+            b: "",
+            _b: "any",
+            eventID: "",
+          })}
+        >❓
+      </button>
+    </p>
+    {#each [...$conditions] as [id, { a, b, _b, eventID }] (id)}
+      <div transition:scale|local animate:flip>
+        <Condition {id} {a} {b} {_b} {eventID} />
+      </div>
     {/each}
-    <button
-      title="Add Condition"
-      on:click={() =>
-        conditions.add({
-          a: "playerBackground",
-          b: "",
-          _b: "any",
-          eventID: "",
-        })}>❓</button
-    >
   </div>
   <div id="events">
-    <h4>Events 🧨</h4>
-    {#each [...$events] as [id, { name, sequence, loop }]}
-      {#if loop != undefined}
-        <LoopEvent {id} {name} {sequence} {loop} />
-      {:else}
-        <Event {id} {name} {sequence} />
-      {/if}
+    <p>
+      Events <button
+        title="Add Event"
+        on:click={() =>
+          events.add({
+            name: `Event${eventIndex++}`,
+            sequence: [],
+          })}>🧨</button
+      >
+      <button
+        title="Add Loop Event"
+        on:click={() =>
+          events.add({
+            name: `LoopEvent${loopEventIndex++}`,
+            sequence: [],
+            loop: {
+              start: 0,
+              end: 16,
+              iterationNumber: 1,
+              iterationType: "increment",
+              timeGap: 50,
+              reverse: false,
+            },
+          })}>🔄🧨</button
+      >
+    </p>
+    {#each [...$events] as [id, { name, sequence, loop }] (id)}
+      <div transition:scale|local animate:flip>
+        {#if loop != undefined}
+          <LoopEvent {id} {name} {sequence} {loop} />
+        {:else}
+          <Event {id} {name} {sequence} />
+        {/if}
+      </div>
     {/each}
-    <button
-      title="Add Event"
-      on:click={() =>
-        events.add({
-          name: `Event${eventIndex++}`,
-          sequence: [],
-        })}>🧨</button
-    >
-    <button
-      title="Add Loop Event"
-      on:click={() =>
-        events.add({
-          name: `LoopEvent${loopEventIndex++}`,
-          sequence: [],
-          loop: {
-            start: 0,
-            end: 16,
-            iterationNumber: 1,
-            iterationType: "increment",
-            timeGap: 50,
-            reverse: false,
-          },
-        })}>🔄🧨</button
-    >
   </div>
   <div id="palette">
-    <h4>Color Palette 🎨</h4>
-    <!-- TODO: Warn the player to pick the color first -->
+    <p>Color Palette 🎨</p>
     <input type="color" bind:value={color} />
-    <button on:click={() => colorPalette.addColor(color)} title="Add Color"
-      >🎨</button
-    >
+    <button on:click={addColor} title="Add Color">🎨</button>
     <div class="palette">
       {#each [...$colorPalette] as color}
         <div class="color-container">
@@ -145,6 +164,7 @@
             style="background-color: {color};"
             on:click={() => setDefaultBackground(color)}
           />
+          <!-- TODO: Figure out how to keep X's position same while the component is getting longer -->
           <!-- TODO: Change all ❌'s to something appropriate  -->
           <button class="remove-color" on:click={() => removeColor(color)}>
             ❌

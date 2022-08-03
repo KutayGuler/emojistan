@@ -12,7 +12,7 @@
     currentColor,
     currentEmoji,
   } from "../store";
-  import { invertColor } from "../invertColor";
+  import { invertColor } from "../utils/invertColor";
 
   let r: any;
   let defaultBackground = "";

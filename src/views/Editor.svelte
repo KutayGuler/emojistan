@@ -1,5 +1,6 @@
 <script lang="ts">
   import { currentEmoji, currentColor, editableMap as map } from "../store";
+  import { longpress } from "../utils/longpress";
 
   let showIndex = false;
   let deleteMode = "Both";
@@ -65,13 +66,21 @@
         </label>
       {/each}
     </div>
-    <!-- TODO: Add timeout action to prevent mistakes -->
-    <button on:click={map.resetObjects}>Reset Objects</button>
-    <button on:click={map.resetBackgrounds}>Reset Backgrounds</button>
+    <!-- TODO: change styling-->
+    <button class="reset" use:longpress on:longpress={map.resetObjects}
+      >Reset Objects</button
+    >
+    <button class="reset" use:longpress on:longpress={map.resetBackgrounds}
+      >Reset Backgrounds</button
+    >
   </section>
 </section>
 
 <style>
+  :root {
+    --transition: 500ms;
+  }
+
   .editor {
     display: flex;
     flex-direction: row;
@@ -87,5 +96,41 @@
     flex-direction: column;
     justify-content: center;
     align-items: flex-start;
+  }
+
+  .reset {
+    border-radius: 3px;
+    text-decoration: none;
+    position: relative;
+    padding: 16px;
+    border: 1px solid white;
+    z-index: 20;
+    transition: var(--transition);
+    border-color: pink;
+    color: pink;
+  }
+
+  .reset:active {
+    color: white;
+  }
+
+  .reset::before,
+  .reset::after {
+    background: pink;
+    content: "";
+    position: absolute;
+    z-index: -1;
+    transition: var(--transition);
+  }
+
+  .reset::after {
+    height: 100%;
+    width: 0;
+    top: 0;
+    left: 0;
+  }
+
+  .reset:active::after {
+    width: 100%;
   }
 </style>

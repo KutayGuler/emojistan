@@ -193,7 +193,8 @@
     background-color: antiquewhite;
     border-bottom: 2px solid black;
     box-sizing: border-box;
-    transition: 500ms ease-out;
+    transition: 200ms ease-out;
+    height: 5%;
   }
 
   .view {
@@ -201,6 +202,11 @@
     flex-direction: row;
     justify-content: center;
     align-items: center;
+  }
+
+  .view > div:hover {
+    transition: 200ms ease-out;
+    cursor: pointer;
   }
 
   #toolbox h4,
