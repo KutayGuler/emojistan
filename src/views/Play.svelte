@@ -52,8 +52,7 @@
 
   /* ## DATA ## */
   let _events = new Map($events);
-  // let _map = structuredClone($map);
-  let _map = $map;
+  let _map = structuredClone($map);
   let items = new Map(_map.items);
   let backgrounds = new Map(_map.backgrounds);
   let _collisions = new Map<string, Map<string, string>>();
@@ -238,6 +237,9 @@
         if (c.condition()) c.event();
       }
     }
+
+    // MAGIC UPDATE, NECESSARY FOR REACTIVITY
+    items = items;
   }
 
   let wasd = ["KeyW", "KeyA", "KeyS", "KeyD"];
@@ -273,13 +275,9 @@
     let item = items.get(ac);
     if (item == undefined || $statics.has(item.emoji)) return;
     let postOpItem = items.get(ac + operation);
-    if (postOpItem != undefined) {
+    if (postOpItem) {
       switch (getCollisionType(item.emoji, postOpItem.emoji)) {
         case "push":
-          // TODO: Cascade pushables
-          // EDGE: shouldn't move if chain is getting out of map
-          //       (can use calcOperation for this)
-          // EDGE: shouldn't move if chain includes bump;
           let collisionChain = [];
           let i = 1;
           while (items.get(ac + operation * i)) {
@@ -295,6 +293,18 @@
               arr.push(_collisions.get(cur)?.get(next));
             }
           }
+
+          let finalIndex = ac + operation * (i - 1);
+          let code = "";
+
+          if (operation == 1) code = "ArrowRight";
+          if (operation == -1) code = "ArrowLeft";
+          if (operation == 16) code = "ArrowDown";
+          if (operation == -16) code = "ArrowUp";
+
+          if (calcOperation(code, finalIndex) == 0) break;
+
+          console.log(arr);
 
           if (arr.every((str) => str == "push")) {
             while (collisionChain.length != 0) {
@@ -312,18 +322,34 @@
               items = items;
               console.log(items);
             }
-          } else if (
-            arr.includes("merge") &&
-            !arr.includes(undefined) &&
-            !arr.includes("bump")
-          ) {
+          } else if (!arr.includes("bump")) {
+            console.log(_collisions);
+            console.log(arr);
+            console.log(collisionChain);
             // TODO: Merge
+            for (let i = 0; i < collisionChain.length; i++) {
+              let cur = collisionChain[i]?.emoji;
+              let next = collisionChain[i + 1]?.emoji;
+              if (next && cur) {
+                let emoji = _collisions.get(cur)?.get(next);
+                if (emoji) {
+                  // TODO: Fix logic
+                  items.set(ac + operation * (i + 2), { emoji });
+                  // @ts-expect-error
+                  items.set(ac + operation, items.get(ac));
+                  items = items;
+                  moveActiveCell(operation, true);
+                  break;
+                }
+              }
+            }
           }
           break;
         case "bump":
           break;
         default:
           // MERGE
+          // TODO: Fix logic
           postOpItem.emoji = getCollisionType(item.emoji, postOpItem.emoji);
           moveActiveCell(operation, true);
           items.set(ac + operation, postOpItem);
@@ -331,12 +357,8 @@
           break;
       }
     } else {
-      postOpItem = {
-        emoji: item.emoji,
-      };
-      items.set(ac + operation, postOpItem);
+      items.set(ac + operation, { emoji: item.emoji });
       items = items;
-
       moveActiveCell(operation, true);
     }
   }
