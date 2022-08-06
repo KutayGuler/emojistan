@@ -4,6 +4,7 @@
   import Editor from "../views/Editor.svelte";
   import Rules from "../views/Rules.svelte";
 
+  import Modal from "../components/Modal.svelte";
   import { emojis } from "../emojis";
   import {
     currentEmoji,
@@ -15,7 +16,7 @@
 
   let filter = "";
 
-  let viewIndex = 2;
+  let viewIndex = 0;
   let inventoryIndex = 0;
   $currentItem = $inventory[inventoryIndex];
 
@@ -80,16 +81,17 @@
   {$currentEmoji}
 </div>
 
+<Modal />
 <main>
   <div class="playground" on:mousemove={setCursorEmoji}>
     <div id="interactive" style={interactiveStyle}>
-      <div id="toolbox">
+      <nav>
         <!-- TODO: Tooltip for shortcuts -->
         <!-- <div>
           <h4>Shortcuts</h4>
           <p>Esc - Deselect emoji/color</p>
         </div> -->
-        <h4>{views[viewIndex].title}</h4>
+        <p>{views[viewIndex].title}</p>
         <div class="view noselect">
           {#each views as view, i}
             <div
@@ -100,7 +102,7 @@
             </div>
           {/each}
         </div>
-      </div>
+      </nav>
       {#if viewIndex == 1}
         <Editor>
           <div class="palette">
@@ -184,7 +186,7 @@
     box-sizing: border-box;
   }
 
-  #toolbox {
+  nav {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -193,7 +195,6 @@
     background-color: antiquewhite;
     border-bottom: 2px solid black;
     box-sizing: border-box;
-    transition: 200ms ease-out;
     height: 5%;
   }
 
@@ -204,13 +205,15 @@
     align-items: center;
   }
 
-  .view > div:hover {
+  .view > div {
     transition: 200ms ease-out;
+  }
+
+  .view > div:hover {
     cursor: pointer;
   }
 
-  #toolbox h4,
-  p {
+  nav p {
     font-size: 1rem;
     padding: 0;
     margin: 0;

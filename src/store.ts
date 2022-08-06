@@ -37,7 +37,6 @@ export interface Condition {
 }
 
 export interface Emoji {
-  index: number;
   emoji: string;
   inventory?: Array<any>;
 }
@@ -98,9 +97,9 @@ function createEditableMap() {
         state.backgrounds.clear();
         return state;
       }),
-    addEmoji: (obj: Emoji) =>
+    addEmoji: (index: number, obj: Emoji) =>
       update((state) => {
-        state.items.set(obj.index, obj);
+        state.items.set(index, obj);
         return state;
       }),
     removeEmoji: (index: number) =>

@@ -21,6 +21,7 @@
 </script>
 
 <section>
+  <!-- TODO: reverse color on hover -->
   <button on:click={() => dispatch("remove")}>
     <svg
       xmlns="http://www.w3.org/2000/svg"

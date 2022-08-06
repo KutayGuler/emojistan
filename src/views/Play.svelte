@@ -1,5 +1,4 @@
 <script lang="ts">
-  import type { Emoji } from "../store";
   import { scale } from "svelte/transition";
   import { onMount } from "svelte/internal";
   import {
@@ -41,7 +40,6 @@
   let ac = 0; // ACTIVE CELL
   let adc = 1; // ADJACENT CELL
   let ghost = true;
-  let collisionChain: Array<any> = [];
   let dirs: {
     [key: string]: { style: string; emoji: string; operation: number };
   } = {
@@ -54,7 +52,8 @@
 
   /* ## DATA ## */
   let _events = new Map($events);
-  let _map = structuredClone($map);
+  // let _map = structuredClone($map);
+  let _map = $map;
   let items = new Map(_map.items);
   let backgrounds = new Map(_map.backgrounds);
   let _collisions = new Map<string, Map<string, string>>();
@@ -88,8 +87,11 @@
     removeBackgroundOf: ({ index }: { index: number }) => {
       backgrounds.delete(index);
     },
-    spawn: ({ index, emoji }: Emoji, _start?: number) => {
-      items.set(_start || index, { index: _start || index, emoji });
+    spawn: (
+      { index, emoji }: { index: number; emoji: string },
+      _start?: number
+    ) => {
+      items.set(_start || index, { emoji });
       items = items;
     },
     destroy: ({ index }: { index: number }) => {
@@ -214,19 +216,17 @@
   }
 
   function getCollisionType(key1: string, key2: string): string {
-    if (_collisions.has(key1))
+    if (_collisions.has(key1)) {
       return _collisions.get(key1)?.get(key2) || "bump";
+    }
     return "bump";
   }
 
-  function executeCollisionChain(index?: number, operation?: number) {
-    while (collisionChain.length != 0) {
-      collisionChain.pop();
-    }
-  }
-
   function moveActiveCell(operation: number, _delete?: boolean) {
-    if (_delete) items.delete(ac);
+    if (_delete) {
+      items.delete(ac);
+      items = items;
+    }
     ac += operation;
     adc = ac + dirs[dirKey].operation;
     r.style.setProperty(
@@ -238,8 +238,6 @@
         if (c.condition()) c.event();
       }
     }
-    // MAGIC UPDATE
-    items = items;
   }
 
   let wasd = ["KeyW", "KeyA", "KeyS", "KeyD"];
@@ -279,46 +277,61 @@
       switch (getCollisionType(item.emoji, postOpItem.emoji)) {
         case "push":
           // TODO: Cascade pushables
-          let i = 2;
-          collisionChain = [];
-
-          while (items.get(ac + operation * i) !== undefined) {
-            let _emoji = items.get(ac + operation * (i - 1))?.emoji;
-            let _emoji2 = items.get(ac + operation * i)?.emoji;
-            if (_emoji == undefined || _emoji2 == undefined) continue;
-            collisionChain.push(getCollisionType(_emoji, _emoji2));
-
+          // EDGE: shouldn't move if chain is getting out of map
+          //       (can use calcOperation for this)
+          // EDGE: shouldn't move if chain includes bump;
+          let collisionChain = [];
+          let i = 1;
+          while (items.get(ac + operation * i)) {
+            collisionChain.push(items.get(ac + operation * i));
             i++;
           }
 
-          if (i != 2) {
-            if (collisionChain.includes(undefined)) break;
-            executeCollisionChain();
-            break;
+          let arr = [];
+          for (let i = 0; i < collisionChain.length; i++) {
+            let cur = collisionChain[i]?.emoji;
+            let next = collisionChain[i + 1]?.emoji;
+            if (cur && next) {
+              arr.push(_collisions.get(cur)?.get(next));
+            }
           }
 
-          items.set(ac + operation * 2, postOpItem);
-          items.set(ac + operation, item);
-          items = items;
-          moveActiveCell(operation, true);
+          if (arr.every((str) => str == "push")) {
+            while (collisionChain.length != 0) {
+              let item = collisionChain.pop();
+              if (item) {
+                items.set(ac + operation * i--, item);
+                items = items;
+              }
+            }
+
+            let item = items.get(ac);
+            if (item) {
+              items.set(ac + operation, item);
+              moveActiveCell(operation, true);
+              items = items;
+              console.log(items);
+            }
+          } else if (
+            arr.includes("merge") &&
+            !arr.includes(undefined) &&
+            !arr.includes("bump")
+          ) {
+            // TODO: Merge
+          }
           break;
         case "bump":
           break;
         default:
           // MERGE
           postOpItem.emoji = getCollisionType(item.emoji, postOpItem.emoji);
+          moveActiveCell(operation, true);
           items.set(ac + operation, postOpItem);
           items = items;
-          // items[ac + operation].emoji = getCollisionType(
-          //   items[ac].emoji,
-          //   items[ac + operation].emoji
-          // );
-          moveActiveCell(operation, true);
           break;
       }
     } else {
       postOpItem = {
-        index: ac + operation,
         emoji: item.emoji,
       };
       items.set(ac + operation, postOpItem);

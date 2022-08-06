@@ -28,8 +28,7 @@
     }
 
     if ($currentEmoji != "") {
-      map.addEmoji({
-        index,
+      map.addEmoji(index, {
         emoji: $currentEmoji,
       });
     }
