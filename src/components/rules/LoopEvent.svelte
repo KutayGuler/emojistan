@@ -104,7 +104,6 @@
           Object.assign(newItem, { index, background });
           break;
         case "spawn":
-          console.log("here");
           Object.assign(newItem, { index, emoji });
           break;
         case "destroy":
@@ -154,7 +153,6 @@
   }
 
   function update(i?: number | "name") {
-    console.log("update");
     if (i != undefined && i != "name") {
       sequence[i] = generateSequenceItem(sequence[i].type, { ...sequence[i] });
     }

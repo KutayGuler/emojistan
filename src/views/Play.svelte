@@ -304,8 +304,6 @@
 
           if (calcOperation(code, finalIndex) == 0) break;
 
-          console.log(arr);
-
           if (arr.every((str) => str == "push")) {
             while (collisionChain.length != 0) {
               let item = collisionChain.pop();
@@ -320,20 +318,23 @@
               items.set(ac + operation, item);
               moveActiveCell(operation, true);
               items = items;
-              console.log(items);
             }
-          } else if (!arr.includes("bump")) {
-            console.log(_collisions);
-            console.log(arr);
-            console.log(collisionChain);
-            // TODO: Merge
-            for (let i = 0; i < collisionChain.length; i++) {
+          } else if (
+            arr.some((str) => [undefined, "push", "bump"].includes(str))
+          ) {
+            arr = arr.slice(
+              0,
+              arr.findIndex((str) =>
+                [undefined, "push", "bump"].includes(str)
+              ) + 1
+            );
+
+            for (let i = 0; i < arr.length + 2; i++) {
               let cur = collisionChain[i]?.emoji;
               let next = collisionChain[i + 1]?.emoji;
               if (next && cur) {
                 let emoji = _collisions.get(cur)?.get(next);
-                if (emoji) {
-                  // TODO: Fix logic
+                if (emoji && emoji != "push") {
                   items.set(ac + operation * (i + 2), { emoji });
                   // @ts-expect-error
                   items.set(ac + operation, items.get(ac));
@@ -349,7 +350,6 @@
           break;
         default:
           // MERGE
-          // TODO: Fix logic
           postOpItem.emoji = getCollisionType(item.emoji, postOpItem.emoji);
           moveActiveCell(operation, true);
           items.set(ac + operation, postOpItem);

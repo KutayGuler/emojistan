@@ -8,6 +8,8 @@
   export let id: string;
   export let rule: string;
 
+  // TODO: Turn rule to array
+
   const types = ["push", "merge"];
   let type = types[0];
   let slots = ["", ""];
@@ -30,7 +32,19 @@
   function checkCollision(collision: string) {
     if ([...$collisions.values()].includes(collision)) {
       [type, mergeSlot, slots] = [types[0], "", ["", ""]];
-      error.display("Can't have duplicate collisions");
+      error.display("Can't have duplicate collisions.");
+      return;
+    }
+
+    if (
+      [...$collisions].some(([_id, _rule]) => {
+        let rule = _rule.split(",");
+        rule.pop();
+        return _id != id && (rule.reverse() == rule || slots == rule);
+      })
+    ) {
+      [type, mergeSlot, slots] = [types[0], "", ["", ""]];
+      error.display("Merges are bidirectional and can only have one outcome");
       return;
     }
 
@@ -68,13 +82,13 @@
   --background="#e9f3fb"
 >
   <div class="slots">
+    <select bind:value={type}>
+      {#each types as type}
+        <option value={type}>{type}</option>
+      {/each}
+    </select>
     {#each { length: 3 } as _, i}
       {#if i == 2}
-        <select bind:value={type} on:change={() => updateSlot(i)}>
-          {#each types as type}
-            <option value={type}>{type}</option>
-          {/each}
-        </select>
         {#if type == "merge"}
           <div class="slot" on:click={() => updateSlot(2)}>
             <div>{mergeSlot}</div>
@@ -90,7 +104,6 @@
   <Error bind:this={error} />
 </Base>
 
-<!-- </section> -->
 <style>
   .slots {
     position: relative;
@@ -100,11 +113,6 @@
     align-items: center;
     width: 100%;
     height: 100%;
-    gap: 5%;
-  }
-
-  .slots > :not(.slot) {
-    margin-top: 2.5%;
   }
 
   .slot {
@@ -113,13 +121,8 @@
     height: 4vw;
     background-color: var(--primary);
     border: 2px solid black;
-  }
-
-  .slot :nth-child(1) {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 100%;
-    height: 100%;
   }
 </style>

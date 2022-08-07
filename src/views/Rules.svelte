@@ -2,7 +2,7 @@
   // import autoAnimate from "@formkit/auto-animate";
   import { flip } from "svelte/animate";
   import { scale } from "svelte/transition";
-  import { onMount } from "svelte/internal";
+  import { identity, onMount } from "svelte/internal";
   import { invertColor } from "../utils/invertColor";
   import Collision from "../components/rules/Collision.svelte";
   import {
@@ -64,17 +64,14 @@
 <section class="noselect rules">
   <!-- TODO: Add tooltip to collisions -->
   <div id="collisions">
-    <p title="Objects will bump into each other by default">
-      Collisions <button
-        title="Add Collision"
-        on:click={() => collisions.add("")}>🤼</button
-      >
-    </p>
+    <p title="Objects will bump into each other by default">Collisions 🤼</p>
     {#each [...$collisions] as [id, rule] (id)}
       <div transition:scale|local animate:flip>
         <Collision {id} {rule} />
       </div>
     {/each}
+    <button title="Add Collision" on:click={() => collisions.add("")}>🤼</button
+    >
   </div>
   <div id="statics">
     <!-- TODO: Add tooltip to statics -->

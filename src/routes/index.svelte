@@ -16,7 +16,7 @@
 
   let filter = "";
 
-  let viewIndex = 0;
+  let viewIndex = 1;
   let inventoryIndex = 0;
   $currentItem = $inventory[inventoryIndex];
 
