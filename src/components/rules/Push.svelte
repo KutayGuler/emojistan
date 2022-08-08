@@ -71,8 +71,6 @@
 
   .slot {
     aspect-ratio: 1;
-    width: 4vw;
-    height: 4vw;
     background-color: var(--primary);
     border: 2px solid black;
     display: flex;

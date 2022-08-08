@@ -75,7 +75,7 @@
 <div
   class="cursor"
   style="transform: translate({x + 75 >= innerWidth ? x - 30 : x + 15}px,
-   {y + 30 >= innerHeight ? y - 30 : y}px);"
+   {y + 75 >= innerHeight ? y - 30 : y}px);"
   style:background={$currentColor}
 >
   {$currentEmoji}
@@ -92,16 +92,16 @@
           <p>Esc - Deselect emoji/color</p>
         </div> -->
         <p>{views[viewIndex].title}</p>
-        <div class="view noselect">
+        <span class="noselect">
           {#each views as view, i}
-            <div
+            <span
               on:click={() => changeView(i)}
               class:currentView={viewIndex == i}
             >
               {view.emoji}
-            </div>
+            </span>
           {/each}
-        </div>
+        </span>
       </nav>
       {#if viewIndex == 1}
         <Editor>
@@ -130,7 +130,7 @@
       {/if}
     </div>
     <div id="aside-container" class="noselect" style={asideStyle}>
-      <input type="text" placeholder="search" bind:value={filter} />
+      <input id="search" type="text" placeholder="search" bind:value={filter} />
       <div id="emoji-container">
         {#each Object.keys(emojis) as category}
           {#if emojis[category].some((item) => item.name.includes(filter))}
@@ -198,18 +198,11 @@
     height: 5%;
   }
 
-  .view {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .view > div {
+  nav span {
     transition: 200ms ease-out;
   }
 
-  .view > div:hover {
+  nav span:hover {
     cursor: pointer;
   }
 
@@ -223,6 +216,25 @@
     font-size: 2rem;
   }
 
+  #search {
+    width: 90%;
+    margin-right: 10%;
+    margin-top: 10%;
+  }
+
+  #search,
+  #emoji-container * {
+    font-size: 1.25rem;
+  }
+
+  #emoji-container h4 {
+    font-size: 1.75rem;
+  }
+
+  #interactive {
+    width: var(--interactive-container-size);
+  }
+
   #interactive,
   #aside-container {
     transition: 200ms ease-out;
@@ -230,7 +242,7 @@
 
   #aside-container {
     background-color: var(--secondary);
-    width: 25%;
+    width: var(--emoji-container-size);
     padding: 0.5rem;
     border-left: 2px solid black;
     overflow-y: auto;

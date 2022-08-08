@@ -11,11 +11,18 @@
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
 
-  --cell-size: 4vw;
-  --cell: 3.8vw;
+  /* LAYOUT */
+  --emoji-container-size: clamp(64px, 25%, 256px);
+  --interactive-container-size: calc(100vw - var(--emoji-container-size));
+
+  /* MAP */
+  --cell-size: clamp(16px, 4vw, 48px);
+  --cell: calc(var(--cell-size) - 0.2vw);
   --cell-gap: calc(var(--cell-size) - var(--cell));
   --cell-br: calc(var(--cell-size) / 2);
+  --map-size: calc(var(--cell-size) * 16);
 
+  /* COMPONENTS */
   --card-br: 5px;
 
   /* COLOR PALETTE */
@@ -48,8 +55,8 @@ body {
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  width: 64vw;
-  height: 64vw;
+  width: var(--map-size);
+  height: var(--map-size);
   gap: var(--cell-gap);
   border: 5px solid black;
 }

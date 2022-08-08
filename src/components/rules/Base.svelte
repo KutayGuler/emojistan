@@ -24,6 +24,7 @@
 
 <style>
   section {
+    max-height: 96px;
     border-color: var(--border-color);
     background: var(--background);
     position: relative;

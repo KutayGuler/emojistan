@@ -58,7 +58,7 @@
   let _collisions = new Map<string, Map<string, string>>();
 
   for (let rule of $collisions.values()) {
-    let [key1, key2, val] = rule.split(",");
+    let [key1, key2, val] = rule;
     if (!_collisions.has(key1)) {
       _collisions.set(key1, new Map());
     }
@@ -335,6 +335,7 @@
               if (next && cur) {
                 let emoji = _collisions.get(cur)?.get(next);
                 if (emoji && emoji != "push") {
+                  // TODO: Fix spawning double emojis on merge
                   items.set(ac + operation * (i + 2), { emoji });
                   // @ts-expect-error
                   items.set(ac + operation, items.get(ac));

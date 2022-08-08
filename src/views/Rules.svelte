@@ -71,7 +71,7 @@
     </p>
     <input type="color" bind:value={color} />
     <button on:click={addColor}>🎨</button>
-    <div class="palette">
+    <div>
       {#each [...$colorPalette] as color}
         <div class="color-container">
           <div
@@ -137,7 +137,6 @@
       </div>
     {/each}
   </div>
-
   <div id="conditions">
     <p>Conditions ❓</p>
     {#each [...$conditions, ["", {}]] as [id, { a, b, _b, eventID }] (id)}
@@ -213,44 +212,6 @@
     box-sizing: border-box;
   }
 
-  /* #pushes {
-    grid-area: 1 / 1 / 2 / 2;
-  }
-  #merges {
-    grid-area: 1 / 2 / 2 / 3;
-  }
-  #statics {
-    grid-area: 2 / 1 / 3 / 3;
-  }
-  #conditions {
-    grid-area: 3 / 1 / 4 / 2;
-  }
-  #events {
-    grid-area: 3 / 2 / 4 / 3;
-  }
-  #palette {
-    grid-area: 4 / 1 / 5 / 3;
-  } */
-
-  /* #palette {
-    grid-area: 1 / 1 / 2 / 3;
-  }
-  #statics {
-    grid-area: 2 / 1 / 3 / 3;
-  }
-  #pushes {
-    grid-area: 3 / 1 / 4 / 2;
-  }
-  #merges {
-    grid-area: 3 / 2 / 4 / 3;
-  }
-  #conditions {
-    grid-area: 4 / 1 / 5 / 2;
-  }
-  #events {
-    grid-area: 4 / 2 / 5 / 3;
-  } */
-
   .statics {
     display: flex;
     flex-wrap: wrap;
@@ -271,16 +232,29 @@
     width: 100%;
   }
 
-  .palette {
-    display: flex;
-    flex-direction: row;
+  #palette {
+    width: 100%;
   }
 
   .color-container,
   .color {
+    --size: clamp(16px, 8vw, 64px);
+    --br: calc(var(--size) / 8);
     position: relative;
-    width: 10vw;
-    height: 10vw;
+    width: var(--size);
+    height: var(--size);
+    border-radius: var(--br);
+    margin: 1%;
+  }
+
+  .color-container {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    /* gap: 2.5%; */
+  }
+
+  .color {
   }
 
   .isDefault::after {
@@ -360,5 +334,31 @@
   .event-btn {
     margin-top: 0;
     box-sizing: border-box;
+  }
+
+  @media (min-width: 1200px) {
+    .rules {
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(2, 1fr);
+    }
+
+    #palette {
+      grid-area: 1 / 1 / 2 / 2;
+    }
+    #statics {
+      grid-area: 2 / 1 / 3 / 2;
+    }
+    #pushes {
+      grid-area: 1 / 2 / 2 / 3;
+    }
+    #conditions {
+      grid-area: 2 / 2 / 3 / 3;
+    }
+    #merges {
+      grid-area: 1 / 3 / 2 / 4;
+    }
+    #events {
+      grid-area: 2 / 3 / 3 / 4;
+    }
   }
 </style>
