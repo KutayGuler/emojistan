@@ -185,7 +185,9 @@ export const inventory = createInventory();
 export const colorPalette = createColorPalette();
 export const editableMap = createEditableMap();
 export const statics = createStatics();
-export const collisions = createMapStore<string>(new Map<string, string>());
+export const collisions = createMapStore<Array<string>>(
+  new Map<string, Array<string>>()
+);
 export const events = createMapStore<Event>(new Map<string, Event>());
 export const conditions = createMapStore<Condition>(
   new Map<string, Condition>()

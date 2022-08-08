@@ -2,9 +2,8 @@
   // import autoAnimate from "@formkit/auto-animate";
   import { flip } from "svelte/animate";
   import { scale } from "svelte/transition";
-  import { identity, onMount } from "svelte/internal";
+  import { onMount } from "svelte/internal";
   import { invertColor } from "../utils/invertColor";
-  import Collision from "../components/rules/Collision.svelte";
   import {
     collisions,
     events,
@@ -13,6 +12,8 @@
     statics,
     currentEmoji,
   } from "../store";
+  import Push from "../components/rules/Push.svelte";
+  import Merge from "../components/rules/Merge.svelte";
   import Condition from "../components/rules/Condition.svelte";
   import Event from "../components/rules/Event.svelte";
   import LoopEvent from "../components/rules/LoopEvent.svelte";
@@ -59,19 +60,33 @@
       defaultBackground = "#faebd7";
     }
   }
+
+  console.log([...$conditions]);
 </script>
 
 <section class="noselect rules">
-  <!-- TODO: Add tooltip to collisions -->
-  <div id="collisions">
-    <p title="Objects will bump into each other by default">Collisions 🤼</p>
-    {#each [...$collisions] as [id, rule] (id)}
-      <div transition:scale|local animate:flip>
-        <Collision {id} {rule} />
-      </div>
-    {/each}
-    <button title="Add Collision" on:click={() => collisions.add("")}>🤼</button
-    >
+  <div id="palette">
+    <p title="Click on any color to set it as the default background color">
+      Color Palette 🎨
+    </p>
+    <input type="color" bind:value={color} />
+    <button on:click={addColor}>🎨</button>
+    <div class="palette">
+      {#each [...$colorPalette] as color}
+        <div class="color-container">
+          <div
+            class="color"
+            class:isDefault={color == defaultBackground}
+            style="background-color: {color};"
+            on:click={() => setDefaultBackground(color)}
+          />
+          <!-- TODO: Figure out how to keep X's position same while the component is getting longer -->
+          <button class="remove-color" on:click={() => removeColor(color)}>
+            ❌
+          </button>
+        </div>
+      {/each}
+    </div>
   </div>
   <div id="statics">
     <!-- TODO: Add tooltip to statics -->
@@ -91,85 +106,98 @@
       {/each}
     </div>
   </div>
-  <div id="conditions">
-    <p>
-      Conditions <button
-        title="Add Condition"
-        on:click={() =>
-          conditions.add({
-            a: "playerBackground",
-            b: "",
-            _b: "any",
-            eventID: "",
-          })}
-        >❓
-      </button>
-    </p>
-    {#each [...$conditions] as [id, { a, b, _b, eventID }] (id)}
+  <!-- TODO: Add tooltip to collisions -->
+  <div id="pushes">
+    <p title="Objects will bump into each other by default">Pushes 💨</p>
+    {#each [...$collisions, ["", ["", "", "push"]]].filter( ([k, v]) => v.includes("push") ) as [id, rule] (id)}
       <div transition:scale|local animate:flip>
-        <Condition {id} {a} {b} {_b} {eventID} />
+        {#if id == ""}
+          <button
+            class="collision-btn"
+            on:click={() => collisions.add(["", "", "push"])}>💨</button
+          >
+        {:else}
+          <Push {id} {rule} />
+        {/if}
+      </div>
+    {/each}
+  </div>
+  <div id="merges">
+    <p title="Objects will bump into each other by default">Merges 💫</p>
+    {#each [...$collisions, ["", ["", "", ""]]].filter(([k, v]) => !v.includes("push")) as [id, rule] (id)}
+      <div transition:scale|local animate:flip>
+        {#if id == ""}
+          <button
+            class="collision-btn"
+            on:click={() => collisions.add(["", "", ""])}>💫</button
+          >
+        {:else}
+          <Merge {id} {rule} />
+        {/if}
+      </div>
+    {/each}
+  </div>
+
+  <div id="conditions">
+    <p>Conditions ❓</p>
+    {#each [...$conditions, ["", {}]] as [id, { a, b, _b, eventID }] (id)}
+      <div transition:scale|local animate:flip>
+        {#if id == ""}
+          <button
+            class="condition-btn"
+            on:click={() =>
+              conditions.add({
+                a: "playerBackground",
+                b: "",
+                _b: "any",
+                eventID: "",
+              })}
+            >❓
+          </button>
+        {:else}
+          <Condition {id} {a} {b} {_b} {eventID} />
+        {/if}
       </div>
     {/each}
   </div>
   <div id="events">
-    <p>
-      Events <button
-        title="Add Event"
-        on:click={() =>
-          events.add({
-            name: `Event${eventIndex++}`,
-            sequence: [],
-          })}>🧨</button
-      >
-      <button
-        title="Add Loop Event"
-        on:click={() =>
-          events.add({
-            name: `LoopEvent${loopEventIndex++}`,
-            sequence: [],
-            loop: {
-              start: 0,
-              end: 16,
-              iterationNumber: 1,
-              iterationType: "increment",
-              timeGap: 50,
-              reverse: false,
-            },
-          })}>🔄🧨</button
-      >
-    </p>
-    {#each [...$events] as [id, { name, sequence, loop }] (id)}
+    <p>Events 🧨</p>
+    {#each [...$events, ["", {}]] as [id, { name, sequence, loop }] (id)}
       <div transition:scale|local animate:flip>
-        {#if loop != undefined}
+        {#if id == ""}
+          <div class="event-btn-container">
+            <button
+              class="event-btn"
+              on:click={() =>
+                events.add({
+                  name: `Event${eventIndex++}`,
+                  sequence: [],
+                })}>🧨</button
+            >
+            <button
+              class="event-btn"
+              on:click={() =>
+                events.add({
+                  name: `LoopEvent${loopEventIndex++}`,
+                  sequence: [],
+                  loop: {
+                    start: 0,
+                    end: 16,
+                    iterationNumber: 1,
+                    iterationType: "increment",
+                    timeGap: 50,
+                    reverse: false,
+                  },
+                })}>🔄🧨</button
+            >
+          </div>
+        {:else if loop != undefined}
           <LoopEvent {id} {name} {sequence} {loop} />
         {:else}
           <Event {id} {name} {sequence} />
         {/if}
       </div>
     {/each}
-  </div>
-  <div id="palette">
-    <p title="Click on any color to set it as the default background color">
-      Color Palette 🎨
-    </p>
-    <input type="color" bind:value={color} />
-    <button on:click={addColor} title="Add Color">🎨</button>
-    <div class="palette">
-      {#each [...$colorPalette] as color}
-        <div class="color-container">
-          <div
-            class="color"
-            class:isDefault={color == defaultBackground}
-            style="background-color: {color};"
-            on:click={() => setDefaultBackground(color)}
-          />
-          <!-- TODO: Figure out how to keep X's position same while the component is getting longer -->
-          <button class="remove-color" on:click={() => removeColor(color)}>
-            ❌
-          </button>
-        </div>
-      {/each}
-    </div>
   </div>
 </section>
 
@@ -185,21 +213,43 @@
     box-sizing: border-box;
   }
 
-  #collisions {
+  /* #pushes {
     grid-area: 1 / 1 / 2 / 2;
   }
-  #statics {
+  #merges {
     grid-area: 1 / 2 / 2 / 3;
   }
+  #statics {
+    grid-area: 2 / 1 / 3 / 3;
+  }
   #conditions {
-    grid-area: 2 / 1 / 3 / 2;
+    grid-area: 3 / 1 / 4 / 2;
   }
   #events {
-    grid-area: 2 / 2 / 3 / 3;
+    grid-area: 3 / 2 / 4 / 3;
   }
   #palette {
-    grid-area: 3 / 1 / 4 / 3;
+    grid-area: 4 / 1 / 5 / 3;
+  } */
+
+  /* #palette {
+    grid-area: 1 / 1 / 2 / 3;
   }
+  #statics {
+    grid-area: 2 / 1 / 3 / 3;
+  }
+  #pushes {
+    grid-area: 3 / 1 / 4 / 2;
+  }
+  #merges {
+    grid-area: 3 / 2 / 4 / 3;
+  }
+  #conditions {
+    grid-area: 4 / 1 / 5 / 2;
+  }
+  #events {
+    grid-area: 4 / 2 / 5 / 3;
+  } */
 
   .statics {
     display: flex;
@@ -245,5 +295,70 @@
     position: absolute;
     top: 0;
     right: 0;
+  }
+
+  .collision-btn,
+  .condition-btn {
+    color: white;
+  }
+
+  .collision-btn {
+    border-color: #3a96dd;
+    background: #e9f3fb;
+  }
+
+  .collision-btn:hover {
+    background: #3a96dd;
+  }
+
+  .condition-btn {
+    border-color: #644292;
+    background: #cfc0e3;
+  }
+
+  .condition-btn:hover {
+    background: #644292;
+  }
+
+  .event-btn {
+    border-color: #ffc83d;
+    background: #fff3d6;
+  }
+
+  .event-btn:hover {
+    background: #ffc83d;
+  }
+
+  .collision-btn:hover::after,
+  .condition-btn:hover::after,
+  .event-btn:hover::after {
+    content: "++";
+  }
+
+  .collision-btn,
+  .condition-btn,
+  .event-btn {
+    font-size: 1.5em;
+    transition: 200ms ease-out;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 90%;
+    padding: 5%;
+    margin: 5%;
+    border-radius: var(--card-br);
+    border-width: 3px;
+    border-style: solid;
+    box-shadow: rgba(149, 157, 165, 0.2) 0px 4px 12px;
+  }
+
+  .event-btn-container {
+    display: flex;
+  }
+
+  .event-btn {
+    margin-top: 0;
+    box-sizing: border-box;
   }
 </style>

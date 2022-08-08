@@ -241,6 +241,11 @@
     flex-wrap: wrap;
   }
 
+  #aside-container .flex > div:hover {
+    transform: scale(150%);
+    transition: 50ms;
+  }
+
   .selected {
     border: 2px solid red;
   }
