@@ -1,12 +1,18 @@
 <script lang="ts">
+  // SVELTE
+
   // VIEWS
   import Play from "../views/Play.svelte";
   import Editor from "../views/Editor.svelte";
   import Rules from "../views/Rules.svelte";
 
+  // COMPONENTS
   import Modal from "../components/Modal.svelte";
+
+  // DATA
   import { emojis } from "../emojis";
   import {
+    quickAccess,
     currentEmoji,
     inventory,
     currentItem,
@@ -15,6 +21,9 @@
   } from "../store";
 
   let filter = "";
+
+  // quickAcess edit mode
+  let editMode = false;
 
   let viewIndex = 1;
   let inventoryIndex = 0;
@@ -132,6 +141,31 @@
     <div id="aside-container" class="noselect" style={asideStyle}>
       <input id="search" type="text" placeholder="search" bind:value={filter} />
       <div id="emoji-container">
+        <h4>
+          Quick Access <button on:click={() => (editMode = !editMode)}
+            >Edit {editMode ? "❌" : ""}</button
+          >
+        </h4>
+        {#if editMode}
+          <span
+            ><button on:click={() => quickAccess.add($currentEmoji)}
+              >Add ( {$currentEmoji || "____"} )</button
+            ><button on:click={() => quickAccess.remove($currentEmoji)}
+              >Remove ( {$currentEmoji || "____"} )</button
+            ></span
+          >
+        {/if}
+
+        <div class="flex">
+          {#each [...$quickAccess] as emoji}
+            <div
+              class:selected={$currentEmoji == emoji}
+              on:click={() => pickEmoji(emoji)}
+            >
+              {emoji}
+            </div>
+          {/each}
+        </div>
         {#each Object.keys(emojis) as category}
           {#if emojis[category].some((item) => item.name.includes(filter))}
             <h4>{category}</h4>

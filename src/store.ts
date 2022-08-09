@@ -178,6 +178,28 @@ function createInventory() {
   };
 }
 
+function createQuickAccess() {
+  const { subscribe, update } = writable(new Set<string>());
+
+  return {
+    subscribe,
+    add: (value: string) =>
+      value != "" &&
+      update((state) => {
+        state.add(value);
+        return state;
+      }),
+    remove: (value: string) =>
+      value != "" &&
+      update((state) => {
+        state.delete(value);
+        return state;
+      }),
+  };
+}
+
+export const quickAccess = createQuickAccess();
+
 export const currentItem = writable("");
 export const currentColor = writable("");
 export const currentEmoji = writable("");

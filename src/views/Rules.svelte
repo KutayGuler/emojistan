@@ -19,7 +19,8 @@
   import LoopEvent from "../components/rules/LoopEvent.svelte";
 
   let color = "";
-  let r: any, defaultBackground: string;
+  let r: any,
+    defaultBackground: string = "#faebd7";
   let eventIndex = 0;
   let loopEventIndex = 0;
 
@@ -65,21 +66,20 @@
 </script>
 
 <section class="noselect rules">
-  <div id="palette">
-    <p title="Click on any color to set it as the default background color">
-      Color Palette 🎨
-    </p>
+  <div id="palette" style:background={defaultBackground}>
+    <!-- <h4 title="Click on any color to set it as the default background color">
+      🎨
+    </h4> -->
     <input type="color" bind:value={color} />
-    <button on:click={addColor}>🎨</button>
-    <div>
-      {#each [...$colorPalette] as color}
-        <div class="color-container">
-          <div
-            class="color"
-            class:isDefault={color == defaultBackground}
-            style="background-color: {color};"
-            on:click={() => setDefaultBackground(color)}
-          />
+    <button class="palette-btn" on:click={addColor}>🎨</button>
+    <div class="color-container">
+      {#each [...$colorPalette] as color (color)}
+        <div
+          class="color"
+          class:isDefault={color == defaultBackground}
+          style="background-color: {color};"
+          on:click={() => setDefaultBackground(color)}
+        >
           <!-- TODO: Figure out how to keep X's position same while the component is getting longer -->
           <button class="remove-color" on:click={() => removeColor(color)}>
             ❌
@@ -90,8 +90,8 @@
   </div>
   <div id="statics">
     <!-- TODO: Add tooltip to statics -->
-    <p>Static Items 🗿</p>
-    <p>Static items cannot be moved by players</p>
+    <h4>🗿</h4>
+    <!-- <p>Static items cannot be moved by players</p> -->
     <div
       class="statics noselect"
       on:click={() => statics.toggleEmoji($currentEmoji, "add")}
@@ -101,14 +101,12 @@
           <div>{item}</div>
           <button on:click={() => statics.toggleEmoji(item)}>❌</button>
         </div>
-      {:else}
-        <p>Select an emoji and click here to set it as a static item</p>
       {/each}
     </div>
   </div>
   <!-- TODO: Add tooltip to collisions -->
   <div id="pushes">
-    <p title="Objects will bump into each other by default">Pushes 💨</p>
+    <h4 title="Objects will bump into each other by default">Pushes 💨</h4>
     {#each [...$collisions, ["", ["", "", "push"]]].filter( ([k, v]) => v.includes("push") ) as [id, rule] (id)}
       <div transition:scale|local animate:flip>
         {#if id == ""}
@@ -123,7 +121,7 @@
     {/each}
   </div>
   <div id="merges">
-    <p title="Objects will bump into each other by default">Merges 💫</p>
+    <h4 title="Objects will bump into each other by default">Merges 💫</h4>
     {#each [...$collisions, ["", ["", "", ""]]].filter(([k, v]) => !v.includes("push")) as [id, rule] (id)}
       <div transition:scale|local animate:flip>
         {#if id == ""}
@@ -138,7 +136,7 @@
     {/each}
   </div>
   <div id="conditions">
-    <p>Conditions ❓</p>
+    <h4>Conditions ❓</h4>
     {#each [...$conditions, ["", {}]] as [id, { a, b, _b, eventID }] (id)}
       <div transition:scale|local animate:flip>
         {#if id == ""}
@@ -160,7 +158,7 @@
     {/each}
   </div>
   <div id="events">
-    <p>Events 🧨</p>
+    <h4>Events 🧨</h4>
     {#each [...$events, ["", {}]] as [id, { name, sequence, loop }] (id)}
       <div transition:scale|local animate:flip>
         {#if id == ""}
@@ -201,15 +199,32 @@
 </section>
 
 <style>
+  input[type="color"] {
+    border: 1px solid black;
+    --size: clamp(16px, 8vw, 64px);
+    --br: calc(var(--size) / 8);
+    position: relative;
+    width: 100%;
+    /* width: var(--size); */
+    height: var(--size);
+    border-radius: var(--br);
+    margin: 1%;
+  }
+
   .rules {
+    position: relative;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(3, 1fr);
     gap: 2%;
-    padding: 2%;
+    padding: 0 15%;
     overflow-y: auto;
     height: 94vh;
     box-sizing: border-box;
+  }
+
+  h4 {
+    font-size: 1.5rem;
   }
 
   .statics {
@@ -217,6 +232,7 @@
     flex-wrap: wrap;
     justify-content: flex-start;
     align-items: flex-start;
+    width: 10%;
     height: 10vh;
     border: 5px solid black;
   }
@@ -226,39 +242,51 @@
     flex-direction: row;
   }
 
-  .statics > p {
-    align-self: center;
-    text-align: center;
-    width: 100%;
+  #statics {
+    position: absolute;
+    right: 0;
   }
 
   #palette {
-    width: 100%;
+    position: absolute;
+    top: 25%;
+    height: 50%;
+    left: 0;
+    width: clamp(32px, 15%, 144px);
+    padding: 1%;
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
   }
 
-  .color-container,
   .color {
-    --size: clamp(16px, 8vw, 64px);
+    --size: clamp(16px, 10vw, 72px);
     --br: calc(var(--size) / 8);
+    font-size: calc(var(--size) / 2.5);
     position: relative;
     width: var(--size);
     height: var(--size);
     border-radius: var(--br);
     margin: 1%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .color > button {
+    cursor: pointer;
   }
 
   .color-container {
     display: flex;
-    flex-wrap: wrap;
-    width: 100%;
-    /* gap: 2.5%; */
-  }
-
-  .color {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    overflow-y: auto;
   }
 
   .isDefault::after {
-    font-size: 2rem;
     content: "🌍";
     color: white;
     mix-blend-mode: difference;
@@ -303,6 +331,25 @@
     background: #ffc83d;
   }
 
+  .palette-btn {
+    color: white;
+    transition: 200ms ease-out;
+    width: 100%;
+    margin: 5%;
+    box-sizing: border-box;
+    background: whitesmoke;
+  }
+
+  .palette-btn:hover {
+    background: linear-gradient(
+      90deg,
+      rgba(131, 58, 180, 1) 0%,
+      rgba(253, 29, 29, 1) 50%,
+      rgba(252, 176, 69, 1) 100%
+    );
+  }
+
+  .palette-btn:hover::after,
   .collision-btn:hover::after,
   .condition-btn:hover::after,
   .event-btn:hover::after {
@@ -325,6 +372,7 @@
     border-width: 3px;
     border-style: solid;
     box-shadow: rgba(149, 157, 165, 0.2) 0px 4px 12px;
+    cursor: pointer;
   }
 
   .event-btn-container {
@@ -334,31 +382,5 @@
   .event-btn {
     margin-top: 0;
     box-sizing: border-box;
-  }
-
-  @media (min-width: 1200px) {
-    .rules {
-      grid-template-columns: repeat(3, 1fr);
-      grid-template-rows: repeat(2, 1fr);
-    }
-
-    #palette {
-      grid-area: 1 / 1 / 2 / 2;
-    }
-    #statics {
-      grid-area: 2 / 1 / 3 / 2;
-    }
-    #pushes {
-      grid-area: 1 / 2 / 2 / 3;
-    }
-    #conditions {
-      grid-area: 2 / 2 / 3 / 3;
-    }
-    #merges {
-      grid-area: 1 / 3 / 2 / 4;
-    }
-    #events {
-      grid-area: 2 / 3 / 3 / 4;
-    }
   }
 </style>
