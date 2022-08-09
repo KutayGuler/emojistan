@@ -106,7 +106,10 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    width: clamp(200px, 25vw, 400px);
+    /* width: clamp(200px, 25vw, 400px); */
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0 20%;
   }
 
   h4 {

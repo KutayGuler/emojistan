@@ -57,24 +57,3 @@
   </div>
   <Error bind:this={error} />
 </Base>
-
-<style>
-  .slots {
-    position: relative;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-around;
-    align-items: center;
-    width: 100%;
-    height: 100%;
-  }
-
-  .slot {
-    aspect-ratio: 1;
-    background-color: var(--primary);
-    border: 2px solid black;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-</style>

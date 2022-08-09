@@ -1,26 +1,32 @@
 <script lang="ts">
-  // import autoAnimate from "@formkit/auto-animate";
+  // SVELTE
   import { flip } from "svelte/animate";
   import { scale } from "svelte/transition";
   import { onMount } from "svelte/internal";
+
+  // UTILS
   import { invertColor } from "../utils/invertColor";
+
+  // DATA
   import {
     collisions,
     events,
     conditions,
-    colorPalette,
+    colorPalette as cp,
     statics,
     currentEmoji,
   } from "../store";
+
+  // COMPONENTS
   import Push from "../components/rules/Push.svelte";
   import Merge from "../components/rules/Merge.svelte";
   import Condition from "../components/rules/Condition.svelte";
   import Event from "../components/rules/Event.svelte";
   import LoopEvent from "../components/rules/LoopEvent.svelte";
 
-  let color = "";
-  let r: any,
-    defaultBackground: string = "#faebd7";
+  let pickedColor = "#000000";
+  let defaultBackground: string = "#faebd7";
+  let r: any;
   let eventIndex = 0;
   let loopEventIndex = 0;
 
@@ -45,21 +51,17 @@
     defaultBackground = color;
   }
 
-  function addColor() {
-    if (color == "") {
-      // TODO: Warn the player to pick the color first
-    } else {
-      colorPalette.addColor(color);
-    }
-  }
-
   function removeColor(color: string) {
-    colorPalette.removeColor(color);
-    if (!$colorPalette.has(defaultBackground)) {
+    cp.removeColor(color);
+    if (!$cp.has(defaultBackground)) {
       r.style.setProperty("--default-background", "#faebd7");
       r.style.setProperty("--inverted", "#ff3e00");
       defaultBackground = "#faebd7";
     }
+  }
+
+  function pickedColorChanged() {
+    r.style.setProperty("--picked-color", pickedColor);
   }
 
   console.log([...$conditions]);
@@ -70,10 +72,16 @@
     <!-- <h4 title="Click on any color to set it as the default background color">
       🎨
     </h4> -->
-    <input type="color" bind:value={color} />
-    <button class="palette-btn" on:click={addColor}>🎨</button>
+    <input
+      type="color"
+      bind:value={pickedColor}
+      on:change={pickedColorChanged}
+    />
+    <button class="palette-btn" on:click={() => cp.addColor(pickedColor)}
+      >🎨</button
+    >
     <div class="color-container">
-      {#each [...$colorPalette] as color (color)}
+      {#each [...$cp] as color (color)}
         <div
           class="color"
           class:isDefault={color == defaultBackground}
@@ -90,10 +98,9 @@
   </div>
   <div id="statics">
     <!-- TODO: Add tooltip to statics -->
-    <h4>🗿</h4>
     <!-- <p>Static items cannot be moved by players</p> -->
     <div
-      class="statics noselect"
+      class="statics-container noselect"
       on:click={() => statics.toggleEmoji($currentEmoji, "add")}
     >
       {#each [...$statics] as item}
@@ -199,13 +206,16 @@
 </section>
 
 <style>
+  :root {
+    --picked-color: black;
+  }
+
   input[type="color"] {
     border: 1px solid black;
     --size: clamp(16px, 8vw, 64px);
     --br: calc(var(--size) / 8);
     position: relative;
     width: 100%;
-    /* width: var(--size); */
     height: var(--size);
     border-radius: var(--br);
     margin: 1%;
@@ -215,58 +225,78 @@
     position: relative;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(3, 1fr);
+    grid-template-rows: repeat(2, 1fr);
     gap: 2%;
-    padding: 0 15%;
+    padding: 0 25%;
+    padding-bottom: 10%;
     overflow-y: auto;
-    height: 94vh;
+    height: 95%;
     box-sizing: border-box;
+    transition: 200ms ease-out;
   }
 
   h4 {
     font-size: 1.5rem;
+    text-align: center;
   }
 
-  .statics {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    align-items: flex-start;
-    width: 10%;
-    height: 10vh;
+  .statics-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    height: 100%;
     border: 5px solid black;
+    font-size: 1.25rem;
   }
 
-  .statics > div {
+  .statics-container > div {
     display: flex;
     flex-direction: row;
   }
 
-  #statics {
-    position: absolute;
-    right: 0;
-  }
-
+  #statics,
   #palette {
     position: absolute;
     top: 25%;
     height: 50%;
-    left: 0;
     width: clamp(32px, 15%, 144px);
     padding: 1%;
     border-top-right-radius: 12px;
     border-bottom-right-radius: 12px;
   }
 
+  #statics::before,
+  #palette::before {
+    top: -10%;
+    position: absolute;
+    font-size: 2rem;
+  }
+
+  #palette::before {
+    content: "🎨";
+  }
+
+  #statics::before {
+    right: 0;
+    content: "🗿";
+  }
+
+  #palette {
+    left: 0;
+  }
+
+  #statics {
+    right: 0;
+  }
+
   .color {
-    --size: clamp(16px, 10vw, 72px);
+    --size: clamp(64px, 10vw, 72px);
     --br: calc(var(--size) / 8);
+    min-height: 64px;
     font-size: calc(var(--size) / 2.5);
     position: relative;
     width: var(--size);
     height: var(--size);
     border-radius: var(--br);
-    margin: 1%;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -281,9 +311,13 @@
   .color-container {
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
+    gap: 1%;
+    padding: 20% 0;
+    margin-top: 15%;
+    height: 65%;
     overflow-y: auto;
+    direction: rtl;
   }
 
   .isDefault::after {
@@ -298,6 +332,8 @@
     top: 0;
     right: 0;
   }
+
+  /* BUTTONS */
 
   .collision-btn,
   .condition-btn {
@@ -341,12 +377,7 @@
   }
 
   .palette-btn:hover {
-    background: linear-gradient(
-      90deg,
-      rgba(131, 58, 180, 1) 0%,
-      rgba(253, 29, 29, 1) 50%,
-      rgba(252, 176, 69, 1) 100%
-    );
+    background: var(--picked-color);
   }
 
   .palette-btn:hover::after,
@@ -354,6 +385,10 @@
   .condition-btn:hover::after,
   .event-btn:hover::after {
     content: "++";
+  }
+
+  .palette-btn:hover::after {
+    mix-blend-mode: difference;
   }
 
   .collision-btn,

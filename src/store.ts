@@ -121,6 +121,7 @@ function createEditableMap() {
   };
 }
 
+// TODO: implement quick access pattern
 function createStatics() {
   const { subscribe, update } = writable(new Set<string>());
 
@@ -140,6 +141,7 @@ function createStatics() {
 }
 
 function createColorPalette() {
+  // TODO: Add last picked color
   const { subscribe, update } = writable(new Set<string>());
 
   return {

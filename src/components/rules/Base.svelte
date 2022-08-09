@@ -3,7 +3,7 @@
   const dispatch = createEventDispatcher();
 </script>
 
-<section>
+<section class="base">
   <button on:click={() => dispatch("remove")}>
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -23,8 +23,8 @@
 </section>
 
 <style>
-  section {
-    max-height: 96px;
+  .base {
+    --padding: clamp(8px, 5%, 32px);
     border-color: var(--border-color);
     background: var(--background);
     position: relative;
@@ -32,12 +32,16 @@
     flex-direction: column;
     align-items: flex-start;
     justify-content: flex-start;
-    padding: 5%;
-    margin: 5%;
+    padding: var(--padding);
+    margin: var(--padding);
     border-radius: var(--card-br);
     border-width: 3px;
     border-style: solid;
     box-shadow: rgba(149, 157, 165, 0.2) 0px 4px 12px;
+  }
+
+  :global(.base *) {
+    font-size: 1.2rem;
   }
 
   svg {
