@@ -1,5 +1,11 @@
 <script lang="ts">
   // SVELTE
+  import { setContext } from "svelte";
+
+  setContext("modal", {
+    open: true,
+    key: "keyboard",
+  });
 
   // VIEWS
   import Play from "../views/Play.svelte";
@@ -7,7 +13,7 @@
   import Rules from "../views/Rules.svelte";
 
   // COMPONENTS
-  import Modal from "../components/Modal.svelte";
+  import Modal from "../components/tutorial/Modal.svelte";
 
   // DATA
   import { emojis } from "../emojis";
@@ -25,7 +31,7 @@
   // quickAcess edit mode
   let editMode = false;
 
-  let viewIndex = 1;
+  let viewIndex = 2;
   let inventoryIndex = 0;
   $currentItem = $inventory[inventoryIndex];
 
@@ -74,8 +80,6 @@
     $currentColor = color == $currentColor ? "" : color;
   }
 
-  // TODO: Find what is causing the jank
-
   let innerWidth: number;
   let innerHeight: number;
 </script>
@@ -95,7 +99,7 @@
   <div class="playground" on:mousemove={setCursorEmoji}>
     <div id="interactive" style={interactiveStyle}>
       <nav>
-        <!-- TODO: Tooltip for shortcuts -->
+        <!-- TODO: Tooltip for shortcuts (Shortcuts.svelte)-->
         <!-- <div>
           <h4>Shortcuts</h4>
           <p>Esc - Deselect emoji/color</p>

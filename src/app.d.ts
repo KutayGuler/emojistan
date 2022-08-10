@@ -13,5 +13,6 @@ declare namespace App {
 declare namespace svelte.JSX {
   interface HTMLAttributes<T> {
     longress?: (event: any) => any;
+    outsideclick?: (event: any) => any;
   }
 }

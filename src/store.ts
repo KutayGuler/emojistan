@@ -121,7 +121,6 @@ function createEditableMap() {
   };
 }
 
-// TODO: implement quick access pattern
 function createStatics() {
   const { subscribe, update } = writable(new Set<string>());
 
@@ -141,7 +140,6 @@ function createStatics() {
 }
 
 function createColorPalette() {
-  // TODO: Add last picked color
   const { subscribe, update } = writable(new Set<string>());
 
   return {
@@ -200,6 +198,42 @@ function createQuickAccess() {
   };
 }
 
+export type ModalType =
+  | "keyboard"
+  | "pushes"
+  | "merges"
+  | "conditions"
+  | "events"
+  | "statics"
+  | "palette";
+
+function createModal() {
+  const modal: { open: boolean; type: ModalType } = {
+    open: false,
+    type: "keyboard",
+  };
+  const { subscribe, update } = writable(modal);
+
+  return {
+    subscribe,
+    show: (type: ModalType) =>
+      update((state) => {
+        console.log("show");
+        state.type = type;
+        state.open = true;
+        console.log(state);
+        return state;
+      }),
+    close: () =>
+      update((state) => {
+        console.log("close");
+        state.open = false;
+        return state;
+      }),
+  };
+}
+
+export const modal = createModal();
 export const quickAccess = createQuickAccess();
 
 export const currentItem = writable("");

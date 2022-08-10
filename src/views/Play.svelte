@@ -245,6 +245,8 @@
   let wasd = ["KeyW", "KeyA", "KeyS", "KeyD"];
   let playerInteracted = false;
 
+  let emojiStyle = "";
+
   function handle(e: KeyboardEvent) {
     if (e.code == "Space") {
       playerInteracted = true;
@@ -256,7 +258,7 @@
       return;
     }
     playerInteracted = false;
-    if (e.code == "KeyG") {
+    if (e.code.includes("Control")) {
       ghost = !ghost;
       return;
     }
@@ -267,7 +269,10 @@
     }
     if (!e.code.includes("Arrow")) return;
     let operation = calcOperation(e.code, ac);
-    if (operation == 0) return;
+    if (operation == 0) {
+      emojiStyle = "transform: translateX(5%);";
+      return;
+    }
     if (ghost || !items.has(ac)) {
       moveActiveCell(operation);
       return;
@@ -368,7 +373,6 @@
 <svelte:window on:keydown={handle} />
 
 <section class="playable-map">
-  <!-- TODO: Add how to play modal with kbd elements -->
   <button class="guide">❔</button>
   <section class="noselect">
     <p><strong>Objective: </strong>{_map.objective || "?"}</p>
@@ -378,6 +382,7 @@
         {@const isControlling = !ghost && items.has(ac)}
         {@const isActive = ac == i}
         <div
+          style:transform={emojiStyle}
           style:background={backgrounds.get(i) || ""}
           class:adc={adc == i && isControlling}
           class:active={isActive}

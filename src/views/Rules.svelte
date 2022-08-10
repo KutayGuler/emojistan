@@ -15,6 +15,7 @@
     colorPalette as cp,
     statics,
     currentEmoji,
+    modal,
   } from "../store";
 
   // COMPONENTS
@@ -24,17 +25,17 @@
   import Event from "../components/rules/Event.svelte";
   import LoopEvent from "../components/rules/LoopEvent.svelte";
 
-  let pickedColor = "#000000";
-  let defaultBackground: string = "#faebd7";
   let r: any;
+  let pickedColor = "#000000";
+  let defaultBackground = "#faebd7";
   let eventIndex = 0;
   let loopEventIndex = 0;
 
   onMount(() => {
     r = document.querySelector(":root");
-    defaultBackground = getComputedStyle(r).getPropertyValue(
-      "--default-background"
-    );
+    let compStyle = getComputedStyle(r);
+    defaultBackground = compStyle.getPropertyValue("--default-background");
+    pickedColor = compStyle.getPropertyValue("--picked-color");
   });
 
   function setDefaultBackground(color: string) {
@@ -69,9 +70,7 @@
 
 <section class="noselect rules">
   <div id="palette" style:background={defaultBackground}>
-    <!-- <h4 title="Click on any color to set it as the default background color">
-      🎨
-    </h4> -->
+    <h4 on:click={() => modal.show("statics")}>Palette 🎨</h4>
     <input
       type="color"
       bind:value={pickedColor}
@@ -97,8 +96,7 @@
     </div>
   </div>
   <div id="statics">
-    <!-- TODO: Add tooltip to statics -->
-    <!-- <p>Static items cannot be moved by players</p> -->
+    <h4 on:click={() => modal.show("statics")}>Statics 🗿</h4>
     <div
       class="statics-container noselect"
       on:click={() => statics.toggleEmoji($currentEmoji, "add")}
@@ -111,9 +109,13 @@
       {/each}
     </div>
   </div>
-  <!-- TODO: Add tooltip to collisions -->
   <div id="pushes">
-    <h4 title="Objects will bump into each other by default">Pushes 💨</h4>
+    <h4
+      on:click={() => modal.show("pushes")}
+      title="Objects will bump into each other by default"
+    >
+      Pushes 💨
+    </h4>
     {#each [...$collisions, ["", ["", "", "push"]]].filter( ([k, v]) => v.includes("push") ) as [id, rule] (id)}
       <div transition:scale|local animate:flip>
         {#if id == ""}
@@ -128,7 +130,12 @@
     {/each}
   </div>
   <div id="merges">
-    <h4 title="Objects will bump into each other by default">Merges 💫</h4>
+    <h4
+      on:click={() => modal.show("merges")}
+      title="Objects will bump into each other by default"
+    >
+      Merges 💫
+    </h4>
     {#each [...$collisions, ["", ["", "", ""]]].filter(([k, v]) => !v.includes("push")) as [id, rule] (id)}
       <div transition:scale|local animate:flip>
         {#if id == ""}
@@ -143,7 +150,7 @@
     {/each}
   </div>
   <div id="conditions">
-    <h4>Conditions ❓</h4>
+    <h4 on:click={() => modal.show("conditions")}>Conditions ❓</h4>
     {#each [...$conditions, ["", {}]] as [id, { a, b, _b, eventID }] (id)}
       <div transition:scale|local animate:flip>
         {#if id == ""}
@@ -165,7 +172,7 @@
     {/each}
   </div>
   <div id="events">
-    <h4>Events 🧨</h4>
+    <h4 on:click={() => modal.show("events")}>Events & Loop Events 🧨</h4>
     {#each [...$events, ["", {}]] as [id, { name, sequence, loop }] (id)}
       <div transition:scale|local animate:flip>
         {#if id == ""}
@@ -238,54 +245,60 @@
   h4 {
     font-size: 1.5rem;
     text-align: center;
+    cursor: help;
+    transition: 200ms ease-out;
+  }
+
+  h4:hover {
+    transform: scale(125%);
   }
 
   .statics-container {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    display: flex;
+    flex-direction: column;
+    align-items: start;
     height: 100%;
-    border: 5px solid black;
+    padding: 25% 0;
+    box-sizing: border-box;
+    overflow-y: auto;
     font-size: 1.25rem;
   }
 
   .statics-container > div {
     display: flex;
     flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    font-size: 2rem;
   }
 
   #statics,
   #palette {
+    box-sizing: border-box;
     position: absolute;
     top: 25%;
     height: 50%;
     width: clamp(32px, 15%, 144px);
     padding: 1%;
-    border-top-right-radius: 12px;
-    border-bottom-right-radius: 12px;
   }
 
-  #statics::before,
-  #palette::before {
-    top: -10%;
-    position: absolute;
-    font-size: 2rem;
-  }
-
-  #palette::before {
-    content: "🎨";
-  }
-
-  #statics::before {
-    right: 0;
-    content: "🗿";
+  #statics h4,
+  #palette h4 {
+    margin-top: 0;
   }
 
   #palette {
     left: 0;
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
   }
 
   #statics {
     right: 0;
+    background: #e6e6e6;
+    border: 5px solid black;
+    border-right: none;
   }
 
   .color {
