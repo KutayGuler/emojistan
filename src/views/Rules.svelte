@@ -66,6 +66,8 @@
   }
 
   console.log([...$conditions]);
+
+  // TODO: Divide rules into Physics and Triggers
 </script>
 
 <section class="noselect rules">

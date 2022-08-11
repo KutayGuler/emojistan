@@ -29,37 +29,8 @@
   <div transition:fly class="modal-background">
     <div use:clickOutside on:outsideclick={modal.close}>
       <svelte:component this={components[$modal.type]}>
-        <button class="close" on:click={modal.close} />
+        <button class="modal-close" on:click={modal.close} />
       </svelte:component>
     </div>
   </div>
 {/if}
-
-<style>
-  :global(.modal) {
-    position: relative;
-    width: 75vw;
-    height: 75vh;
-    background-color: var(--primary);
-  }
-
-  .modal-background {
-    position: absolute;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    background-color: rgba(0, 0, 0, 0.24);
-    width: 100vw;
-    height: 100vh;
-    z-index: 100;
-  }
-
-  .close {
-    position: absolute;
-    width: 50px;
-    height: 50px;
-    top: 0;
-    right: 0;
-  }
-</style>

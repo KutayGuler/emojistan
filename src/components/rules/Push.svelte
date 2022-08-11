@@ -7,6 +7,7 @@
 
   export let id: string;
   export let rule: Array<string> = [];
+  export let disabled = false;
 
   let slots = ["", ""];
   let error: SvelteComponent;
@@ -44,13 +45,14 @@
 </script>
 
 <Base
+  {disabled}
   on:remove={() => collisions.remove(id)}
   --border-color="#3a96dd"
   --background="#e9f3fb"
 >
   <div class="slots">
     {#each { length: 2 } as _, i}
-      <div class="slot" on:click={() => updateSlot(i)}>
+      <div class="slot" on:click={() => !disabled && updateSlot(i)}>
         <div>{slots[i]}</div>
       </div>
     {/each}
