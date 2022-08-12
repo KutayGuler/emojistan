@@ -57,10 +57,10 @@
     position: absolute;
     top: -20%;
     right: 2%;
+    cursor: pointer;
   }
 
   button:hover {
     background-color: var(--background);
-    cursor: pointer;
   }
 </style>

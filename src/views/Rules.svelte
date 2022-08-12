@@ -72,9 +72,9 @@
 
   // DUMMY STUFF FOR TYPE SAFETY IN HTML
   let iterationType: "increment" | "decrement" = "increment";
-  let dc = { a: "", b: "", _b: "", eventID: "" };
+  let dc = { a: "_", b: "_", _b: "_", eventID: "_" };
   let de = {
-    name: "",
+    name: "_",
     sequence: [],
     loop: {
       start: 0,
@@ -131,12 +131,7 @@
     </div>
   </div>
   <div id="pushes">
-    <h4
-      on:click={() => modal.show("pushes")}
-      title="Objects will bump into each other by default"
-    >
-      Pushes 💨
-    </h4>
+    <h4 on:click={() => modal.show("pushes")}>Pushes 💨</h4>
     {#each [...$collisions, ["", ["", "", "push"]]].filter( ([k, v]) => v.includes("push") ) as [id, rule] (id)}
       <div transition:scale|local animate:flip>
         {#if id == ""}
@@ -151,12 +146,7 @@
     {/each}
   </div>
   <div id="merges">
-    <h4
-      on:click={() => modal.show("merges")}
-      title="Objects will bump into each other by default"
-    >
-      Merges 💫
-    </h4>
+    <h4 on:click={() => modal.show("merges")}>Merges 💫</h4>
     {#each [...$collisions, ["", ["", "", ""]]].filter(([k, v]) => !v.includes("push")) as [id, rule] (id)}
       <div transition:scale|local animate:flip>
         {#if id == ""}
@@ -172,9 +162,9 @@
   </div>
   <div id="conditions">
     <h4 on:click={() => modal.show("conditions")}>Conditions ❓</h4>
-    {#each [...$conditions, [{ id: "", ...dc }, dc]] as [id, { a, b, _b, eventID }] (id)}
+    {#each [...$conditions, ["", {}]] as [id, { a, b, _b, eventID }] (id)}
       <div transition:scale|local animate:flip>
-        {#if typeof id === "object"}
+        {#if id == ""}
           <button
             class="condition-btn"
             on:click={() =>
@@ -194,9 +184,9 @@
   </div>
   <div id="events">
     <h4 on:click={() => modal.show("events")}>Events & Loop Events 🧨</h4>
-    {#each [...$events, [{ id: "", ...de }, de]] as [id, { name, sequence, loop }] (id)}
+    {#each [...$events, ["", {}]] as [id, { name, sequence, loop }] (id)}
       <div transition:scale|local animate:flip>
-        {#if typeof id === "object"}
+        {#if id == ""}
           <div class="event-btn-container">
             <button
               class="event-btn"

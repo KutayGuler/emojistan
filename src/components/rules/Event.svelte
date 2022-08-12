@@ -2,11 +2,12 @@
   import Base from "./Base.svelte";
   import { onDestroy } from "svelte/internal";
   import { colorPalette, events, currentEmoji } from "../../store";
-  import type { SequenceItem, Loop } from "../../store";
+  import type { SequenceItem } from "../../store";
 
   export let id: string;
   export let name: string;
   export let sequence: Array<SequenceItem> = [];
+  export let disabled = false;
   let onEndID = 0;
 
   const types = [
@@ -47,7 +48,7 @@
   }
 
   function generateSequenceItem(_type: string, vals?: any) {
-    let newItem: SequenceItem = { type: _type };
+    let newItem = { type: _type };
     if (vals) {
       let { index, background, emoji, duration } = vals;
       index = validateInput(index, MIN_INDEX, MAX_INDEX);
@@ -115,6 +116,7 @@
   }
 
   function update(i: number | "name") {
+    if (disabled) return;
     if (i != undefined && i != "name") {
       sequence[i] = generateSequenceItem(sequence[i].type, { ...sequence[i] });
     }
@@ -122,10 +124,12 @@
   }
 
   function updateSlot(i: number) {
+    if (disabled) return;
     sequence[i].emoji = $currentEmoji;
   }
 
   onDestroy(() => {
+    if (disabled) return;
     if (sequence.length == 0) {
       events.remove(id);
     } else if (
@@ -142,92 +146,98 @@
 </script>
 
 <Base
+  {disabled}
   on:remove={() => events.remove(id)}
   --border-color="#ffc83d"
   --background="#fff3d6"
 >
-  <input
-    type="text"
-    bind:value={name}
-    on:input={() => update("name")}
-    placeholder="Event Name"
-  />
-  {#each sequence as s, i}
-    <div>
-      <select id="type" bind:value={s.type} on:change={() => update(i)}>
+  {#if disabled}
+    <!-- content here -->
+    <h4>EventName</h4>
+  {:else}
+    <input
+      type="text"
+      bind:value={name}
+      on:input={() => update("name")}
+      placeholder="Event Name"
+    />
+    {#each sequence as s, i}
+      <div>
+        <select id="type" bind:value={s.type} on:change={() => update(i)}>
+          {#each types as t}
+            <option value={t}>{t}</option>
+          {/each}
+        </select>
+        {#if s.type == "spawn"}
+          <div class="slot" on:click={() => updateSlot(i)}>{s.emoji || ""}</div>
+          at
+          <input
+            type="number"
+            bind:value={s.index}
+            min={MIN_INDEX}
+            max={MAX_INDEX}
+            on:change={() => update(i)}
+          />
+        {:else if s.type == "destroy"}
+          <input
+            type="number"
+            bind:value={s.index}
+            min={MIN_INDEX}
+            max={MAX_INDEX}
+            on:change={() => update(i)}
+          />
+        {:else if s.type == "wait"}
+          <input
+            type="number"
+            bind:value={s.duration}
+            min={MIN_DURATION}
+            max={MAX_DURATION}
+            on:change={() => update(i)}
+          /> ms
+        {:else if s.type == "setBackgroundOf" || s.type == "removeBackgroundOf"}
+          <input
+            type="number"
+            bind:value={s.index}
+            min={MIN_INDEX}
+            max={MAX_INDEX}
+            on:change={() => update(i)}
+          />
+          {#if s.type == "setBackgroundOf"}
+            to
+            <select
+              bind:value={s.background}
+              style:background={s.background}
+              on:change={() => update(i)}
+            >
+              {#each [...$colorPalette] as color}
+                <option value={color} style:background={color} />
+              {/each}
+            </select>
+          {/if}
+        {/if}
+        <button id="remove" on:click={() => removeFromSequence(i)}>❌</button>
+      </div>
+    {/each}
+    <label>
+      <select bind:value={type}>
         {#each types as t}
           <option value={t}>{t}</option>
         {/each}
       </select>
-      {#if s.type == "spawn"}
-        <div class="slot" on:click={() => updateSlot(i)}>{s.emoji || ""}</div>
-        at
-        <input
-          type="number"
-          bind:value={s.index}
-          min={MIN_INDEX}
-          max={MAX_INDEX}
-          on:change={() => update(i)}
-        />
-      {:else if s.type == "destroy"}
-        <input
-          type="number"
-          bind:value={s.index}
-          min={MIN_INDEX}
-          max={MAX_INDEX}
-          on:change={() => update(i)}
-        />
-      {:else if s.type == "wait"}
-        <input
-          type="number"
-          bind:value={s.duration}
-          min={MIN_DURATION}
-          max={MAX_DURATION}
-          on:change={() => update(i)}
-        /> ms
-      {:else if s.type == "setBackgroundOf" || s.type == "removeBackgroundOf"}
-        <input
-          type="number"
-          bind:value={s.index}
-          min={MIN_INDEX}
-          max={MAX_INDEX}
-          on:change={() => update(i)}
-        />
-        {#if s.type == "setBackgroundOf"}
-          to
-          <select
-            bind:value={s.background}
-            style:background={s.background}
-            on:change={() => update(i)}
-          >
-            {#each [...$colorPalette] as color}
-              <option value={color} style:background={color} />
-            {/each}
-          </select>
-        {/if}
+      <button on:click={addToSequence}>➕</button>
+    </label>
+    <label>
+      <strong>Trigger on complete</strong>
+      <input type="checkbox" bind:checked={trigger} />
+      {#if trigger}
+        <select bind:value={onEndID}>
+          {#each [...$events] as [_id, { name }]}
+            {#if id != _id}
+              <option value={_id}>{name}</option>
+            {/if}
+          {/each}
+        </select>
       {/if}
-      <button id="remove" on:click={() => removeFromSequence(i)}>❌</button>
-    </div>
-  {/each}
-  <label>
-    <select bind:value={type}>
-      {#each types as t}
-        <option value={t}>{t}</option>
-      {/each}
-    </select>
-    <button on:click={addToSequence}>➕</button>
-  </label>
-  <label>
-    <strong>Trigger on complete</strong>
-    <input type="checkbox" bind:checked={trigger} />
-    {#if trigger}
-      <select bind:value={onEndID}>
-        {#each [...$events] as [_id, { name }]}
-          {#if id != _id}
-            <option value={_id}>{name}</option>
-          {/if}
-        {/each}
-      </select>
-    {/if}
-  </label>
+    </label>
+  {/if}
 </Base>

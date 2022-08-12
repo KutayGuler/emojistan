@@ -143,6 +143,9 @@ body {
   height: 50px;
   top: 0;
   right: 0;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
 }
 
 .body {
@@ -172,7 +175,7 @@ body {
   font-size: 2rem;
 }
 
-.content > p {
+.modal p {
   font-size: 1.5rem;
 }
 

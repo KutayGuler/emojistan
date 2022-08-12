@@ -26,10 +26,24 @@
 </script>
 
 {#if $modal.open}
-  <div transition:fly class="modal-background">
+  <div transition:fly class="modal-background noselect">
     <div use:clickOutside on:outsideclick={modal.close}>
       <svelte:component this={components[$modal.type]}>
-        <button class="modal-close" on:click={modal.close} />
+        <button class="modal-close" on:click={modal.close}>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="white"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
       </svelte:component>
     </div>
   </div>

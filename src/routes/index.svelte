@@ -228,9 +228,6 @@
 
   nav span {
     transition: 200ms ease-out;
-  }
-
-  nav span:hover {
     cursor: pointer;
   }
 
