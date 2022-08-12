@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { MIN_INDEX, MAX_INDEX } from "../constants";
   import { currentEmoji, currentColor, editableMap as map } from "../store";
   import { longpress } from "../utils/longpress";
 
@@ -35,8 +36,6 @@
   }
 
   let startIndex = $map.startIndex;
-  const MIN_INDEX = 0;
-  const MAX_INDEX = 255;
 
   function startIndexChanged() {
     // OPTIMIZATION could be turned into derived store

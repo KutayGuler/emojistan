@@ -23,17 +23,29 @@ export interface Loop {
   reverse: boolean;
 }
 
-export interface TEvent {
+export interface Orderable {
+  order?: number;
+}
+
+export interface TEvent extends Orderable {
   name: string;
   sequence: Array<SequenceItem>;
   loop?: Loop;
 }
 
-export interface TCondition {
+export interface TCondition extends Orderable {
   a: string;
   b: string;
   _b: string | "any";
   eventID: string;
+}
+
+export interface TPush extends Orderable {
+  rule: Array<string>;
+}
+
+export interface TCollision extends Orderable {
+  rule: Array<string>;
 }
 
 export interface Emoji {
@@ -42,20 +54,29 @@ export interface Emoji {
 }
 
 function createMapStore<T>(_state: Map<string, T>) {
-  const { subscribe, update } = writable(_state);
+  const { set, subscribe, update } = writable(_state);
 
   return {
+    set,
     subscribe,
     add: (value: T) =>
       update((state) => {
+        Object.assign(value, { order: state.size + 1 });
+        console.log(value);
         let id = Date.now().toString().slice(7);
-
         state.set(id, value);
+        console.log(state);
         return state;
       }),
     update: (id: string, value: T) =>
       update((state) => {
         state.set(id, value);
+        return state;
+      }),
+    updateValue: (id: string, key: string, value: T) =>
+      update((state) => {
+        // @ts-expect-error
+        state.get(id)[key] = value;
         return state;
       }),
     remove: (id: string) =>
@@ -212,15 +233,12 @@ function createModal() {
     subscribe,
     show: (type: ModalType) =>
       update((state) => {
-        console.log("show");
         state.type = type;
         state.open = true;
-        console.log(state);
         return state;
       }),
     close: () =>
       update((state) => {
-        console.log("close");
         state.open = false;
         return state;
       }),
@@ -237,8 +255,10 @@ export const inventory = createInventory();
 export const colorPalette = createColorPalette();
 export const editableMap = createEditableMap();
 export const statics = createStatics();
-export const collisions = createMapStore<Array<string>>(
-  new Map<string, Array<string>>()
+export const pushes = createMapStore<TCollision>(new Map<string, TCollision>());
+export const merges = createMapStore<TCollision>(new Map<string, TCollision>());
+export const collisions = createMapStore<TCollision>(
+  new Map<string, TCollision>()
 );
 export const events = createMapStore<TEvent>(new Map<string, TEvent>());
 export const conditions = createMapStore<TCondition>(

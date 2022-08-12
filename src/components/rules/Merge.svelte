@@ -2,7 +2,7 @@
   import Error from "./Error.svelte";
   import type { SvelteComponent } from "svelte";
   import { onDestroy, onMount } from "svelte";
-  import { collisions, currentEmoji } from "../../store";
+  import { merges, currentEmoji } from "../../store";
   import Base from "./Base.svelte";
 
   export let id: string;
@@ -20,7 +20,8 @@
 
   function checkCollision() {
     if (
-      [...$collisions].some(([_id, _rule]) => {
+      [...$merges].some(([_id, _]) => {
+        let _rule = _.rule;
         if (id == _id) return false;
         let _firstTwo = [_rule[0], _rule[1]];
         let firstTwo = [slots[0], slots[1]];
@@ -36,7 +37,8 @@
       return;
     }
 
-    collisions.update(id, slots);
+    // @ts-expect-error
+    merges.updateValue(id, "rule", slots);
   }
 
   function updateSlot(i: number) {
@@ -53,14 +55,14 @@
 
   onDestroy(() => {
     if (slots.includes("")) {
-      collisions.remove(id);
+      merges.remove(id);
     }
   });
 </script>
 
 <Base
-{disabled}
-  on:remove={() => collisions.remove(id)}
+  {disabled}
+  on:remove={() => merges.remove(id)}
   --border-color="#3a96dd"
   --background="#e9f3fb"
 >

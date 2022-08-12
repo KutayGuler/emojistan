@@ -9,14 +9,14 @@
 
   // DATA
   import {
-    collisions,
     events,
     conditions,
     colorPalette as cp,
     statics,
     currentEmoji,
     modal,
-    type Loop,
+    pushes,
+    merges,
   } from "../store";
 
   // COMPONENTS
@@ -29,8 +29,8 @@
   let r: any;
   let pickedColor = "#000000";
   let defaultBackground = "#faebd7";
-  let eventIndex = 0;
-  let loopEventIndex = 0;
+  let eventIndex = 1;
+  let loopEventIndex = 1;
 
   onMount(() => {
     r = document.querySelector(":root");
@@ -66,25 +66,36 @@
     r.style.setProperty("--picked-color", pickedColor);
   }
 
-  console.log([...$conditions]);
-
   // TODO: Divide rules into Physics and Triggers
+  let hovering: any = false;
 
-  // DUMMY STUFF FOR TYPE SAFETY IN HTML
-  let iterationType: "increment" | "decrement" = "increment";
-  let dc = { a: "_", b: "_", _b: "_", eventID: "_" };
-  let de = {
-    name: "_",
-    sequence: [],
-    loop: {
-      start: 0,
-      end: 16,
-      iterationNumber: 1,
-      iterationType,
-      timeGap: 50,
-      reverse: false,
-    },
+  const drop = (event: any, target: any) => {
+    console.log("drop");
+    event.dataTransfer.dropEffect = "move";
+    const start = event.dataTransfer.getData("text/plain");
+
+    // @ts-expect-error
+    let prevOrder = $pushes.get(start).order;
+    // @ts-expect-error
+    let nextOrder = $pushes.get(target).order;
+
+    // @ts-expect-error
+    pushes.updateValue(start, "order", nextOrder);
+    // @ts-expect-error
+    pushes.updateValue(target, "order", prevOrder);
+
+    hovering = null;
   };
+
+  const dragstart = (event: any, i: any) => {
+    console.log("drag start");
+    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.dropEffect = "move";
+    const start = i;
+    event.dataTransfer.setData("text/plain", start);
+  };
+
+  // TODO: Seperate pushes and merges
 </script>
 
 <section class="noselect rules">
@@ -108,7 +119,6 @@
           style="background-color: {color};"
           on:click={() => setDefaultBackground(color)}
         >
-          <!-- TODO: Figure out how to keep X's position same while the component is getting longer -->
           <button class="remove-color" on:click={() => removeColor(color)}>
             ❌
           </button>
@@ -130,14 +140,28 @@
       {/each}
     </div>
   </div>
+  <!-- TODO: Do not apply to other items until this one is bug free -->
+  <!-- TODO: Change to ul and li -->
+  <!-- TODO: Try autoanimate (how will it keep track of order?)-->
   <div id="pushes">
     <h4 on:click={() => modal.show("pushes")}>Pushes 💨</h4>
-    {#each [...$collisions, ["", ["", "", "push"]]].filter( ([k, v]) => v.includes("push") ) as [id, rule] (id)}
-      <div transition:scale|local animate:flip>
+    {#each [...$pushes, ["", { rule: ["", "", "push"], order: 1000 }]] as [id, { rule, order }], i (id)}
+      <div
+        transition:scale|local
+        animate:flip
+        style:order
+        draggable={id != ""}
+        on:dragstart={(event) => dragstart(event, id)}
+        ondragover={id != "" ? "return false" : "return true"}
+        on:drop|preventDefault={(event) => drop(event, id)}
+        on:dragenter={() => (hovering = i)}
+        class:is-active={hovering === i}
+      >
         {#if id == ""}
           <button
             class="collision-btn"
-            on:click={() => collisions.add(["", "", "push"])}>💨</button
+            on:click={() => pushes.add({ rule: ["", "", "push"], order: 1000 })}
+            >💨</button
           >
         {:else if typeof id === "string" && Array.isArray(rule)}
           <Push {id} {rule} />
@@ -147,12 +171,12 @@
   </div>
   <div id="merges">
     <h4 on:click={() => modal.show("merges")}>Merges 💫</h4>
-    {#each [...$collisions, ["", ["", "", ""]]].filter(([k, v]) => !v.includes("push")) as [id, rule] (id)}
+    {#each [...$merges, ["", { rule: ["", "", ""] }]] as [id, { rule, order }] (id)}
       <div transition:scale|local animate:flip>
         {#if id == ""}
           <button
             class="collision-btn"
-            on:click={() => collisions.add(["", "", ""])}>💫</button
+            on:click={() => merges.add({ rule: ["", "", ""] })}>💫</button
           >
         {:else if typeof id === "string" && Array.isArray(rule)}
           <Merge {id} {rule} />
@@ -251,6 +275,11 @@
     height: 95%;
     box-sizing: border-box;
     transition: 200ms ease-out;
+  }
+
+  .rules > div {
+    display: flex;
+    flex-direction: column;
   }
 
   h4 {
@@ -441,5 +470,10 @@
   .event-btn {
     margin-top: 0;
     box-sizing: border-box;
+  }
+
+  .is-active {
+    background-color: #3273dc;
+    color: #fff;
   }
 </style>

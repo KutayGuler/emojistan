@@ -2,7 +2,7 @@
   import Error from "./Error.svelte";
   import type { SvelteComponent } from "svelte";
   import { onDestroy, onMount } from "svelte";
-  import { collisions, currentEmoji } from "../../store";
+  import { pushes, currentEmoji } from "../../store";
   import Base from "./Base.svelte";
 
   export let id: string;
@@ -21,14 +21,17 @@
 
   function checkCollision() {
     if (
-      [...$collisions].some(([k, v]) => v[0] == slots[0] && v[1] == slots[1])
+      [...$pushes].some(
+        ([k, { rule }]) => rule[0] == slots[0] && rule[1] == slots[1]
+      )
     ) {
       slots = ["", ""];
       error.display("Can't have duplicate pushes.");
       return;
     }
 
-    collisions.update(id, [...slots, "push"]);
+    // @ts-expect-error
+    pushes.updateValue(id, "rule", [...slots, "push"]);
   }
 
   function updateSlot(i: number) {
@@ -39,14 +42,14 @@
 
   onDestroy(() => {
     if (slots.includes("")) {
-      collisions.remove(id);
+      pushes.remove(id);
     }
   });
 </script>
 
 <Base
   {disabled}
-  on:remove={() => collisions.remove(id)}
+  on:remove={() => pushes.remove(id)}
   --border-color="#3a96dd"
   --background="#e9f3fb"
 >

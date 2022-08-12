@@ -1,24 +1,28 @@
 <script lang="ts">
-  import Error from "./Error.svelte";
-  import type { SvelteComponent } from "svelte";
+  // DATA
+  import { MIN_INDEX, MAX_INDEX } from "../../constants";
   import { onDestroy } from "svelte/internal";
   import { colorPalette, events, currentEmoji } from "../../store";
+
+  // TYPES
+  import type { SvelteComponent } from "svelte/internal";
   import type { SequenceItem, Loop } from "../../store";
+
+  // COMPONENTS
   import Base from "./Base.svelte";
+  import Error from "./Error.svelte";
 
   export let id: string;
   export let name: string;
   export let sequence: Array<SequenceItem> = [];
   export let loop: Loop;
 
-  let error: SvelteComponent;
+  let error: any;
 
   const types = ["setBackgroundOf", "removeBackgroundOf", "spawn", "destroy"];
 
   const MIN_DURATION = 50;
   const MAX_DURATION = 10000;
-  const MIN_INDEX = 0;
-  const MAX_INDEX = 256;
   const MIN_ITERATION = 1;
   const MAX_ITERATION = 16;
 

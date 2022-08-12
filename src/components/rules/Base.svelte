@@ -55,7 +55,7 @@
     border-color: var(--border-color);
     border-radius: var(--cell-br);
     position: absolute;
-    top: -20%;
+    top: -20px;
     right: 2%;
     cursor: pointer;
   }

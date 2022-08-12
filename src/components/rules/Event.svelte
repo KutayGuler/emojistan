@@ -1,5 +1,7 @@
 <script lang="ts">
   import Base from "./Base.svelte";
+
+  import { MIN_INDEX, MAX_INDEX } from "../../constants";
   import { onDestroy } from "svelte/internal";
   import { colorPalette, events, currentEmoji } from "../../store";
   import type { SequenceItem } from "../../store";
@@ -20,8 +22,6 @@
     "completeLevel",
   ];
 
-  const MIN_INDEX = 0;
-  const MAX_INDEX = 256;
   const MIN_DURATION = 50;
   const MAX_DURATION = 10000;
 
@@ -153,9 +153,11 @@
 >
   {#if disabled}
     <!-- content here -->
-    <h4>EventName</h4>
+    <h4 id="disabled-name">EventName</h4>
+    <p>completeLevel</p>
   {:else}
     <input
+      id="name"
       type="text"
       bind:value={name}
       on:input={() => update("name")}
@@ -241,3 +243,20 @@
     </label>
   {/if}
 </Base>
+
+<style>
+  #name {
+    position: absolute;
+    top: -15px;
+    left: 2%;
+    border: 3px solid var(--border-color);
+  }
+
+  #disabled-name {
+    padding: 0 1%;
+    top: -60px;
+    position: absolute;
+    background-color: white;
+    border: 3px solid var(--border-color);
+  }
+</style>

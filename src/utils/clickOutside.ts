@@ -4,7 +4,7 @@ export function clickOutside(node: HTMLElement) {
   window.addEventListener("click", handleClick);
 
   function handleClick(e: any) {
-    if (e.target.className.includes("modal-background")) {
+    if (e.target.classList.value.includes("x")) {
       node.dispatchEvent(new CustomEvent("outsideclick"));
     }
   }

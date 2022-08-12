@@ -3,7 +3,8 @@
   import { onMount } from "svelte/internal";
   import {
     editableMap as map,
-    collisions,
+    pushes,
+    merges,
     conditions,
     events,
     statics,
@@ -57,7 +58,7 @@
   let backgrounds = new Map(_map.backgrounds);
   let _collisions = new Map<string, Map<string, string>>();
 
-  for (let rule of $collisions.values()) {
+  for (let [id, { rule }] of [...$merges, ...$pushes]) {
     let [key1, key2, val] = rule;
     if (!_collisions.has(key1)) {
       _collisions.set(key1, new Map());
