@@ -16,6 +16,7 @@
     statics,
     currentEmoji,
     modal,
+    type Loop,
   } from "../store";
 
   // COMPONENTS
@@ -68,16 +69,34 @@
   console.log([...$conditions]);
 
   // TODO: Divide rules into Physics and Triggers
+
+  // DUMMY STUFF FOR TYPE SAFETY IN HTML
+  let iterationType: "increment" | "decrement" = "increment";
+  let dc = { a: "", b: "", _b: "", eventID: "" };
+  let de = {
+    name: "",
+    sequence: [],
+    loop: {
+      start: 0,
+      end: 16,
+      iterationNumber: 1,
+      iterationType,
+      timeGap: 50,
+      reverse: false,
+    },
+  };
 </script>
 
 <section class="noselect rules">
   <div id="palette" style:background={defaultBackground}>
-    <h4 on:click={() => modal.show("statics")}>Palette 🎨</h4>
-    <input
-      type="color"
-      bind:value={pickedColor}
-      on:change={pickedColorChanged}
-    />
+    <span>
+      <h4 on:click={() => modal.show("statics")}>Palette</h4>
+      <input
+        type="color"
+        bind:value={pickedColor}
+        on:change={pickedColorChanged}
+      />
+    </span>
     <button class="palette-btn" on:click={() => cp.addColor(pickedColor)}
       >🎨</button
     >
@@ -125,7 +144,7 @@
             class="collision-btn"
             on:click={() => collisions.add(["", "", "push"])}>💨</button
           >
-        {:else}
+        {:else if typeof id === "string" && Array.isArray(rule)}
           <Push {id} {rule} />
         {/if}
       </div>
@@ -145,7 +164,7 @@
             class="collision-btn"
             on:click={() => collisions.add(["", "", ""])}>💫</button
           >
-        {:else}
+        {:else if typeof id === "string" && Array.isArray(rule)}
           <Merge {id} {rule} />
         {/if}
       </div>
@@ -153,9 +172,9 @@
   </div>
   <div id="conditions">
     <h4 on:click={() => modal.show("conditions")}>Conditions ❓</h4>
-    {#each [...$conditions, ["", {}]] as [id, { a, b, _b, eventID }] (id)}
+    {#each [...$conditions, [{ id: "", ...dc }, dc]] as [id, { a, b, _b, eventID }] (id)}
       <div transition:scale|local animate:flip>
-        {#if id == ""}
+        {#if typeof id === "object"}
           <button
             class="condition-btn"
             on:click={() =>
@@ -175,9 +194,9 @@
   </div>
   <div id="events">
     <h4 on:click={() => modal.show("events")}>Events & Loop Events 🧨</h4>
-    {#each [...$events, ["", {}]] as [id, { name, sequence, loop }] (id)}
+    {#each [...$events, [{ id: "", ...de }, de]] as [id, { name, sequence, loop }] (id)}
       <div transition:scale|local animate:flip>
-        {#if id == ""}
+        {#if typeof id === "object"}
           <div class="event-btn-container">
             <button
               class="event-btn"

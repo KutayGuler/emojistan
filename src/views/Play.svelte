@@ -37,8 +37,8 @@
   /* ## STATE ## */
   let dialog: HTMLDialogElement;
   let levelCompleted = false;
-  let ac = 0; // ACTIVE CELL
-  let adc = 1; // ADJACENT CELL
+  let ac = $map.startIndex; // ACTIVE CELL
+  let adc = ac + 1; // ADJACENT CELL
   let ghost = true;
   let dirs: {
     [key: string]: { style: string; emoji: string; operation: number };
@@ -105,8 +105,8 @@
     reset: () => {
       backgrounds = new Map(_map.backgrounds);
       items = new Map(_map.items);
-      ac = 0;
-      adc = 1;
+      ac = $map.startIndex;
+      adc = ac + 1;
       dirKey = "KeyD";
       levelCompleted = false;
       ghost = true;
@@ -342,7 +342,6 @@
                 if (emoji && emoji != "push") {
                   // TODO: Fix spawning double emojis on merge
                   items.set(ac + operation * (i + 2), { emoji });
-                  // @ts-expect-error
                   items.set(ac + operation, items.get(ac));
                   items = items;
                   moveActiveCell(operation, true);
@@ -379,15 +378,15 @@
     <p title="ghost mode {ghost ? 'on' : 'off'}">👻 {ghost ? "✔️" : "❌"}</p>
     <div class="map">
       {#each { length: 256 } as _, i}
-        {@const isControlling = !ghost && items.has(ac)}
-        {@const isActive = ac == i}
+        {@const controlling = !ghost && items.has(ac)}
+        {@const active = ac == i}
         <div
           style:transform={emojiStyle}
           style:background={backgrounds.get(i) || ""}
-          class:adc={adc == i && isControlling}
-          class:active={isActive}
+          class:adc={adc == i && controlling}
+          class:active
         >
-          {#if isActive && isControlling}
+          {#if active && controlling}
             <div class="direction" style={dirs[dirKey].style}>
               {$currentItem || dirs[dirKey].emoji}
             </div>

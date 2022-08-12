@@ -11,8 +11,7 @@ declare namespace App {
 }
 
 declare namespace svelte.JSX {
-  interface HTMLAttributes<T> {
-    longress?: (event: any) => any;
-    outsideclick?: (event: any) => any;
+  interface DOMAttributes<T extends EventTarget> {
+    onlongpress?: EventHandler<Event, T> | undefined | null;
   }
 }

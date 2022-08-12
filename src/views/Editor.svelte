@@ -33,16 +33,47 @@
       });
     }
   }
+
+  let startIndex = $map.startIndex;
+  const MIN_INDEX = 0;
+  const MAX_INDEX = 255;
+
+  function startIndexChanged() {
+    // OPTIMIZATION could be turned into derived store
+    if (startIndex < MIN_INDEX) {
+      startIndex = MIN_INDEX;
+    } else if (startIndex > MAX_INDEX) {
+      startIndex = MAX_INDEX;
+    }
+
+    $map.startIndex = startIndex;
+  }
+
+  // @ts-expect-error
+  HTMLButtonElement.prototype.onlongpress = () => {};
 </script>
 
 <section class="editor">
   <section class="noselect editable-map">
     <input type="text" placeholder="Objective" bind:value={$map.objective} />
-    <p><input type="checkbox" bind:checked={showIndex} />🔢</p>
+    <span>
+      <input type="checkbox" bind:checked={showIndex} />🔢
+    </span>
+    <label>
+      Starting Index
+      <input
+        type="number"
+        min={MIN_INDEX}
+        max={MAX_INDEX}
+        bind:value={startIndex}
+        on:change={startIndexChanged}
+      />
+    </label>
     <slot />
     <div class="map">
       {#each { length: 256 } as _, i}
         <div
+          class:startIndex={startIndex == i}
           style:background={$map.backgrounds.get(i) ||
             "var(--default-background)"}
           on:click={() => clickedCell(i)}
@@ -145,5 +176,9 @@
     display: flex;
     justify-content: space-between;
     width: 100%;
+  }
+
+  .startIndex {
+    outline: 2px solid var(--inverted);
   }
 </style>

@@ -23,13 +23,13 @@ export interface Loop {
   reverse: boolean;
 }
 
-export interface Event {
+export interface TEvent {
   name: string;
   sequence: Array<SequenceItem>;
   loop?: Loop;
 }
 
-export interface Condition {
+export interface TCondition {
   a: string;
   b: string;
   _b: string | "any";
@@ -39,12 +39,6 @@ export interface Condition {
 export interface Emoji {
   emoji: string;
   inventory?: Array<any>;
-}
-
-interface EditableMap {
-  items: Map<number, Emoji>;
-  backgrounds: Map<number, string>;
-  objective: string;
 }
 
 function createMapStore<T>(_state: Map<string, T>) {
@@ -73,12 +67,12 @@ function createMapStore<T>(_state: Map<string, T>) {
 }
 
 function createEditableMap() {
-  const map: EditableMap = {
+  const { set, subscribe, update } = writable({
     items: new Map(),
     backgrounds: new Map(),
     objective: "",
-  };
-  const { subscribe, update } = writable(map);
+    startIndex: 0,
+  });
 
   return {
     subscribe,
@@ -246,7 +240,7 @@ export const statics = createStatics();
 export const collisions = createMapStore<Array<string>>(
   new Map<string, Array<string>>()
 );
-export const events = createMapStore<Event>(new Map<string, Event>());
-export const conditions = createMapStore<Condition>(
-  new Map<string, Condition>()
+export const events = createMapStore<TEvent>(new Map<string, TEvent>());
+export const conditions = createMapStore<TCondition>(
+  new Map<string, TCondition>()
 );

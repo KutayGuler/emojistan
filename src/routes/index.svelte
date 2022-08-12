@@ -119,15 +119,6 @@
       {#if viewIndex == 1}
         <Editor>
           <div class="palette">
-            <p
-              title={$colorPalette.size == 0
-                ? "Create a palette in Rules tab color your map!"
-                : ""}
-              on:click={() => ($currentColor = "")}
-              style:opacity={$colorPalette.size == 0 ? "50%" : "100%"}
-            >
-              🎨{$colorPalette.has($currentColor) ? "" : "🖌️"}
-            </p>
             {#each [...$colorPalette] as c}
               <div
                 class="color"
@@ -159,7 +150,6 @@
             ></span
           >
         {/if}
-
         <div class="flex">
           {#each [...$quickAccess] as emoji}
             <div
@@ -303,6 +293,16 @@
   .color {
     width: 50px;
     height: 50px;
+    transition: 200ms ease-out;
+  }
+
+  .color:hover {
+    transform: scale(125%);
+  }
+
+  .currentColor {
+    transition: 200ms;
+    transform: scale(125%);
   }
 
   .palette {
@@ -310,11 +310,6 @@
     flex-direction: row;
     justify-content: center;
     align-items: center;
-  }
-
-  .currentColor::after {
-    content: "🖌️";
-    color: white;
-    mix-blend-mode: difference;
+    /* column-gap: 10%; */
   }
 </style>
