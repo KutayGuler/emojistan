@@ -15,10 +15,12 @@
   const types = [
     "setBackgroundOf",
     "removeBackgroundOf",
+    "equipInteractedItem",
+    "equipItem",
     "spawn",
     "destroy",
     "wait",
-    "reset",
+    "resetLevel",
     "completeLevel",
   ];
 
@@ -64,11 +66,15 @@
         case "removeBackgroundOf":
           Object.assign(newItem, { index });
           break;
+        case "equipItem":
+          break;
+        case "equipInteractedItem":
+          break;
         case "wait":
           Object.assign(newItem, { duration });
           break;
         case "completeLevel":
-        case "reset":
+        case "resetLevel":
         default:
           Object.assign(newItem);
           break;
@@ -89,7 +95,7 @@
           Object.assign(newItem, { duration });
           break;
         case "completeLevel":
-        case "reset":
+        case "resetLevel":
         default:
           Object.assign(newItem);
           break;

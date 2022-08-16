@@ -8,9 +8,9 @@
     conditions,
     events,
     statics,
-    currentItem,
     currentColor,
     currentEmoji,
+    modal,
   } from "../store";
   import { invertColor } from "../utils/invertColor";
 
@@ -57,6 +57,8 @@
   let items = new Map(_map.items);
   let backgrounds = new Map(_map.backgrounds);
   let _collisions = new Map<string, Map<string, string>>();
+  let currentItem = "";
+  let inventoryIndex = 0;
 
   for (let [id, { rule }] of [...$merges, ...$pushes]) {
     let [key1, key2, val] = rule;
@@ -66,13 +68,30 @@
     _collisions.get(key1)?.set(key2, val);
 
     // making emoji merge both ways
-    if (/\p{Extended_Pictographic}/gu.test(val)) {
+    // TODO: Check if it still works
+    if (val != "push") {
       if (key1 != key2) {
         if (!_collisions.has(key2)) {
           _collisions.set(key2, new Map());
         }
         _collisions.get(key2)?.set(key1, val);
       }
+    }
+  }
+
+  function equip(item: string, destroy = false) {
+    if (ghost || !items.get(adc) || !items.get(ac)) return;
+    if (item == "") item = items.get(adc).emoji;
+    let player = items.get(ac);
+    if (!player.inventory) {
+      player.inventory = ["", "", "", ""];
+    }
+
+    let inventory = player.inventory;
+    if (inventory.includes("")) {
+      inventory[inventory.indexOf("")] = item;
+      if (destroy) items.delete(adc);
+      items = items;
     }
   }
 
@@ -87,6 +106,8 @@
     removeBackgroundOf: ({ index }: { index: number }) => {
       backgrounds.delete(index);
     },
+    equipItem: ({ item }: { item: string }) => equip(item),
+    equipInteractedItem: () => equip("", true),
     spawn: (
       { index, emoji }: { index: number; emoji: string },
       _start?: number
@@ -103,7 +124,7 @@
         clearTimeout(timer);
       });
     },
-    reset: () => {
+    resetLevel: () => {
       backgrounds = new Map(_map.backgrounds);
       items = new Map(_map.items);
       ac = $map.startIndex;
@@ -136,15 +157,17 @@
         a = () => {
           let interactedItem = items.get(adc);
           if (interactedItem != undefined) {
-            if (!_interactables.has(interactedItem.emoji)) return;
+            if (!_interactables.has(interactedItem.emoji)) return "";
             if (playerInteracted) {
               return [
-                interactedItem.emoji + "," + $currentItem,
+                interactedItem.emoji + "," + currentItem,
                 interactedItem.emoji + ",any",
               ];
             } else {
               return "";
             }
+          } else {
+            return "";
           }
         };
         break;
@@ -233,7 +256,7 @@
       "--inverted",
       invertColor(backgrounds.get(ac) || defaultBackground)
     );
-    if (items.has(ac)) {
+    if (!ghost && items.has(ac)) {
       for (let c of _conditions.values()) {
         if (c.condition()) c.event();
       }
@@ -248,15 +271,27 @@
 
   let emojiStyle = "";
 
+  // TODO: Prevent portal-like adc
+
   function handle(e: KeyboardEvent) {
-    if (e.code == "Space") {
-      playerInteracted = true;
-      if (items.has(ac)) {
-        for (let c of _conditions.values()) {
-          if (c.condition()) c.event();
+    if (!ghost) {
+      if (e.code.includes("Digit")) {
+        let num = +e.code.replace("Digit", "");
+        if (num >= 1 && num <= 4) {
+          inventoryIndex = num - 1;
         }
+        return;
       }
-      return;
+
+      if (e.code == "Space") {
+        playerInteracted = true;
+        if (items.has(ac)) {
+          for (let c of _conditions.values()) {
+            if (c.condition()) c.event();
+          }
+        }
+        return;
+      }
     }
     playerInteracted = false;
     if (e.code.includes("Control")) {
@@ -363,7 +398,12 @@
           break;
       }
     } else {
-      items.set(ac + operation, { emoji: item.emoji });
+      if (item.inventory) {
+        let { emoji, inventory } = item;
+        items.set(ac + operation, { emoji, inventory });
+      } else {
+        items.set(ac + operation, { emoji: item.emoji });
+      }
       items = items;
       moveActiveCell(operation, true);
     }
@@ -373,10 +413,17 @@
 <svelte:window on:keydown={handle} />
 
 <section class="playable-map">
-  <button class="guide">❔</button>
+  <p class="keyboard" on:click={() => modal.show("keyboard")}>⌨️</p>
   <section class="noselect">
     <p><strong>Objective: </strong>{_map.objective || "?"}</p>
     <p title="ghost mode {ghost ? 'on' : 'off'}">👻 {ghost ? "✔️" : "❌"}</p>
+    {#if !ghost}
+      <div class="inventory">
+        {#each items.get(ac)?.inventory || [] as item, i}
+          <div class:currentItem={i == inventoryIndex}>{item}</div>
+        {/each}
+      </div>
+    {/if}
     <div class="map">
       {#each { length: 256 } as _, i}
         {@const controlling = !ghost && items.has(ac)}
@@ -389,7 +436,7 @@
         >
           {#if active && controlling}
             <div class="direction" style={dirs[dirKey].style}>
-              {$currentItem || dirs[dirKey].emoji}
+              {currentItem || dirs[dirKey].emoji}
             </div>
           {/if}
           {items.get(i)?.emoji || ""}
@@ -400,7 +447,7 @@
           LEVEL COMPLETED!
           <button on:click={() => (levelCompleted = !levelCompleted)}>OK</button
           >
-          <button on:click={mutations.reset}>REPLAY</button>
+          <button on:click={mutations.resetLevel}>REPLAY</button>
         </dialog>
       {/if}
     </div>
@@ -433,9 +480,36 @@
     outline: 1px dotted var(--inverted);
   }
 
-  .guide {
+  .keyboard {
+    font-size: 2rem;
     position: absolute;
+    padding: 0;
+    margin: 0;
     top: 2%;
     right: 2%;
+    transition: 200ms ease-out;
+    cursor: help;
+  }
+
+  .keyboard:hover {
+    transform: scale(150%);
+  }
+
+  .inventory {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 2%;
+  }
+
+  .inventory > div {
+    min-width: 30px;
+    min-height: 30px;
+    border: 2px solid black;
+  }
+
+  .currentItem {
+    transform: scale(120%);
   }
 </style>

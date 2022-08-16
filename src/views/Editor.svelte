@@ -47,9 +47,6 @@
 
     $map.startIndex = startIndex;
   }
-
-  // @ts-expect-error
-  HTMLButtonElement.prototype.onlongpress = () => {};
 </script>
 
 <section class="editor">

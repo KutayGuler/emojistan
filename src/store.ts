@@ -96,6 +96,7 @@ function createEditableMap() {
   });
 
   return {
+    set,
     subscribe,
     updateBackground: (index: number, color: string) =>
       update((state) => {
@@ -173,26 +174,6 @@ function createColorPalette() {
   };
 }
 
-function createInventory() {
-  const { subscribe, update } = writable(["🎮", "", "🎮", ""]);
-
-  return {
-    subscribe,
-    addItem: (item: string) =>
-      update((state) => {
-        if (!state.includes("")) {
-          state[state.indexOf("")] = item;
-        }
-        return state;
-      }),
-    removeItemAt: (index: number) =>
-      update((state) => {
-        state[index] = "";
-        return state;
-      }),
-  };
-}
-
 function createQuickAccess() {
   const { subscribe, update } = writable(new Set<string>());
 
@@ -251,7 +232,6 @@ export const quickAccess = createQuickAccess();
 export const currentItem = writable("");
 export const currentColor = writable("");
 export const currentEmoji = writable("");
-export const inventory = createInventory();
 export const colorPalette = createColorPalette();
 export const editableMap = createEditableMap();
 export const statics = createStatics();

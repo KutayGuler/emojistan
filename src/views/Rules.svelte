@@ -94,8 +94,6 @@
     const start = i;
     event.dataTransfer.setData("text/plain", start);
   };
-
-  // TODO: Seperate pushes and merges
 </script>
 
 <section class="noselect rules">
@@ -141,22 +139,20 @@
     </div>
   </div>
   <!-- TODO: Do not apply to other items until this one is bug free -->
-  <!-- TODO: Change to ul and li -->
-  <!-- TODO: Try autoanimate (how will it keep track of order?)-->
+  <!-- TODO: Check stackblitz solution to animation problem -->
+  <!-- TODO: Make animations faster -->
+
+  <!-- draggable={id != ""}
+  on:dragstart={(event) => dragstart(event, id)}
+  ondragover={id != "" ? "return false" : "return true"}
+  on:drop|preventDefault={(event) => drop(event, id)}
+  on:dragenter={() => (hovering = i)}
+  class:is-active={hovering === i} -->
+
   <div id="pushes">
     <h4 on:click={() => modal.show("pushes")}>Pushes 💨</h4>
     {#each [...$pushes, ["", { rule: ["", "", "push"], order: 1000 }]] as [id, { rule, order }], i (id)}
-      <div
-        transition:scale|local
-        animate:flip
-        style:order
-        draggable={id != ""}
-        on:dragstart={(event) => dragstart(event, id)}
-        ondragover={id != "" ? "return false" : "return true"}
-        on:drop|preventDefault={(event) => drop(event, id)}
-        on:dragenter={() => (hovering = i)}
-        class:is-active={hovering === i}
-      >
+      <div transition:scale|local animate:flip style:order>
         {#if id == ""}
           <button
             class="collision-btn"
@@ -277,10 +273,12 @@
     transition: 200ms ease-out;
   }
 
-  .rules > div {
+  /* Breaks flip animation */
+  /* .rules > div {
+    position: relative;
     display: flex;
     flex-direction: column;
-  }
+  } */
 
   h4 {
     font-size: 1.5rem;

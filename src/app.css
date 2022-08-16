@@ -3,8 +3,13 @@
   src: url("/fonts/MouseMemoirs.ttf") format("truetype");
 }
 
+@font-face {
+  font-family: emoji;
+  src: url("/fonts/TwemojiMozilla.ttf") format("truetype");
+}
+
 :root {
-  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+  /* font-family: Inter, Avenir, Helvetica, Arial, sans-serif; */
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -60,7 +65,7 @@ body {
 
 ::-webkit-scrollbar-thumb {
   border-radius: 10px;
-  background-color: slategray;
+  background-color: #e6e6e6;
 }
 
 /* MAP */
