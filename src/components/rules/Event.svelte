@@ -12,6 +12,7 @@
   export let disabled = false;
   let onEndID = 0;
 
+  // TODO: Auto add throwables and projectile weapons to statics
   // freeze, unfreeze player maybe?
   const types = [
     "setBackgroundOf",
@@ -19,7 +20,7 @@
     "equipInteractedItem",
     "equipItem",
     "consumeEquippedItem",
-    "fireProjectile", // TODO: Fire projectile
+    "fireProjectile",
     "spawn",
     "destroy",
     "wait",
@@ -106,6 +107,7 @@
           Object.assign(newItem, { duration });
           break;
         case "fireProjectile":
+          // TODO: Add direction and origin point
           Object.assign(newItem, { emoji, duration });
           break;
         case "consumeEquippedItem":
@@ -224,7 +226,7 @@
           /> ms
         {:else if s.type == "fireProjectile"}
           <div class="slot" on:click={() => updateSlot(i)}>{s.emoji || ""}</div>
-
+          <!-- TODO: Add direction and origin -->
           <input
             type="number"
             bind:value={s.duration}

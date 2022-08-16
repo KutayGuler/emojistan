@@ -68,6 +68,7 @@
 
   // TODO: Divide rules into Physics and Triggers
   let hovering: any = false;
+  // TODO: Add implicit controllables
 
   const drop = (event: any, target: any) => {
     console.log("drop");

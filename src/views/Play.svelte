@@ -142,6 +142,43 @@
       currentItem = "";
       items = items;
     },
+    fireProjectile: ({
+      emoji,
+      duration,
+    }: {
+      emoji: string;
+      duration: number;
+    }) => {
+      console.log("started");
+      let key = dirKey;
+      let index = adc;
+      items.set(index, { emoji });
+      items = items;
+      let interval = setInterval(() => {
+        let deleted = items.delete(index);
+        console.log(deleted);
+
+        if (!deleted) {
+          items = items;
+          clearInterval(interval);
+          return;
+        }
+        let operation = calcOperation(key, index, true);
+        if (operation == 0 || items.get(index + operation)) {
+          // hit by projectile
+          // push, merge, bump
+          items.delete(index);
+          items = items;
+          clearInterval(interval);
+          return;
+        }
+
+        index += operation;
+        items.set(index, { emoji });
+        items = items;
+      }, duration);
+      intervals.push(interval);
+    },
     spawn: (
       { index, emoji }: { index: number; emoji: string },
       _start?: number
@@ -467,6 +504,16 @@
       moveActiveCell(operation, true);
     }
   }
+
+  let canFire = true;
+
+  function fire() {
+    if (!canFire) return;
+
+    mutations.fireProjectile({ emoji: "💩", duration: 1000 });
+    canFire = false;
+    setTimeout(() => (canFire = true), 500);
+  }
 </script>
 
 <svelte:window on:keydown={handle} />
@@ -474,6 +521,7 @@
 <section class="playable-map">
   <p class="keyboard" on:click={() => modal.show("keyboard")}>⌨️</p>
   <section class="noselect">
+    <button on:click={fire}>FIRE</button>
     <p><strong>Objective: </strong>{_map.objective || "?"}</p>
     <p title="ghost mode {ghost ? 'on' : 'off'}">👻 {ghost ? "✔️" : "❌"}</p>
     {#if !ghost}

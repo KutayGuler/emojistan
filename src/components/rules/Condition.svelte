@@ -68,7 +68,7 @@
       <div class="color" />
     </div>
     <div class="then">
-      <h4>then trigger</h4>
+      <h4>then</h4>
       <p>EventName</p>
     </div>
   {:else}
