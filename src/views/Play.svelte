@@ -1,6 +1,6 @@
 <script lang="ts">
   import { scale } from "svelte/transition";
-  import { onMount } from "svelte/internal";
+  import { onDestroy, onMount } from "svelte/internal";
   import {
     editableMap as map,
     pushes,
@@ -24,7 +24,19 @@
     [$currentColor, $currentEmoji] = ["", ""];
   });
 
-  function calcOperation(code: string, index: number) {
+  function calcOperation(
+    _code: string,
+    index: number,
+    translate = false,
+    opposite = false
+  ) {
+    let code = _code;
+    if (translate) {
+      if (code == "KeyW") code = opposite ? "ArrowDown" : "ArrowUp";
+      if (code == "KeyA") code = opposite ? "ArrowRight" : "ArrowLeft";
+      if (code == "KeyS") code = opposite ? "ArrowUp" : "ArrowDown";
+      if (code == "KeyD") code = opposite ? "ArrowLeft" : "ArrowRight";
+    }
     if (code == "ArrowLeft" && index % 16 == 0) return 0;
     if (code == "ArrowUp" && index < 16) return 0;
     if (code == "ArrowRight" && (index + 1) % 16 == 0) return 0;
@@ -37,6 +49,20 @@
 
   /* ## STATE ## */
   let dialog: HTMLDialogElement;
+
+  let timeouts: Array<NodeJS.Timeout> = [];
+  let intervals: Array<NodeJS.Timer> = [];
+
+  onDestroy(() => {
+    for (let timer of timeouts) {
+      clearTimeout(timer);
+    }
+
+    for (let interval of intervals) {
+      clearInterval(interval);
+    }
+  });
+
   let levelCompleted = false;
   let ac = $map.startIndex; // ACTIVE CELL
   let adc = ac + 1; // ADJACENT CELL
@@ -50,6 +76,8 @@
     KeyD: { style: `right: -30%;`, emoji: "➡️", operation: 1 },
   };
   let dirKey = "KeyD";
+  let currentItem = "";
+  let inventoryIndex = 0;
 
   /* ## DATA ## */
   let _events = new Map($events);
@@ -57,8 +85,6 @@
   let items = new Map(_map.items);
   let backgrounds = new Map(_map.backgrounds);
   let _collisions = new Map<string, Map<string, string>>();
-  let currentItem = "";
-  let inventoryIndex = 0;
 
   for (let [id, { rule }] of [...$merges, ...$pushes]) {
     let [key1, key2, val] = rule;
@@ -80,6 +106,7 @@
   }
 
   function equip(item: string, destroy = false) {
+    console.log(item);
     if (ghost || !items.get(adc) || !items.get(ac)) return;
     if (item == "") item = items.get(adc).emoji;
     let player = items.get(ac);
@@ -89,7 +116,9 @@
 
     let inventory = player.inventory;
     if (inventory.includes("")) {
-      inventory[inventory.indexOf("")] = item;
+      let index = inventory.indexOf("");
+      inventory[index] = item;
+      currentItem = item;
       if (destroy) items.delete(adc);
       items = items;
     }
@@ -106,8 +135,13 @@
     removeBackgroundOf: ({ index }: { index: number }) => {
       backgrounds.delete(index);
     },
-    equipItem: ({ item }: { item: string }) => equip(item),
+    equipItem: ({ emoji }: { emoji: string }) => equip(emoji),
     equipInteractedItem: () => equip("", true),
+    consumeEquippedItem: () => {
+      items.get(ac).inventory[inventoryIndex] = "";
+      currentItem = "";
+      items = items;
+    },
     spawn: (
       { index, emoji }: { index: number; emoji: string },
       _start?: number
@@ -119,9 +153,9 @@
       items.delete(index);
     },
     wait: async (duration: number) => {
-      return new Promise((resolve: Function) => {
+      return new Promise((resolve) => {
         let timer = setTimeout(resolve, duration);
-        clearTimeout(timer);
+        timeouts.push(timer);
       });
     },
     resetLevel: () => {
@@ -202,7 +236,7 @@
         async () =>
           await new Promise((resolve) => {
             let timer = setTimeout(resolve, duration);
-            clearTimeout(timer);
+            timeouts.push(timer);
           })
       );
     }
@@ -271,24 +305,49 @@
 
   let emojiStyle = "";
 
-  // TODO: Prevent portal-like adc
-
   function handle(e: KeyboardEvent) {
+    console.log(e.code);
     if (!ghost) {
-      if (e.code.includes("Digit")) {
-        let num = +e.code.replace("Digit", "");
-        if (num >= 1 && num <= 4) {
-          inventoryIndex = num - 1;
-        }
-        return;
-      }
-
       if (e.code == "Space") {
+        if (calcOperation(dirKey, adc, true, true) == 0) {
+          playerInteracted = false;
+          return;
+        }
+
         playerInteracted = true;
         if (items.has(ac)) {
           for (let c of _conditions.values()) {
             if (c.condition()) c.event();
           }
+        }
+        return;
+      }
+
+      if (e.code.includes("Digit")) {
+        let num = +e.code.replace("Digit", "");
+        if (num >= 1 && num <= 4) {
+          if (inventoryIndex == num - 1) {
+            inventoryIndex = -1;
+            currentItem = "";
+          } else {
+            inventoryIndex = num - 1;
+            currentItem = items.get(ac).inventory[inventoryIndex];
+          }
+        }
+        return;
+      }
+
+      if (e.code == "KeyX") {
+        if (calcOperation(dirKey, adc, true, true) == 0) {
+          playerInteracted = false;
+          return;
+        }
+
+        if (!items.get(adc)) {
+          items.set(adc, { emoji: currentItem });
+          items.get(ac).inventory[inventoryIndex] = "";
+          currentItem = "";
+          items = items;
         }
         return;
       }
@@ -431,10 +490,12 @@
         <div
           style:transform={emojiStyle}
           style:background={backgrounds.get(i) || ""}
-          class:adc={adc == i && controlling}
+          class:adc={adc == i &&
+            controlling &&
+            calcOperation(dirKey, adc, true, true) != 0}
           class:active
         >
-          {#if active && controlling}
+          {#if active && controlling && calcOperation(dirKey, i, true) != 0}
             <div class="direction" style={dirs[dirKey].style}>
               {currentItem || dirs[dirKey].emoji}
             </div>

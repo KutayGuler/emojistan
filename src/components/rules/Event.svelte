@@ -12,11 +12,14 @@
   export let disabled = false;
   let onEndID = 0;
 
+  // freeze, unfreeze player maybe?
   const types = [
     "setBackgroundOf",
     "removeBackgroundOf",
     "equipInteractedItem",
     "equipItem",
+    "consumeEquippedItem",
+    "fireProjectile", // TODO: Fire projectile
     "spawn",
     "destroy",
     "wait",
@@ -49,6 +52,7 @@
     }
   }
 
+  // TODO: Add extra duration for rate of fire
   function generateSequenceItem(_type: string, vals?: any) {
     let newItem = { type: _type };
     if (vals) {
@@ -67,12 +71,16 @@
           Object.assign(newItem, { index });
           break;
         case "equipItem":
-          break;
-        case "equipInteractedItem":
+          Object.assign(newItem, { emoji });
           break;
         case "wait":
           Object.assign(newItem, { duration });
           break;
+        case "fireProjectile":
+          Object.assign(newItem, { emoji, duration });
+          break;
+        case "consumeEquippedItem":
+        case "equipInteractedItem":
         case "completeLevel":
         case "resetLevel":
         default:
@@ -87,13 +95,21 @@
         case "spawn":
           Object.assign(newItem, { index, emoji });
           break;
-        case "removeBackgroundOf":
         case "destroy":
+        case "removeBackgroundOf":
           Object.assign(newItem, { index });
+          break;
+        case "equipItem":
+          Object.assign(newItem, { emoji });
           break;
         case "wait":
           Object.assign(newItem, { duration });
           break;
+        case "fireProjectile":
+          Object.assign(newItem, { emoji, duration });
+          break;
+        case "consumeEquippedItem":
+        case "equipInteractedItem":
         case "completeLevel":
         case "resetLevel":
         default:
@@ -149,6 +165,8 @@
   });
 
   // TODO: Fix colors not being shown on update
+  // TODO: Ordering sequences would be convenient
+  // TODO: Destroying the entire component for having only one unassigned function is brutal
 </script>
 
 <Base
@@ -170,7 +188,7 @@
       placeholder="Event Name"
     />
     {#each sequence as s, i}
-      <div>
+      <span>
         <select id="type" bind:value={s.type} on:change={() => update(i)}>
           {#each types as t}
             <option value={t}>{t}</option>
@@ -186,6 +204,8 @@
             max={MAX_INDEX}
             on:change={() => update(i)}
           />
+        {:else if s.type == "equipItem"}
+          <div class="slot" on:click={() => updateSlot(i)}>{s.emoji || ""}</div>
         {:else if s.type == "destroy"}
           <input
             type="number"
@@ -195,6 +215,16 @@
             on:change={() => update(i)}
           />
         {:else if s.type == "wait"}
+          <input
+            type="number"
+            bind:value={s.duration}
+            min={MIN_DURATION}
+            max={MAX_DURATION}
+            on:change={() => update(i)}
+          /> ms
+        {:else if s.type == "fireProjectile"}
+          <div class="slot" on:click={() => updateSlot(i)}>{s.emoji || ""}</div>
+
           <input
             type="number"
             bind:value={s.duration}
@@ -224,7 +254,7 @@
           {/if}
         {/if}
         <button id="remove" on:click={() => removeFromSequence(i)}>❌</button>
-      </div>
+      </span>
     {/each}
     <label>
       <select bind:value={type}>
@@ -264,5 +294,12 @@
     position: absolute;
     background-color: white;
     border: 3px solid var(--border-color);
+  }
+
+  span {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
   }
 </style>

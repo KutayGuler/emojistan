@@ -92,9 +92,11 @@ body {
   background-color: var(--default-background);
 }
 
+/* TODO: Standardize z-indexes */
+
 .map > div > .direction {
   position: absolute;
-  z-index: 100;
+  z-index: 99;
 }
 
 /* CARDS */
