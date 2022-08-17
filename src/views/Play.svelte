@@ -115,8 +115,7 @@
   }
 
   function equip(item: string, destroy = false) {
-    console.log(item);
-    if (!items.get(adc) || !items.get(ac)) return;
+    if (!items.get(adc)) return;
     if (item == "") item = items.get(adc).emoji;
     let player = items.get(ac);
     if (!player.inventory) {
@@ -132,6 +131,8 @@
       items = items;
     }
   }
+
+  // TODO: Transfer styles on merge
 
   const mutations = {
     setBackgroundOf: (
@@ -150,6 +151,28 @@
       items.get(ac).inventory[inventoryIndex] = "";
       currentItem = "";
       items = items;
+    },
+    rotateInteractedItem: ({ deg }: { deg: number }) => {
+      if (!items.get(adc)) return;
+      let style = items.get(adc).style;
+      if (!style) {
+        style = `transform: rotate(${deg}deg);`;
+      } else if (!style.includes("transform")) {
+        style = `transform: rotate(${deg}deg);`;
+      } else if (style.includes("rotate")) {
+        console.log(style);
+        let [rgx, rgx2] = [/rotate\(-?\d+deg\)/g, /-?\d+/g];
+        let str = style.match(rgx)[0];
+        style = style.replace(
+          str,
+          `rotate(${parseInt(str.match(rgx2)) + deg}deg)`
+        );
+      }
+
+      items.get(adc).style = style;
+
+      items = items;
+      console.log(items);
     },
     fireProjectile: ({
       emoji,
@@ -587,6 +610,9 @@
   <p class="keyboard" on:click={() => modal.show("keyboard")}>⌨️</p>
   <section class="noselect">
     <button on:click={fire}>FIRE</button>
+    <button on:click={() => mutations.rotateInteractedItem({ deg: 30 })}
+      >ROTATE</button
+    >
     <p><strong>Objective: </strong>{_map.objective || "?"}</p>
     <div class="inventory">
       {#each items.get(ac)?.inventory || [] as item, i}
@@ -606,7 +632,11 @@
               {currentItem || dirs[dirKey].emoji}
             </div>
           {/if}
-          <div class="emoji" class:adc={adc == i && playerInteracted}>
+          <div
+            class="emoji"
+            class:adc={adc == i && playerInteracted}
+            style={items.get(i)?.style}
+          >
             {items.get(i)?.emoji || ""}
           </div>
         </div>
