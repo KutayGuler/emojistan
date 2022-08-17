@@ -26,6 +26,6 @@
     border: 2px solid black;
     padding: 2%;
     box-sizing: border-box;
-    z-index: 90;
+    z-index: 2;
   }
 </style>

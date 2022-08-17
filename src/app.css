@@ -92,11 +92,9 @@ body {
   background-color: var(--default-background);
 }
 
-/* TODO: Standardize z-indexes */
-
 .map > div > .direction {
   position: absolute;
-  z-index: 99;
+  z-index: 2;
 }
 
 /* CARDS */
@@ -141,7 +139,7 @@ body {
   background-color: rgba(0, 0, 0, 0.24);
   width: 100vw;
   height: 100vh;
-  z-index: 100;
+  z-index: 4;
 }
 
 .modal-close {

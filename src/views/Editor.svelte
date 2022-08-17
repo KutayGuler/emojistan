@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { currentEmoji, currentColor, statics, map, mapItems } from "../store";
+  import { currentEmoji, currentColor, map } from "../store";
   import { longpress } from "../utils/longpress";
 
   let showIndex = false;
@@ -33,18 +33,6 @@
       });
     }
   }
-
-  let _statics = structuredClone($statics);
-
-  let controllables: Array<string> = [];
-
-  $: {
-    controllables = [];
-    for (let c of $mapItems.values()) {
-      if (!_statics.has(c.emoji)) controllables.push(c.emoji);
-    }
-    console.log(controllables);
-  }
 </script>
 
 <section class="editor">
@@ -54,7 +42,6 @@
       <input type="checkbox" bind:checked={showIndex} />🔢
     </span>
     <slot />
-    <p>{controllables.toString()}</p>
     <div class="map">
       {#each { length: 256 } as _, i}
         <div
@@ -120,7 +107,7 @@
     text-decoration: none;
     position: relative;
     border: 1px solid var(--primary);
-    z-index: 20;
+    z-index: 2;
     width: 7vw;
     transition: var(--transition);
     border-color: var(--danger);

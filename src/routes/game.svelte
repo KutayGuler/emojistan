@@ -72,8 +72,8 @@
 <svelte:window on:keydown={handleKeydown} bind:innerWidth bind:innerHeight />
 <div
   class:cursor={$currentEmoji != ""}
-  style="transform: translate({x + 75 >= innerWidth ? x - 30 : x + 15}px,
-   {y + 75 >= innerHeight ? y - 30 : y}px);"
+  style:display={x + 85 >= innerWidth || y + 85 >= innerHeight ? "none" : ""}
+  style="transform: translate({x + 15}px, {y}px);"
   style:background={$currentColor}
 >
   {$currentEmoji}
@@ -173,7 +173,7 @@
     width: 2.5vw;
     height: 2.5vw;
     position: absolute;
-    z-index: 99;
+    z-index: 3;
   }
 
   main {

@@ -379,7 +379,7 @@
   }
 
   .remove-color {
-    z-index: 99;
+    z-index: 2;
     position: absolute;
     top: 0;
     right: 0;

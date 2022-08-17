@@ -1,6 +1,6 @@
 <script lang="ts">
   import { scale } from "svelte/transition";
-  import { onDestroy, onMount } from "svelte/internal";
+  import { identity, onDestroy, onMount } from "svelte/internal";
   import {
     map,
     pushes,
@@ -24,7 +24,6 @@
     [$currentColor, $currentEmoji] = ["", ""];
   });
 
-  // TODO: Revise calcOperation
   function calcOperation(
     _code: string,
     index: number,
@@ -352,12 +351,17 @@
   let emojiStyle = "";
 
   function handle(e: KeyboardEvent) {
-    console.log(e.code);
     if (e.code == "KeyE") {
       let closestDistance = 300;
       let closestID = ac;
 
-      for (let [id, _] of items) {
+      let _items = Array.from(items).filter(
+        ([id, val]) => !$statics.has(val.emoji)
+      );
+
+      console.log(_items);
+
+      for (let [id, _] of _items) {
         if (id == ac) continue;
         if (id > ac && id - ac < closestDistance) {
           closestDistance = id - ac;
@@ -367,12 +371,11 @@
 
       if (closestDistance == 300) {
         let smallest = 300;
-        for (let [id, _] of items) {
+        for (let [id, _] of _items) {
           if (id < smallest) smallest = id;
         }
         ac = smallest;
         adc = ac + dirs[dirKey].operation;
-        // TODO Figure out
       } else {
         ac = closestID;
         adc = ac + dirs[dirKey].operation;
@@ -381,7 +384,32 @@
     }
 
     if (e.code == "KeyQ") {
-      // TODO: this
+      let closestDistance = 300;
+      let closestID = ac;
+
+      let _items = Array.from(items).filter(
+        ([id, val]) => !$statics.has(val.emoji)
+      );
+
+      for (let [id, _] of _items) {
+        if (id == ac) continue;
+        if (ac > id && ac - id < closestDistance) {
+          closestDistance = ac - id;
+          closestID = id;
+        }
+      }
+
+      if (closestDistance == 300) {
+        let biggest = 0;
+        for (let [id, _] of _items) {
+          if (id > biggest) biggest = id;
+        }
+        ac = biggest;
+        adc = ac + dirs[dirKey].operation;
+      } else {
+        ac = closestID;
+        adc = ac + dirs[dirKey].operation;
+      }
       return;
     }
 
@@ -397,6 +425,8 @@
           if (c.condition()) c.event();
         }
       }
+      let timer = setTimeout(() => (playerInteracted = false), 100);
+      timeouts.push(timer);
       return;
     }
 
@@ -565,22 +595,20 @@
     </div>
     <div class="map">
       {#each { length: 256 } as _, i}
-        {@const controlling = items.has(ac)}
         {@const active = ac == i}
         <div
           style:transform={emojiStyle}
           style:background={backgrounds.get(i) || ""}
-          class:adc={adc == i &&
-            controlling &&
-            calcOperation(dirKey, adc, true, true) != 0}
           class:active
         >
-          {#if active && controlling && calcOperation(dirKey, i, true) != 0}
+          {#if active && calcOperation(dirKey, i, true) != 0}
             <div class="direction" style={dirs[dirKey].style}>
               {currentItem || dirs[dirKey].emoji}
             </div>
           {/if}
-          {items.get(i)?.emoji || ""}
+          <div class="emoji" class:adc={adc == i && playerInteracted}>
+            {items.get(i)?.emoji || ""}
+          </div>
         </div>
       {/each}
       {#if levelCompleted}
@@ -596,6 +624,32 @@
 </section>
 
 <style>
+  :root {
+    --duration: 100ms;
+  }
+
+  .active {
+    box-shadow: var(--inverted) 0 0 5px;
+  }
+
+  .emoji {
+    z-index: 3;
+  }
+
+  .adc {
+    animation: scale var(--duration) alternate;
+  }
+
+  @keyframes scale {
+    50% {
+      transform: scale(125%);
+    }
+
+    100% {
+      transform: scale(100%);
+    }
+  }
+
   .playable-map {
     display: flex;
     flex-direction: row;
@@ -611,14 +665,6 @@
     flex-direction: column;
     justify-content: center;
     align-items: flex-start;
-  }
-
-  .active {
-    outline: 2px solid var(--inverted);
-  }
-
-  .adc {
-    outline: 1px dotted var(--inverted);
   }
 
   .keyboard {

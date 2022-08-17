@@ -166,14 +166,14 @@ export const emojis: Emojis = {
       unicode_version: "1.0",
       emoji_version: "1.0",
     },
-    {
-      emoji: "☺️",
-      skin_tone_support: false,
-      name: "smiling face",
-      slug: "smiling_face",
-      unicode_version: "0.6",
-      emoji_version: "0.6",
-    },
+    // {
+    //   emoji: "☺️",
+    //   skin_tone_support: false,
+    //   name: "smiling face",
+    //   slug: "smiling_face",
+    //   unicode_version: "0.6",
+    //   emoji_version: "0.6",
+    // },
     {
       emoji: "😚",
       skin_tone_support: false,
