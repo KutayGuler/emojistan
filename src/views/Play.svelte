@@ -2,15 +2,15 @@
   import { scale } from "svelte/transition";
   import { onDestroy, onMount } from "svelte/internal";
   import {
-    editableMap as map,
+    map,
     pushes,
     merges,
     conditions,
     events,
-    statics,
     currentColor,
     currentEmoji,
     modal,
+    statics,
   } from "../store";
   import { invertColor } from "../utils/invertColor";
 
@@ -24,6 +24,7 @@
     [$currentColor, $currentEmoji] = ["", ""];
   });
 
+  // TODO: Revise calcOperation
   function calcOperation(
     _code: string,
     index: number,
@@ -64,9 +65,8 @@
   });
 
   let levelCompleted = false;
-  let ac = $map.startIndex; // ACTIVE CELL
-  let adc = ac + 1; // ADJACENT CELL
-  let ghost = true;
+  let ac: number; // ACTIVE CELL
+  let adc: number; // ADJACENT CELL
   let dirs: {
     [key: string]: { style: string; emoji: string; operation: number };
   } = {
@@ -85,6 +85,16 @@
   let items = new Map(_map.items);
   let backgrounds = new Map(_map.backgrounds);
   let _collisions = new Map<string, Map<string, string>>();
+
+  ac = items.entries().next().value[0];
+  adc = ac + 1;
+
+  let controllables = [];
+  for (let c of _map.items.values()) {
+    if (!$statics.has(c.emoji)) controllables.push(c.emoji);
+  }
+
+  console.log(controllables);
 
   for (let [id, { rule }] of [...$merges, ...$pushes]) {
     let [key1, key2, val] = rule;
@@ -107,7 +117,7 @@
 
   function equip(item: string, destroy = false) {
     console.log(item);
-    if (ghost || !items.get(adc) || !items.get(ac)) return;
+    if (!items.get(adc) || !items.get(ac)) return;
     if (item == "") item = items.get(adc).emoji;
     let player = items.get(ac);
     if (!player.inventory) {
@@ -198,11 +208,10 @@
     resetLevel: () => {
       backgrounds = new Map(_map.backgrounds);
       items = new Map(_map.items);
-      ac = $map.startIndex;
+      ac = items.entries().next().value[0];
       adc = ac + 1;
       dirKey = "KeyD";
       levelCompleted = false;
-      ghost = true;
     },
     completeLevel: () => (levelCompleted = true),
   };
@@ -327,7 +336,7 @@
       "--inverted",
       invertColor(backgrounds.get(ac) || defaultBackground)
     );
-    if (!ghost && items.has(ac)) {
+    if (items.has(ac)) {
       for (let c of _conditions.values()) {
         if (c.condition()) c.event();
       }
@@ -344,56 +353,82 @@
 
   function handle(e: KeyboardEvent) {
     console.log(e.code);
-    if (!ghost) {
-      if (e.code == "Space") {
-        if (calcOperation(dirKey, adc, true, true) == 0) {
-          playerInteracted = false;
-          return;
-        }
+    if (e.code == "KeyE") {
+      let closestDistance = 300;
+      let closestID = ac;
 
-        playerInteracted = true;
-        if (items.has(ac)) {
-          for (let c of _conditions.values()) {
-            if (c.condition()) c.event();
-          }
+      for (let [id, _] of items) {
+        if (id == ac) continue;
+        if (id > ac && id - ac < closestDistance) {
+          closestDistance = id - ac;
+          closestID = id;
         }
-        return;
       }
 
-      if (e.code.includes("Digit")) {
-        let num = +e.code.replace("Digit", "");
-        if (num >= 1 && num <= 4) {
-          if (inventoryIndex == num - 1) {
-            inventoryIndex = -1;
-            currentItem = "";
-          } else {
-            inventoryIndex = num - 1;
-            currentItem = items.get(ac).inventory[inventoryIndex];
-          }
+      if (closestDistance == 300) {
+        let smallest = 300;
+        for (let [id, _] of items) {
+          if (id < smallest) smallest = id;
         }
-        return;
+        ac = smallest;
+        adc = ac + dirs[dirKey].operation;
+        // TODO Figure out
+      } else {
+        ac = closestID;
+        adc = ac + dirs[dirKey].operation;
       }
-
-      if (e.code == "KeyX") {
-        if (calcOperation(dirKey, adc, true, true) == 0) {
-          playerInteracted = false;
-          return;
-        }
-
-        if (!items.get(adc)) {
-          items.set(adc, { emoji: currentItem });
-          items.get(ac).inventory[inventoryIndex] = "";
-          currentItem = "";
-          items = items;
-        }
-        return;
-      }
-    }
-    playerInteracted = false;
-    if (e.code.includes("Control")) {
-      ghost = !ghost;
       return;
     }
+
+    if (e.code == "KeyQ") {
+      // TODO: this
+      return;
+    }
+
+    if (e.code == "Space") {
+      if (calcOperation(dirKey, adc, true, true) == 0) {
+        playerInteracted = false;
+        return;
+      }
+
+      playerInteracted = true;
+      if (items.has(ac)) {
+        for (let c of _conditions.values()) {
+          if (c.condition()) c.event();
+        }
+      }
+      return;
+    }
+
+    if (e.code.includes("Digit")) {
+      let num = +e.code.replace("Digit", "");
+      if (num >= 1 && num <= 4) {
+        if (inventoryIndex == num - 1) {
+          inventoryIndex = -1;
+          currentItem = "";
+        } else {
+          inventoryIndex = num - 1;
+          currentItem = items.get(ac).inventory[inventoryIndex];
+        }
+      }
+      return;
+    }
+
+    if (e.code == "KeyX") {
+      if (calcOperation(dirKey, adc, true, true) == 0) {
+        playerInteracted = false;
+        return;
+      }
+
+      if (!items.get(adc)) {
+        items.set(adc, { emoji: currentItem });
+        items.get(ac).inventory[inventoryIndex] = "";
+        currentItem = "";
+        items = items;
+      }
+      return;
+    }
+    playerInteracted = false;
     if (wasd.includes(e.code)) {
       dirKey = e.code;
       adc = ac + dirs[dirKey].operation;
@@ -405,7 +440,7 @@
       emojiStyle = "transform: translateX(5%);";
       return;
     }
-    if (ghost || !items.has(ac)) {
+    if (!items.has(ac)) {
       moveActiveCell(operation);
       return;
     }
@@ -523,17 +558,14 @@
   <section class="noselect">
     <button on:click={fire}>FIRE</button>
     <p><strong>Objective: </strong>{_map.objective || "?"}</p>
-    <p title="ghost mode {ghost ? 'on' : 'off'}">👻 {ghost ? "✔️" : "❌"}</p>
-    {#if !ghost}
-      <div class="inventory">
-        {#each items.get(ac)?.inventory || [] as item, i}
-          <div class:currentItem={i == inventoryIndex}>{item}</div>
-        {/each}
-      </div>
-    {/if}
+    <div class="inventory">
+      {#each items.get(ac)?.inventory || [] as item, i}
+        <div class:currentItem={i == inventoryIndex}>{item}</div>
+      {/each}
+    </div>
     <div class="map">
       {#each { length: 256 } as _, i}
-        {@const controlling = !ghost && items.has(ac)}
+        {@const controlling = items.has(ac)}
         {@const active = ac == i}
         <div
           style:transform={emojiStyle}

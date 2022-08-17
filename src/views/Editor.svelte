@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { MIN_INDEX, MAX_INDEX } from "../constants";
-  import { currentEmoji, currentColor, editableMap as map } from "../store";
+  import { currentEmoji, currentColor, statics, map, mapItems } from "../store";
   import { longpress } from "../utils/longpress";
 
   let showIndex = false;
@@ -35,17 +34,16 @@
     }
   }
 
-  let startIndex = $map.startIndex;
+  let _statics = structuredClone($statics);
 
-  function startIndexChanged() {
-    // OPTIMIZATION could be turned into derived store
-    if (startIndex < MIN_INDEX) {
-      startIndex = MIN_INDEX;
-    } else if (startIndex > MAX_INDEX) {
-      startIndex = MAX_INDEX;
+  let controllables: Array<string> = [];
+
+  $: {
+    controllables = [];
+    for (let c of $mapItems.values()) {
+      if (!_statics.has(c.emoji)) controllables.push(c.emoji);
     }
-
-    $map.startIndex = startIndex;
+    console.log(controllables);
   }
 </script>
 
@@ -55,21 +53,11 @@
     <span>
       <input type="checkbox" bind:checked={showIndex} />🔢
     </span>
-    <label>
-      Starting Index
-      <input
-        type="number"
-        min={MIN_INDEX}
-        max={MAX_INDEX}
-        bind:value={startIndex}
-        on:change={startIndexChanged}
-      />
-    </label>
     <slot />
+    <p>{controllables.toString()}</p>
     <div class="map">
       {#each { length: 256 } as _, i}
         <div
-          class:startIndex={startIndex == i}
           style:background={$map.backgrounds.get(i) ||
             "var(--default-background)"}
           on:click={() => clickedCell(i)}
@@ -172,9 +160,5 @@
     display: flex;
     justify-content: space-between;
     width: 100%;
-  }
-
-  .startIndex {
-    outline: 2px solid var(--inverted);
   }
 </style>

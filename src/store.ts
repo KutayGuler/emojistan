@@ -1,4 +1,4 @@
-import { writable } from "svelte/store";
+import { derived, writable } from "svelte/store";
 
 export interface Interactable {
   emoji: string;
@@ -89,10 +89,9 @@ function createMapStore<T>(_state: Map<string, T>) {
 
 function createEditableMap() {
   const { set, subscribe, update } = writable({
-    items: new Map(),
-    backgrounds: new Map(),
+    items: new Map<number, any>(),
+    backgrounds: new Map<number, string>(),
     objective: "",
-    startIndex: 0,
   });
 
   return {
@@ -226,14 +225,17 @@ function createModal() {
   };
 }
 
-export const modal = createModal();
-export const quickAccess = createQuickAccess();
-
 export const currentItem = writable("");
 export const currentColor = writable("");
 export const currentEmoji = writable("");
+
+export const modal = createModal();
+export const quickAccess = createQuickAccess();
 export const colorPalette = createColorPalette();
-export const editableMap = createEditableMap();
+
+export const map = createEditableMap();
+export const mapItems = derived(map, ($map) => $map.items);
+
 export const statics = createStatics();
 export const pushes = createMapStore<TCollision>(new Map<string, TCollision>());
 export const merges = createMapStore<TCollision>(new Map<string, TCollision>());
