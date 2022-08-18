@@ -30,6 +30,7 @@ export interface Orderable {
 export interface TEvent extends Orderable {
   name: string;
   sequence: Array<SequenceItem>;
+  loop?: Loop;
 }
 
 export interface TLoopEvent extends Orderable {
@@ -168,6 +169,8 @@ export type ModalType =
   | "conditions"
   | "events"
   | "statics"
+  | "weapons"
+  | "throwables"
   | "palette";
 
 function createModal() {

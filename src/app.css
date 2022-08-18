@@ -14,6 +14,18 @@
   .statics-add-btn {
     @apply mx-2 mt-4 flex w-32 cursor-pointer  items-center justify-center rounded-xl border-4 border-solid py-4 text-2xl text-black shadow-lg duration-200 ease-out hover:after:content-['++'];
   }
+
+  .color {
+    @apply mx-2 mt-4 flex w-32 items-center justify-center rounded-xl border-4 border-solid border-none py-4 text-2xl duration-200 ease-out;
+  }
+
+  .map {
+    @apply grid h-full w-auto grid-cols-16 grid-rows-16 gap-1 border-4 border-solid border-black p-1;
+  }
+
+  .cell {
+    @apply relative flex h-10 w-10 items-center justify-center;
+  }
 }
 
 @font-face {
@@ -39,11 +51,8 @@
   --interactive-container-size: calc(100vw - var(--emoji-container-size));
 
   /* MAP */
-  --cell-size: clamp(16px, 4vw, 48px);
-  --cell: calc(var(--cell-size) - 0.2vw);
-  --cell-gap: calc(var(--cell-size) - var(--cell));
-  --cell-br: calc(var(--cell-size) / 2);
-  --map-size: calc(var(--cell-size) * 16);
+  --cell: 10px;
+  --map-size: calc(var(--cell) * 16);
 
   /* COMPONENTS */
   --card-br: 5px;
@@ -87,33 +96,6 @@ body {
 }
 
 /* MAP */
-
-.map {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  width: var(--map-size);
-  height: var(--map-size);
-  gap: var(--cell-gap);
-  border: 5px solid black;
-}
-
-.map > div {
-  position: relative;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  width: var(--cell);
-  height: var(--cell);
-  background-color: var(--default-background);
-}
-
-.map > div > .direction {
-  position: absolute;
-  z-index: 2;
-}
 
 /* CARDS */
 

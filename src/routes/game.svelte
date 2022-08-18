@@ -21,7 +21,7 @@
   // quickAcess edit mode
   let editMode = false;
 
-  let viewIndex = 2;
+  let viewIndex = 1;
 
   let views = [
     { component: Play, emoji: "🎬", title: "Play" },
@@ -278,9 +278,12 @@
     font-family: emoji;
   } */
 
+  #aside-container .flex > div {
+    transition: 50ms ease-out;
+  }
+
   #aside-container .flex > div:hover {
     transform: scale(150%);
-    transition: 50ms;
   }
 
   .selected {
@@ -290,7 +293,7 @@
   .color {
     width: 50px;
     height: 50px;
-    transition: 200ms ease-out;
+    transition: 50ms ease-out;
   }
 
   .color:hover {

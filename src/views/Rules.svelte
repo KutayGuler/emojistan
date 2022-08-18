@@ -120,7 +120,9 @@
 >
   <div class="mt-8 mb-16 flex flex-row justify-center gap-16">
     {#each types as type, i}
-      <h3 on:click={() => (index = i)}>{type}</h3>
+      <h3 class:currentRule={index == i} on:click={() => (index = i)}>
+        {type}
+      </h3>
     {/each}
   </div>
   {#key index}
@@ -291,8 +293,7 @@
         <div class="flex w-full">
           <!-- WEAPONS -->
           <div class="flex-1">
-            <!-- TODO: Change to proper modal -->
-            <h4 on:click={() => modal.show("palette")}>Weapons 🔫</h4>
+            <h4 on:click={() => modal.show("weapons")}>Weapons 🔫</h4>
             {#each [...$weapons, ["", { order: 1000 }]] as [id, { order }], i (id)}
               <div
                 class="flex items-center justify-center"
@@ -313,8 +314,7 @@
           </div>
           <!-- THROWABLES -->
           <div class="flex-1">
-            <!-- TODO: Change to proper modal -->
-            <h4 on:click={() => modal.show("palette")}>Throwables 🥏</h4>
+            <h4 on:click={() => modal.show("throwables")}>Throwables 🥏</h4>
 
             {#each [...$throwables, ["", { order: 1000 }]] as [id, { order }], i (id)}
               <div
@@ -335,10 +335,12 @@
             {/each}
           </div>
           <div class="flex-1">
-            <!-- TODO: Add defaultBackground functionality -->
             <h4 on:click={() => modal.show("palette")}>Palette 🎨</h4>
 
-            <div class="flex flex-wrap items-start justify-start">
+            <div
+              style:background={defaultBackground}
+              class="my-4 flex flex-wrap items-start justify-start rounded-lg pb-4 shadow-lg"
+            >
               {#each [...$cp, ""] as color (color)}
                 <div
                   transition:scale|local={flipParams}
@@ -346,8 +348,7 @@
                 >
                   {#if color == ""}
                     <button
-                      class="statics-add-btn relative"
-                      style:border-color={pickedColor}
+                      class="statics-add-btn relative bg-white"
                       on:click={() => cp.add(pickedColor)}
                       >🎨
                       <input
@@ -358,12 +359,12 @@
                       />
                     </button>
                   {:else}
-                    <button
-                      style:background={color}
-                      style:color
-                      class="statics-btn"
-                      on:click={() => removeColor(color)}>_</button
-                    >
+                    <div style:background={color} class="color">
+                      <button on:click={() => setDefaultBackground(color)}
+                        >🌍</button
+                      >
+                      <button on:click={() => removeColor(color)}>❌</button>
+                    </div>
                   {/if}
                 </div>
               {/each}
@@ -396,9 +397,19 @@
     transition: 200ms ease-out;
   }
 
+  h3 {
+    opacity: 50%;
+  }
+
   h3:hover,
-  h4:hover {
+  h4:hover,
+  .currentRule {
     transform: scale(125%);
+  }
+
+  h3:hover,
+  .currentRule {
+    opacity: 100%;
   }
 
   .isDefault::after {
@@ -408,6 +419,14 @@
   }
 
   /* BUTTONS */
+
+  .color > button {
+    transition: 50ms ease-out;
+  }
+
+  .color > button:hover {
+    transform: scale(125%);
+  }
 
   .collision-btn,
   .condition-btn {

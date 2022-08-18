@@ -23,8 +23,11 @@
     </div>
   </div>
   <div>
-    <h1>Change Movement Mode</h1>
-    <kbd>Ctrl</kbd>
+    <h1>Change Character</h1>
+    <span>
+      <kbd>Q</kbd>
+      <kbd>E</kbd>
+    </span>
   </div>
   <div>
     <h1>Interact</h1>
@@ -33,6 +36,11 @@
 </div>
 
 <style>
+  h1 {
+    font-size: 2rem;
+    padding-bottom: 1rem;
+  }
+
   .keyboard {
     display: grid;
     grid-template-columns: repeat(2, 1fr);

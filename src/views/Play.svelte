@@ -1,17 +1,19 @@
 <script lang="ts">
   import { scale } from "svelte/transition";
-  import { identity, onDestroy, onMount } from "svelte/internal";
+  import { onDestroy, onMount } from "svelte/internal";
   import {
     map,
     pushes,
     merges,
     conditions,
     events,
+    loopEvents,
     currentColor,
     currentEmoji,
     modal,
     statics,
   } from "../store";
+  import type { TLoopEvent, TEvent } from "../store";
   import { invertColor } from "../utils/invertColor";
 
   let r: any;
@@ -79,13 +81,18 @@
   let inventoryIndex = 0;
 
   /* ## DATA ## */
-  let _events = new Map($events);
+  let _events = new Map<string, TEvent | TLoopEvent>(
+    [...$events].concat([...$loopEvents])
+  );
+  // TODO
+  console.log(_events);
   let _map = structuredClone($map);
   let items = new Map(_map.items);
   let backgrounds = new Map(_map.backgrounds);
   let _collisions = new Map<string, Map<string, string>>();
 
-  ac = items.entries().next().value[0];
+  let firstItemIndex = items.entries().next().value;
+  ac = firstItemIndex ? firstItemIndex[0] : -2;
   adc = ac + 1;
 
   let controllables = [];
@@ -296,7 +303,7 @@
       }
     }
 
-    if (event.loop != undefined) {
+    if (event.loop) {
       let duration = event.loop.timeGap;
       eventQueue.push(
         async () =>
@@ -621,12 +628,13 @@
       {#each { length: 256 } as _, i}
         {@const active = ac == i}
         <div
+          class="cell"
           style:transform={emojiStyle}
-          style:background={backgrounds.get(i) || ""}
+          style:background={backgrounds.get(i) || "var(--default-background)"}
           class:active
         >
           {#if active && calcOperation(dirKey, i, true) != 0}
-            <div class="direction" style={dirs[dirKey].style}>
+            <div class="z-2 absolute" style={dirs[dirKey].style}>
               {currentItem || dirs[dirKey].emoji}
             </div>
           {/if}

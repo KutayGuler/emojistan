@@ -35,16 +35,23 @@
   }
 </script>
 
-<section class="editor">
-  <section class="noselect editable-map">
+<section class="relative flex h-[90vh] w-full items-center justify-center">
+  <section class="noselect flex flex-col items-start justify-center">
     <input type="text" placeholder="Objective" bind:value={$map.objective} />
     <span>
       <input type="checkbox" bind:checked={showIndex} />🔢
     </span>
     <slot />
+
+    <!-- .map > div > .direction {
+  position: absolute;
+  z-index: 2;
+}  -->
+
     <div class="map">
       {#each { length: 256 } as _, i}
         <div
+          class="cell"
           style:background={$map.backgrounds.get(i) ||
             "var(--default-background)"}
           on:click={() => clickedCell(i)}
@@ -83,23 +90,6 @@
 <style>
   :root {
     --transition: 500ms;
-  }
-
-  .editor {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    width: 100%;
-    height: 90vh;
-  }
-
-  .editable-map {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
   }
 
   .clear > button {
