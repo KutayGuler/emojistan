@@ -2,10 +2,9 @@
   // DATA
   import { MIN_INDEX, MAX_INDEX } from "../../constants";
   import { onDestroy } from "svelte/internal";
-  import { colorPalette, events, currentEmoji } from "../../store";
+  import { colorPalette, loopEvents, currentEmoji } from "../../store";
 
   // TYPES
-  import type { SvelteComponent } from "svelte/internal";
   import type { SequenceItem, Loop } from "../../store";
 
   // COMPONENTS
@@ -95,7 +94,7 @@
       loop.iterationNumber = MAX_ITERATION;
     }
 
-    events.update(id, { name, sequence, loop });
+    loopEvents.update(id, { name, sequence, loop });
   }
 
   function generateSequenceItem(_type: string, vals?: any) {
@@ -142,7 +141,7 @@
   function addToSequence() {
     sequence = [...sequence, generateSequenceItem(type)];
     validateLoop();
-    events.update(id, { name, sequence, loop });
+    loopEvents.update(id, { name, sequence, loop });
     [type, index, background] = [types[0], 0, ""];
   }
 
@@ -150,9 +149,9 @@
     sequence.splice(i, 1);
     sequence = sequence;
     if (sequence.length == 0) {
-      events.remove(id);
+      loopEvents.remove(id);
     } else {
-      events.update(id, { name, sequence, loop });
+      loopEvents.update(id, { name, sequence, loop });
     }
   }
 
@@ -171,15 +170,15 @@
 
   onDestroy(() => {
     if (sequence.length == 0) {
-      events.remove(id);
+      loopEvents.remove(id);
     } else if (sequence.some((item) => Object.values(item).includes(""))) {
-      events.remove(id);
+      loopEvents.remove(id);
     }
   });
 </script>
 
 <Base
-  on:remove={() => events.remove(id)}
+  on:remove={() => loopEvents.remove(id)}
   --border-color="#ffc83d"
   --background="#fff3d6"
 >

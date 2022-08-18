@@ -4,7 +4,15 @@
 
 @layer components {
   .btn {
-    @apply m-4 flex w-full cursor-pointer flex-row items-center justify-center rounded-xl border-4 border-solid p-4 text-2xl shadow-lg duration-200 ease-out hover:after:content-['++'];
+    @apply m-4 flex w-full cursor-pointer items-center justify-center rounded-xl border-4 border-solid p-4 text-2xl shadow-lg duration-200 ease-out hover:after:content-['++'];
+  }
+
+  .statics-btn {
+    @apply mx-2 mt-4 flex w-32 cursor-pointer items-center justify-center rounded-xl border-4 border-solid py-4 text-2xl shadow-lg duration-200 ease-out hover:after:content-['❌'];
+  }
+
+  .statics-add-btn {
+    @apply mx-2 mt-4 flex w-32 cursor-pointer  items-center justify-center rounded-xl border-4 border-solid py-4 text-2xl text-black shadow-lg duration-200 ease-out hover:after:content-['++'];
   }
 }
 

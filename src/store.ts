@@ -1,4 +1,4 @@
-import { derived, writable } from "svelte/store";
+import { writable } from "svelte/store";
 
 export interface Interactable {
   emoji: string;
@@ -141,44 +141,7 @@ function createEditableMap() {
   };
 }
 
-function createStatics() {
-  const { subscribe, update } = writable(new Set<string>());
-
-  return {
-    subscribe,
-    toggleEmoji: (emoji: string, operation?: string) =>
-      emoji != "" &&
-      update((state) => {
-        if (operation == "add") {
-          state.add(emoji);
-        } else {
-          state.delete(emoji);
-        }
-        return state;
-      }),
-  };
-}
-
-function createColorPalette() {
-  const { subscribe, update } = writable(new Set<string>());
-
-  return {
-    subscribe,
-    addColor: (color: string) =>
-      color != "" &&
-      update((state) => {
-        state.add(color);
-        return state;
-      }),
-    removeColor: (color: string) =>
-      update((state) => {
-        state.delete(color);
-        return state;
-      }),
-  };
-}
-
-function createQuickAccess() {
+function createSetStore() {
   const { subscribe, update } = writable(new Set<string>());
 
   return {
@@ -230,20 +193,26 @@ function createModal() {
   };
 }
 
+export const modal = createModal();
+
 export const currentItem = writable("");
 export const currentColor = writable("");
 export const currentEmoji = writable("");
 
-export const modal = createModal();
-export const quickAccess = createQuickAccess();
-export const colorPalette = createColorPalette();
+export const statics = createSetStore();
+export const quickAccess = createSetStore();
+export const colorPalette = createSetStore();
 
 export const map = createEditableMap();
-export const mapItems = derived(map, ($map) => $map.items);
+// export const mapItems = derived(map, ($map) => $map.items);
 
-export const statics = createStatics();
 export const pushes = createMapStore<TCollision>(new Map<string, TCollision>());
 export const merges = createMapStore<TCollision>(new Map<string, TCollision>());
+export const weapons = createMapStore<Orderable>(new Map<string, Orderable>());
+export const throwables = createMapStore<Orderable>(
+  new Map<string, Orderable>()
+);
+
 export const collisions = createMapStore<TCollision>(
   new Map<string, TCollision>()
 );
