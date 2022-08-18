@@ -1,3 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .btn {
+    @apply m-4 flex w-full cursor-pointer flex-row items-center justify-center rounded-xl border-4 border-solid p-4 text-2xl shadow-lg duration-200 ease-out hover:after:content-['++'];
+  }
+}
+
 @font-face {
   font-family: regular;
   src: url("/fonts/MouseMemoirs.ttf") format("truetype");

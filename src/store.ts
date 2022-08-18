@@ -30,7 +30,12 @@ export interface Orderable {
 export interface TEvent extends Orderable {
   name: string;
   sequence: Array<SequenceItem>;
-  loop?: Loop;
+}
+
+export interface TLoopEvent extends Orderable {
+  name: string;
+  sequence: Array<SequenceItem>;
+  loop: Loop;
 }
 
 export interface TCondition extends Orderable {
@@ -241,6 +246,9 @@ export const pushes = createMapStore<TCollision>(new Map<string, TCollision>());
 export const merges = createMapStore<TCollision>(new Map<string, TCollision>());
 export const collisions = createMapStore<TCollision>(
   new Map<string, TCollision>()
+);
+export const loopEvents = createMapStore<TLoopEvent>(
+  new Map<string, TLoopEvent>()
 );
 export const events = createMapStore<TEvent>(new Map<string, TEvent>());
 export const conditions = createMapStore<TCondition>(

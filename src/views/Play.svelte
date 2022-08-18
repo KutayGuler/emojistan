@@ -170,9 +170,7 @@
       }
 
       items.get(adc).style = style;
-
       items = items;
-      console.log(items);
     },
     fireProjectile: ({
       emoji,
