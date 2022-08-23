@@ -17,9 +17,12 @@
   } from "../store";
 
   import { slide } from "svelte/transition";
+  import { onMount } from "svelte";
 
   let loading = true;
-  setTimeout(() => (loading = false), 2000);
+  onMount(() => {
+    setTimeout(() => (loading = false), 2000);
+  });
 
   let filter = "";
 
@@ -85,7 +88,7 @@
   {$currentEmoji}
 </div>
 
-{#if loading}
+{#if false}
   <div
     out:slide
     class="absolute z-10 flex h-full w-full items-center justify-center bg-white text-2xl"
@@ -94,11 +97,20 @@
     <span class="px-2" id="loading">👾</span>
   </div>
 {/if}
+
 <Modal />
 <main class="noselect">
   <div class="playground" on:mousemove={setCursorEmoji}>
     <div id="interactive" style={interactiveStyle}>
-      <nav>
+      <nav
+        class="relative box-border flex h-16 items-center justify-center border-b-2 bg-amber-50 text-lg"
+      >
+        <p
+          title="Main Menu"
+          class="absolute left-4 duration-200 ease-out hover:scale-125 hover:before:content-['🔙']"
+        >
+          🏝️
+        </p>
         <p>{views[viewIndex].title}</p>
         <span>
           {#each views as view, i}
@@ -219,31 +231,20 @@
     box-sizing: border-box;
   }
 
-  nav {
-    position: relative;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    font-size: 1.5rem;
-    background-color: antiquewhite;
-    border-bottom: 2px solid black;
-    box-sizing: border-box;
-    height: 5%;
-  }
-
   nav > span {
     position: absolute;
-    right: 0;
+    right: 24px;
     display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
     cursor: pointer;
+    gap: 15%;
   }
 
   nav > span > span {
     transition: 200ms ease-out;
+    opacity: 50%;
   }
 
   nav p {
@@ -252,8 +253,10 @@
     margin: 0;
   }
 
+  nav > span > span:hover,
   .currentView {
-    font-size: 2rem;
+    opacity: 100%;
+    transform: scale(150%);
   }
 
   #search {
@@ -292,11 +295,6 @@
     display: flex;
     flex-wrap: wrap;
   }
-
-  /* EMOJI */
-  /* .flex > div {
-    font-family: emoji;
-  } */
 
   #aside-container .flex > div {
     transition: 50ms ease-out;

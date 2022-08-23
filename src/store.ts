@@ -257,7 +257,8 @@ export type ModalType =
   | "statics"
   | "weapons"
   | "throwables"
-  | "palette";
+  | "palette"
+  | "emojistan";
 
 function createModal() {
   const modal: { open: boolean; type: ModalType } = {

@@ -4,11 +4,11 @@
 
 @layer components {
   .btn {
-    @apply m-4 flex w-full cursor-pointer items-center justify-center rounded-xl border-4 border-solid p-4 text-2xl shadow-lg duration-200 ease-out hover:after:content-['++'];
+    @apply m-4 flex w-full cursor-pointer items-center justify-center rounded-xl border-4 border-solid p-4 text-2xl shadow-lg duration-200 ease-out;
   }
 
-  .menu-btn {
-    @apply m-4 flex w-full cursor-pointer items-center justify-center rounded-xl border-4 border-solid p-4 text-2xl shadow-lg duration-200 ease-out;
+  .add {
+    @apply hover:after:content-['++'];
   }
 
   .statics-btn {
@@ -59,16 +59,9 @@
   --emoji-container-size: clamp(64px, 25%, 256px);
   --interactive-container-size: calc(100vw - var(--emoji-container-size));
 
-  /* MAP */
-  --cell: 10px;
-  --map-size: calc(var(--cell) * 16);
-
-  /* COMPONENTS */
-  --card-br: 5px;
-
   /* COLOR PALETTE */
 
-  --default-background: antiquewhite;
+  --default-background: #fff3d6;
   --primary: #f6fafd;
   --secondary: #40b3ff;
 

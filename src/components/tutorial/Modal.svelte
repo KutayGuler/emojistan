@@ -14,6 +14,7 @@
   import Events from "./Events.svelte";
   import Statics from "./Statics.svelte";
   import Palette from "./Palette.svelte";
+  import Emojistan from "./Emojistan.svelte";
 
   const components: { [key in ModalType]: any } = {
     keyboardPlay: KeyboardPlay,
@@ -24,13 +25,14 @@
     events: Events,
     statics: Statics,
     palette: Palette,
+    emojistan: Emojistan,
     weapons: undefined,
     throwables: undefined,
   };
 </script>
 
 {#if $modal.open}
-  <div transition:fly class="modal-background noselect x">
+  <div transition:fly class="modal-background noselect x-modal">
     <div use:clickOutside on:outsideclick={modal.close}>
       <svelte:component this={components[$modal.type]}>
         <button class="modal-close x-modal" on:click={modal.close}>
