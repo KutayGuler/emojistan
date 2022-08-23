@@ -54,6 +54,17 @@ export interface TCollision extends Orderable {
   rule: Array<string>;
 }
 
+// export interface TThrowable {
+//   throwable: string;
+//   range: number;
+//   speed: number;
+// }
+
+// export interface TWeapon {
+//   weapon: string;
+//   speed: number;
+// }
+
 export interface Emoji {
   emoji: string;
   inventory?: Array<any>;
@@ -93,6 +104,51 @@ function createMapStore<T>(_state: Map<string, T>) {
   };
 }
 
+function createSaves() {
+  const { set, subscribe, update } = writable({
+    saves: new Map<string, string>(),
+    current: "",
+  });
+
+  return {
+    set,
+    subscribe,
+    useStorage: () => {
+      const current = localStorage.getItem("currentSave");
+      const saves = JSON.parse(localStorage.getItem("saves"));
+
+      update((state) => {
+        if (saves != undefined) {
+          state.saves = new Map(saves);
+        }
+        if (current != undefined) {
+          state.current = current;
+        }
+        return state;
+      });
+
+      subscribe((state) => {
+        localStorage.setItem(
+          "saves",
+          JSON.stringify(Array.from(state.saves.entries()))
+        );
+        localStorage.setItem("currentSave", state.current);
+      });
+    },
+    add: () =>
+      update((state) => {
+        let id = Date.now().toString().slice(7);
+        state.saves.set(id, "Game #" + (state.saves.size + 1).toString());
+        return state;
+      }),
+    delete: (id: string) =>
+      update((state) => {
+        state.saves.delete(id);
+        return state;
+      }),
+  };
+}
+
 function createEditableMap() {
   const { set, subscribe, update } = writable({
     items: new Map<number, any>(),
@@ -103,6 +159,39 @@ function createEditableMap() {
   return {
     set,
     subscribe,
+    useStorage: (id: string) => {
+      const objective = localStorage.getItem(id + "_objective");
+      const items = JSON.parse(localStorage.getItem(id + "_items"));
+      const backgrounds = JSON.parse(localStorage.getItem(id + "_backgrounds"));
+      console.log(items, objective, backgrounds);
+
+      // TODO: Add save id
+
+      update((state) => {
+        if (objective != undefined) {
+          state.objective = objective;
+        }
+        if (items != undefined) {
+          state.items = new Map(items);
+        }
+        if (backgrounds != undefined) {
+          state.backgrounds = new Map(backgrounds);
+        }
+        return state;
+      });
+
+      subscribe((state) => {
+        localStorage.setItem(
+          id + "_items",
+          JSON.stringify(Array.from(state.items.entries()))
+        );
+        localStorage.setItem(
+          id + "_backgrounds",
+          JSON.stringify(Array.from(state.backgrounds.entries()))
+        );
+        localStorage.setItem(id + "_objective", state.objective);
+      });
+    },
     updateBackground: (index: number, color: string) =>
       update((state) => {
         state.backgrounds.set(index, color);
@@ -125,6 +214,7 @@ function createEditableMap() {
       }),
     removeEmoji: (index: number) =>
       update((state) => {
+        console.log(state);
         state.items.delete(index);
         return state;
       }),
@@ -163,7 +253,8 @@ function createSetStore() {
 }
 
 export type ModalType =
-  | "keyboard"
+  | "keyboardPlay"
+  | "keyboardEditor"
   | "pushes"
   | "merges"
   | "conditions"
@@ -176,7 +267,7 @@ export type ModalType =
 function createModal() {
   const modal: { open: boolean; type: ModalType } = {
     open: false,
-    type: "keyboard",
+    type: "keyboardPlay",
   };
   const { subscribe, update } = writable(modal);
 
@@ -201,20 +292,22 @@ export const modal = createModal();
 export const currentItem = writable("");
 export const currentColor = writable("");
 export const currentEmoji = writable("");
+export const rulesIndex = writable(0);
+
+export const saves = createSaves();
 
 export const statics = createSetStore();
 export const quickAccess = createSetStore();
 export const colorPalette = createSetStore();
 
 export const map = createEditableMap();
-// export const mapItems = derived(map, ($map) => $map.items);
 
 export const pushes = createMapStore<TCollision>(new Map<string, TCollision>());
 export const merges = createMapStore<TCollision>(new Map<string, TCollision>());
-export const weapons = createMapStore<Orderable>(new Map<string, Orderable>());
-export const throwables = createMapStore<Orderable>(
-  new Map<string, Orderable>()
-);
+// export const weapons = createMapStore<Orderable>(new Map<string, Orderable>());
+// export const throwables = createMapStore<Orderable>(
+//   new Map<string, Orderable>()
+// );
 
 export const collisions = createMapStore<TCollision>(
   new Map<string, TCollision>()

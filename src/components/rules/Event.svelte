@@ -12,15 +12,13 @@
   export let disabled = false;
   let onEndID = 0;
 
-  // TODO: Auto add throwables and projectile weapons to statics
-  // freeze, unfreeze player maybe?
   const types = [
     "setBackgroundOf",
     "removeBackgroundOf",
     "equipInteractedItem",
     "equipItem",
     "consumeEquippedItem",
-    "fireProjectile",
+    // "fireProjectile",
     "spawn",
     "destroy",
     "wait",
@@ -53,7 +51,6 @@
     }
   }
 
-  // TODO: Add extra duration for rate of fire
   function generateSequenceItem(_type: string, vals?: any) {
     let newItem = { type: _type };
     if (vals) {
@@ -77,9 +74,10 @@
         case "wait":
           Object.assign(newItem, { duration });
           break;
-        case "fireProjectile":
-          Object.assign(newItem, { emoji, duration });
-          break;
+        // case "fireProjectile":
+        // // Add extra duration for rate of fire
+        //   Object.assign(newItem, { emoji, duration });
+        //   break;
         case "consumeEquippedItem":
         case "equipInteractedItem":
         case "completeLevel":
@@ -106,10 +104,9 @@
         case "wait":
           Object.assign(newItem, { duration });
           break;
-        case "fireProjectile":
-          // TODO: Add direction and origin point
-          Object.assign(newItem, { emoji, duration });
-          break;
+        // case "fireProjectile":
+        //   Object.assign(newItem, { emoji, duration });
+        //   break;
         case "consumeEquippedItem":
         case "equipInteractedItem":
         case "completeLevel":
@@ -154,21 +151,19 @@
 
   onDestroy(() => {
     if (disabled) return;
+    let newsequence = sequence.filter((item) => {
+      let vals = Object.values(item);
+      return !(vals.includes("") || vals.includes(undefined));
+    });
+
     if (sequence.length == 0) {
       events.remove(id);
-    } else if (
-      sequence.some((item) => {
-        let vals = Object.values(item);
-        return vals.includes("") || vals.includes(undefined);
-      })
-    ) {
-      events.remove(id);
+    } else if (newsequence.length < sequence.length) {
+      events.update(id, { name, sequence: newsequence });
     }
   });
 
-  // TODO: Fix colors not being shown on update
-  // TODO: Ordering sequences would be convenient
-  // TODO: Destroying the entire component for having only one unassigned function is brutal
+  // TODO: Polish UI
 </script>
 
 <Base
@@ -178,12 +173,11 @@
   --background="#fff3d6"
 >
   {#if disabled}
-    <!-- content here -->
-    <h4 id="disabled-name">EventName</h4>
+    <h4 class="disabled -top-15 absolute bg-white py-0 px-2">EventName</h4>
     <p>completeLevel</p>
   {:else}
     <input
-      id="name"
+      class="name absolute -top-4 left-2 border border-solid"
       type="text"
       bind:value={name}
       on:input={() => update("name")}
@@ -226,7 +220,7 @@
           /> ms
         {:else if s.type == "fireProjectile"}
           <div class="slot" on:click={() => updateSlot(i)}>{s.emoji || ""}</div>
-          <!-- TODO: Add direction and origin -->
+          <!-- Add direction and origin -->
           <input
             type="number"
             bind:value={s.duration}
@@ -283,19 +277,12 @@
 </Base>
 
 <style>
-  #name {
-    position: absolute;
-    top: -15px;
-    left: 2%;
-    border: 3px solid var(--border-color);
+  .name {
+    border-color: var(--border-color);
   }
 
-  #disabled-name {
-    padding: 0 1%;
-    top: -60px;
-    position: absolute;
-    background-color: white;
-    border: 3px solid var(--border-color);
+  .disabled-name {
+    border-color: var(--border-color);
   }
 
   span {

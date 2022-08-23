@@ -1,6 +1,15 @@
 <script lang="ts">
-  import { currentEmoji, currentColor, map } from "../store";
+  import { onMount } from "svelte";
+
+  import { currentEmoji, currentColor, map, modal, saves } from "../store";
   import { longpress } from "../utils/longpress";
+
+  onMount(() => {
+    if ($saves.current == "") {
+      saves.useStorage();
+    }
+    map.useStorage($saves.current);
+  });
 
   let showIndex = false;
   let deleteMode = "Both";
@@ -36,17 +45,23 @@
 </script>
 
 <section class="relative flex h-[90vh] w-full items-center justify-center">
-  <section class="noselect flex flex-col items-start justify-center">
-    <input type="text" placeholder="Objective" bind:value={$map.objective} />
-    <span>
+  <p
+    class="absolute top-8 right-8 cursor-help text-3xl duration-200 ease-out hover:scale-150"
+    on:click={() => modal.show("keyboardEditor")}
+  >
+    ⌨️
+  </p>
+  <section class="relative flex flex-col items-start justify-center">
+    <input
+      class="w-full text-center"
+      type="text"
+      placeholder="Objective"
+      bind:value={$map.objective}
+    />
+    <span class="absolute top-0 -left-12 w-auto">
       <input type="checkbox" bind:checked={showIndex} />🔢
     </span>
     <slot />
-
-    <!-- .map > div > .direction {
-  position: absolute;
-  z-index: 2;
-}  -->
 
     <div class="map">
       {#each { length: 256 } as _, i}
@@ -135,6 +150,7 @@
 
   .remove-actions {
     display: flex;
+    flex-direction: column;
     justify-content: space-between;
     width: 100%;
   }

@@ -16,6 +16,11 @@
     colorPalette,
   } from "../store";
 
+  import { slide } from "svelte/transition";
+
+  let loading = true;
+  setTimeout(() => (loading = false), 2000);
+
   let filter = "";
 
   // quickAcess edit mode
@@ -59,6 +64,7 @@
 
   function pickEmoji(emoji: string) {
     $currentEmoji = emoji == $currentEmoji ? "" : emoji;
+    console.log($currentEmoji);
   }
 
   function pickColor(color: string) {
@@ -79,18 +85,22 @@
   {$currentEmoji}
 </div>
 
+{#if loading}
+  <div
+    out:slide
+    class="absolute z-10 flex h-full w-full items-center justify-center bg-white text-2xl"
+  >
+    LOADING
+    <span class="px-2" id="loading">👾</span>
+  </div>
+{/if}
 <Modal />
-<main>
+<main class="noselect">
   <div class="playground" on:mousemove={setCursorEmoji}>
     <div id="interactive" style={interactiveStyle}>
       <nav>
-        <!-- TODO: Tooltip for shortcuts (Shortcuts.svelte)-->
-        <!-- <div>
-          <h4>Shortcuts</h4>
-          <p>Esc - Deselect emoji/color</p>
-        </div> -->
         <p>{views[viewIndex].title}</p>
-        <span class="noselect">
+        <span>
           {#each views as view, i}
             <span
               on:click={() => changeView(i)}
@@ -118,7 +128,7 @@
         <svelte:component this={views[viewIndex].component} />
       {/if}
     </div>
-    <div id="aside-container" class="noselect" style={asideStyle}>
+    <div id="aside-container" style={asideStyle}>
       <input id="search" type="text" placeholder="search" bind:value={filter} />
       <div id="emoji-container">
         <h4>
@@ -169,6 +179,16 @@
 </main>
 
 <style>
+  #loading {
+    animation: idle 300ms ease-out infinite alternate;
+  }
+
+  @keyframes idle {
+    100% {
+      transform: translateY(-20px);
+    }
+  }
+
   .cursor {
     width: 2.5vw;
     height: 2.5vw;
@@ -179,7 +199,7 @@
   main {
     display: flex;
     flex-direction: column;
-    justify-content: start;
+    justify-content: flex-start;
     align-items: center;
     height: 100vh;
     box-sizing: border-box;

@@ -1,4 +1,4 @@
-<script lang="ts">
+<!-- <script lang="ts">
   import Base from "./Base.svelte";
   import { throwables } from "../../store";
 
@@ -15,4 +15,4 @@
   <div class="slots">
     <div class="slot" on:click={() => {}}>XD</div>
   </div>
-</Base>
+</Base> -->

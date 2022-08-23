@@ -1,3 +1,10 @@
-"Click on any color to set it as the default background color"
+<div class="modal flex items-center justify-center">
+  <slot />
+  <p>🤷</p>
+</div>
 
-<!-- TODO: Complete this modal -->
+<style>
+  p {
+    font-size: 8rem;
+  }
+</style>

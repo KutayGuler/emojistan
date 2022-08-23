@@ -4,7 +4,7 @@ export function clickOutside(node: HTMLElement) {
   window.addEventListener("click", handleClick);
 
   function handleClick(e: any) {
-    if (e.target.classList.value.includes("x")) {
+    if (e.target.classList.value.includes("x-modal")) {
       node.dispatchEvent(new CustomEvent("outsideclick"));
     }
   }

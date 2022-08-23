@@ -1,4 +1,4 @@
-<script lang="ts">
+<!-- <script lang="ts">
   import Base from "./Base.svelte";
   import { weapons } from "../../store";
 
@@ -22,4 +22,4 @@
       </div>
     {/each}
   </div>
-</Base>
+</Base> -->

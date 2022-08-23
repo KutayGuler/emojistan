@@ -1,3 +1,5 @@
-<!-- <p>Static items cannot be moved by players</p> -->
-
-<!-- TODO: Complete this modal -->
+<div class="modal flex flex-col items-center justify-center">
+  <slot />
+  <p>Statics cannot be controlled by players</p>
+  <div class="gif" />
+</div>

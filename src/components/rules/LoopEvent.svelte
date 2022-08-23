@@ -11,6 +11,7 @@
   import Base from "./Base.svelte";
   import Error from "./Error.svelte";
 
+  export let disabled = false;
   export let id: string;
   export let name: string;
   export let sequence: Array<SequenceItem> = [];
@@ -169,12 +170,21 @@
   }
 
   onDestroy(() => {
+    if (disabled) return;
+
+    let newsequence = sequence.filter((item) => {
+      let vals = Object.values(item);
+      return !(vals.includes("") || vals.includes(undefined));
+    });
+
     if (sequence.length == 0) {
       loopEvents.remove(id);
-    } else if (sequence.some((item) => Object.values(item).includes(""))) {
-      loopEvents.remove(id);
+    } else if (newsequence.length < sequence.length) {
+      loopEvents.update(id, { name, loop, sequence: newsequence });
     }
   });
+
+  // TODO: Polish UI
 </script>
 
 <Base

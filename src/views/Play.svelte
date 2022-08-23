@@ -84,8 +84,6 @@
   let _events = new Map<string, TEvent | TLoopEvent>(
     [...$events].concat([...$loopEvents])
   );
-  // TODO
-  console.log(_events);
   let _map = structuredClone($map);
   let items = new Map(_map.items);
   let backgrounds = new Map(_map.backgrounds);
@@ -100,8 +98,6 @@
     if (!$statics.has(c.emoji)) controllables.push(c.emoji);
   }
 
-  console.log(controllables);
-
   for (let [id, { rule }] of [...$merges, ...$pushes]) {
     let [key1, key2, val] = rule;
     if (!_collisions.has(key1)) {
@@ -110,7 +106,6 @@
     _collisions.get(key1)?.set(key2, val);
 
     // making emoji merge both ways
-    // TODO: Check if it still works
     if (val != "push") {
       if (key1 != key2) {
         if (!_collisions.has(key2)) {
@@ -139,8 +134,6 @@
     }
   }
 
-  // TODO: Transfer styles on merge
-
   const mutations = {
     setBackgroundOf: (
       { index, background }: { index: number; background: string },
@@ -167,7 +160,6 @@
       } else if (!style.includes("transform")) {
         style = `transform: rotate(${deg}deg);`;
       } else if (style.includes("rotate")) {
-        console.log(style);
         let [rgx, rgx2] = [/rotate\(-?\d+deg\)/g, /-?\d+/g];
         let str = style.match(rgx)[0];
         style = style.replace(
@@ -179,43 +171,41 @@
       items.get(adc).style = style;
       items = items;
     },
-    fireProjectile: ({
-      emoji,
-      duration,
-    }: {
-      emoji: string;
-      duration: number;
-    }) => {
-      console.log("started");
-      let key = dirKey;
-      let index = adc;
-      items.set(index, { emoji });
-      items = items;
-      let interval = setInterval(() => {
-        let deleted = items.delete(index);
-        console.log(deleted);
+    // fireProjectile: ({
+    //   emoji,
+    //   duration,
+    // }: {
+    //   emoji: string;
+    //   duration: number;
+    // }) => {
+    //   let key = dirKey;
+    //   let index = adc;
+    //   items.set(index, { emoji });
+    //   items = items;
+    //   let interval = setInterval(() => {
+    //     let deleted = items.delete(index);
 
-        if (!deleted) {
-          items = items;
-          clearInterval(interval);
-          return;
-        }
-        let operation = calcOperation(key, index, true);
-        if (operation == 0 || items.get(index + operation)) {
-          // hit by projectile
-          // push, merge, bump
-          items.delete(index);
-          items = items;
-          clearInterval(interval);
-          return;
-        }
+    //     if (!deleted) {
+    //       items = items;
+    //       clearInterval(interval);
+    //       return;
+    //     }
+    //     let operation = calcOperation(key, index, true);
+    //     if (operation == 0 || items.get(index + operation)) {
+    //       // hit by projectile
+    //       // push, merge, bump
+    //       items.delete(index);
+    //       items = items;
+    //       clearInterval(interval);
+    //       return;
+    //     }
 
-        index += operation;
-        items.set(index, { emoji });
-        items = items;
-      }, duration);
-      intervals.push(interval);
-    },
+    //     index += operation;
+    //     items.set(index, { emoji });
+    //     items = items;
+    //   }, duration);
+    //   intervals.push(interval);
+    // },
     spawn: (
       { index, emoji }: { index: number; emoji: string },
       _start?: number
@@ -386,8 +376,6 @@
       let _items = Array.from(items).filter(
         ([id, val]) => !$statics.has(val.emoji)
       );
-
-      console.log(_items);
 
       for (let [id, _] of _items) {
         if (id == ac) continue;
@@ -565,10 +553,8 @@
               if (next && cur) {
                 let emoji = _collisions.get(cur)?.get(next);
                 if (emoji && emoji != "push") {
-                  // TODO: Fix spawning double emojis on merge
                   items.set(ac + operation * (i + 2), { emoji });
                   items.set(ac + operation, items.get(ac));
-                  items = items;
                   moveActiveCell(operation, true);
                   break;
                 }
@@ -582,8 +568,6 @@
           // MERGE
           postOpItem.emoji = getCollisionType(item.emoji, postOpItem.emoji);
           moveActiveCell(operation, true);
-          items.set(ac + operation, postOpItem);
-          items = items;
           break;
       }
     } else {
@@ -598,26 +582,28 @@
     }
   }
 
-  let canFire = true;
+  // let canFire = true;
 
-  function fire() {
-    if (!canFire) return;
+  // function fire() {
+  //   if (!canFire) return;
 
-    mutations.fireProjectile({ emoji: "💩", duration: 1000 });
-    canFire = false;
-    setTimeout(() => (canFire = true), 500);
-  }
+  //   mutations.fireProjectile({ emoji: "💩", duration: 1000 });
+  //   canFire = false;
+  //   setTimeout(() => (canFire = true), 500);
+  // }
 </script>
 
 <svelte:window on:keydown={handle} />
 
 <section class="playable-map">
-  <p class="keyboard" on:click={() => modal.show("keyboard")}>⌨️</p>
-  <section class="noselect">
-    <button on:click={fire}>FIRE</button>
-    <button on:click={() => mutations.rotateInteractedItem({ deg: 30 })}
-      >ROTATE</button
-    >
+  <p
+    class="absolute top-8 right-8 cursor-help text-3xl duration-200 ease-out hover:scale-150"
+    on:click={() => modal.show("keyboardPlay")}
+  >
+    ⌨️
+  </p>
+  <section>
+    <!-- <button on:click={fire}>FIRE</button> -->
     <p><strong>Objective: </strong>{_map.objective || "?"}</p>
     <div class="inventory">
       {#each items.get(ac)?.inventory || [] as item, i}
@@ -634,7 +620,7 @@
           class:active
         >
           {#if active && calcOperation(dirKey, i, true) != 0}
-            <div class="z-2 absolute" style={dirs[dirKey].style}>
+            <div class="direction" style={dirs[dirKey].style}>
               {currentItem || dirs[dirKey].emoji}
             </div>
           {/if}
@@ -701,21 +687,6 @@
     flex-direction: column;
     justify-content: center;
     align-items: flex-start;
-  }
-
-  .keyboard {
-    font-size: 2rem;
-    position: absolute;
-    padding: 0;
-    margin: 0;
-    top: 2%;
-    right: 2%;
-    transition: 200ms ease-out;
-    cursor: help;
-  }
-
-  .keyboard:hover {
-    transform: scale(150%);
   }
 
   .inventory {

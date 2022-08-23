@@ -18,8 +18,9 @@
     modal,
     pushes,
     merges,
-    weapons,
-    throwables,
+    // weapons,
+    // throwables,
+    rulesIndex,
   } from "../store";
 
   // COMPONENTS
@@ -28,8 +29,8 @@
   import Condition from "../components/rules/Condition.svelte";
   import Event from "../components/rules/Event.svelte";
   import LoopEvent from "../components/rules/LoopEvent.svelte";
-  import Weapon from "../components/rules/Weapon.svelte";
-  import Throwable from "../components/rules/Throwable.svelte";
+  // import Weapon from "../components/rules/Weapon.svelte";
+  // import Throwable from "../components/rules/Throwable.svelte";
 
   let r: any;
   let pickedColor = "#000000";
@@ -99,14 +100,10 @@
     event.dataTransfer.setData("text/plain", start);
   };
 
-  let index = 2;
   let types = ["Physics ⚛️", "Triggers 🔔", "Misc 🔮"];
 
   const flipParams = { duration: 300 };
 </script>
-
-<!-- TODO: Do not apply to other items until this one is bug free -->
-<!-- TODO: Check stackblitz solution to animation problem -->
 
 <!-- draggable={id != ""}
   on:dragstart={(event) => dragstart(event, id)}
@@ -116,18 +113,28 @@
   class:is-active={hovering === i} -->
 
 <section
-  class="noselect px-1/4 relative flex h-[90%] w-full flex-col gap-2 overflow-auto px-40 pb-10"
+  class="px-1/4 relative flex h-[90%] w-full flex-col gap-2 overflow-auto px-40 pb-10"
 >
+  <p
+    class="absolute top-8 right-8 cursor-help text-3xl duration-200 ease-out hover:scale-150"
+    on:click={() => modal.show("keyboardEditor")}
+  >
+    ⌨️
+  </p>
+
   <div class="mt-8 mb-16 flex flex-row justify-center gap-16">
     {#each types as type, i}
-      <h3 class:currentRule={index == i} on:click={() => (index = i)}>
+      <h3
+        class:currentRule={$rulesIndex == i}
+        on:click={() => ($rulesIndex = i)}
+      >
         {type}
       </h3>
     {/each}
   </div>
-  {#key index}
+  {#key $rulesIndex}
     <div in:fly>
-      {#if index == 0}
+      {#if $rulesIndex == 0}
         <!-- PHYSICS -->
         <div class="flex w-full">
           <!-- PUSHES -->
@@ -201,7 +208,7 @@
             </div>
           </div>
         </div>
-      {:else if index == 1}
+      {:else if $rulesIndex == 1}
         <!-- TRIGGERS -->
         <div class="flex w-full">
           <!-- CONDITIONS -->
@@ -288,11 +295,11 @@
             {/each}
           </div>
         </div>
-      {:else if index == 2}
+      {:else if $rulesIndex == 2}
         <!-- MISC -->
         <div class="flex w-full">
           <!-- WEAPONS -->
-          <div class="flex-1">
+          <!-- <div class="flex-1">
             <h4 on:click={() => modal.show("weapons")}>Weapons 🔫</h4>
             {#each [...$weapons, ["", { order: 1000 }]] as [id, { order }], i (id)}
               <div
@@ -311,9 +318,9 @@
                 {/if}
               </div>
             {/each}
-          </div>
+          </div> -->
           <!-- THROWABLES -->
-          <div class="flex-1">
+          <!-- <div class="flex-1">
             <h4 on:click={() => modal.show("throwables")}>Throwables 🥏</h4>
 
             {#each [...$throwables, ["", { order: 1000 }]] as [id, { order }], i (id)}
@@ -333,7 +340,7 @@
                 {/if}
               </div>
             {/each}
-          </div>
+          </div> -->
           <div class="flex-1">
             <h4 on:click={() => modal.show("palette")}>Palette 🎨</h4>
 
@@ -347,17 +354,19 @@
                   animate:flip={flipParams}
                 >
                   {#if color == ""}
-                    <button
-                      class="statics-add-btn relative bg-white"
-                      on:click={() => cp.add(pickedColor)}
-                      >🎨
+                    <div class="relative">
+                      <button
+                        class="statics-add-btn relative bg-white"
+                        on:click={() => cp.add(pickedColor)}
+                        >🎨
+                      </button>
                       <input
                         class="absolute -bottom-full h-full w-full"
                         type="color"
                         bind:value={pickedColor}
                         on:change={pickedColorChanged}
                       />
-                    </button>
+                    </div>
                   {:else}
                     <div style:background={color} class="color">
                       <button on:click={() => setDefaultBackground(color)}
@@ -460,7 +469,7 @@
     background: #ffc83d;
   }
 
-  .weapon-btn {
+  /* .weapon-btn {
     border-color: #13a10e;
     background: #89f485;
   }
@@ -476,7 +485,7 @@
 
   .throwable-btn:hover {
     background: #f7630c;
-  }
+  } */
 
   /* .is-active {
     background-color: #3273dc;

@@ -16,7 +16,7 @@
   }
 
   .color {
-    @apply mx-2 mt-4 flex w-32 items-center justify-center rounded-xl border-4 border-solid border-none py-4 text-2xl duration-200 ease-out;
+    @apply mx-2 mt-4 flex w-32 items-center justify-center rounded-xl border-4  border-none py-4 text-2xl duration-200 ease-out;
   }
 
   .map {
@@ -25,6 +25,11 @@
 
   .cell {
     @apply relative flex h-10 w-10 items-center justify-center;
+  }
+
+  .cell > .direction {
+    position: absolute;
+    z-index: 2;
   }
 }
 
@@ -188,6 +193,18 @@ body {
   min-width: 20%;
   min-height: 20%;
   background-color: pink;
+}
+
+kbd {
+  background-color: #eee;
+  border-radius: 4px;
+  font-size: 2rem;
+  padding: 0.2em 0.5em;
+  border-top: 5px solid rgba(255, 255, 255, 0.5);
+  border-left: 5px solid rgba(255, 255, 255, 0.5);
+  border-right: 5px solid rgba(0, 0, 0, 0.2);
+  border-bottom: 5px solid rgba(0, 0, 0, 0.2);
+  color: #555;
 }
 
 /* UTILS */

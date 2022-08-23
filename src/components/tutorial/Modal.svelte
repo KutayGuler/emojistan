@@ -6,7 +6,8 @@
   import { clickOutside } from "../../utils/clickOutside";
 
   // COMPONENTS
-  import Keyboard from "./Keyboard.svelte";
+  import KeyboardPlay from "./KeyboardPlay.svelte";
+  import KeyboardEditor from "./KeyboardEditor.svelte";
   import Pushes from "./Pushes.svelte";
   import Merges from "./Merges.svelte";
   import Conditions from "./Conditions.svelte";
@@ -15,13 +16,16 @@
   import Palette from "./Palette.svelte";
 
   const components: { [key in ModalType]: any } = {
-    keyboard: Keyboard,
+    keyboardPlay: KeyboardPlay,
+    keyboardEditor: KeyboardEditor,
     pushes: Pushes,
     merges: Merges,
     conditions: Conditions,
     events: Events,
     statics: Statics,
     palette: Palette,
+    weapons: undefined,
+    throwables: undefined,
   };
 </script>
 
@@ -29,7 +33,7 @@
   <div transition:fly class="modal-background noselect x">
     <div use:clickOutside on:outsideclick={modal.close}>
       <svelte:component this={components[$modal.type]}>
-        <button class="modal-close x" on:click={modal.close}>
+        <button class="modal-close x-modal" on:click={modal.close}>
           <svg
             class="x"
             xmlns="http://www.w3.org/2000/svg"
@@ -39,7 +43,7 @@
             stroke-width="2"
           >
             <path
-              class="x"
+              class="x-modal"
               stroke-linecap="round"
               stroke-linejoin="round"
               d="M6 18L18 6M6 6l12 12"
