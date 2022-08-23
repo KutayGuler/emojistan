@@ -157,7 +157,7 @@
         </div>
         {#each Object.keys(emojis) as category}
           {#if emojis[category].some((item) => item.name.includes(filter))}
-            <h4>{category}</h4>
+            <h4 class="pt-16 pb-4">{category}</h4>
           {/if}
           <div class="flex">
             {#each emojis[category] as { emoji, name }}

@@ -79,10 +79,8 @@ function createMapStore<T>(_state: Map<string, T>) {
     add: (value: T) =>
       update((state) => {
         Object.assign(value, { order: state.size + 1 });
-        console.log(value);
         let id = Date.now().toString().slice(7);
         state.set(id, value);
-        console.log(state);
         return state;
       }),
     update: (id: string, value: T) =>
@@ -138,6 +136,7 @@ function createSaves() {
     add: () =>
       update((state) => {
         let id = Date.now().toString().slice(7);
+        state.current = id;
         state.saves.set(id, "Game #" + (state.saves.size + 1).toString());
         return state;
       }),
@@ -163,9 +162,6 @@ function createEditableMap() {
       const objective = localStorage.getItem(id + "_objective");
       const items = JSON.parse(localStorage.getItem(id + "_items"));
       const backgrounds = JSON.parse(localStorage.getItem(id + "_backgrounds"));
-      console.log(items, objective, backgrounds);
-
-      // TODO: Add save id
 
       update((state) => {
         if (objective != undefined) {
@@ -214,7 +210,6 @@ function createEditableMap() {
       }),
     removeEmoji: (index: number) =>
       update((state) => {
-        console.log(state);
         state.items.delete(index);
         return state;
       }),
