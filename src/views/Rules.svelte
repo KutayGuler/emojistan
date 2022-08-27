@@ -4,9 +4,6 @@
   import { scale, fly } from "svelte/transition";
   import { onMount } from "svelte/internal";
 
-  // UTILS
-  import { invertColor } from "../utils/invertColor";
-
   // DATA
   import {
     events,
@@ -49,13 +46,11 @@
     if (color == "") return;
     if (color == defaultBackground) {
       r.style.setProperty("--default-background", "#faebd7");
-      r.style.setProperty("--inverted", "#ff3e00");
       defaultBackground = "#faebd7";
       return;
     }
 
     r.style.setProperty("--default-background", color);
-    r.style.setProperty("--inverted", invertColor(color));
     defaultBackground = color;
   }
 
@@ -63,7 +58,6 @@
     cp.remove(color);
     if (!$cp.has(defaultBackground)) {
       r.style.setProperty("--default-background", "#faebd7");
-      r.style.setProperty("--inverted", "#ff3e00");
       defaultBackground = "#faebd7";
     }
   }

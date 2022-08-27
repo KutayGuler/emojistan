@@ -185,6 +185,7 @@
   });
 
   // TODO: Polish UI
+  // TODO: Doesn't show up on if statements
 </script>
 
 <Base

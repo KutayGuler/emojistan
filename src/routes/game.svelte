@@ -88,7 +88,7 @@
   {$currentEmoji}
 </div>
 
-{#if false}
+{#if loading}
   <div
     out:slide
     class="absolute z-10 flex h-full w-full items-center justify-center bg-white text-2xl"

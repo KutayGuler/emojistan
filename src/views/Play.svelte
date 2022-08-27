@@ -14,7 +14,6 @@
     statics,
   } from "../store";
   import type { TLoopEvent, TEvent } from "../store";
-  import { invertColor } from "../utils/invertColor";
 
   let r: any;
   let defaultBackground = "";
@@ -134,7 +133,8 @@
     }
   }
 
-  const mutations = {
+  // MUTATIONS
+  const m = {
     setBackgroundOf: (
       { index, background }: { index: number; background: string },
       _start?: number
@@ -237,6 +237,9 @@
   let _interactables = new Set<string>();
 
   for (let [id, condition] of $conditions.entries()) {
+    let event = _events.get(condition.eventID);
+    if (event == undefined) continue;
+
     let a: Function;
     let b: string = condition.b;
     let _b: string = condition._b;
@@ -270,55 +273,8 @@
         break;
     }
 
-    let eventQueue: Array<Function> = [];
-
-    let event = _events.get(condition.eventID);
-    if (event == undefined) continue;
     let sequence = event.sequence;
-
-    let loop = structuredClone(event.loop);
-    let start: number, end: number, op: number;
-    if (loop != undefined) {
-      start = loop.start;
-      end = loop.end;
-      op = loop.iterationNumber * (loop.iterationType == "increment" ? 1 : -1);
-    }
-
-    for (let { type, ...args } of sequence) {
-      if (type == "wait") {
-        eventQueue.push(async () => await mutations.wait(args.duration || 50)); // MAGIC NUMBER
-      } else {
-        // @ts-expect-error
-        eventQueue.push((_start?: number) => mutations[type](args, _start));
-      }
-    }
-
-    if (event.loop) {
-      let duration = event.loop.timeGap;
-      eventQueue.push(
-        async () =>
-          await new Promise((resolve) => {
-            let timer = setTimeout(resolve, duration);
-            timeouts.push(timer);
-          })
-      );
-    }
-
-    async function execute(i: number, _start?: number) {
-      await eventQueue[i](_start);
-      if (i + 1 == eventQueue.length) {
-        if (event && event.loop == undefined) return;
-        start += op;
-        if (start >= end) {
-          // @ts-expect-error
-          start = loop.start;
-        } else {
-          execute(0, start);
-        }
-      } else {
-        execute(i + 1);
-      }
-    }
+    let isLoop = event.loop != undefined;
 
     _conditions.set(+id, {
       condition: () => {
@@ -328,9 +284,20 @@
           return a().includes(`${b},${_b}`);
         }
       },
-      event: () => {
-        if (eventQueue.length == 0) return;
-        execute(0);
+      event: async (_start?: number) => {
+        // TODO: Implement loop
+        // TODO: Implement _start
+        for (let { type, ...args } of sequence) {
+          if (type == "wait") {
+            // @ts-expect-error
+            await m["wait"](args.duration);
+          } else {
+            // @ts-expect-error
+            m[type](args);
+          }
+        }
+        // @ts-expect-error
+        if (isLoop) this.event(_start);
       },
     });
   }
@@ -345,14 +312,9 @@
   function moveActiveCell(operation: number, _delete?: boolean) {
     if (_delete) {
       items.delete(ac);
-      items = items;
     }
     ac += operation;
     adc = ac + dirs[dirKey].operation;
-    r.style.setProperty(
-      "--inverted",
-      invertColor(backgrounds.get(ac) || defaultBackground)
-    );
     if (items.has(ac)) {
       for (let c of _conditions.values()) {
         if (c.condition()) c.event();
@@ -366,9 +328,111 @@
   let wasd = ["KeyW", "KeyA", "KeyS", "KeyD"];
   let playerInteracted = false;
 
-  let emojiStyle = "";
-
   function handle(e: KeyboardEvent) {
+    if (e.code.includes("Arrow")) {
+      let operation = calcOperation(e.code, ac);
+      if (!items.has(ac)) {
+        moveActiveCell(operation);
+        return;
+      }
+      let item = items.get(ac);
+      if (item == undefined || $statics.has(item.emoji)) return;
+      let postOpItem = items.get(ac + operation);
+      if (postOpItem) {
+        switch (getCollisionType(item.emoji, postOpItem.emoji)) {
+          case "push":
+            let collisionChain = [];
+            let i = 1;
+            while (items.get(ac + operation * i)) {
+              collisionChain.push(items.get(ac + operation * i));
+              i++;
+            }
+
+            let arr = [];
+            for (let i = 0; i < collisionChain.length; i++) {
+              let cur = collisionChain[i]?.emoji;
+              let next = collisionChain[i + 1]?.emoji;
+              if (cur && next) {
+                arr.push(_collisions.get(cur)?.get(next));
+              }
+            }
+
+            let finalIndex = ac + operation * (i - 1);
+            let code = "";
+
+            if (operation == 1) code = "ArrowRight";
+            if (operation == -1) code = "ArrowLeft";
+            if (operation == 16) code = "ArrowDown";
+            if (operation == -16) code = "ArrowUp";
+
+            if (calcOperation(code, finalIndex) == 0) break;
+
+            if (arr.every((str) => str == "push")) {
+              while (collisionChain.length != 0) {
+                let item = collisionChain.pop();
+                if (item) {
+                  items.set(ac + operation * i--, item);
+                  items = items;
+                }
+              }
+
+              let item = items.get(ac);
+              if (item) {
+                items.set(ac + operation, item);
+                moveActiveCell(operation, true);
+                items = items;
+              }
+            } else if (
+              arr.some((str) => [undefined, "push", "bump"].includes(str))
+            ) {
+              arr = arr.slice(
+                0,
+                arr.findIndex((str) =>
+                  [undefined, "push", "bump"].includes(str)
+                ) + 1
+              );
+
+              for (let i = 0; i < arr.length + 2; i++) {
+                let cur = collisionChain[i]?.emoji;
+                let next = collisionChain[i + 1]?.emoji;
+                if (next && cur) {
+                  let emoji = _collisions.get(cur)?.get(next);
+                  if (emoji && emoji != "push") {
+                    items.set(ac + operation * (i + 2), { emoji });
+                    items.set(ac + operation, items.get(ac));
+                    moveActiveCell(operation, true);
+                    break;
+                  }
+                }
+              }
+            }
+            break;
+          case "bump":
+            break;
+          default:
+            // MERGE
+            postOpItem.emoji = getCollisionType(item.emoji, postOpItem.emoji);
+            moveActiveCell(operation, true);
+            break;
+        }
+      } else {
+        if (item.inventory) {
+          let { emoji, inventory } = item;
+          items.set(ac + operation, { emoji, inventory });
+        } else {
+          items.set(ac + operation, { emoji: item.emoji });
+        }
+        items = items;
+        moveActiveCell(operation, true);
+      }
+    }
+
+    if (wasd.includes(e.code)) {
+      dirKey = e.code;
+      adc = ac + dirs[dirKey].operation;
+      return;
+    }
+
     if (e.code == "KeyE") {
       let closestDistance = 300;
       let closestID = ac;
@@ -398,6 +462,7 @@
       }
       return;
     }
+    playerInteracted = false;
 
     if (e.code == "KeyQ") {
       let closestDistance = 300;
@@ -446,20 +511,6 @@
       return;
     }
 
-    if (e.code.includes("Digit")) {
-      let num = +e.code.replace("Digit", "");
-      if (num >= 1 && num <= 4) {
-        if (inventoryIndex == num - 1) {
-          inventoryIndex = -1;
-          currentItem = "";
-        } else {
-          inventoryIndex = num - 1;
-          currentItem = items.get(ac).inventory[inventoryIndex];
-        }
-      }
-      return;
-    }
-
     if (e.code == "KeyX") {
       if (calcOperation(dirKey, adc, true, true) == 0) {
         playerInteracted = false;
@@ -474,111 +525,19 @@
       }
       return;
     }
-    playerInteracted = false;
-    if (wasd.includes(e.code)) {
-      dirKey = e.code;
-      adc = ac + dirs[dirKey].operation;
-      return;
-    }
-    if (!e.code.includes("Arrow")) return;
-    let operation = calcOperation(e.code, ac);
-    if (operation == 0) {
-      emojiStyle = "transform: translateX(5%);";
-      return;
-    }
-    if (!items.has(ac)) {
-      moveActiveCell(operation);
-      return;
-    }
-    let item = items.get(ac);
-    if (item == undefined || $statics.has(item.emoji)) return;
-    let postOpItem = items.get(ac + operation);
-    if (postOpItem) {
-      switch (getCollisionType(item.emoji, postOpItem.emoji)) {
-        case "push":
-          let collisionChain = [];
-          let i = 1;
-          while (items.get(ac + operation * i)) {
-            collisionChain.push(items.get(ac + operation * i));
-            i++;
-          }
 
-          let arr = [];
-          for (let i = 0; i < collisionChain.length; i++) {
-            let cur = collisionChain[i]?.emoji;
-            let next = collisionChain[i + 1]?.emoji;
-            if (cur && next) {
-              arr.push(_collisions.get(cur)?.get(next));
-            }
-          }
-
-          let finalIndex = ac + operation * (i - 1);
-          let code = "";
-
-          if (operation == 1) code = "ArrowRight";
-          if (operation == -1) code = "ArrowLeft";
-          if (operation == 16) code = "ArrowDown";
-          if (operation == -16) code = "ArrowUp";
-
-          if (calcOperation(code, finalIndex) == 0) break;
-
-          if (arr.every((str) => str == "push")) {
-            while (collisionChain.length != 0) {
-              let item = collisionChain.pop();
-              if (item) {
-                items.set(ac + operation * i--, item);
-                items = items;
-              }
-            }
-
-            let item = items.get(ac);
-            if (item) {
-              items.set(ac + operation, item);
-              moveActiveCell(operation, true);
-              items = items;
-            }
-          } else if (
-            arr.some((str) => [undefined, "push", "bump"].includes(str))
-          ) {
-            arr = arr.slice(
-              0,
-              arr.findIndex((str) =>
-                [undefined, "push", "bump"].includes(str)
-              ) + 1
-            );
-
-            for (let i = 0; i < arr.length + 2; i++) {
-              let cur = collisionChain[i]?.emoji;
-              let next = collisionChain[i + 1]?.emoji;
-              if (next && cur) {
-                let emoji = _collisions.get(cur)?.get(next);
-                if (emoji && emoji != "push") {
-                  items.set(ac + operation * (i + 2), { emoji });
-                  items.set(ac + operation, items.get(ac));
-                  moveActiveCell(operation, true);
-                  break;
-                }
-              }
-            }
-          }
-          break;
-        case "bump":
-          break;
-        default:
-          // MERGE
-          postOpItem.emoji = getCollisionType(item.emoji, postOpItem.emoji);
-          moveActiveCell(operation, true);
-          break;
+    if (e.code.includes("Digit")) {
+      let num = +e.code.replace("Digit", "");
+      if (num >= 1 && num <= 4) {
+        if (inventoryIndex == num - 1) {
+          inventoryIndex = -1;
+          currentItem = "";
+        } else {
+          inventoryIndex = num - 1;
+          currentItem = items.get(ac).inventory[inventoryIndex];
+        }
       }
-    } else {
-      if (item.inventory) {
-        let { emoji, inventory } = item;
-        items.set(ac + operation, { emoji, inventory });
-      } else {
-        items.set(ac + operation, { emoji: item.emoji });
-      }
-      items = items;
-      moveActiveCell(operation, true);
+      return;
     }
   }
 
@@ -591,6 +550,8 @@
   //   canFire = false;
   //   setTimeout(() => (canFire = true), 500);
   // }
+
+  // TODO: Switch to canvas
 </script>
 
 <svelte:window on:keydown={handle} />
@@ -615,7 +576,6 @@
         {@const active = ac == i}
         <div
           class="cell"
-          style:transform={emojiStyle}
           style:background={backgrounds.get(i) || "var(--default-background)"}
           class:active
         >
@@ -638,7 +598,7 @@
           LEVEL COMPLETED!
           <button on:click={() => (levelCompleted = !levelCompleted)}>OK</button
           >
-          <button on:click={mutations.resetLevel}>REPLAY</button>
+          <button on:click={m.resetLevel}>REPLAY</button>
         </dialog>
       {/if}
     </div>
@@ -651,7 +611,7 @@
   }
 
   .active {
-    box-shadow: var(--inverted) 0 0 5px;
+    box-shadow: black 0 0 5px;
   }
 
   .emoji {
