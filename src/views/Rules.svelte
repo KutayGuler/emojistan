@@ -341,9 +341,9 @@
               </div>
             {/each}
           </div> -->
+          <!-- PALETTE -->
           <div class="flex-1">
             <h4 on:click={() => modal.show("palette")}>Palette 🎨</h4>
-
             <div
               style:background={defaultBackground}
               class="my-4 flex flex-wrap items-start justify-start rounded-lg pb-4 shadow-lg"

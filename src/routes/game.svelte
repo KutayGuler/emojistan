@@ -1,4 +1,6 @@
 <script lang="ts">
+  // TODO: if in this route and currentSave == "" then redirect to home
+
   // VIEWS
   import Play from "../views/Play.svelte";
   import Editor from "../views/Editor.svelte";
@@ -88,7 +90,7 @@
   {$currentEmoji}
 </div>
 
-{#if loading}
+<!-- {#if loading}
   <div
     out:slide
     class="absolute z-10 flex h-full w-full items-center justify-center bg-white text-2xl"
@@ -96,7 +98,7 @@
     LOADING
     <span class="px-2" id="loading">👾</span>
   </div>
-{/if}
+{/if} -->
 
 <Modal />
 <main class="noselect">
