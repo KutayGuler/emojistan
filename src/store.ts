@@ -70,12 +70,22 @@ export interface Emoji {
   inventory?: Array<any>;
 }
 
-function createMapStore<T>(_state: Map<string, T>) {
-  const { set, subscribe, update } = writable(_state);
+function createMapStore<T>(name: string) {
+  const { set, subscribe, update } = writable(new Map<string, T>());
 
   return {
     set,
     subscribe,
+    useStorage: (id: string) => {
+      const val = JSON.parse(localStorage.getItem(id + "_" + name));
+      set(new Map(val) || new Map<string, T>());
+      subscribe((state) => {
+        localStorage.setItem(
+          id + "_" + name,
+          JSON.stringify(Array.from(state.entries()))
+        );
+      });
+    },
     add: (value: T) =>
       update((state) => {
         Object.assign(value, { order: state.size + 1 });
@@ -106,6 +116,7 @@ function createSaves() {
   const { set, subscribe, update } = writable({
     saves: new Map<string, string>(),
     current: "",
+    loaded: false,
   });
 
   return {
@@ -116,12 +127,9 @@ function createSaves() {
       const saves = JSON.parse(localStorage.getItem("saves"));
 
       update((state) => {
-        if (saves != undefined) {
-          state.saves = new Map(saves);
-        }
-        if (current != undefined) {
-          state.current = current;
-        }
+        state.saves = new Map(saves) || new Map();
+        state.current = current || "";
+        state.loaded = true;
         return state;
       });
 
@@ -164,15 +172,9 @@ function createEditableMap() {
       const backgrounds = JSON.parse(localStorage.getItem(id + "_backgrounds"));
 
       update((state) => {
-        if (objective != undefined) {
-          state.objective = objective;
-        }
-        if (items != undefined) {
-          state.items = new Map(items);
-        }
-        if (backgrounds != undefined) {
-          state.backgrounds = new Map(backgrounds);
-        }
+        state.objective = objective || "";
+        state.items = new Map(items) || new Map();
+        state.backgrounds = new Map(backgrounds) || new Map();
         return state;
       });
 
@@ -227,11 +229,22 @@ function createEditableMap() {
   };
 }
 
-function createSetStore() {
-  const { subscribe, update } = writable(new Set<string>());
+function createSetStore(name: string) {
+  const { set, subscribe, update } = writable(new Set<string>());
 
   return {
+    set,
     subscribe,
+    useStorage: (id: string) => {
+      const val = JSON.parse(localStorage.getItem(id + "_" + name));
+      set(new Set<string>(val || []));
+      subscribe((state) => {
+        localStorage.setItem(
+          id + "_" + name,
+          JSON.stringify(Array.from(state.entries()))
+        );
+      });
+    },
     add: (value: string) =>
       value != "" &&
       update((state) => {
@@ -292,26 +305,20 @@ export const rulesIndex = writable(0);
 
 export const saves = createSaves();
 
-export const statics = createSetStore();
-export const quickAccess = createSetStore();
-export const colorPalette = createSetStore();
+export const statics = createSetStore("statics");
+export const quickAccess = createSetStore("quickAccess");
+export const colorPalette = createSetStore("cp");
 
 export const map = createEditableMap();
 
-export const pushes = createMapStore<TCollision>(new Map<string, TCollision>());
-export const merges = createMapStore<TCollision>(new Map<string, TCollision>());
+export const pushes = createMapStore<TCollision>("pushes");
+export const merges = createMapStore<TCollision>("merges");
 // export const weapons = createMapStore<Orderable>(new Map<string, Orderable>());
 // export const throwables = createMapStore<Orderable>(
 //   new Map<string, Orderable>()
 // );
 
-export const collisions = createMapStore<TCollision>(
-  new Map<string, TCollision>()
-);
-export const loopEvents = createMapStore<TLoopEvent>(
-  new Map<string, TLoopEvent>()
-);
-export const events = createMapStore<TEvent>(new Map<string, TEvent>());
-export const conditions = createMapStore<TCondition>(
-  new Map<string, TCondition>()
-);
+export const collisions = createMapStore<TCollision>("collisions");
+export const loopEvents = createMapStore<TLoopEvent>("loopEvents");
+export const events = createMapStore<TEvent>("events");
+export const conditions = createMapStore<TCondition>("conditions");

@@ -12,15 +12,13 @@
     saves.useStorage();
   });
 
-  function openSave(id: string, newSave = false) {
+  function openSave(id?: string) {
     navigating = true;
-    $saves.current = id;
-    goto("/game");
-  }
-
-  function openNewSave() {
-    navigating = true;
-    saves.add();
+    if (id) {
+      $saves.current = id;
+    } else {
+      saves.add();
+    }
     goto("/game");
   }
 
@@ -95,22 +93,26 @@
       </h1>
       <p class="pt-4 pr-4">v0.0.1</p>
     </div>
-    <div class="w-1/4" out:scale>
-      <button class="btn hover:bg-green-400" on:click={openNewSave}
-        >NEW GAME</button
-      >
-      {#each [...$saves.saves] as [id, title]}
-        <div class="flex ">
-          <button class="btn hover:bg-blue-400" on:click={() => openSave(id)}
-            >{title}</button
-          >
-          <button
-            class="duration-200 ease-out hover:scale-150"
-            on:click={() => showPopup(id, title)}>❌</button
-          >
-        </div>
-      {/each}
-    </div>
+    {#if $saves.loaded}
+      <div class="w-1/4" transition:scale>
+        <button class="btn hover:bg-green-400" on:click={() => openSave()}
+          >NEW GAME</button
+        >
+        {#each [...$saves.saves] as [id, title]}
+          <div class="flex ">
+            <button class="btn hover:bg-blue-400" on:click={() => openSave(id)}
+              >{title}</button
+            >
+            <button
+              class="duration-200 ease-out hover:scale-150"
+              on:click={() => showPopup(id, title)}>❌</button
+            >
+          </div>
+        {/each}
+      </div>
+    {:else}
+      <p>Loading...</p>
+    {/if}
   </main>
 {/if}
 

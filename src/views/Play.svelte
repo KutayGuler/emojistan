@@ -380,7 +380,6 @@
               if (item) {
                 items.set(ac + operation, item);
                 moveActiveCell(operation, true);
-                items = items;
               }
             } else if (
               arr.some((str) => [undefined, "push", "bump"].includes(str))
@@ -422,7 +421,6 @@
         } else {
           items.set(ac + operation, { emoji: item.emoji });
         }
-        items = items;
         moveActiveCell(operation, true);
       }
     }

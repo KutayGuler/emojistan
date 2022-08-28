@@ -15,10 +15,15 @@
     modal,
     pushes,
     merges,
+    saves,
     // weapons,
     // throwables,
     rulesIndex,
   } from "../store";
+
+  for (let store of [pushes, merges, events, loopEvents, cp, statics]) {
+    store.useStorage($saves.current);
+  }
 
   // COMPONENTS
   import Push from "../components/rules/Push.svelte";
