@@ -111,8 +111,9 @@
   on:dragenter={() => (hovering = i)}
   class:is-active={hovering === i} -->
 
+<!-- TODO: Fix height -->
 <section
-  class="px-1/4 relative flex h-[90%] w-full flex-col gap-2 overflow-auto px-40 pb-10"
+  class="px-1/4 relative flex w-full flex-col gap-2 overflow-auto px-40 pb-10"
 >
   <p
     class="absolute top-8 right-8 cursor-help text-3xl duration-200 ease-out hover:scale-150"

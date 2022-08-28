@@ -3,7 +3,13 @@
   import Base from "./Base.svelte";
   import type { SvelteComponent } from "svelte";
   import { onDestroy } from "svelte";
-  import { colorPalette, events, conditions, currentEmoji } from "../../store";
+  import {
+    colorPalette,
+    events,
+    loopEvents,
+    conditions,
+    currentEmoji,
+  } from "../../store";
 
   const props = ["playerBackground", "playerInteractsWith"];
 
@@ -47,11 +53,15 @@
       [a, b].includes("") ||
       eventID == "" ||
       $events.get(eventID) == undefined ||
-      $events.get(eventID)?.sequence.length == 0
+      $loopEvents.get(eventID) == undefined ||
+      $events.get(eventID)?.sequence.length == 0 ||
+      $loopEvents.get(eventID)?.sequence.length == 0
     ) {
       conditions.remove(id);
     }
   });
+
+  // TODO: Can't add global color as condition color
 </script>
 
 <Base
@@ -101,7 +111,7 @@
     <div class="then">
       <h4>then trigger</h4>
       <select bind:value={eventID} on:change={update}>
-        {#each [...$events] as [id, { name }]}
+        {#each [...$events, ...$loopEvents] as [id, { name }]}
           <option value={id}>{name}</option>
         {/each}
       </select>
