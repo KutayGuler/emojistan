@@ -1,29 +1,33 @@
 <script lang="ts">
   // TODO: if in this route and currentSave == "" then redirect to home
+  // TODO: Switch to IndexedDB
 
   // VIEWS
-  import Play from "../views/Play.svelte";
-  import Editor from "../views/Editor.svelte";
-  import Rules from "../views/Rules.svelte";
+  import Play from "../../views/Play.svelte";
+  import Editor from "../../views/Editor.svelte";
+  import Rules from "../../views/Rules.svelte";
 
   // COMPONENTS
-  import Modal from "../components/tutorial/Modal.svelte";
+  import Modal from "../../components/tutorial/Modal.svelte";
 
   // DATA
-  import { emojis } from "../emojis";
+  import { emojis } from "../../emojis";
   import {
     quickAccess,
     currentEmoji,
     currentColor,
     colorPalette,
-  } from "../store";
+  } from "../../store";
 
-  import { slide } from "svelte/transition";
   import { onMount } from "svelte";
+  // import { redirect } from "@sveltejs/kit";
 
   let loading = true;
   onMount(() => {
     setTimeout(() => (loading = false), 2000);
+    // if (localStorage.getItem("currentSave") == "") {
+    //   throw redirect(307, "/");
+    // }
   });
 
   let filter = "";
@@ -89,16 +93,6 @@
 >
   {$currentEmoji}
 </div>
-
-<!-- {#if loading}
-  <div
-    out:slide
-    class="absolute z-10 flex h-full w-full items-center justify-center bg-white text-2xl"
-  >
-    LOADING
-    <span class="px-2" id="loading">👾</span>
-  </div>
-{/if} -->
 
 <Modal />
 <main class="noselect">
@@ -193,10 +187,6 @@
 </main>
 
 <style>
-  #loading {
-    animation: idle 300ms ease-out infinite alternate;
-  }
-
   @keyframes idle {
     100% {
       transform: translateY(-20px);

@@ -25,3 +25,9 @@
 {/if}
 
 <slot />
+
+<style>
+  #loading {
+    animation: idle 300ms ease-out infinite alternate;
+  }
+</style>
