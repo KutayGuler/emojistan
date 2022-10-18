@@ -33,6 +33,8 @@
   import LoopEvent from "../components/rules/LoopEvent.svelte";
   // import Weapon from "../components/rules/Weapon.svelte";
   // import Throwable from "../components/rules/Throwable.svelte";
+  import Svelvet from "../lib/index";
+  import Container from "../components/rules/Container.svelte";
 
   let r: any;
   let pickedColor = "#000000";
@@ -73,317 +75,71 @@
 
   let hovering: any = false;
 
-  const drop = (event: any, target: any) => {
-    console.log("drop");
-    event.dataTransfer.dropEffect = "move";
-    const start = event.dataTransfer.getData("text/plain");
+  const initialNodes = [
+    {
+      id: 1,
+      position: { x: 225, y: 10 },
+      data: { label: "Add Images!" },
+      width: 100,
+      height: 100,
+      bgColor: "white",
+      borderColor: "transparent",
+      sourcePosition: "right",
+    },
+    {
+      id: 2,
+      position: { x: 390, y: 180 },
+      data: { label: "Mixed Anchors" },
+      width: 125,
+      height: 40,
+      bgColor: "white",
+      targetPosition: "left",
+    },
+    {
+      id: 3,
+      position: { x: 390, y: 180 },
+      data: { component: Container },
+      width: 125,
+      height: 40,
+    },
+    // {
+    //   id: 4,
+    //   position: { x: 390, y: 180 },
+    //   data: { component: Merge },
+    //   width: 125,
+    //   height: 40,
+    // },
+    // {
+    //   id: 4,
+    //   position: { x: 390, y: 180 },
+    //   data: { component: Condition },
+    //   width: 125,
+    //   height: 40,
+    // },
+    // {
+    //   id: 5,
+    //   position: { x: 390, y: 180 },
+    //   data: { component: Event },
+    //   width: 125,
+    //   height: 40,
+    // },
+    // {
+    //   id: 6,
+    //   position: { x: 390, y: 180 },
+    //   data: { component: LoopEvent },
+    //   width: 125,
+    //   height: 40,
+    // },
+  ];
 
-    // @ts-expect-error
-    let prevOrder = $pushes.get(start).order;
-    // @ts-expect-error
-    let nextOrder = $pushes.get(target).order;
+  const initialEdges = [
+    { id: "e1-2", source: 1, target: 2, label: "edge label" },
+  ];
 
-    // @ts-expect-error
-    pushes.updateValue(start, "order", nextOrder);
-    // @ts-expect-error
-    pushes.updateValue(target, "order", prevOrder);
-
-    hovering = null;
-  };
-
-  const dragstart = (event: any, i: any) => {
-    console.log("drag start");
-    event.dataTransfer.effectAllowed = "move";
-    event.dataTransfer.dropEffect = "move";
-    const start = i;
-    event.dataTransfer.setData("text/plain", start);
-  };
-
-  let types = ["Physics ⚛️", "Triggers 🔔", "Misc 🔮"];
-
-  const flipParams = { duration: 300 };
+  // TODO: Fix height
 </script>
 
-<!-- draggable={id != ""}
-  on:dragstart={(event) => dragstart(event, id)}
-  ondragover={id != "" ? "return false" : "return true"}
-  on:drop|preventDefault={(event) => drop(event, id)}
-  on:dragenter={() => (hovering = i)}
-  class:is-active={hovering === i} -->
-
-<!-- TODO: Fix height -->
-<section
-  class="px-1/4 relative flex w-full flex-col gap-2 overflow-auto px-40 pb-10"
->
-  <p
-    class="absolute top-8 right-8 cursor-help text-3xl duration-200 ease-out hover:scale-150"
-    on:click={() => modal.show("keyboardEditor")}
-  >
-    ⌨️
-  </p>
-
-  <div class="mt-8 mb-16 flex flex-row justify-center gap-16">
-    {#each types as type, i}
-      <h3
-        class:currentRule={$rulesIndex == i}
-        on:click={() => ($rulesIndex = i)}
-      >
-        {type}
-      </h3>
-    {/each}
-  </div>
-  {#key $rulesIndex}
-    <div in:fly>
-      {#if $rulesIndex == 0}
-        <!-- PHYSICS -->
-        <div class="flex w-full">
-          <!-- PUSHES -->
-          <div class="flex-1">
-            <h4 on:click={() => modal.show("pushes")}>Pushes 💨</h4>
-            {#each [...$pushes, ["", { rule: ["", "", "push"], order: 1000 }]] as [id, { rule, order }], i (id)}
-              <div
-                class="flex items-center justify-center"
-                transition:scale|local={flipParams}
-                animate:flip={flipParams}
-                style:order
-              >
-                {#if id == ""}
-                  <button
-                    class="btn collision-btn"
-                    on:click={() =>
-                      pushes.add({ rule: ["", "", "push"], order: 1000 })}
-                    >💨</button
-                  >
-                {:else if typeof id === "string" && Array.isArray(rule)}
-                  <Push {id} {rule} />
-                {/if}
-              </div>
-            {/each}
-          </div>
-          <!-- MERGES -->
-          <div class="flex-1">
-            <h4 on:click={() => modal.show("merges")}>Merges 🌌</h4>
-            {#each [...$merges, ["", { rule: ["", "", ""] }]] as [id, { rule, order }] (id)}
-              <div
-                class="flex items-center justify-center"
-                transition:scale|local={flipParams}
-                animate:flip={flipParams}
-              >
-                {#if id == ""}
-                  <button
-                    class="btn collision-btn"
-                    on:click={() => merges.add({ rule: ["", "", ""] })}
-                    >🌌</button
-                  >
-                {:else if typeof id === "string" && Array.isArray(rule)}
-                  <Merge {id} {rule} />
-                {/if}
-              </div>
-            {/each}
-          </div>
-          <!-- STATICS -->
-          <div class="flex-1">
-            <h4 on:click={() => modal.show("statics")}>Statics 🗿</h4>
-            <div class="flex flex-wrap items-start justify-start">
-              {#each [...$statics, ""] as item (item)}
-                <div
-                  transition:scale|local={flipParams}
-                  animate:flip={flipParams}
-                >
-                  {#if item == ""}
-                    <button
-                      class="statics-add-btn"
-                      on:click={() => statics.add($currentEmoji)}
-                    >
-                      [ {$currentEmoji == "" ? "&emsp" : $currentEmoji} ]
-                    </button>
-                  {:else}
-                    <button
-                      class="statics-btn"
-                      on:click={() => statics.remove(item)}>{item}</button
-                    >
-                  {/if}
-                </div>
-              {/each}
-            </div>
-          </div>
-        </div>
-      {:else if $rulesIndex == 1}
-        <!-- TRIGGERS -->
-        <div class="flex w-full">
-          <!-- CONDITIONS -->
-          <div class="flex-1">
-            <h4 on:click={() => modal.show("conditions")}>Conditions ❓</h4>
-            {#each [...$conditions, ["", {}]] as [id, { a, b, _b, eventID }] (id)}
-              <div
-                class="flex items-center justify-center"
-                transition:scale|local={flipParams}
-                animate:flip={flipParams}
-              >
-                {#if id == ""}
-                  <button
-                    class="btn condition-btn"
-                    on:click={() =>
-                      conditions.add({
-                        a: "playerBackground",
-                        b: "",
-                        _b: "any",
-                        eventID: "",
-                      })}
-                    >❓
-                  </button>
-                {:else}
-                  <Condition {id} {a} {b} {_b} {eventID} />
-                {/if}
-              </div>
-            {/each}
-          </div>
-          <!-- EVENTS -->
-          <div class="flex-1">
-            <h4 on:click={() => modal.show("events")}>Events 🧨</h4>
-            {#each [...$events, ["", {}]] as [id, { name, sequence }] (id)}
-              <div
-                class="flex items-center justify-center"
-                transition:scale|local={flipParams}
-                animate:flip={flipParams}
-              >
-                {#if id == ""}
-                  <button
-                    class="btn event-btn"
-                    on:click={() =>
-                      events.add({
-                        name: `Event${eventIndex++}`,
-                        sequence: [],
-                      })}>🧨</button
-                  >
-                {:else}
-                  <Event {id} {name} {sequence} />
-                {/if}
-              </div>
-            {/each}
-          </div>
-          <!-- LOOP EVENTS -->
-          <div class="flex-1">
-            <h4 on:click={() => modal.show("events")}>Loop Events 🔄🧨</h4>
-            {#each [...$loopEvents, ["", {}]] as [id, { name, sequence, loop }] (id)}
-              <div
-                class="flex items-center justify-center"
-                transition:scale|local={flipParams}
-                animate:flip={flipParams}
-              >
-                {#if id == ""}
-                  <button
-                    class="btn event-btn"
-                    on:click={() =>
-                      loopEvents.add({
-                        name: `LoopEvent${loopEventIndex++}`,
-                        sequence: [],
-                        loop: {
-                          start: 0,
-                          end: 16,
-                          iterationNumber: 1,
-                          iterationType: "increment",
-                          timeGap: 50,
-                          reverse: false,
-                        },
-                      })}>🔄🧨</button
-                  >
-                {:else}
-                  <LoopEvent {id} {name} {sequence} {loop} />
-                {/if}
-              </div>
-            {/each}
-          </div>
-        </div>
-      {:else if $rulesIndex == 2}
-        <!-- MISC -->
-        <div class="flex w-full">
-          <!-- WEAPONS -->
-          <!-- <div class="flex-1">
-            <h4 on:click={() => modal.show("weapons")}>Weapons 🔫</h4>
-            {#each [...$weapons, ["", { order: 1000 }]] as [id, { order }], i (id)}
-              <div
-                class="flex items-center justify-center"
-                transition:scale|local={flipParams}
-                animate:flip={flipParams}
-                style:order
-              >
-                {#if id == ""}
-                  <button
-                    class="btn weapon-btn"
-                    on:click={() => weapons.add({ order: 1000 })}>🔫</button
-                  >
-                {:else}
-                  <Weapon {id} />
-                {/if}
-              </div>
-            {/each}
-          </div> -->
-          <!-- THROWABLES -->
-          <!-- <div class="flex-1">
-            <h4 on:click={() => modal.show("throwables")}>Throwables 🥏</h4>
-
-            {#each [...$throwables, ["", { order: 1000 }]] as [id, { order }], i (id)}
-              <div
-                class="flex items-center justify-center"
-                transition:scale|local={flipParams}
-                animate:flip={flipParams}
-                style:order
-              >
-                {#if id == ""}
-                  <button
-                    class="btn throwable-btn"
-                    on:click={() => throwables.add({ order: 1000 })}>🥏</button
-                  >
-                {:else}
-                  <Throwable {id} />
-                {/if}
-              </div>
-            {/each}
-          </div> -->
-          <!-- PALETTE -->
-          <div class="flex-1">
-            <h4 on:click={() => modal.show("palette")}>Palette 🎨</h4>
-            <div
-              style:background={defaultBackground}
-              class="my-4 flex flex-wrap items-start justify-start rounded-lg pb-4 shadow-lg"
-            >
-              {#each [...$cp, ""] as color (color)}
-                <div
-                  transition:scale|local={flipParams}
-                  animate:flip={flipParams}
-                >
-                  {#if color == ""}
-                    <div class="relative">
-                      <button
-                        class="statics-add-btn relative bg-white"
-                        on:click={() => cp.add(pickedColor)}
-                        >🎨
-                      </button>
-                      <input
-                        class="absolute -bottom-full h-full w-full"
-                        type="color"
-                        bind:value={pickedColor}
-                        on:change={pickedColorChanged}
-                      />
-                    </div>
-                  {:else}
-                    <div style:background={color} class="color">
-                      <button on:click={() => setDefaultBackground(color)}
-                        >🌍</button
-                      >
-                      <button on:click={() => removeColor(color)}>❌</button>
-                    </div>
-                  {/if}
-                </div>
-              {/each}
-            </div>
-          </div>
-        </div>
-      {/if}
-    </div>
-  {/key}
-</section>
+<Svelvet nodes={initialNodes} edges={initialEdges} background />
 
 <style>
   :root {

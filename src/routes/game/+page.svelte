@@ -23,7 +23,10 @@
   // import { redirect } from "@sveltejs/kit";
 
   let loading = true;
+  let interactiveDiv;
+
   onMount(() => {
+    console.log(interactiveDiv.offsetWidth, interactiveDiv.offsetHeight);
     let timer = setTimeout(() => (loading = false), 2000);
     // if (localStorage.getItem("currentSave") == "") {
     //   throw redirect(307, "/");
@@ -102,7 +105,7 @@
 <Modal />
 <main class="noselect">
   <div class="playground" on:mousemove={setCursorEmoji}>
-    <div id="interactive" style={interactiveStyle}>
+    <div id="interactive" style={interactiveStyle} bind:this={interactiveDiv}>
       <nav
         class="relative box-border flex h-16 items-center justify-center border-b-2 bg-amber-50 text-lg"
       >

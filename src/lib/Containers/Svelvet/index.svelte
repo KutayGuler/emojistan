@@ -1,9 +1,9 @@
 <!--Note: Import / export in svelvet is used for passing props  -->
 <script lang="ts">
-  import GraphView from '$lib/Containers/GraphView/index.svelte';
-  import { findOrCreateStore } from '$lib/stores/store';
-  import { afterUpdate, onMount } from 'svelte';
-  import type { Node, Edge } from '$lib/types/index.js';
+  import GraphView from "$lib/Containers/GraphView/index.svelte";
+  import { findOrCreateStore } from "$lib/stores/store";
+  import { afterUpdate, onMount } from "svelte";
+  import type { Node, Edge } from "$lib/types/index.js";
 
   // Declaring variables for Svelvet components which will be usable in other files
   export let nodes: Node[];
@@ -42,7 +42,10 @@
 </script>
 
 <!-- Now that a store has been created from the initial nodes and initial edges we drill props from the store down to the D3 GraphView along with the unique key -->
-<div class="Svelvet" style={`width: ${$widthStore}px; height: ${$heightStore}px`}>
+<div
+  class="Svelvet"
+  style={`width: ${$widthStore}px; height: ${$heightStore}px`}
+>
   <GraphView {nodesStore} {derivedEdges} {key} />
 </div>
 
@@ -51,7 +54,7 @@
     position: relative;
     overflow: hidden;
     display: grid;
-    font-family: 'Segoe UI', sans-serif;
-    background-color: 'white';
+    font-family: "Segoe UI", sans-serif;
+    background-color: "white";
   }
 </style>

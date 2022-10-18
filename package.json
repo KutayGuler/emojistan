@@ -30,6 +30,8 @@
   },
   "type": "module",
   "dependencies": {
+    "d3-selection": "^3.0.0",
+    "d3-zoom": "^3.0.0",
     "dexie": "^3.2.2"
   }
 }

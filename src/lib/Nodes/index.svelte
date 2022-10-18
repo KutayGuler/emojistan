@@ -31,7 +31,7 @@
   }
 
   function removeSelf() {
-    $edgesStore = $edgesStore.filter((e) => !e.id.includes(node.id));
+    $edgesStore = $edgesStore.filter((e) => !e.id.includes(node.id.toString()));
     $nodesStore = $nodesStore.filter((n) => n.id != node.id);
   }
 
@@ -41,6 +41,8 @@
   // moving local boolean specific to node selected, to change position of individual node once selected
   let moving = false;
   let moved = false;
+
+  // TODO: Integrate base component and this component
 </script>
 
 <svelte:window
