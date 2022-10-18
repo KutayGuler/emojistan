@@ -24,10 +24,11 @@
 
   let loading = true;
   onMount(() => {
-    setTimeout(() => (loading = false), 2000);
+    let timer = setTimeout(() => (loading = false), 2000);
     // if (localStorage.getItem("currentSave") == "") {
     //   throw redirect(307, "/");
     // }
+    return () => clearTimeout(timer);
   });
 
   let filter = "";
@@ -84,11 +85,15 @@
   let innerHeight: number;
 </script>
 
+<svelte:head>
+  <title>Game</title>
+</svelte:head>
+
 <svelte:window on:keydown={handleKeydown} bind:innerWidth bind:innerHeight />
 <div
   class:cursor={$currentEmoji != ""}
   style:display={x + 85 >= innerWidth || y + 85 >= innerHeight ? "none" : ""}
-  style="transform: translate({x + 15}px, {y}px);"
+  style="translate: {x + 15}px {y}px;"
   style:background={$currentColor}
 >
   {$currentEmoji}
@@ -293,7 +298,7 @@
   }
 
   #aside-container .flex > div:hover {
-    transform: scale(150%);
+    scale: 1.5;
   }
 
   .selected {

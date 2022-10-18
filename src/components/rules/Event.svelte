@@ -177,7 +177,7 @@
     <p>completeLevel</p>
   {:else}
     <input
-      class="name absolute -top-4 left-2 border border-solid"
+      class="name absolute -top-4 left-2 border border-solid pl-2"
       type="text"
       bind:value={name}
       on:input={() => update("name")}
@@ -185,7 +185,12 @@
     />
     {#each sequence as s, i}
       <span>
-        <select id="type" bind:value={s.type} on:change={() => update(i)}>
+        <select
+          title="event type"
+          id="type"
+          bind:value={s.type}
+          on:change={() => update(i)}
+        >
           {#each types as t}
             <option value={t}>{t}</option>
           {/each}
@@ -239,6 +244,7 @@
           {#if s.type == "setBackgroundOf"}
             to
             <select
+              title="color"
               bind:value={s.background}
               style:background={s.background}
               on:change={() => update(i)}
@@ -253,14 +259,14 @@
       </span>
     {/each}
     <label>
-      <select bind:value={type}>
+      <select title="event type" bind:value={type}>
         {#each types as t}
           <option value={t}>{t}</option>
         {/each}
       </select>
       <button on:click={addToSequence}>➕</button>
     </label>
-    <label>
+    <!-- <label>
       <strong>Trigger on complete</strong>
       <input type="checkbox" bind:checked={trigger} />
       {#if trigger}
@@ -272,7 +278,7 @@
           {/each}
         </select>
       {/if}
-    </label>
+    </label> -->
   {/if}
 </Base>
 

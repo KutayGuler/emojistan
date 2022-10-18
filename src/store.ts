@@ -237,6 +237,7 @@ function createSetStore(name: string) {
     subscribe,
     useStorage: (id: string) => {
       const val = JSON.parse(localStorage.getItem(id + "_" + name));
+      console.log(val);
       set(new Set<string>(val || []));
       subscribe((state) => {
         localStorage.setItem(id + "_" + name, JSON.stringify(state));

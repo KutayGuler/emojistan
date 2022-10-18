@@ -195,7 +195,7 @@
                       class="statics-add-btn"
                       on:click={() => statics.add($currentEmoji)}
                     >
-                      [ {$currentEmoji == "" ? "____" : $currentEmoji} ]
+                      [ {$currentEmoji == "" ? "&emsp" : $currentEmoji} ]
                     </button>
                   {:else}
                     <button

@@ -211,7 +211,12 @@
   <div class="step">
     {#each sequence as q, i}
       <div>
-        <select id="type" bind:value={q.type} on:input={() => update(i)}>
+        <select
+          title="event type"
+          id="type"
+          bind:value={q.type}
+          on:input={() => update(i)}
+        >
           {#each types as t}
             <option value={t}>{t}</option>
           {/each}
@@ -226,6 +231,7 @@
         {:else if q.type == "setBackgroundOf"}
           <strong>i</strong> to
           <select
+            title="color"
             bind:value={q.background}
             style:background={q.background}
             on:input={() => update(i)}
@@ -239,7 +245,7 @@
       </div>
     {/each}
     <div class="inline">
-      <select bind:value={type}>
+      <select title="event type" bind:value={type}>
         {#each types as t}
           <option value={t}>{t}</option>
         {/each}
@@ -248,7 +254,11 @@
     </div>
     <br />
     <div class="inline">
-      <select bind:value={loop.iterationType} on:change={() => update()}>
+      <select
+        title="iteration type"
+        bind:value={loop.iterationType}
+        on:change={() => update()}
+      >
         {#each ["increment", "decrement"] as operation}
           <option value={operation}>{operation}</option>
         {/each}
