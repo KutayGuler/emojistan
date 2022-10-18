@@ -4,7 +4,6 @@
   import { saves, modal } from "../store";
   import { scale, fly } from "svelte/transition";
   import { clickOutside } from "../utils/clickOutside";
-  import Modal from "../components/tutorial/Modal.svelte";
 
   let navigating = false;
 
@@ -38,7 +37,6 @@
   }
 </script>
 
-<Modal />
 {#if popup}
   <div transition:fly class="modal-background x-modal">
     <div

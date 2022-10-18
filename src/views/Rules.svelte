@@ -26,15 +26,15 @@
   }
 
   // COMPONENTS
-  import Push from "../components/rules/Push.svelte";
-  import Merge from "../components/rules/Merge.svelte";
-  import Condition from "../components/rules/Condition.svelte";
-  import Event from "../components/rules/Event.svelte";
-  import LoopEvent from "../components/rules/LoopEvent.svelte";
-  // import Weapon from "../components/rules/Weapon.svelte";
-  // import Throwable from "../components/rules/Throwable.svelte";
+  import Push from "../components/Push.svelte";
+  import Merge from "../components/Merge.svelte";
+  import Condition from "../components/Condition.svelte";
+  import Event from "../components/Event.svelte";
+  import LoopEvent from "../components/LoopEvent.svelte";
+  // import Weapon from "../components/Weapon.svelte";
+  // import Throwable from "../components/Throwable.svelte";
   import Svelvet from "../lib/index";
-  import Container from "../components/rules/Container.svelte";
+  import Container from "../components/Container.svelte";
 
   let r: any;
   let pickedColor = "#000000";
@@ -78,29 +78,26 @@
   const initialNodes = [
     {
       id: 1,
-      position: { x: 225, y: 10 },
-      data: { label: "Add Images!" },
-      width: 100,
-      height: 100,
-      bgColor: "white",
-      borderColor: "transparent",
+      position: { x: 190, y: 80 },
+      data: { component: Condition },
+      width: 250,
+      height: 80,
       sourcePosition: "right",
     },
     {
       id: 2,
-      position: { x: 390, y: 180 },
-      data: { label: "Mixed Anchors" },
-      width: 125,
-      height: 40,
-      bgColor: "white",
+      position: { x: 290, y: 100 },
+      data: { component: Condition },
+      width: 250,
+      height: 80,
       targetPosition: "left",
     },
     {
       id: 3,
       position: { x: 390, y: 180 },
-      data: { component: Container },
-      width: 125,
-      height: 40,
+      data: { component: Event },
+      width: 250,
+      height: 80,
     },
     // {
     //   id: 4,
@@ -135,8 +132,6 @@
   const initialEdges = [
     { id: "e1-2", source: 1, target: 2, label: "edge label" },
   ];
-
-  // TODO: Fix height
 </script>
 
 <Svelvet nodes={initialNodes} edges={initialEdges} background />

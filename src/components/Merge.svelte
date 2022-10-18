@@ -2,7 +2,7 @@
   import Error from "./Error.svelte";
   import type { SvelteComponent } from "svelte";
   import { onDestroy, onMount } from "svelte";
-  import { merges, currentEmoji } from "../../store";
+  import { merges, currentEmoji } from "../store";
   import Base from "./Base.svelte";
 
   export let id: string;
@@ -61,7 +61,6 @@
 </script>
 
 <Base
-  {disabled}
   on:remove={() => merges.remove(id)}
   --border-color="#3a96dd"
   --background="#e9f3fb"

@@ -1,34 +1,20 @@
 <script lang="ts">
   // DATA
   import { fly } from "svelte/transition";
-  import { modal } from "../../store";
-  import type { ModalType } from "../../store";
+  import { modal } from "../store";
+  import type { ModalType } from "../store";
   import { clickOutside } from "../../utils/clickOutside";
 
   // COMPONENTS
   import KeyboardPlay from "./KeyboardPlay.svelte";
   import KeyboardEditor from "./KeyboardEditor.svelte";
-  import Pushes from "./Pushes.svelte";
-  import Merges from "./Merges.svelte";
-  import Conditions from "./Conditions.svelte";
-  import Events from "./Events.svelte";
-  import Statics from "./Statics.svelte";
-  import Palette from "./Palette.svelte";
-  import Emojistan from "./Emojistan.svelte";
 
   const components: { [key in ModalType]: any } = {
     keyboardPlay: KeyboardPlay,
     keyboardEditor: KeyboardEditor,
-    pushes: Pushes,
-    merges: Merges,
-    conditions: Conditions,
-    events: Events,
-    statics: Statics,
-    palette: Palette,
-    emojistan: Emojistan,
-    weapons: undefined,
-    throwables: undefined,
   };
+
+  // TODO: Add modals back to keyboard stuff
 </script>
 
 {#if $modal.open}

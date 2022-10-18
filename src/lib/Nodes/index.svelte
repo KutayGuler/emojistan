@@ -31,6 +31,7 @@
   }
 
   function removeSelf() {
+    dispatch("remove");
     $edgesStore = $edgesStore.filter((e) => !e.id.includes(node.id.toString()));
     $nodesStore = $nodesStore.filter((n) => n.id != node.id);
   }
@@ -41,8 +42,6 @@
   // moving local boolean specific to node selected, to change position of individual node once selected
   let moving = false;
   let moved = false;
-
-  // TODO: Integrate base component and this component
 </script>
 
 <svelte:window
@@ -100,10 +99,11 @@
     }}
   />
   <button
-    style="position: absolute; top: -16px; right: -16px; cursor: pointer;"
+    class="border-3 absolute -top-4 right-2 cursor-pointer rounded border-2"
     on:click={removeSelf}
   >
     <svg
+      class="w-6"
       xmlns="http://www.w3.org/2000/svg"
       fill="white"
       viewBox="0 0 24 24"
@@ -127,15 +127,25 @@
       <EdgeAnchor x={5} y={5} on:linkAttempt={attemptLink} />
     </svg>
   {/if}
-  <slot />
+  <div
+    style="width: {node.width}"
+    class="flex flex-col items-start justify-start rounded-lg border-2 border-solid p-4"
+  >
+    <slot />
+  </div>
 </div>
+<!-- TODO: Fix width & height problem -->
 
 <!-- TODO: Fix z-index problem -->
 <style>
+  button {
+    border-color: var(--border-color);
+    background-color: var(--background);
+  }
+
   nav {
     cursor: move;
     background: red;
-    width: 100%;
     height: 10px;
   }
 

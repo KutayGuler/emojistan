@@ -1,11 +1,11 @@
 <script lang="ts">
   // DATA
-  import { MIN_INDEX, MAX_INDEX } from "../../constants";
+  import { MIN_INDEX, MAX_INDEX } from "../constants";
   import { onDestroy } from "svelte/internal";
-  import { colorPalette, loopEvents, currentEmoji } from "../../store";
+  import { colorPalette, loopEvents, currentEmoji } from "../store";
 
   // TYPES
-  import type { SequenceItem, Loop } from "../../store";
+  import type { SequenceItem, Loop } from "../store";
 
   // COMPONENTS
   import Base from "./Base.svelte";

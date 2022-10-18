@@ -7,9 +7,6 @@
   import Editor from "../../views/Editor.svelte";
   import Rules from "../../views/Rules.svelte";
 
-  // COMPONENTS
-  import Modal from "../../components/tutorial/Modal.svelte";
-
   // DATA
   import { emojis } from "../../emojis";
   import {
@@ -102,7 +99,6 @@
   {$currentEmoji}
 </div>
 
-<Modal />
 <main class="noselect">
   <div class="playground" on:mousemove={setCursorEmoji}>
     <div id="interactive" style={interactiveStyle} bind:this={interactiveDiv}>

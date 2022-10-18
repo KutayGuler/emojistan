@@ -1,6 +1,6 @@
 <!-- <script lang="ts">
   import Base from "./Base.svelte";
-  import { weapons } from "../../store";
+  import { weapons } from "../store";
 
   export let id: string;
   export let disabled = false;
@@ -10,7 +10,7 @@
 </script>
 
 <Base
-  {disabled}
+  
   on:remove={() => weapons.remove(id)}
   --border-color="#13a10e"
   --background="#89f485"

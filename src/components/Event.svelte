@@ -1,10 +1,10 @@
 <script lang="ts">
   import Base from "./Base.svelte";
 
-  import { MIN_INDEX, MAX_INDEX } from "../../constants";
+  import { MIN_INDEX, MAX_INDEX } from "../constants";
   import { onDestroy } from "svelte/internal";
-  import { colorPalette, events, currentEmoji } from "../../store";
-  import type { SequenceItem } from "../../store";
+  import { colorPalette, events, currentEmoji } from "../store";
+  import type { SequenceItem } from "../store";
 
   export let id: string;
   export let name: string;
@@ -167,7 +167,6 @@
 </script>
 
 <Base
-  {disabled}
   on:remove={() => events.remove(id)}
   --border-color="#ffc83d"
   --background="#fff3d6"

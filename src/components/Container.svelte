@@ -2,7 +2,7 @@
   import Error from "./Error.svelte";
   import type { SvelteComponent } from "svelte";
   import { onDestroy, onMount } from "svelte";
-  import { pushes, currentEmoji } from "../../store";
+  import { pushes, currentEmoji } from "../store";
   import Base from "./Base.svelte";
 
   export let id: string;
@@ -46,15 +46,6 @@
   });
 </script>
 
-<!-- <Base
-  {disabled}
-  on:remove={() => pushes.remove(id)}
-  --border-color="#3a96dd"
-  --background="#e9f3fb"
->
-
-  <Error bind:this={error} />
-</Base> -->
 <div class="slots">
   <div class="slot" on:click={() => !disabled && updateSlot()}>
     {slot}

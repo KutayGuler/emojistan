@@ -116,13 +116,9 @@
   <!-- This container is transformed by d3zoom -->
   <div class={`Node Node-${key}`}>
     {#each $nodesStore as node}
-      {#if node.data.label}
-        <Node on:linked={linked} {node} {key}>{node.data.label}</Node>
-      {:else}
-        <Node {node} {key} on:linked={linked}>
-          <svelte:component this={node.data.component} />
-        </Node>
-      {/if}
+      <Node {node} {key} on:linked={linked}>
+        <svelte:component this={node.data.component} {...node.data.props} />
+      </Node>
     {/each}
   </div>
 </div>
