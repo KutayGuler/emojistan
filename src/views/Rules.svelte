@@ -99,6 +99,8 @@
       id: 2,
       position: { x: 390, y: 180 },
       data: { component: Event },
+      bgColor: "#fff3d6",
+      borderColor: "#ffc83d",
       width: 250,
       height: 80,
       targetPosition: "left",

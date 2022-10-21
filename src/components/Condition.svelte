@@ -57,12 +57,6 @@
   // TODO: Check if color palette is being saved on database
 </script>
 
-<!-- <Base
-  on:remove={() => conditions.remove(id)}
-  --border-color="#644292"
-  --background="#cfc0e3"
-> -->
-
 <div class="if">
   <h4>if</h4>
   <select bind:value={a} on:change={update}>
@@ -91,6 +85,7 @@
     </div>
   </div>
 {/if}
+
 <!-- <div class="then">
   <h4>then trigger</h4>
   <select bind:value={eventID} on:change={update}>
@@ -99,8 +94,6 @@
     {/each}
   </select>
 </div> -->
-
-<!-- </Base> -->
 <style>
   .if,
   .while,
