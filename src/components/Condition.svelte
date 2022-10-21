@@ -15,10 +15,8 @@
   export let b: string;
   export let _b: string | "any";
   export let eventID: string;
-  export let disabled = false;
 
   const update = () => {
-    if (disabled) return;
     let obj = generateCondition();
     conditions.update(id, obj);
 
@@ -43,7 +41,6 @@
       0 is the default eventID value, which means
       no event has been assigned for the condition
     */
-    if (disabled) return;
     if (
       [a, b].includes("") ||
       eventID == "" ||
@@ -111,7 +108,5 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    align-items: center;
-    box-sizing: border-box;
   }
 </style>

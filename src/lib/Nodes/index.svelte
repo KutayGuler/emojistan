@@ -69,6 +69,7 @@
   id="svelvet-{node.id}"
 >
   <nav
+    style:background-color={node.borderColor}
     on:touchmove={(e) => {
       if (shouldMove) {
         onTouchMove(e, node.id);
@@ -127,10 +128,7 @@
       <EdgeAnchor x={5} y={5} on:linkAttempt={attemptLink} />
     </svg>
   {/if}
-  <div
-    style="width: {node.width}"
-    class="flex flex-col items-start justify-start rounded-lg border-2 border-solid p-4"
-  >
+  <div class="flex flex-col ">
     <slot />
   </div>
 </div>
@@ -138,24 +136,25 @@
 
 <!-- TODO: Fix z-index problem -->
 <style>
-  button {
-    border-color: var(--border-color);
-    background-color: var(--background);
-  }
-
   nav {
+    /* background: red; */
+    position: absolute;
+    top: 0px;
+    width: 100%;
     cursor: move;
-    background: red;
     height: 10px;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
   }
 
   .Node {
     position: absolute;
-    display: grid;
-    user-select: none;
+    display: flex;
+    flex-direction: column;
     justify-content: center;
-    overscroll-behavior: auto;
     align-items: center;
+    user-select: none;
+    overscroll-behavior: auto;
     font-size: 14px;
     text-align: center;
     border: solid 1px black;

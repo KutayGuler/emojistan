@@ -9,7 +9,6 @@
   export let id: string;
   export let name: string;
   export let sequence: Array<SequenceItem> = [];
-  export let disabled = false;
   let onEndID = 0;
 
   const types = [
@@ -137,7 +136,6 @@
   }
 
   function update(i: number | "name") {
-    if (disabled) return;
     if (i != undefined && i != "name") {
       sequence[i] = generateSequenceItem(sequence[i].type, { ...sequence[i] });
     }
@@ -145,12 +143,10 @@
   }
 
   function updateSlot(i: number) {
-    if (disabled) return;
     sequence[i].emoji = $currentEmoji;
   }
 
   onDestroy(() => {
-    if (disabled) return;
     let newsequence = sequence.filter((item) => {
       let vals = Object.values(item);
       return !(vals.includes("") || vals.includes(undefined));
@@ -166,106 +162,102 @@
   // TODO: Polish UI
 </script>
 
-<Base
+<!-- <Base
   on:remove={() => events.remove(id)}
   --border-color="#ffc83d"
   --background="#fff3d6"
->
-  {#if disabled}
-    <h4 class="disabled -top-15 absolute bg-white py-0 px-2">EventName</h4>
-    <p>completeLevel</p>
-  {:else}
-    <input
-      class="name absolute -top-4 left-2 border border-solid pl-2"
-      type="text"
-      bind:value={name}
-      on:input={() => update("name")}
-      placeholder="Event Name"
-    />
-    {#each sequence as s, i}
-      <span>
+> -->
+<input
+  class="name absolute -top-4 left-2 border border-solid pl-2"
+  type="text"
+  bind:value={name}
+  on:input={() => update("name")}
+  placeholder="Event Name"
+/>
+{#each sequence as s, i}
+  <span>
+    <select
+      title="event type"
+      id="type"
+      bind:value={s.type}
+      on:change={() => update(i)}
+    >
+      {#each types as t}
+        <option value={t}>{t}</option>
+      {/each}
+    </select>
+    {#if s.type == "spawn"}
+      <div class="slot" on:click={() => updateSlot(i)}>{s.emoji || ""}</div>
+      at
+      <input
+        type="number"
+        bind:value={s.index}
+        min={MIN_INDEX}
+        max={MAX_INDEX}
+        on:change={() => update(i)}
+      />
+    {:else if s.type == "equipItem"}
+      <div class="slot" on:click={() => updateSlot(i)}>{s.emoji || ""}</div>
+    {:else if s.type == "destroy"}
+      <input
+        type="number"
+        bind:value={s.index}
+        min={MIN_INDEX}
+        max={MAX_INDEX}
+        on:change={() => update(i)}
+      />
+    {:else if s.type == "wait"}
+      <input
+        type="number"
+        bind:value={s.duration}
+        min={MIN_DURATION}
+        max={MAX_DURATION}
+        on:change={() => update(i)}
+      /> ms
+    {:else if s.type == "fireProjectile"}
+      <div class="slot" on:click={() => updateSlot(i)}>{s.emoji || ""}</div>
+      <!-- Add direction and origin -->
+      <input
+        type="number"
+        bind:value={s.duration}
+        min={MIN_DURATION}
+        max={MAX_DURATION}
+        on:change={() => update(i)}
+      /> ms
+    {:else if s.type == "setBackgroundOf" || s.type == "removeBackgroundOf"}
+      <input
+        type="number"
+        bind:value={s.index}
+        min={MIN_INDEX}
+        max={MAX_INDEX}
+        on:change={() => update(i)}
+      />
+      {#if s.type == "setBackgroundOf"}
+        to
         <select
-          title="event type"
-          id="type"
-          bind:value={s.type}
+          title="color"
+          bind:value={s.background}
+          style:background={s.background}
           on:change={() => update(i)}
         >
-          {#each types as t}
-            <option value={t}>{t}</option>
+          {#each [...$colorPalette] as color}
+            <option value={color} style:background={color} />
           {/each}
         </select>
-        {#if s.type == "spawn"}
-          <div class="slot" on:click={() => updateSlot(i)}>{s.emoji || ""}</div>
-          at
-          <input
-            type="number"
-            bind:value={s.index}
-            min={MIN_INDEX}
-            max={MAX_INDEX}
-            on:change={() => update(i)}
-          />
-        {:else if s.type == "equipItem"}
-          <div class="slot" on:click={() => updateSlot(i)}>{s.emoji || ""}</div>
-        {:else if s.type == "destroy"}
-          <input
-            type="number"
-            bind:value={s.index}
-            min={MIN_INDEX}
-            max={MAX_INDEX}
-            on:change={() => update(i)}
-          />
-        {:else if s.type == "wait"}
-          <input
-            type="number"
-            bind:value={s.duration}
-            min={MIN_DURATION}
-            max={MAX_DURATION}
-            on:change={() => update(i)}
-          /> ms
-        {:else if s.type == "fireProjectile"}
-          <div class="slot" on:click={() => updateSlot(i)}>{s.emoji || ""}</div>
-          <!-- Add direction and origin -->
-          <input
-            type="number"
-            bind:value={s.duration}
-            min={MIN_DURATION}
-            max={MAX_DURATION}
-            on:change={() => update(i)}
-          /> ms
-        {:else if s.type == "setBackgroundOf" || s.type == "removeBackgroundOf"}
-          <input
-            type="number"
-            bind:value={s.index}
-            min={MIN_INDEX}
-            max={MAX_INDEX}
-            on:change={() => update(i)}
-          />
-          {#if s.type == "setBackgroundOf"}
-            to
-            <select
-              title="color"
-              bind:value={s.background}
-              style:background={s.background}
-              on:change={() => update(i)}
-            >
-              {#each [...$colorPalette] as color}
-                <option value={color} style:background={color} />
-              {/each}
-            </select>
-          {/if}
-        {/if}
-        <button id="remove" on:click={() => removeFromSequence(i)}>❌</button>
-      </span>
+      {/if}
+    {/if}
+    <button id="remove" on:click={() => removeFromSequence(i)}>❌</button>
+  </span>
+{/each}
+<label>
+  <select title="event type" bind:value={type}>
+    {#each types as t}
+      <option value={t}>{t}</option>
     {/each}
-    <label>
-      <select title="event type" bind:value={type}>
-        {#each types as t}
-          <option value={t}>{t}</option>
-        {/each}
-      </select>
-      <button on:click={addToSequence}>➕</button>
-    </label>
-    <!-- <label>
+  </select>
+  <button on:click={addToSequence}>➕</button>
+</label>
+<!-- <label>
       <strong>Trigger on complete</strong>
       <input type="checkbox" bind:checked={trigger} />
       {#if trigger}
@@ -278,9 +270,8 @@
         </select>
       {/if}
     </label> -->
-  {/if}
-</Base>
 
+<!-- </Base> -->
 <style>
   .name {
     border-color: var(--border-color);
