@@ -11,6 +11,7 @@ Known bug:
 Inspired from: Context Menu https://svelte.dev/repl/3a33725c3adb4f57b46b597f9dade0c1?version=3.25.0
 -->
 <script>
+  import Condition from "./components/Condition.svelte";
   import { findOrCreateStore, contextMenu } from "$lib/stores/store";
 
   export let key;
@@ -61,19 +62,43 @@ Inspired from: Context Menu https://svelte.dev/repl/3a33725c3adb4f57b46b597f9dad
   const { nodesStore } = svelvetStore;
 
   function spawnIf() {
-    let ids = $nodesStore.map((n) => n.id);
+    let id = Math.max(...$nodesStore.map((n) => n.id)) + 1;
     $nodesStore.push({
-      id: Math.max(...ids) + 1,
-      bgColor: "white",
-      position: { x: 100, y: 100 },
-      width: 100,
-      height: 100,
-      data: { label: "If statement" },
+      id,
+      position: { x: 190, y: 80 },
+      data: {
+        component: Condition,
+        props: {
+          id: "",
+          a: "playerBackground",
+          b: "#ff00ff",
+          _b: "any",
+          eventID: "123456",
+        },
+      },
+      bgColor: "#cfc0e3",
+      borderColor: "#644292",
+      width: 250,
+      height: 120,
+      sourcePosition: "right",
     });
     $nodesStore = $nodesStore;
   }
 
-  function spawnEvent() {}
+  function spawnEvent() {
+    let id = Math.max(...$nodesStore.map((n) => n.id)) + 1;
+    $nodesStore.push({
+      id,
+      position: { x: 390, y: 180 },
+      data: { component: Event },
+      bgColor: "#fff3d6",
+      borderColor: "#ffc83d",
+      width: 250,
+      height: 80,
+      targetPosition: "left",
+    });
+    $nodesStore = $nodesStore;
+  }
   function spawnLoopEvent() {}
 
   function spawnEmojiContainer() {}

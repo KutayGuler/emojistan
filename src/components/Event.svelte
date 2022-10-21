@@ -5,7 +5,6 @@
   import type { SequenceItem } from "../store";
 
   export let id: string;
-  export let name: string;
   export let sequence: Array<SequenceItem> = [];
   let onEndID = 0;
 
@@ -119,7 +118,7 @@
 
   function addToSequence() {
     sequence = [...sequence, generateSequenceItem(type)];
-    events.update(id, { name, sequence });
+    events.update(id, { sequence });
     [type, duration, index, background] = [types[0], 0, 0, ""];
   }
 
@@ -129,7 +128,7 @@
     if (sequence.length == 0) {
       events.remove(id);
     } else {
-      events.update(id, { name, sequence });
+      events.update(id, { sequence });
     }
   }
 
@@ -137,7 +136,7 @@
     if (i != undefined) {
       sequence[i] = generateSequenceItem(sequence[i].type, { ...sequence[i] });
     }
-    if (type) events.update(id, { name, sequence });
+    if (type) events.update(id, { sequence });
   }
 
   function updateSlot(i: number) {
@@ -153,7 +152,7 @@
     if (sequence.length == 0) {
       events.remove(id);
     } else if (newsequence.length < sequence.length) {
-      events.update(id, { name, sequence: newsequence });
+      events.update(id, { sequence: newsequence });
     }
   });
 

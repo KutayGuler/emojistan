@@ -28,7 +28,6 @@ export interface Orderable {
 }
 
 export interface TEvent extends Orderable {
-  name: string;
   sequence: Array<SequenceItem>;
   loop?: Loop;
 }

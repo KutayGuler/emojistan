@@ -111,10 +111,8 @@ body {
 }
 
 .slot {
-  --size: clamp(12px, 15%, 48px);
-  width: var(--size);
-  height: var(--size);
-  aspect-ratio: 1;
+  width: 48px;
+  height: 24px;
   background-color: var(--primary);
   border: 2px solid black;
   display: flex;

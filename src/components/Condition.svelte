@@ -64,6 +64,9 @@
       <option value={_prop}>{_prop}</option>
     {/each}
   </select>
+  {#if a == "playerInteractsWith"}
+    <div class="slot" on:click={() => (b = $currentEmoji)}>{b}</div>
+  {/if}
 </div>
 <div class="is">
   {#if a == "playerBackground"}
@@ -73,8 +76,6 @@
         <option value={color} style:background={color} />
       {/each}
     </select>
-  {:else if a == "playerInteractsWith"}
-    <div class="slot" on:click={() => (b = $currentEmoji)}>{b}</div>
   {/if}
 </div>
 {#if a == "playerInteractsWith"}
