@@ -1,6 +1,4 @@
 <script lang="ts">
-  import Base from "./Base.svelte";
-
   import { MIN_INDEX, MAX_INDEX } from "../constants";
   import { onDestroy } from "svelte/internal";
   import { colorPalette, events, currentEmoji } from "../store";
@@ -135,8 +133,8 @@
     }
   }
 
-  function update(i: number | "name") {
-    if (i != undefined && i != "name") {
+  function update(i: number) {
+    if (i != undefined) {
       sequence[i] = generateSequenceItem(sequence[i].type, { ...sequence[i] });
     }
     if (type) events.update(id, { name, sequence });
@@ -162,18 +160,6 @@
   // TODO: Polish UI
 </script>
 
-<!-- <Base
-  on:remove={() => events.remove(id)}
-  --border-color="#ffc83d"
-  --background="#fff3d6"
-> -->
-<input
-  class="name absolute -top-4 left-2 border border-solid pl-2"
-  type="text"
-  bind:value={name}
-  on:input={() => update("name")}
-  placeholder="Event Name"
-/>
 {#each sequence as s, i}
   <span>
     <select
@@ -257,6 +243,7 @@
   </select>
   <button on:click={addToSequence}>➕</button>
 </label>
+
 <!-- <label>
       <strong>Trigger on complete</strong>
       <input type="checkbox" bind:checked={trigger} />
@@ -270,17 +257,7 @@
         </select>
       {/if}
     </label> -->
-
-<!-- </Base> -->
 <style>
-  .name {
-    border-color: var(--border-color);
-  }
-
-  .disabled-name {
-    border-color: var(--border-color);
-  }
-
   span {
     display: flex;
     flex-direction: row;
