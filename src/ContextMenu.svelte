@@ -12,6 +12,7 @@ Inspired from: Context Menu https://svelte.dev/repl/3a33725c3adb4f57b46b597f9dad
 -->
 <script>
   import Condition from "./components/Condition.svelte";
+  import { conditions } from "./store";
   import { findOrCreateStore, contextMenu } from "$lib/stores/store";
 
   export let key;
@@ -62,20 +63,20 @@ Inspired from: Context Menu https://svelte.dev/repl/3a33725c3adb4f57b46b597f9dad
   const { nodesStore } = svelvetStore;
 
   function spawnIf() {
+    console.log($nodesStore);
     let id = Math.max(...$nodesStore.map((n) => n.id)) + 1;
+    conditions.add(id, {
+      a: "playerBackground",
+      b: "",
+      _b: "any",
+      eventID: "",
+    });
+    console.log($conditions);
+
     $nodesStore.push({
       id,
       position: { x: 190, y: 80 },
-      data: {
-        component: Condition,
-        props: {
-          id: "",
-          a: "playerBackground",
-          b: "#ff00ff",
-          _b: "any",
-          eventID: "123456",
-        },
-      },
+      component: Condition,
       bgColor: "#cfc0e3",
       borderColor: "#644292",
       width: 250,
@@ -83,6 +84,7 @@ Inspired from: Context Menu https://svelte.dev/repl/3a33725c3adb4f57b46b597f9dad
       sourcePosition: "right",
     });
     $nodesStore = $nodesStore;
+    console.log($conditions, $nodesStore);
   }
 
   function spawnEvent() {

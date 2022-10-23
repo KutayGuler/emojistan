@@ -79,16 +79,7 @@
     {
       id: 1,
       position: { x: 190, y: 80 },
-      data: {
-        component: Condition,
-        props: {
-          id: "",
-          a: "playerBackground",
-          b: "#ff00ff",
-          _b: "any",
-          eventID: "123456",
-        },
-      },
+      component: Condition,
       bgColor: "#cfc0e3",
       borderColor: "#644292",
       width: 250,
@@ -98,7 +89,7 @@
     {
       id: 2,
       position: { x: 390, y: 180 },
-      data: { component: Event },
+      component: Event,
       bgColor: "#fff3d6",
       borderColor: "#ffc83d",
       width: 250,
@@ -108,7 +99,7 @@
     {
       id: 3,
       position: { x: 390, y: 50 },
-      data: { component: Event },
+      component: Event,
       width: 250,
       height: 80,
       targetPosition: "left",

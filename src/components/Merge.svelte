@@ -5,7 +5,7 @@
   import { merges, currentEmoji } from "../store";
   import Base from "./Base.svelte";
 
-  export let id: string;
+  export let id: number;
   export let rule: Array<string> = [];
   export let disabled = false;
 

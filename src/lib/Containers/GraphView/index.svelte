@@ -117,7 +117,7 @@
   <div class={`Node Node-${key}`}>
     {#each $nodesStore as node}
       <Node {node} {key} on:linked={linked}>
-        <svelte:component this={node.data.component} {...node.data.props} />
+        <svelte:component this={node.component} id={node.id} />
       </Node>
     {/each}
   </div>

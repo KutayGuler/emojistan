@@ -1,20 +1,33 @@
 <script lang="ts">
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import {
     colorPalette,
     events,
     loopEvents,
     conditions,
     currentEmoji,
+    type TCondition,
   } from "../store";
 
   const props = ["playerBackground", "playerInteractsWith"];
 
-  export let id: string;
-  export let a: string;
-  export let b: string;
-  export let _b: string | "any";
-  export let eventID: string;
+  export let id: number;
+  let a: string;
+  let b: string;
+  let _b: string | "any";
+  let eventID: string;
+
+  // TODO: Reduce amount of relations
+
+  onMount(() => {
+    console.log(id);
+    console.log(4);
+    console.log($conditions.get(id));
+    let obj = $conditions.get(id);
+    if (!obj) return;
+    ({ a, b, _b, eventID } = obj as TCondition);
+    console.log(a, b, _b, eventID);
+  });
 
   const update = () => {
     let obj = generateCondition();

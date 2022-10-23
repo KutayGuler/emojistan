@@ -23,33 +23,29 @@ export interface Loop {
   reverse: boolean;
 }
 
-export interface Orderable {
-  order?: number;
-}
-
-export interface TEvent extends Orderable {
+export interface TEvent {
   sequence: Array<SequenceItem>;
   loop?: Loop;
 }
 
-export interface TLoopEvent extends Orderable {
+export interface TLoopEvent {
   name: string;
   sequence: Array<SequenceItem>;
   loop: Loop;
 }
 
-export interface TCondition extends Orderable {
+export interface TCondition {
   a: string;
   b: string;
   _b: string | "any";
   eventID: string;
 }
 
-export interface TPush extends Orderable {
+export interface TPush {
   rule: Array<string>;
 }
 
-export interface TCollision extends Orderable {
+export interface TCollision {
   rule: Array<string>;
 }
 
@@ -70,14 +66,14 @@ export interface Emoji {
 }
 
 function createMapStore<T>(name: string) {
-  const { set, subscribe, update } = writable(new Map<string, T>());
+  const { set, subscribe, update } = writable(new Map<number, T>());
 
   return {
     set,
     subscribe,
     useStorage: (id: string) => {
       const val = JSON.parse(localStorage.getItem(id + "_" + name));
-      set(new Map(val) || new Map<string, T>());
+      set(new Map(val) || new Map<number, T>());
       subscribe((state) => {
         localStorage.setItem(
           id + "_" + name,
@@ -85,25 +81,23 @@ function createMapStore<T>(name: string) {
         );
       });
     },
-    add: (value: T) =>
-      update((state) => {
-        Object.assign(value, { order: state.size + 1 });
-        let id = Date.now().toString().slice(7);
-        state.set(id, value);
-        return state;
-      }),
-    update: (id: string, value: T) =>
+    add: (id: number, value: T) =>
       update((state) => {
         state.set(id, value);
         return state;
       }),
-    updateValue: (id: string, key: string, value: T) =>
+    update: (id: number, value: T) =>
+      update((state) => {
+        state.set(id, value);
+        return state;
+      }),
+    updateValue: (id: number, key: string, value: T) =>
       update((state) => {
         // @ts-expect-error
         state.get(id)[key] = value;
         return state;
       }),
-    remove: (id: string) =>
+    remove: (id: number) =>
       update((state) => {
         state.delete(id);
         return state;
