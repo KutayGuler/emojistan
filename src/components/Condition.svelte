@@ -17,8 +17,6 @@
   let _b: string | "any";
   let eventID: string;
 
-  // TODO: Reduce amount of relations
-
   onMount(() => {
     console.log(id);
     console.log(4);

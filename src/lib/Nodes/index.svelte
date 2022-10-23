@@ -118,7 +118,9 @@
       />
     </svg>
   </button>
-  {#if !$edgesStore.some((edge) => edge.source == node.id || edge.target == node.id)}
+  <!-- TODO: Only make it appear when Edge Editing is active -->
+  <!-- TODO: Standardize the position of edge anchors on each component -->
+  <!-- {#if !$edgesStore.some((edge) => edge.source == node.id || edge.target == node.id)}
     <svg
       fill="transparent"
       style="position: absolute; left: {node.width - 10}px; top: {node.height /
@@ -127,7 +129,7 @@
     >
       <EdgeAnchor x={5} y={5} on:linkAttempt={attemptLink} />
     </svg>
-  {/if}
+  {/if} -->
   <div class="flex flex-col ">
     <slot />
   </div>
