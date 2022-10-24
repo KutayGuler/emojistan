@@ -85,6 +85,7 @@
       $nodeSelected = false;
     }}
     on:mousedown={(e) => {
+      console.log(e.button);
       e.preventDefault();
       moving = true;
       $nodeIdSelected = node.id;
@@ -100,15 +101,16 @@
     }}
   />
   <button
-    class="border-3 absolute -top-4 right-2 cursor-pointer rounded border-2"
+    style="border-color: {node.borderColor}"
+    class="absolute -top-1 right-1 cursor-pointer rounded border-2 bg-white"
     on:click={removeSelf}
   >
     <svg
-      class="w-6"
+      class="w-3"
       xmlns="http://www.w3.org/2000/svg"
       fill="white"
       viewBox="0 0 24 24"
-      stroke="currentColor"
+      stroke="black"
       stroke-width="2"
     >
       <path

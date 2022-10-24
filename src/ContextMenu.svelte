@@ -26,6 +26,7 @@ Inspired from: Context Menu https://svelte.dev/repl/3a33725c3adb4f57b46b597f9dad
   import Event from "./components/Event.svelte";
   import LoopEvent from "./components/LoopEvent.svelte";
   import Palette from "./components/Palette.svelte";
+  import Container from "./components/Container.svelte";
 
   export let key;
 
@@ -109,7 +110,26 @@ Inspired from: Context Menu https://svelte.dev/repl/3a33725c3adb4f57b46b597f9dad
     $nodesStore = $nodesStore; // NECESSARY FOR REACTIVITY
   }
 
-  function spawnEmojiContainer() {}
+  function spawnEmojiContainer() {
+    let id = Math.max(...$nodesStore.map((n) => n.id)) + 1;
+    let obj = {
+      id,
+      component: Container,
+      position: { x: 190, y: 80 },
+      width: 50,
+      height: 50,
+      borderColor: "#40b3ff",
+    };
+
+    // Object.assign(
+    //   obj,
+    //   receiver ? { targetPosition: "left" } : { sourcePosition: "right" }
+    // );
+
+    $nodesStore.push(obj);
+    $nodesStore = $nodesStore; // NECESSARY FOR REACTIVITY
+    console.log($nodesStore);
+  }
   function spawnDoubleEmojiContainer() {}
 
   let menuItems = [
