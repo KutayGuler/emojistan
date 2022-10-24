@@ -152,60 +152,6 @@
       currentItem = "";
       items = items;
     },
-    rotateInteractedItem: ({ deg }: { deg: number }) => {
-      if (!items.get(adc)) return;
-      let style = items.get(adc).style;
-      if (!style) {
-        style = `transform: rotate(${deg}deg);`;
-      } else if (!style.includes("transform")) {
-        style = `transform: rotate(${deg}deg);`;
-      } else if (style.includes("rotate")) {
-        let [rgx, rgx2] = [/rotate\(-?\d+deg\)/g, /-?\d+/g];
-        let str = style.match(rgx)[0];
-        style = style.replace(
-          str,
-          `rotate(${parseInt(str.match(rgx2)) + deg}deg)`
-        );
-      }
-
-      items.get(adc).style = style;
-      items = items;
-    },
-    // fireProjectile: ({
-    //   emoji,
-    //   duration,
-    // }: {
-    //   emoji: string;
-    //   duration: number;
-    // }) => {
-    //   let key = dirKey;
-    //   let index = adc;
-    //   items.set(index, { emoji });
-    //   items = items;
-    //   let interval = setInterval(() => {
-    //     let deleted = items.delete(index);
-
-    //     if (!deleted) {
-    //       items = items;
-    //       clearInterval(interval);
-    //       return;
-    //     }
-    //     let operation = calcOperation(key, index, true);
-    //     if (operation == 0 || items.get(index + operation)) {
-    //       // hit by projectile
-    //       // push, merge, bump
-    //       items.delete(index);
-    //       items = items;
-    //       clearInterval(interval);
-    //       return;
-    //     }
-
-    //     index += operation;
-    //     items.set(index, { emoji });
-    //     items = items;
-    //   }, duration);
-    //   intervals.push(interval);
-    // },
     spawn: (
       { index, emoji }: { index: number; emoji: string },
       _start?: number
