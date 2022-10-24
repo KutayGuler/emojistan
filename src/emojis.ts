@@ -1228,24 +1228,8 @@ export const emojis: Emojis = {
       name: "person in tuxedo",
     },
     {
-      emoji: "🤵‍♂️",
-      name: "man in tuxedo",
-    },
-    {
-      emoji: "🤵‍♀️",
-      name: "woman in tuxedo",
-    },
-    {
       emoji: "👰",
       name: "person with veil",
-    },
-    {
-      emoji: "👰‍♂️",
-      name: "man with veil",
-    },
-    {
-      emoji: "👰‍♀️",
-      name: "woman with veil",
     },
     {
       emoji: "🤰",

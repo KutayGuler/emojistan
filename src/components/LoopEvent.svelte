@@ -1,23 +1,27 @@
 <script lang="ts">
   // DATA
   import { MIN_INDEX, MAX_INDEX } from "../constants";
-  import { onDestroy } from "svelte/internal";
-  import { colorPalette, loopEvents, currentEmoji } from "../store";
+  import { onDestroy, onMount } from "svelte/internal";
+  import {
+    colorPalette,
+    loopEvents,
+    currentEmoji,
+    type TLoopEvent,
+  } from "../store";
 
   // TYPES
   import type { SequenceItem, Loop } from "../store";
 
-  // COMPONENTS
-  import Base from "./Base.svelte";
-  import Error from "./Error.svelte";
-
-  export let disabled = false;
-  export let id: string;
-  export let name: string;
-  export let sequence: Array<SequenceItem> = [];
-  export let loop: Loop;
-
-  let error: any;
+  export let id: number;
+  let sequence: Array<SequenceItem> = [];
+  let loop: Loop = {
+    start: 0,
+    end: 16,
+    iterationNumber: 1,
+    iterationType: "increment",
+    timeGap: 50,
+    reverse: false,
+  };
 
   const types = ["setBackgroundOf", "removeBackgroundOf", "spawn", "destroy"];
 
@@ -30,6 +34,12 @@
   let index = 0;
   let background = "";
   let emoji = "";
+
+  onMount(() => {
+    let obj = $loopEvents.get(id);
+    if (!obj) return;
+    ({ sequence, loop } = obj as TLoopEvent);
+  });
 
   function validateInput(input: number, min: number, max: number) {
     if (input == undefined) return input;
@@ -49,14 +59,14 @@
         loop.start = 16;
         loop.end = 0;
       }
-      error.display("starting index and ending index cannot be the same");
+      // error.display("starting index and ending index cannot be the same");
     }
 
     if (loop.iterationType == "increment") {
       if (loop.start > loop.end) {
-        error.display(
-          "starting index cannot be bigger than ending index on increment"
-        );
+        // error.display(
+        //   "starting index cannot be bigger than ending index on increment"
+        // );
         loop.start = 0;
         loop.end = 16;
       }
@@ -66,9 +76,9 @@
       }
     } else if (loop.iterationType == "decrement") {
       if (loop.end > loop.start) {
-        error.display(
-          "ending index cannot be bigger than starting index on decrement"
-        );
+        // error.display(
+        //   "ending index cannot be bigger than starting index on decrement"
+        // );
         loop.start = 16;
         loop.end = 0;
       }
@@ -95,7 +105,7 @@
       loop.iterationNumber = MAX_ITERATION;
     }
 
-    loopEvents.update(id, { name, sequence, loop });
+    loopEvents.update(id, { sequence, loop });
   }
 
   function generateSequenceItem(_type: string, vals?: any) {
@@ -142,7 +152,7 @@
   function addToSequence() {
     sequence = [...sequence, generateSequenceItem(type)];
     validateLoop();
-    loopEvents.update(id, { name, sequence, loop });
+    loopEvents.update(id, { sequence, loop });
     [type, index, background] = [types[0], 0, ""];
   }
 
@@ -152,7 +162,7 @@
     if (sequence.length == 0) {
       loopEvents.remove(id);
     } else {
-      loopEvents.update(id, { name, sequence, loop });
+      loopEvents.update(id, { sequence, loop });
     }
   }
 
@@ -170,8 +180,6 @@
   }
 
   onDestroy(() => {
-    if (disabled) return;
-
     let newsequence = sequence.filter((item) => {
       let vals = Object.values(item);
       return !(vals.includes("") || vals.includes(undefined));
@@ -180,121 +188,108 @@
     if (sequence.length == 0) {
       loopEvents.remove(id);
     } else if (newsequence.length < sequence.length) {
-      loopEvents.update(id, { name, loop, sequence: newsequence });
+      loopEvents.update(id, { loop, sequence: newsequence });
     }
   });
 
   // TODO: Polish UI
 </script>
 
-<Base
-  on:remove={() => loopEvents.remove(id)}
-  --border-color="#ffc83d"
-  --background="#fff3d6"
->
+<label>
+  start <strong>i</strong> from
   <input
-    type="text"
-    bind:value={name}
-    on:input={() => update("name")}
-    placeholder="Loop Event Name"
+    type="number"
+    bind:value={loop.start}
+    min={MIN_INDEX}
+    max={MAX_INDEX}
+    on:input={() => update()}
   />
-  <label>
-    start <strong>i</strong> from
-    <input
-      type="number"
-      bind:value={loop.start}
-      min={MIN_INDEX}
-      max={MAX_INDEX}
-      on:input={() => update()}
-    />
-  </label>
-  <div class="step">
-    {#each sequence as q, i}
-      <div>
-        <select
-          title="event type"
-          id="type"
-          bind:value={q.type}
-          on:input={() => update(i)}
-        >
-          {#each types as t}
-            <option value={t}>{t}</option>
-          {/each}
-        </select>
-        {#if q.type == "spawn"}
-          <div class="slot" on:click={() => updateSlot(i)}>{q.emoji || ""}</div>
-          at<strong>i</strong>
-        {:else if q.type == "destroy"}
-          <p>destroy</p>
-        {:else if q.type == "removeBackgroundOf"}
-          <p>background</p>
-        {:else if q.type == "setBackgroundOf"}
-          <strong>i</strong> to
-          <select
-            title="color"
-            bind:value={q.background}
-            style:background={q.background}
-            on:input={() => update(i)}
-          >
-            {#each [...$colorPalette] as color}
-              <option value={color} style:background={color} />
-            {/each}
-          </select>
-        {/if}
-        <button id="remove" on:click={() => removeFromSequence(i)}>❌</button>
-      </div>
-    {/each}
-    <div class="inline">
-      <select title="event type" bind:value={type}>
+</label>
+<div class="step">
+  {#each sequence as q, i}
+    <div>
+      <select
+        title="event type"
+        id="type"
+        bind:value={q.type}
+        on:input={() => update(i)}
+      >
         {#each types as t}
           <option value={t}>{t}</option>
         {/each}
       </select>
-      <button on:click={addToSequence}>➕</button>
+      {#if q.type == "spawn"}
+        <div class="slot" on:click={() => updateSlot(i)}>{q.emoji || ""}</div>
+        at<strong>i</strong>
+      {:else if q.type == "destroy"}
+        <p>destroy</p>
+      {:else if q.type == "removeBackgroundOf"}
+        <p>background</p>
+      {:else if q.type == "setBackgroundOf"}
+        <strong>i</strong> to
+        <select
+          title="color"
+          bind:value={q.background}
+          style:background={q.background}
+          on:input={() => update(i)}
+        >
+          {#each [...$colorPalette] as color}
+            <option value={color} style:background={color} />
+          {/each}
+        </select>
+      {/if}
+      <button id="remove" on:click={() => removeFromSequence(i)}>❌</button>
     </div>
-    <br />
-    <div class="inline">
-      <select
-        title="iteration type"
-        bind:value={loop.iterationType}
-        on:change={() => update()}
-      >
-        {#each ["increment", "decrement"] as operation}
-          <option value={operation}>{operation}</option>
-        {/each}
-      </select>
-      <strong>i by</strong>
-      <input
-        type="number"
-        bind:value={loop.iterationNumber}
-        min={MIN_ITERATION}
-        max={MAX_ITERATION}
-        on:input={() => update()}
-      />
-    </div>
-    <br />
-    <div class="inline">
-      Wait <input
-        type="number"
-        bind:value={loop.timeGap}
-        on:change={() => update()}
-        min={MIN_DURATION}
-        max={MAX_DURATION}
-      /> ms
-    </div>
+  {/each}
+  <div class="inline">
+    <select title="event type" bind:value={type}>
+      {#each types as t}
+        <option value={t}>{t}</option>
+      {/each}
+    </select>
+    <button on:click={addToSequence}>➕</button>
   </div>
-  <label>
-    end <strong>i</strong> at
+  <br />
+  <div class="inline">
+    <select
+      title="iteration type"
+      bind:value={loop.iterationType}
+      on:change={() => update()}
+    >
+      {#each ["increment", "decrement"] as operation}
+        <option value={operation}>{operation}</option>
+      {/each}
+    </select>
+    <strong>i by</strong>
     <input
       type="number"
-      bind:value={loop.end}
-      min={MIN_INDEX}
-      max={MAX_INDEX}
+      bind:value={loop.iterationNumber}
+      min={MIN_ITERATION}
+      max={MAX_ITERATION}
       on:input={() => update()}
     />
-  </label>
-  <Error bind:this={error} />
-</Base>
+  </div>
+  <br />
+  <div class="inline">
+    Wait <input
+      type="number"
+      bind:value={loop.timeGap}
+      on:change={() => update()}
+      min={MIN_DURATION}
+      max={MAX_DURATION}
+    /> ms
+  </div>
+</div>
+<label>
+  end <strong>i</strong> at
+  <input
+    type="number"
+    bind:value={loop.end}
+    min={MIN_INDEX}
+    max={MAX_INDEX}
+    on:input={() => update()}
+  />
+</label>
 
 <style>
   .inline {

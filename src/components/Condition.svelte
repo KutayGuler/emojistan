@@ -15,16 +15,12 @@
   let a: string;
   let b: string;
   let _b: string | "any";
-  let eventID: string;
+  let eventID: number;
 
   onMount(() => {
-    console.log(id);
-    console.log(4);
-    console.log($conditions.get(id));
     let obj = $conditions.get(id);
     if (!obj) return;
     ({ a, b, _b, eventID } = obj as TCondition);
-    console.log(a, b, _b, eventID);
   });
 
   const update = () => {
@@ -54,7 +50,7 @@
     */
     if (
       [a, b].includes("") ||
-      eventID == "" ||
+      eventID == undefined ||
       $events.get(eventID) == undefined ||
       $loopEvents.get(eventID) == undefined ||
       $events.get(eventID)?.sequence.length == 0 ||

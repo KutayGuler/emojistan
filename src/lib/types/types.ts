@@ -1,8 +1,9 @@
-import type { XYPosition, Position } from './utils';
-
+import type { XYPosition, Position } from "./utils";
+import type { SvelteComponent } from "svelte";
 
 export interface Node<T = any> {
   id: number;
+  component: SvelteComponent;
   position: XYPosition;
   data: T;
   width: number;
@@ -15,8 +16,8 @@ export interface Node<T = any> {
   clickCallback?: Function;
   image?: boolean;
   src?: string;
-  sourcePosition?: 'left' | 'right' | 'top' | 'bottom';
-  targetPosition?: 'left' | 'right' | 'top' | 'bottom';
+  sourcePosition?: "left" | "right" | "top" | "bottom";
+  targetPosition?: "left" | "right" | "top" | "bottom";
 }
 
 export interface Edge {
@@ -56,4 +57,4 @@ export interface EdgeTextProps {
   centerY: number;
 }
 
-export type HandleType = 'source' | 'target';
+export type HandleType = "source" | "target";

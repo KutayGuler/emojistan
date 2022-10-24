@@ -10,10 +10,22 @@ Known bug:
 
 Inspired from: Context Menu https://svelte.dev/repl/3a33725c3adb4f57b46b597f9dade0c1?version=3.25.0
 -->
-<script>
+<script lang="ts">
   import Condition from "./components/Condition.svelte";
-  import { conditions } from "./store";
+  import {
+    conditions,
+    events,
+    loopEvents,
+    colorPalette,
+    type TCondition,
+    type TEvent,
+    type TLoopEvent,
+  } from "./store";
   import { findOrCreateStore, contextMenu } from "$lib/stores/store";
+  import type { SvelteComponent } from "svelte";
+  import Event from "./components/Event.svelte";
+  import LoopEvent from "./components/LoopEvent.svelte";
+  import Palette from "./components/Palette.svelte";
 
   export let key;
 
@@ -62,98 +74,100 @@ Inspired from: Context Menu https://svelte.dev/repl/3a33725c3adb4f57b46b597f9dad
   const svelvetStore = findOrCreateStore(key);
   const { nodesStore } = svelvetStore;
 
-  function spawnIf() {
-    console.log($nodesStore);
-    let id = Math.max(...$nodesStore.map((n) => n.id)) + 1;
-    conditions.add(id, {
-      a: "playerBackground",
-      b: "",
-      _b: "any",
-      eventID: "",
-    });
-    console.log($conditions);
+  const colors = {
+    condition: ["#cfc0e3", "#644292"],
+    event: ["#f6fafd", "#ffc83d"],
+  };
 
-    $nodesStore.push({
+  function spawn<T>(
+    name: string,
+    component: SvelteComponent,
+    store: any,
+    value: T,
+    receiver = false
+  ) {
+    let id = Math.max(...$nodesStore.map((n) => n.id)) + 1;
+    let obj = {
       id,
+      component,
       position: { x: 190, y: 80 },
-      component: Condition,
-      bgColor: "#cfc0e3",
-      borderColor: "#644292",
       width: 250,
       height: 120,
-      sourcePosition: "right",
-    });
-    $nodesStore = $nodesStore;
-    console.log($conditions, $nodesStore);
-  }
+    };
 
-  function spawnEvent() {
-    let id = Math.max(...$nodesStore.map((n) => n.id)) + 1;
-    $nodesStore.push({
-      id,
-      position: { x: 390, y: 180 },
-      data: { component: Event },
-      bgColor: "#fff3d6",
-      borderColor: "#ffc83d",
-      width: 250,
-      height: 80,
-      targetPosition: "left",
+    Object.assign(
+      obj,
+      receiver ? { targetPosition: "left" } : { sourcePosition: "right" }
+    );
+    Object.assign(obj, {
+      bgColor: colors[name][0],
+      borderColor: colors[name][1],
     });
-    $nodesStore = $nodesStore;
+
+    store.add(id, value);
+    $nodesStore.push(obj);
+    $nodesStore = $nodesStore; // NECESSARY FOR REACTIVITY
   }
-  function spawnLoopEvent() {}
 
   function spawnEmojiContainer() {}
   function spawnDoubleEmojiContainer() {}
 
-  function spawnStatics() {
-    // can only be spawned once
-  }
-
-  function spawnPalette() {
-    // can only be spawned once
-  }
-
   let menuItems = [
     {
-      name: "spawnEmojiContainer",
+      name: "Emoji Container",
       onClick: spawnEmojiContainer,
-      displayText: "Emoji Container",
     },
     {
-      name: "spawnEmojiContainer",
+      name: "Double Emoji Container",
       onClick: spawnDoubleEmojiContainer,
-      displayText: "Double Emoji Container",
     },
     {
-      name: "spawnIf",
-      onClick: spawnIf,
-      displayText: "Condition",
+      name: "Condition",
+      onClick: () =>
+        spawn<TCondition>("condition", Condition, conditions, {
+          a: "playerBackground",
+          b: "",
+          _b: "any",
+          eventID: "",
+        }),
     },
     {
-      name: "spawnEvent",
-      onClick: spawnEvent,
-      displayText: "Event",
+      name: "Event",
+      onClick: () =>
+        spawn<TEvent>(
+          "event",
+          Event,
+          events,
+          {
+            sequence: [],
+          },
+          true
+        ),
     },
     {
-      name: "spawnEvent",
-      onClick: spawnEvent,
-      displayText: "Loop Event",
-    },
-    {
-      name: "hr",
-    },
-    {
-      name: "spawnStatics",
-      onClick: spawnStatics,
-      displayText: "Statics",
-    },
-    {
-      name: "spawnPalette",
-      onClick: spawnPalette,
-      displayText: "Palette",
+      name: "Loop Event",
+      onClick: () =>
+        spawn<TLoopEvent>(
+          "event",
+          LoopEvent,
+          loopEvents,
+          {
+            sequence: [],
+            loop: {
+              start: 0,
+              end: 16,
+              iterationNumber: 1,
+              iterationType: "increment",
+              timeGap: 50,
+              reverse: false,
+            },
+          },
+          true
+        ),
     },
   ];
+
+  // TODO: Palette and statics should be seperate
 </script>
 
 {#if $contextMenu}
@@ -163,12 +177,12 @@ Inspired from: Context Menu https://svelte.dev/repl/3a33725c3adb4f57b46b597f9dad
   >
     <div class="navbar" id="navbar">
       <ul>
-        {#each menuItems as item}
-          {#if item.name == "hr"}
+        {#each menuItems as { name, onClick }}
+          {#if name == "hr"}
             <hr />
           {:else}
             <li>
-              <button on:click={item.onClick}>{item.displayText}</button>
+              <button on:click={onClick}>{name}</button>
             </li>
           {/if}
         {/each}

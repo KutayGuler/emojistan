@@ -36,42 +36,8 @@
   import Svelvet from "../lib/index";
   import Container from "../components/Container.svelte";
 
-  let r: any;
-  let pickedColor = "#000000";
-  let defaultBackground = "#faebd7";
   let eventIndex = 1;
   let loopEventIndex = 1;
-
-  onMount(() => {
-    r = document.querySelector(":root");
-    let compStyle = getComputedStyle(r);
-    defaultBackground = compStyle.getPropertyValue("--default-background");
-    pickedColor = compStyle.getPropertyValue("--picked-color");
-  });
-
-  function setDefaultBackground(color: string) {
-    if (color == "") return;
-    if (color == defaultBackground) {
-      r.style.setProperty("--default-background", "#faebd7");
-      defaultBackground = "#faebd7";
-      return;
-    }
-
-    r.style.setProperty("--default-background", color);
-    defaultBackground = color;
-  }
-
-  function removeColor(color: string) {
-    cp.remove(color);
-    if (!$cp.has(defaultBackground)) {
-      r.style.setProperty("--default-background", "#faebd7");
-      defaultBackground = "#faebd7";
-    }
-  }
-
-  function pickedColorChanged() {
-    r.style.setProperty("--picked-color", pickedColor);
-  }
 
   let hovering: any = false;
 
@@ -92,14 +58,6 @@
       component: Event,
       bgColor: "#fff3d6",
       borderColor: "#ffc83d",
-      width: 250,
-      height: 80,
-      targetPosition: "left",
-    },
-    {
-      id: 3,
-      position: { x: 390, y: 50 },
-      component: Event,
       width: 250,
       height: 80,
       targetPosition: "left",

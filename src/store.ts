@@ -29,7 +29,6 @@ export interface TEvent {
 }
 
 export interface TLoopEvent {
-  name: string;
   sequence: Array<SequenceItem>;
   loop: Loop;
 }
@@ -38,7 +37,7 @@ export interface TCondition {
   a: string;
   b: string;
   _b: string | "any";
-  eventID: string;
+  eventID: number;
 }
 
 export interface TPush {
