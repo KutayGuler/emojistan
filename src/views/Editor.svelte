@@ -1,8 +1,13 @@
 <script lang="ts">
-  import { db } from "../db";
   import { onMount } from "svelte";
-
-  import { currentEmoji, currentColor, map, modal, saves } from "../store";
+  import {
+    currentEmoji,
+    currentColor,
+    map,
+    modal,
+    saves,
+    palette,
+  } from "../store";
   import { longpress } from "../utils/longpress";
 
   onMount(() => {
@@ -14,6 +19,11 @@
 
   let showIndex = false;
   let deleteMode = "Both";
+
+  function pickColor(color: string) {
+    console.log(color);
+    $currentColor = color == $currentColor ? "" : color;
+  }
 
   function clickedCell(index: number) {
     if ($currentColor == "" && $currentEmoji == "") {
@@ -46,24 +56,24 @@
   }
 </script>
 
-<section class="relative flex h-[90vh] w-full items-center justify-center">
+<section class="flex h-[90vh] w-full items-center justify-center">
   <p
     class="absolute top-8 right-8 cursor-help text-3xl duration-200 ease-out hover:scale-150"
     on:click={() => modal.show("keyboardEditor")}
   >
     ⌨️
   </p>
-  <section class="relative flex flex-col items-start justify-center">
-    <input
-      class="w-full text-center"
-      type="text"
-      placeholder="Objective"
-      bind:value={$map.objective}
-    />
-    <span class="absolute top-0 -left-12 w-auto">
-      <input type="checkbox" bind:checked={showIndex} />🔢
-    </span>
-    <slot />
+  <section class="relative">
+    <div class="flex flex-row items-center justify-center gap-4">
+      {#each [...$palette] as c}
+        <div
+          class="color"
+          class:currentColor={c == $currentColor}
+          style:background={c}
+          on:click={() => pickColor(c)}
+        />
+      {/each}
+    </div>
 
     <div class="map">
       {#each { length: 256 } as _, i}
@@ -77,34 +87,55 @@
         </div>
       {/each}
     </div>
-    <div class="remove-actions">
-      <div>
-        Delete Mode:
-        {#each ["Item", "Background", "Both"] as mode}
-          <label>
-            <input
-              type="radio"
-              bind:group={deleteMode}
-              name="delete-mode"
-              value={mode}
-            />
-            {mode}
-          </label>
-        {/each}
+    <div class="panel">
+      <div class="remove-actions">
+        <div>
+          Delete Mode:
+          {#each ["Item", "Background", "Both"] as mode}
+            <label>
+              <input
+                type="radio"
+                bind:group={deleteMode}
+                name="delete-mode"
+                value={mode}
+              />
+              {mode}
+            </label>
+          {/each}
+        </div>
+        <div class="clear">
+          Clear:
+          <button use:longpress on:longpress={map.clearObjects}> Items </button>
+          <button use:longpress on:longpress={map.clearBackgrounds}>
+            Backgrounds
+          </button>
+          <button use:longpress on:longpress={map.clearAll}> All </button>
+        </div>
       </div>
-      <div class="clear">
-        Clear:
-        <button use:longpress on:longpress={map.clearObjects}> Items </button>
-        <button use:longpress on:longpress={map.clearBackgrounds}>
-          Backgrounds
-        </button>
-        <button use:longpress on:longpress={map.clearAll}> All </button>
-      </div>
+      <input
+        class="w-full text-center"
+        type="text"
+        placeholder="Objective"
+        bind:value={$map.objective}
+      />
+      <span class="absolute top-0 -left-12 w-auto">
+        <input type="checkbox" bind:checked={showIndex} />🔢
+      </span>
     </div>
   </section>
 </section>
 
 <style>
+  .panel {
+    position: absolute;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    top: 0;
+    left: 110%;
+  }
+
   :root {
     --transition: 500ms;
   }

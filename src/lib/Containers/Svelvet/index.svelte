@@ -8,8 +8,8 @@
   // Declaring variables for Svelvet components which will be usable in other files
   export let nodes: Node[];
   export let edges: Edge[];
-  export let width: number = 600;
-  export let height: number = 600;
+  export let width: number = 800;
+  export let height: number = 800;
   export let background: boolean = false;
   export let movement: boolean = true;
 
@@ -43,7 +43,7 @@
 
 <!-- Now that a store has been created from the initial nodes and initial edges we drill props from the store down to the D3 GraphView along with the unique key -->
 <div
-  class="Svelvet"
+  class="Svelvet h-[90vh] w-[90vh] border border-black"
   style={`width: ${$widthStore}px; height: ${$heightStore}px`}
 >
   <GraphView {nodesStore} {derivedEdges} {key} />

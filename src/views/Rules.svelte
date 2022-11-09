@@ -100,7 +100,9 @@
   ];
 </script>
 
-<Svelvet nodes={initialNodes} edges={initialEdges} background />
+<div class="flex h-[90vh] flex-col items-center justify-center">
+  <Svelvet nodes={initialNodes} edges={initialEdges} background />
+</div>
 
 <style>
   :root {

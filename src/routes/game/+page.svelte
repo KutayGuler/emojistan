@@ -9,21 +9,14 @@
 
   // DATA
   import { emojis } from "../../emojis";
-  import {
-    quickAccess,
-    currentEmoji,
-    currentColor,
-    palette,
-  } from "../../store";
+  import { quickAccess, currentEmoji, currentColor } from "../../store";
 
   import { onMount } from "svelte";
   // import { redirect } from "@sveltejs/kit";
 
   let loading = true;
-  let interactiveDiv;
 
   onMount(() => {
-    console.log(interactiveDiv.offsetWidth, interactiveDiv.offsetHeight);
     let timer = setTimeout(() => (loading = false), 2000);
     // if (localStorage.getItem("currentSave") == "") {
     //   throw redirect(307, "/");
@@ -67,10 +60,6 @@
     console.log($currentEmoji);
   }
 
-  function pickColor(color: string) {
-    $currentColor = color == $currentColor ? "" : color;
-  }
-
   let innerWidth: number;
   let innerHeight: number;
 </script>
@@ -80,60 +69,53 @@
 </svelte:head>
 
 <svelte:window on:keydown={handleKeydown} bind:innerWidth bind:innerHeight />
+
 <div
-  class:cursor={$currentEmoji != ""}
-  style={$currentEmoji != "" ? `translate: ${x + 15}px ${y}px` : ""}
-  style:display={x + 85 >= innerWidth || y + 85 >= innerHeight ? "none" : ""}
-  style:background={$currentColor}
+  class="absolute z-10 h-4 w-4"
+  style:display={x + 64 >= innerWidth || y + 64 >= innerHeight ? "none" : ""}
+  style={$currentColor || $currentEmoji
+    ? `translate: ${x + 16}px ${y}px; background: ${$currentColor}`
+    : ""}
 >
   {$currentEmoji}
 </div>
 
-<main class="noselect">
-  <div class="playground" on:mousemove={setCursorEmoji}>
-    <div id="interactive" bind:this={interactiveDiv}>
-      <nav
-        class="relative box-border flex h-16 items-center justify-center border-b-2 bg-amber-50 text-lg"
+<main class="noselect box-border flex flex-col items-center justify-start">
+  <div
+    class="playground flex w-full flex-row items-start justify-center"
+    on:mousemove={setCursorEmoji}
+  >
+    <div
+      class="box-border flex h-[100vh] w-5/6 flex-col items-center justify-center overflow-y-hidden duration-200 ease-out"
+    >
+      <span
+        class="flex cursor-pointer flex-row items-center justify-center gap-3 py-6"
       >
-        <p
-          title="Main Menu"
-          class="absolute left-4 duration-200 ease-out hover:scale-125 hover:before:content-['🔙']"
-        >
-          🏝️
-        </p>
-        <p>{views[viewIndex].title}</p>
-        <span>
-          {#each views as view, i}
-            <span
-              on:click={() => changeView(i)}
-              class:currentView={viewIndex == i}
-            >
-              {view.emoji}
-            </span>
-          {/each}
-        </span>
-      </nav>
-      {#if viewIndex == 1}
-        <Editor>
-          <div class="palette">
-            {#each [...$palette] as c}
-              <div
-                class="color"
-                class:currentColor={c == $currentColor}
-                style:background={c}
-                on:click={() => pickColor(c)}
-              />
-            {/each}
-          </div>
-        </Editor>
-      {:else}
-        <svelte:component this={views[viewIndex].component} />
-      {/if}
+        {#each views as view, i}
+          <span
+            class="opacity-50 duration-200 hover:scale-150"
+            on:click={() => changeView(i)}
+            class:currentView={viewIndex == i}
+          >
+            {view.emoji}
+          </span>
+        {/each}
+      </span>
+      <p>{views[viewIndex].title}</p>
+
+      <svelte:component this={views[viewIndex].component} />
     </div>
-    <aside>
-      <input id="search" type="text" placeholder="search" bind:value={filter} />
+    <aside
+      class="h-[100vh] w-1/6 overflow-y-auto rounded-tl-lg rounded-bl-lg  bg-sky-400 p-2"
+    >
+      <input
+        class="w-full rounded-lg pl-1"
+        type="text"
+        placeholder="Search"
+        bind:value={filter}
+      />
       <div id="emoji-container">
-        <h4>
+        <h4 class="pt-4 pb-4 text-lg">
           Quick Access <button on:click={() => (editMode = !editMode)}
             >Edit {editMode ? "❌" : ""}</button
           >
@@ -159,12 +141,13 @@
         </div>
         {#each Object.keys(emojis) as category}
           {#if emojis[category].some((item) => item.name.includes(filter))}
-            <h4 class="pt-16 pb-4">{category}</h4>
+            <h4 class="pt-16 pb-4 text-lg">{category}</h4>
           {/if}
-          <div class="flex">
+          <div class="flex flex-wrap">
             {#each emojis[category] as { emoji, name }}
               {#if name.includes(filter)}
                 <div
+                  class="duration-75 ease-out hover:scale-150"
                   class:selected={$currentEmoji == emoji}
                   on:click={() => pickEmoji(emoji)}
                   title={name}
@@ -181,63 +164,16 @@
 </main>
 
 <style>
+  /* TAILWINDED */
   @keyframes idle {
     100% {
       transform: translateY(-20px);
     }
   }
 
-  .cursor {
-    width: 2.5vw;
-    height: 2.5vw;
-    position: absolute;
-    z-index: 3;
-  }
-
-  main {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    height: 100vh;
-    box-sizing: border-box;
-  }
-
-  .playground {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: start;
-    width: 100%;
-    overflow-x: hidden;
-  }
-
-  .playground > div {
-    height: 100vh;
-    width: 75%;
-    box-sizing: border-box;
-  }
-
-  nav > span {
-    position: absolute;
-    right: 24px;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    gap: 15%;
-  }
-
   nav > span > span {
     transition: 200ms ease-out;
     opacity: 50%;
-  }
-
-  nav p {
-    font-size: 2rem;
-    padding: 0;
-    margin: 0;
   }
 
   nav > span > span:hover,
@@ -246,76 +182,11 @@
     transform: scale(150%);
   }
 
-  #search {
-    width: 90%;
-    margin-right: 10%;
-    margin-top: 10%;
-  }
-
-  #search,
   #emoji-container * {
     font-size: 1.25rem;
   }
 
-  #emoji-container h4 {
-    font-size: 1.75rem;
-  }
-
-  #interactive {
-    /* width: var(--interactive-container-size); */
-    width: 100%;
-  }
-
-  #interactive,
-  aside {
-    transition: 200ms ease-out;
-  }
-
-  aside {
-    background-color: var(--secondary);
-    width: var(--emoji-container-size);
-    padding: 0.5rem;
-    border-left: 2px solid black;
-    overflow-y: auto;
-  }
-
-  aside .flex {
-    display: flex;
-    flex-wrap: wrap;
-  }
-
-  aside .flex > div {
-    transition: 50ms ease-out;
-  }
-
-  aside .flex > div:hover {
-    scale: 1.5;
-  }
-
   .selected {
     border: 2px solid red;
-  }
-
-  .color {
-    width: 50px;
-    height: 50px;
-    transition: 50ms ease-out;
-  }
-
-  .color:hover {
-    transform: scale(125%);
-  }
-
-  .currentColor {
-    transition: 200ms;
-    transform: scale(125%);
-  }
-
-  .palette {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    /* column-gap: 10%; */
   }
 </style>

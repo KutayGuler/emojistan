@@ -24,11 +24,11 @@
   }
 
   .map {
-    @apply grid h-full w-auto grid-cols-16 grid-rows-16 gap-1 border-4 border-solid border-black p-1;
+    @apply grid h-full w-auto grid-cols-16 grid-rows-16 gap-1 bg-gray-200 p-1;
   }
 
   .cell {
-    @apply relative flex h-10 w-10 items-center justify-center;
+    @apply relative flex h-11 w-11 items-center justify-center;
   }
 
   .cell > .direction {
@@ -55,15 +55,10 @@
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
 
-  /* LAYOUT */
-  --emoji-container-size: clamp(64px, 25%, 256px);
-  --interactive-container-size: calc(100vw - var(--emoji-container-size));
-
   /* COLOR PALETTE */
 
   --default-background: #fff3d6;
   --primary: #f6fafd;
-  --secondary: #40b3ff;
 
   --dark: #676778;
   --danger: #ff3e00;
@@ -95,8 +90,6 @@ body {
   border-radius: 10px;
   background-color: #e6e6e6;
 }
-
-/* MAP */
 
 /* CARDS */
 

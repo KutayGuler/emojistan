@@ -490,7 +490,9 @@
 
 <svelte:window on:keydown={handle} />
 
-<section class="playable-map">
+<section
+  class="relative flex h-[90vh] w-full flex-col items-center justify-center "
+>
   <p
     class="absolute top-8 right-8 cursor-help text-3xl duration-200 ease-out hover:scale-150"
     on:click={() => modal.show("keyboardPlay")}
@@ -498,8 +500,11 @@
     ⌨️
   </p>
   <section>
-    <p><strong>Objective: </strong>{_map.objective || "?"}</p>
-    <div class="inventory">
+    <!-- TODO: Place objective to the right side of the map -->
+    <!-- <p><strong>Objective: </strong>{_map.objective || "?"}</p> -->
+
+    <!-- INVENTORY -->
+    <div class="flex flex-row items-center justify-center gap-2">
       {#each items.get(ac)?.inventory || [] as item, i}
         <div class:currentItem={i == inventoryIndex}>{item}</div>
       {/each}
@@ -557,37 +562,6 @@
     100% {
       transform: scale(100%);
     }
-  }
-
-  .playable-map {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    width: 100%;
-    height: 90vh;
-  }
-
-  section {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
-  }
-
-  .inventory {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    gap: 2%;
-  }
-
-  .inventory > div {
-    min-width: 30px;
-    min-height: 30px;
-    border: 2px solid black;
   }
 
   .currentItem {

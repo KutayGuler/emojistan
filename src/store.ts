@@ -290,7 +290,6 @@ export const map = createEditableMap();
 
 export const pushes = createMapStore<TCollision>("pushes");
 export const merges = createMapStore<TCollision>("merges");
-
 export const collisions = createMapStore<TCollision>("collisions");
 export const loopEvents = createMapStore<TLoopEvent>("loopEvents");
 export const events = createMapStore<TEvent>("events");
