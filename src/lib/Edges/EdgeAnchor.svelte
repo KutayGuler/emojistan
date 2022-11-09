@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { Position } from "$lib/types/utils";
   import { createEventDispatcher } from "svelte";
   const dispatch = createEventDispatcher();
 
@@ -14,7 +13,7 @@
   cy={y}
   r={5}
   stroke="white"
-  fill="purple"
+  fill="crimson"
 />
 
 <style>

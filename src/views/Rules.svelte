@@ -9,7 +9,7 @@
     events,
     loopEvents,
     conditions,
-    colorPalette as cp,
+    palette as cp,
     statics,
     currentEmoji,
     modal,

@@ -16,7 +16,7 @@ Inspired from: Context Menu https://svelte.dev/repl/3a33725c3adb4f57b46b597f9dad
     conditions,
     events,
     loopEvents,
-    colorPalette,
+    palette,
     type TCondition,
     type TEvent,
     type TLoopEvent,
@@ -119,6 +119,7 @@ Inspired from: Context Menu https://svelte.dev/repl/3a33725c3adb4f57b46b597f9dad
       width: 50,
       height: 50,
       borderColor: "#40b3ff",
+      sourcePosition: "right",
     };
 
     // Object.assign(

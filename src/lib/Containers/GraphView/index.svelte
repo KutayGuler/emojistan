@@ -10,7 +10,7 @@
   import Node from "$lib/Nodes/index.svelte";
   import ContextMenu from "../../../ContextMenu.svelte";
 
-  import { findOrCreateStore, contextMenu } from "$lib/stores/store";
+  import { findOrCreateStore, contextMenu, linker } from "$lib/stores/store";
 
   // leveraging d3 library to zoom/pan
   let d3 = {
@@ -41,6 +41,13 @@
     let id = e.detail;
     console.log($edgesStore);
     $edgesStore = $edgesStore.filter((edge) => id != edge.id);
+  }
+
+  function attemptLink(node) {
+    let type = node.sourcePosition != undefined ? "source" : "target";
+    if (linker.link(key, node.id, type)) {
+      $nodesStore = $nodesStore;
+    }
   }
 
   // declaring the grid and dot size for d3's transformations and zoom
@@ -98,11 +105,6 @@
 
   let z1 = "z-index: 1;";
   let svgStyle = z1;
-
-  function linked() {
-    $nodesStore = $nodesStore;
-    console.log("linked");
-  }
 </script>
 
 <button on:click={() => (svgStyle = svgStyle == z1 ? "" : z1)}
@@ -116,7 +118,7 @@
   <!-- This container is transformed by d3zoom -->
   <div class={`Node Node-${key}`}>
     {#each $nodesStore as node}
-      <Node {node} {key} on:linked={linked}>
+      <Node {node} {key}>
         <svelte:component this={node.component} id={node.id} />
       </Node>
     {/each}
@@ -156,13 +158,14 @@
   <g>
     {#each $derivedEdges as edge}
       <SimpleBezierEdge {edge} on:removeEdge={removeEdge} />
-      <!-- sets anchor points type to either arrow or halfcircle-->
-      {#if !edge.noHandle}
-        <EdgeAnchor x={edge.sourceX} y={edge.sourceY} />
-        {#if !edge.arrow}
-          <EdgeAnchor x={edge.targetX} y={edge.targetY} />
-        {/if}
-      {/if}
+    {/each}
+    {#each $nodesStore as node}
+      {@const target = node.targetPosition != undefined}
+      <EdgeAnchor
+        on:linkAttempt={() => attemptLink(node)}
+        x={node.position.x + (target ? 0 : node.width)}
+        y={node.position.y + node.height / 2}
+      />
     {/each}
   </g>
 </svg>

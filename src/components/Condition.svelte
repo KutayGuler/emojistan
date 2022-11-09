@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
   import {
-    colorPalette,
+    palette,
     events,
     loopEvents,
     conditions,
@@ -79,7 +79,7 @@
   {#if a == "playerBackground"}
     <h4>is</h4>
     <select bind:value={b} style:background={b} on:change={update}>
-      {#each [...$colorPalette] as color}
+      {#each [...$palette] as color}
         <option value={color} style:background={color} />
       {/each}
     </select>

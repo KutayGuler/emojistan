@@ -13,7 +13,7 @@
     quickAccess,
     currentEmoji,
     currentColor,
-    colorPalette,
+    palette,
   } from "../../store";
 
   import { onMount } from "svelte";
@@ -126,7 +126,7 @@
       {#if viewIndex == 1}
         <Editor>
           <div class="palette">
-            {#each [...$colorPalette] as c}
+            {#each [...$palette] as c}
               <div
                 class="color"
                 class:currentColor={c == $currentColor}

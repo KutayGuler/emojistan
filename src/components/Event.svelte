@@ -1,10 +1,10 @@
 <script lang="ts">
   import { MIN_INDEX, MAX_INDEX } from "../constants";
   import { onDestroy } from "svelte/internal";
-  import { colorPalette, events, currentEmoji } from "../store";
+  import { palette, events, currentEmoji } from "../store";
   import type { SequenceItem } from "../store";
 
-  export let id: string;
+  export let id: number;
   export let sequence: Array<SequenceItem> = [];
   let onEndID = 0;
 
@@ -79,7 +79,7 @@
         case "completeLevel":
         case "resetLevel":
         default:
-          Object.assign(newItem);
+          // Object.assign(newItem);
           break;
       }
     } else {
@@ -108,7 +108,7 @@
         case "completeLevel":
         case "resetLevel":
         default:
-          Object.assign(newItem);
+          // Object.assign(newItem);
           break;
       }
     }
@@ -155,8 +155,6 @@
       events.update(id, { sequence: newsequence });
     }
   });
-
-  // TODO: Polish UI
 </script>
 
 {#each sequence as s, i}
@@ -225,7 +223,7 @@
           style:background={s.background}
           on:change={() => update(i)}
         >
-          {#each [...$colorPalette] as color}
+          {#each [...$palette] as color}
             <option value={color} style:background={color} />
           {/each}
         </select>

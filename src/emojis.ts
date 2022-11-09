@@ -1008,10 +1008,6 @@ export const emojis: Emojis = {
       name: "woman shrugging",
     },
     {
-      emoji: "🧑‍⚕️",
-      name: "health worker",
-    },
-    {
       emoji: "👨‍⚕️",
       name: "man health worker",
     },
@@ -1020,20 +1016,12 @@ export const emojis: Emojis = {
       name: "woman health worker",
     },
     {
-      emoji: "🧑‍🎓",
-      name: "student",
-    },
-    {
       emoji: "👨‍🎓",
       name: "man student",
     },
     {
       emoji: "👩‍🎓",
       name: "woman student",
-    },
-    {
-      emoji: "🧑‍🏫",
-      name: "teacher",
     },
     {
       emoji: "👨‍🏫",

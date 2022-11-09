@@ -4,24 +4,41 @@ import type { Node, Edge } from "../types/types";
 
 export const contextMenu = writable(false);
 
+interface Linker {
+  source: number;
+  target: number;
+}
+
+class Linker {
+  constructor(source: number, target: number) {
+    this.source = source;
+    this.target = target;
+  }
+  reset() {
+    this.source = -1;
+    this.target = -1;
+  }
+}
+
 function createLinker() {
-  const { subscribe, update } = writable([]);
+  const { subscribe, update } = writable(new Linker(-1, -1));
 
   return {
     subscribe,
-    link: (key: string, id: number) => {
+    link: (key: string, id: number, type: "source" | "target") => {
       let linkSuccess = false;
       update((state) => {
-        state.push(id);
-        if (state.length == 2) {
+        state[type] = id;
+        console.log(state);
+        if (state.source != -1 && state.target != -1) {
           let { edgesStore } = findOrCreateStore(key);
           get(edgesStore).push({
-            id: `e${state[0]}-${state[1]}`,
-            source: state[0],
-            target: state[1],
+            id: `e${state.source}-${state.target}`,
+            source: state.source,
+            target: state.target,
             label: "labelski",
           });
-          state = [];
+          state.reset();
           linkSuccess = true;
         }
         return state;

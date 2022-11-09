@@ -2,12 +2,7 @@
   // DATA
   import { MIN_INDEX, MAX_INDEX } from "../constants";
   import { onDestroy, onMount } from "svelte/internal";
-  import {
-    colorPalette,
-    loopEvents,
-    currentEmoji,
-    type TLoopEvent,
-  } from "../store";
+  import { palette, loopEvents, currentEmoji, type TLoopEvent } from "../store";
 
   // TYPES
   import type { SequenceItem, Loop } from "../store";
@@ -125,7 +120,7 @@
           Object.assign(newItem, { index });
           break;
         default:
-          Object.assign(newItem);
+          // Object.assign(newItem);
           break;
       }
     } else {
@@ -141,7 +136,7 @@
           Object.assign(newItem, { index });
           break;
         default:
-          Object.assign(newItem);
+          // Object.assign(newItem);
           break;
       }
     }
@@ -191,8 +186,6 @@
       loopEvents.update(id, { loop, sequence: newsequence });
     }
   });
-
-  // TODO: Polish UI
 </script>
 
 <label>
@@ -233,7 +226,7 @@
           style:background={q.background}
           on:input={() => update(i)}
         >
-          {#each [...$colorPalette] as color}
+          {#each [...$palette] as color}
             <option value={color} style:background={color} />
           {/each}
         </select>

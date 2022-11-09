@@ -297,7 +297,7 @@ export const saves = createSaves();
 
 export const statics = createSetStore("statics");
 export const quickAccess = createSetStore("quickAccess");
-export const colorPalette = createSetStore("cp");
+export const palette = createSetStore("cp");
 
 export const map = createEditableMap();
 

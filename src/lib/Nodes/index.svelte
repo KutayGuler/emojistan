@@ -1,10 +1,6 @@
 <script lang="ts">
-  import { findOrCreateStore, linker } from "$lib/stores/store";
+  import { findOrCreateStore } from "$lib/stores/store";
   import type { Node } from "$lib/types/types";
-  import { createEventDispatcher } from "svelte";
-  import EdgeAnchor from "../Edges/EdgeAnchor.svelte";
-
-  const dispatch = createEventDispatcher();
 
   export let node: Node;
   export let key: string;
@@ -23,15 +19,7 @@
     movementStore,
   } = findOrCreateStore(key);
 
-  function attemptLink() {
-    let success = linker.link(key, node.id);
-    if (success) {
-      dispatch("linked");
-    }
-  }
-
   function removeSelf() {
-    dispatch("remove");
     $edgesStore = $edgesStore.filter((e) => !e.id.includes(node.id.toString()));
     $nodesStore = $nodesStore.filter((n) => n.id != node.id);
   }
@@ -120,18 +108,6 @@
       />
     </svg>
   </button>
-  <!-- TODO: Only make it appear when Edge Editing is active -->
-  <!-- TODO: Standardize the position of edge anchors on each component -->
-  <!-- {#if !$edgesStore.some((edge) => edge.source == node.id || edge.target == node.id)}
-    <svg
-      fill="transparent"
-      style="position: absolute; left: {node.width - 10}px; top: {node.height /
-        2}px  width: 10px; height: 10px; z-index: 2;"
-      viewBox="0 0 10 10"
-    >
-      <EdgeAnchor x={5} y={5} on:linkAttempt={attemptLink} />
-    </svg>
-  {/if} -->
   <div class="flex flex-col ">
     <slot />
   </div>

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { db } from "../db";
   import { onMount } from "svelte";
 
   import { currentEmoji, currentColor, map, modal, saves } from "../store";
@@ -37,6 +38,7 @@
     }
 
     if ($currentEmoji != "") {
+      // db.saves.update();
       map.addEmoji(index, {
         emoji: $currentEmoji,
       });

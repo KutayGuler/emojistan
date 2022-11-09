@@ -1,6 +1,6 @@
 <script lang="ts">
   // DATA
-  import { colorPalette as cp } from "../store";
+  import { palette as cp } from "../store";
   import { scale } from "svelte/transition";
   import { flip } from "svelte/animate";
   import { onMount } from "svelte";
