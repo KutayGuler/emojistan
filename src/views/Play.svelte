@@ -485,16 +485,6 @@
     }
   }
 
-  // let canFire = true;
-
-  // function fire() {
-  //   if (!canFire) return;
-
-  //   mutations.fireProjectile({ emoji: "💩", duration: 1000 });
-  //   canFire = false;
-  //   setTimeout(() => (canFire = true), 500);
-  // }
-
   // TODO: Switch to canvas
 </script>
 
@@ -508,7 +498,6 @@
     ⌨️
   </p>
   <section>
-    <!-- <button on:click={fire}>FIRE</button> -->
     <p><strong>Objective: </strong>{_map.objective || "?"}</p>
     <div class="inventory">
       {#each items.get(ac)?.inventory || [] as item, i}
@@ -528,13 +517,7 @@
               {currentItem || dirs[dirKey].emoji}
             </div>
           {/if}
-          <div
-            class="emoji"
-            class:adc={adc == i && playerInteracted}
-            style={items.get(i)?.style}
-          >
-            {items.get(i)?.emoji || ""}
-          </div>
+          {items.get(i)?.emoji || ""}
         </div>
       {/each}
       {#if levelCompleted}

@@ -14,7 +14,6 @@
     "equipInteractedItem",
     "equipItem",
     "consumeEquippedItem",
-    // "fireProjectile",
     "spawn",
     "destroy",
     "wait",
@@ -70,10 +69,6 @@
         case "wait":
           Object.assign(newItem, { duration });
           break;
-        // case "fireProjectile":
-        // // Add extra duration for rate of fire
-        //   Object.assign(newItem, { emoji, duration });
-        //   break;
         case "consumeEquippedItem":
         case "equipInteractedItem":
         case "completeLevel":
@@ -100,9 +95,6 @@
         case "wait":
           Object.assign(newItem, { duration });
           break;
-        // case "fireProjectile":
-        //   Object.assign(newItem, { emoji, duration });
-        //   break;
         case "consumeEquippedItem":
         case "equipInteractedItem":
         case "completeLevel":
@@ -190,16 +182,6 @@
         on:change={() => update(i)}
       />
     {:else if s.type == "wait"}
-      <input
-        type="number"
-        bind:value={s.duration}
-        min={MIN_DURATION}
-        max={MAX_DURATION}
-        on:change={() => update(i)}
-      /> ms
-    {:else if s.type == "fireProjectile"}
-      <div class="slot" on:click={() => updateSlot(i)}>{s.emoji || ""}</div>
-      <!-- Add direction and origin -->
       <input
         type="number"
         bind:value={s.duration}

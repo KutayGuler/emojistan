@@ -48,17 +48,6 @@ export interface TCollision {
   rule: Array<string>;
 }
 
-// export interface TThrowable {
-//   throwable: string;
-//   range: number;
-//   speed: number;
-// }
-
-// export interface TWeapon {
-//   weapon: string;
-//   speed: number;
-// }
-
 export interface Emoji {
   emoji: string;
   inventory?: Array<any>;
@@ -258,8 +247,6 @@ export type ModalType =
   | "conditions"
   | "events"
   | "statics"
-  | "weapons"
-  | "throwables"
   | "palette"
   | "emojistan";
 
@@ -303,10 +290,6 @@ export const map = createEditableMap();
 
 export const pushes = createMapStore<TCollision>("pushes");
 export const merges = createMapStore<TCollision>("merges");
-// export const weapons = createMapStore<Orderable>(new Map<string, Orderable>());
-// export const throwables = createMapStore<Orderable>(
-//   new Map<string, Orderable>()
-// );
 
 export const collisions = createMapStore<TCollision>("collisions");
 export const loopEvents = createMapStore<TLoopEvent>("loopEvents");

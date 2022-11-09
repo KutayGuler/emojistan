@@ -16,8 +16,6 @@
     pushes,
     merges,
     saves,
-    // weapons,
-    // throwables,
     rulesIndex,
   } from "../store";
 
@@ -31,8 +29,6 @@
   import Condition from "../components/Condition.svelte";
   import Event from "../components/Event.svelte";
   import LoopEvent from "../components/LoopEvent.svelte";
-  // import Weapon from "../components/Weapon.svelte";
-  // import Throwable from "../components/Throwable.svelte";
   import Svelvet from "../lib/index";
   import Container from "../components/Container.svelte";
 
@@ -189,27 +185,4 @@
   .event-btn:hover {
     background: #ffc83d;
   }
-
-  /* .weapon-btn {
-    border-color: #13a10e;
-    background: #89f485;
-  }
-
-  .weapon-btn:hover {
-    background: #13a10e;
-  }
-
-  .throwable-btn {
-    border-color: #f7630c;
-    background: #fee2d2;
-  }
-
-  .throwable-btn:hover {
-    background: #f7630c;
-  } */
-
-  /* .is-active {
-    background-color: #3273dc;
-    color: #fff;
-  } */
 </style>

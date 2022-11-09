@@ -58,18 +58,8 @@
     }
   }
 
-  let asideStyle = "";
-  let interactiveStyle = "";
-
   function changeView(i: number) {
     viewIndex = i;
-    if (i == 0) {
-      interactiveStyle = "width: 100vw;";
-      asideStyle = "width: 0; padding: 0; border-left: 0;";
-    } else {
-      asideStyle = "";
-      interactiveStyle = "";
-    }
   }
 
   function pickEmoji(emoji: string) {
@@ -101,7 +91,7 @@
 
 <main class="noselect">
   <div class="playground" on:mousemove={setCursorEmoji}>
-    <div id="interactive" style={interactiveStyle} bind:this={interactiveDiv}>
+    <div id="interactive" bind:this={interactiveDiv}>
       <nav
         class="relative box-border flex h-16 items-center justify-center border-b-2 bg-amber-50 text-lg"
       >
@@ -140,7 +130,7 @@
         <svelte:component this={views[viewIndex].component} />
       {/if}
     </div>
-    <div id="aside-container" style={asideStyle}>
+    <aside>
       <input id="search" type="text" placeholder="search" bind:value={filter} />
       <div id="emoji-container">
         <h4>
@@ -186,7 +176,7 @@
           </div>
         {/each}
       </div>
-    </div>
+    </aside>
   </div>
 </main>
 
@@ -219,6 +209,7 @@
     justify-content: center;
     align-items: start;
     width: 100%;
+    overflow-x: hidden;
   }
 
   .playground > div {
@@ -271,15 +262,16 @@
   }
 
   #interactive {
-    width: var(--interactive-container-size);
+    /* width: var(--interactive-container-size); */
+    width: 100%;
   }
 
   #interactive,
-  #aside-container {
+  aside {
     transition: 200ms ease-out;
   }
 
-  #aside-container {
+  aside {
     background-color: var(--secondary);
     width: var(--emoji-container-size);
     padding: 0.5rem;
@@ -287,16 +279,16 @@
     overflow-y: auto;
   }
 
-  #aside-container .flex {
+  aside .flex {
     display: flex;
     flex-wrap: wrap;
   }
 
-  #aside-container .flex > div {
+  aside .flex > div {
     transition: 50ms ease-out;
   }
 
-  #aside-container .flex > div:hover {
+  aside .flex > div:hover {
     scale: 1.5;
   }
 
