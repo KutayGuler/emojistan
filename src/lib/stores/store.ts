@@ -2,8 +2,6 @@ import { writable, derived, get } from "svelte/store";
 import type { Readable, Writable } from "svelte/store";
 import type { Node, Edge } from "../types/types";
 
-export const contextMenu = writable(false);
-
 interface Linker {
   source: number;
   target: number;
@@ -19,6 +17,8 @@ class Linker {
     this.target = -1;
   }
 }
+
+export const _key: Writable<any> = writable();
 
 function createLinker() {
   const { subscribe, update } = writable(new Linker(-1, -1));

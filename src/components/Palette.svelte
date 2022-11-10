@@ -42,12 +42,10 @@
   }
 </script>
 
-<div class="flex-1">
-  <!-- <h4 on:click={() => modal.show("palette")}>Palette 🎨</h4> -->
-  <h4>Palette 🎨</h4>
+<div class="absolute -right-40 top-44 flex-1">
   <div
     style:background={defaultBackground}
-    class="my-4 flex flex-wrap items-start justify-start rounded-lg pb-4 shadow-lg"
+    class="my-4 flex flex-col items-start justify-start rounded-lg pb-4 shadow-lg"
   >
     {#each [...$cp, ""] as color (color)}
       <div transition:scale|local={flipParams} animate:flip={flipParams}>
@@ -59,7 +57,7 @@
               >🎨
             </button>
             <input
-              class="absolute -bottom-full h-full w-full"
+              class="absolute -bottom-0 -right-full h-full w-full"
               type="color"
               bind:value={pickedColor}
               on:change={pickedColorChanged}

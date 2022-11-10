@@ -4,6 +4,7 @@
   import { findOrCreateStore } from "$lib/stores/store";
   import { afterUpdate, onMount } from "svelte";
   import type { Node, Edge } from "$lib/types/index.js";
+  import { _key } from "$lib/stores/store";
 
   // Declaring variables for Svelvet components which will be usable in other files
   export let nodes: Node[];
@@ -15,6 +16,7 @@
 
   // generates a unique string for each svelvet component's unique store instance
   const key = (Math.random() + 1).toString(36).substring(7);
+  $_key = key;
   // creates a store that uses the unique sting as the key to create and look up the corresponding store
   // this way we can have multiple Svelvet Components on the same page and prevent overlap of information
   const svelvetStore = findOrCreateStore(key);

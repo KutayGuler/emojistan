@@ -1,6 +1,7 @@
 <script lang="ts">
   import { findOrCreateStore } from "$lib/stores/store";
   import type { Node } from "$lib/types/types";
+  import { scale } from "svelte/transition";
 
   export let node: Node;
   export let key: string;
@@ -42,9 +43,11 @@
   }}
 />
 
+<!-- TODO: Fix input getting stuck -->
 <!-- TODO: Prevent moving the grid on mousedown move -->
 
 <div
+  transition:scale|local
   class="Node"
   style="left: {node.position.x}px;
     top: {node.position.y}px;

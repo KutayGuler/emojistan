@@ -101,12 +101,12 @@
           </span>
         {/each}
       </span>
-      <p>{views[viewIndex].title}</p>
+      <p class="text-2xl">{views[viewIndex].title}</p>
 
       <svelte:component this={views[viewIndex].component} />
     </div>
     <aside
-      class="h-[100vh] w-1/6 overflow-y-auto rounded-tl-lg rounded-bl-lg  bg-sky-400 p-2"
+      class="h-[100vh] w-1/6 overflow-y-auto rounded-tl-lg rounded-bl-lg  bg-sky-400 p-2 shadow-2xl"
     >
       <input
         class="w-full rounded-lg pl-1"

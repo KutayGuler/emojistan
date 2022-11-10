@@ -16,63 +16,18 @@ Inspired from: Context Menu https://svelte.dev/repl/3a33725c3adb4f57b46b597f9dad
     conditions,
     events,
     loopEvents,
-    palette,
     type TCondition,
     type TEvent,
     type TLoopEvent,
   } from "./store";
-  import { findOrCreateStore, contextMenu } from "$lib/stores/store";
+  import { findOrCreateStore } from "$lib/stores/store";
   import type { SvelteComponent } from "svelte";
   import Event from "./components/Event.svelte";
   import LoopEvent from "./components/LoopEvent.svelte";
-  import Palette from "./components/Palette.svelte";
   import Container from "./components/Container.svelte";
+  import { _key as key } from "$lib/stores/store";
 
-  export let key;
-
-  // pos is cursor position when right click occur
-  let pos = { x: 0, y: 0 };
-  // menu is dimension (height and width) of context menu
-  let menu = { h: 0, y: 0 };
-  // browser/window dimension (height and width)
-  let browser = { h: 0, y: 0 };
-
-  function rightClickContextMenu(e) {
-    $contextMenu = true;
-    browser = {
-      w: window.innerWidth,
-      h: window.innerHeight,
-    };
-    pos = {
-      x: e.clientX,
-      y: e.clientY,
-    };
-    // If bottom part of context menu will be displayed
-    // after right-click, then change the position of the
-    // context menu. This position is controlled by `top` and `left`
-    // at inline style.
-    // Instead of context menu is displayed from top left of cursor position
-    // when right-click occur, it will be displayed from bottom left.
-    if (browser.h - pos.y < menu.h) pos.y = pos.y - menu.h;
-    if (browser.w - pos.x < menu.w) pos.x = pos.x - menu.w;
-  }
-  function onPageClick(e) {
-    // To make context menu disappear when
-    // mouse is clicked outside context menu
-    $contextMenu = false;
-  }
-  function getContextMenuDimension(node) {
-    // This function will get context menu dimension
-    // when navigation is shown => showMenu = true
-    let height = node.offsetHeight;
-    let width = node.offsetWidth;
-    menu = {
-      h: height,
-      w: width,
-    };
-  }
-
-  const svelvetStore = findOrCreateStore(key);
+  const svelvetStore = findOrCreateStore($key);
   const { nodesStore } = svelvetStore;
 
   const colors = {
@@ -135,14 +90,18 @@ Inspired from: Context Menu https://svelte.dev/repl/3a33725c3adb4f57b46b597f9dad
 
   let menuItems = [
     {
+      id: "ec",
       name: "Emoji Container",
       onClick: spawnEmojiContainer,
     },
     {
+      id: "dec",
       name: "Double Emoji Container",
       onClick: spawnDoubleEmojiContainer,
     },
     {
+      id: "c",
+
       name: "Condition",
       onClick: () =>
         spawn<TCondition>("condition", Condition, conditions, {
@@ -153,6 +112,8 @@ Inspired from: Context Menu https://svelte.dev/repl/3a33725c3adb4f57b46b597f9dad
         }),
     },
     {
+      id: "e",
+
       name: "Event",
       onClick: () =>
         spawn<TEvent>(
@@ -166,6 +127,8 @@ Inspired from: Context Menu https://svelte.dev/repl/3a33725c3adb4f57b46b597f9dad
         ),
     },
     {
+      id: "le",
+
       name: "Loop Event",
       onClick: () =>
         spawn<TLoopEvent>(
@@ -191,79 +154,18 @@ Inspired from: Context Menu https://svelte.dev/repl/3a33725c3adb4f57b46b597f9dad
   // TODO: Palette and statics should be seperate
 </script>
 
-{#if $contextMenu}
-  <nav
-    use:getContextMenuDimension
-    style="position: absolute; top:{pos.y}px; left:{pos.x}px"
-  >
-    <div class="navbar" id="navbar">
-      <ul>
-        {#each menuItems as { name, onClick }}
-          {#if name == "hr"}
-            <hr />
-          {:else}
-            <li>
-              <button on:click={onClick}>{name}</button>
-            </li>
-          {/if}
-        {/each}
-      </ul>
-    </div>
-  </nav>
-{/if}
-
-<!-- TODO: Take context menu to right side -->
-
-<svelte:window
-  on:contextmenu|preventDefault={rightClickContextMenu}
-  on:click={onPageClick}
-/>
+<nav class="absolute -right-36 top-0 rounded-lg border border-purple-400 p-1">
+  <ul>
+    {#each menuItems as { name, onClick }}
+      <li class="h-8 w-full">
+        <button
+          class="w-full rounded-md px-2 text-left hover:bg-slate-200"
+          on:click={onClick}>{name}</button
+        >
+      </li>
+    {/each}
+  </ul>
+</nav>
 
 <style>
-  * {
-    padding: 0;
-    margin: 0;
-    z-index: 5;
-  }
-  .navbar {
-    display: inline-flex;
-    border: 1px #999 solid;
-    width: 170px;
-    background-color: #fff;
-    border-radius: 10px;
-    overflow: hidden;
-    flex-direction: column;
-  }
-  .navbar ul {
-    margin: 6px;
-  }
-  ul li {
-    padding-left: 8px;
-    display: block;
-    list-style-type: none;
-    width: 1fr;
-  }
-  ul li button {
-    font-size: 1rem;
-    color: #222;
-    width: 100%;
-    height: 30px;
-    text-align: left;
-    border: 0px;
-    background-color: #fff;
-  }
-  ul li button:hover {
-    color: #000;
-    text-align: left;
-    border-radius: 5px;
-    background-color: #eee;
-  }
-  :global(ul li button.info:hover) {
-    color: navy;
-  }
-  hr {
-    border: none;
-    border-bottom: 1px solid #ccc;
-    margin: 5px 0px;
-  }
 </style>

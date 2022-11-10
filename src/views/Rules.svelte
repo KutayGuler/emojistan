@@ -31,6 +31,8 @@
   import LoopEvent from "../components/LoopEvent.svelte";
   import Svelvet from "../lib/index";
   import Container from "../components/Container.svelte";
+  import Spawner from "../Spawner.svelte";
+  import Palette from "../components/Palette.svelte";
 
   let eventIndex = 1;
   let loopEventIndex = 1;
@@ -100,8 +102,10 @@
   ];
 </script>
 
-<div class="flex h-[90vh] flex-col items-center justify-center">
+<div class="relative flex h-[90vh]">
   <Svelvet nodes={initialNodes} edges={initialEdges} background />
+  <Spawner />
+  <Palette />
 </div>
 
 <style>

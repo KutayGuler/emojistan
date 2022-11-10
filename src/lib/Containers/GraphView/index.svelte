@@ -8,9 +8,8 @@
   import SimpleBezierEdge from "$lib/Edges/SimpleBezierEdge.svelte";
   import EdgeAnchor from "$lib/Edges/EdgeAnchor.svelte";
   import Node from "$lib/Nodes/index.svelte";
-  import ContextMenu from "../../../ContextMenu.svelte";
 
-  import { findOrCreateStore, contextMenu, linker } from "$lib/stores/store";
+  import { findOrCreateStore, linker } from "$lib/stores/store";
 
   // leveraging d3 library to zoom/pan
   let d3 = {
@@ -68,7 +67,7 @@
 
   // function to handle zoom events - arguments: d3ZoomEvent
   function handleZoom(e: any): void {
-    if (!$movementStore || $contextMenu) return;
+    if (!$movementStore) return;
 
     //add a store that contains the current value of the d3-zoom's scale to be used in onMouseMove function
     d3Scale.set(e.transform.k);
@@ -111,7 +110,7 @@
   >{svgStyle == z1 ? "EDIT NODES" : "EDIT EDGES"}</button
 >
 
-<ContextMenu {key} />
+<!-- TODO: disabled double click zoom -->
 
 <!-- This is the container that holds GraphView and we have disabled right click functionality to prevent a sticking behavior -->
 <div class={`Nodes Nodes-${key}`}>
