@@ -490,25 +490,25 @@
 
 <svelte:window on:keydown={handle} />
 
+
 <section
-  class="relative flex h-[90vh] w-full flex-col items-center justify-center "
+  class="relative flex h-[90vh] w-full flex-col items-center justify-start "
 >
-  <p
+  <!-- <p
     class="absolute top-8 right-8 cursor-help text-3xl duration-200 ease-out hover:scale-150"
     on:click={() => modal.show("keyboardPlay")}
   >
     ⌨️
-  </p>
+  </p> -->
   <section>
-    <!-- TODO: Place objective to the right side of the map -->
     <!-- <p><strong>Objective: </strong>{_map.objective || "?"}</p> -->
 
     <!-- INVENTORY -->
-    <div class="flex flex-row items-center justify-center gap-2">
+    <!-- <div class="flex flex-row items-center justify-center gap-2">
       {#each items.get(ac)?.inventory || [] as item, i}
         <div class:currentItem={i == inventoryIndex}>{item}</div>
       {/each}
-    </div>
+    </div> -->
     <div class="map">
       {#each { length: 256 } as _, i}
         {@const active = ac == i}

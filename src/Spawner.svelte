@@ -150,16 +150,15 @@ Inspired from: Context Menu https://svelte.dev/repl/3a33725c3adb4f57b46b597f9dad
         ),
     },
   ];
-
-  // TODO: Palette and statics should be seperate
 </script>
 
-<nav class="absolute -right-36 top-0 rounded-lg border border-purple-400 p-1">
+<h4 on:click={() => modal.show("statics")}>Spawner 🗿</h4>
+<nav class="rounded-lg border border-purple-400 p-1">
   <ul>
     {#each menuItems as { name, onClick }}
       <li class="h-8 w-full">
         <button
-          class="w-full rounded-md px-2 text-left hover:bg-slate-200"
+          class="add w-36 rounded-md px-2 text-left hover:bg-slate-200"
           on:click={onClick}>{name}</button
         >
       </li>

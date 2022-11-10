@@ -100,12 +100,34 @@
   const initialEdges = [
     { id: "e1-2", source: 1, target: 2, label: "edge label" },
   ];
+
+  const flipParams = { duration: 300 };
 </script>
 
-<div class="relative flex h-[90vh]">
-  <Svelvet nodes={initialNodes} edges={initialEdges} background />
-  <Spawner />
+<div class="relative flex h-[90vh] flex-row items-start justify-start gap-4">
   <Palette />
+  <Svelvet nodes={initialNodes} edges={initialEdges} background />
+  <div class="flex flex-col ">
+    <Spawner />
+    <div class="">
+      <h4 on:click={() => modal.show("statics")}>Statics 🗿</h4>
+      <button
+        class="statics-add-btn"
+        on:click={() => statics.add($currentEmoji)}
+      >
+        [ {$currentEmoji == "" ? "____" : $currentEmoji} ]
+      </button>
+      <div class="flex flex-col-reverse items-start justify-start">
+        {#each [...$statics] as item (item)}
+          <div transition:scale|local={flipParams} animate:flip={flipParams}>
+            <button class="statics-btn" on:click={() => statics.remove(item)}
+              >{item}</button
+            >
+          </div>
+        {/each}
+      </div>
+    </div>
+  </div>
 </div>
 
 <style>

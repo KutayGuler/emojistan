@@ -74,7 +74,9 @@
   class="absolute z-10 h-4 w-4"
   style:display={x + 64 >= innerWidth || y + 64 >= innerHeight ? "none" : ""}
   style={$currentColor || $currentEmoji
-    ? `translate: ${x + 16}px ${y}px; background: ${$currentColor}`
+    ? `translate: ${
+        x + 16
+      }px ${y}px; background: ${$currentColor}; border: 1px solid var(--default-background);`
     : ""}
 >
   {$currentEmoji}
@@ -102,6 +104,7 @@
         {/each}
       </span>
       <p class="text-2xl">{views[viewIndex].title}</p>
+      <!-- TODO: Standardize view layout -->
 
       <svelte:component this={views[viewIndex].component} />
     </div>
@@ -165,12 +168,6 @@
 
 <style>
   /* TAILWINDED */
-  @keyframes idle {
-    100% {
-      transform: translateY(-20px);
-    }
-  }
-
   nav > span > span {
     transition: 200ms ease-out;
     opacity: 50%;

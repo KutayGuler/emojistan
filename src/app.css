@@ -16,11 +16,11 @@
   }
 
   .statics-add-btn {
-    @apply mx-2 mt-4 flex w-32 cursor-pointer  items-center justify-center rounded-xl border-4 border-solid py-4 text-2xl text-black shadow-lg duration-200 ease-out hover:after:content-['++'];
+    @apply mx-2 flex w-32 cursor-pointer  items-center justify-center rounded-xl border-4 border-solid py-4 text-2xl text-black shadow-lg duration-200 ease-out hover:after:content-['++'];
   }
 
   .color {
-    @apply mx-2 mt-4 flex w-32 items-center justify-center rounded-xl border-4  border-none py-4 text-2xl duration-200 ease-out;
+    @apply relative flex w-32 items-center justify-center rounded-xl  border-4 border-none py-8 text-2xl duration-200 ease-out;
   }
 
   .map {

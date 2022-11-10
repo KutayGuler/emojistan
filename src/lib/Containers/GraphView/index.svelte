@@ -54,8 +54,8 @@
   const dotSize = 10;
 
   onMount(() => {
-    d3.select(`.Edges-${key}`).call(d3Zoom);
-    d3.select(`.Nodes-${key}`).call(d3Zoom);
+    d3.select(`.Edges-${key}`).call(d3Zoom).on("dblclick.zoom", null);
+    d3.select(`.Nodes-${key}`).call(d3Zoom).on("dblclick.zoom", null);
   });
 
   // TODO: Update d3Zoom type (refer to d3Zoom docs)
@@ -109,8 +109,6 @@
 <button on:click={() => (svgStyle = svgStyle == z1 ? "" : z1)}
   >{svgStyle == z1 ? "EDIT NODES" : "EDIT EDGES"}</button
 >
-
-<!-- TODO: disabled double click zoom -->
 
 <!-- This is the container that holds GraphView and we have disabled right click functionality to prevent a sticking behavior -->
 <div class={`Nodes Nodes-${key}`}>

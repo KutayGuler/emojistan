@@ -56,15 +56,15 @@
   }
 </script>
 
-<section class="flex h-[90vh] w-full items-center justify-center">
-  <p
+<section class="flex h-[90vh] w-full flex-row items-start justify-center gap-2">
+  <!-- <p
     class="absolute top-8 right-8 cursor-help text-3xl duration-200 ease-out hover:scale-150"
     on:click={() => modal.show("keyboardEditor")}
   >
     ⌨️
-  </p>
-  <section class="relative">
-    <div class="flex flex-row items-center justify-center gap-4">
+  </p> -->
+  <section class="relative flex flex-row gap-4">
+    <div class="flex flex-col items-center justify-start gap-2">
       {#each [...$palette] as c}
         <div
           class="color"
@@ -74,7 +74,6 @@
         />
       {/each}
     </div>
-
     <div class="map">
       {#each { length: 256 } as _, i}
         <div
@@ -87,10 +86,20 @@
         </div>
       {/each}
     </div>
-    <div class="panel">
-      <div class="remove-actions">
-        <div>
-          Delete Mode:
+    <div class="flex flex-col">
+      <!-- <textarea name="" id="" cols="30" rows="10"></textarea> -->
+      <textarea
+        class="min-h-40 max-h-96 w-full"
+        type="text"
+        placeholder="Objective"
+        bind:value={$map.objective}
+      />
+      <span class="w-auto">
+        <input type="checkbox" bind:checked={showIndex} />🔢
+      </span>
+      <div>
+        Delete Mode:
+        <div class="flex flex-col">
           {#each ["Item", "Background", "Both"] as mode}
             <label>
               <input
@@ -103,8 +112,8 @@
             </label>
           {/each}
         </div>
-        <div class="clear">
-          Clear:
+        Clear:
+        <div class="clear flex flex-col">
           <button use:longpress on:longpress={map.clearObjects}> Items </button>
           <button use:longpress on:longpress={map.clearBackgrounds}>
             Backgrounds
@@ -112,30 +121,11 @@
           <button use:longpress on:longpress={map.clearAll}> All </button>
         </div>
       </div>
-      <input
-        class="w-full text-center"
-        type="text"
-        placeholder="Objective"
-        bind:value={$map.objective}
-      />
-      <span class="absolute top-0 -left-12 w-auto">
-        <input type="checkbox" bind:checked={showIndex} />🔢
-      </span>
     </div>
   </section>
 </section>
 
 <style>
-  .panel {
-    position: absolute;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    top: 0;
-    left: 110%;
-  }
-
   :root {
     --transition: 500ms;
   }
