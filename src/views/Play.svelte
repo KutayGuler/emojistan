@@ -259,6 +259,7 @@
 
   function moveActiveCell(operation: number, _delete?: boolean) {
     if (_delete) {
+      console.log("deleted");
       items.delete(ac);
     }
     ac += operation;
@@ -271,6 +272,7 @@
 
     // MAGIC UPDATE, NECESSARY FOR REACTIVITY
     items = items;
+    console.log(items);
   }
 
   let wasd = ["KeyW", "KeyA", "KeyS", "KeyD"];
@@ -363,12 +365,11 @@
             break;
         }
       } else {
-        // if (item.inventory) {
-        //   let { emoji, inventory } = item;
-        //   items.set(ac + operation, { emoji, inventory });
-        // } else {
-        //   items.set(ac + operation, { emoji: item.emoji });
-        // }
+        if (item) {
+          items.set(ac + operation, item);
+        } else {
+          items.set(ac + operation, item);
+        }
         moveActiveCell(operation, true);
       }
     }
