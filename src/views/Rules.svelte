@@ -104,28 +104,23 @@
   const flipParams = { duration: 300 };
 </script>
 
-<div class="relative flex h-[90vh] flex-row items-start justify-start gap-4">
-  <Palette />
-  <Svelvet nodes={initialNodes} edges={initialEdges} background />
-  <div class="flex flex-col ">
-    <Spawner />
+<Palette />
+<Svelvet nodes={initialNodes} edges={initialEdges} background />
+<div class="flex w-1/6 flex-col justify-start">
+  <!-- <Spawner /> -->
+  <div class="w-3/4">
+    <h4 on:click={() => modal.show("statics")}>Statics 🗿</h4>
+    <button class="btn add" on:click={() => statics.add($currentEmoji)}>
+      [ {$currentEmoji == "" ? "____" : $currentEmoji} ]
+    </button>
     <div class="">
-      <h4 on:click={() => modal.show("statics")}>Statics 🗿</h4>
-      <button
-        class="statics-add-btn"
-        on:click={() => statics.add($currentEmoji)}
-      >
-        [ {$currentEmoji == "" ? "____" : $currentEmoji} ]
-      </button>
-      <div class="flex flex-col-reverse items-start justify-start">
-        {#each [...$statics] as item (item)}
-          <div transition:scale|local={flipParams} animate:flip={flipParams}>
-            <button class="statics-btn" on:click={() => statics.remove(item)}
-              >{item}</button
-            >
-          </div>
-        {/each}
-      </div>
+      {#each [...$statics] as item (item)}
+        <div transition:scale|local={flipParams} animate:flip={flipParams}>
+          <button class="btn remove" on:click={() => statics.remove(item)}
+            >{item}</button
+          >
+        </div>
+      {/each}
     </div>
   </div>
 </div>

@@ -9,8 +9,8 @@
   // Declaring variables for Svelvet components which will be usable in other files
   export let nodes: Node[];
   export let edges: Edge[];
-  export let width: number = 800;
-  export let height: number = 800;
+  export let width: number = 772;
+  export let height: number = 772;
   export let background: boolean = false;
   export let movement: boolean = true;
 

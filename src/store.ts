@@ -48,11 +48,6 @@ export interface TCollision {
   rule: Array<string>;
 }
 
-export interface Emoji {
-  emoji: string;
-  inventory?: Array<any>;
-}
-
 function createMapStore<T>(name: string) {
   const { set, subscribe, update } = writable(new Map<number, T>());
 
@@ -139,7 +134,7 @@ function createSaves() {
 
 function createEditableMap() {
   const { set, subscribe, update } = writable({
-    items: new Map<number, any>(),
+    items: new Map<number, string>(),
     backgrounds: new Map<number, string>(),
     objective: "",
   });
@@ -186,9 +181,9 @@ function createEditableMap() {
         state.backgrounds.clear();
         return state;
       }),
-    addEmoji: (index: number, obj: Emoji) =>
+    addEmoji: (index: number, emoji: string) =>
       update((state) => {
-        state.items.set(index, obj);
+        state.items.set(index, emoji);
         return state;
       }),
     removeEmoji: (index: number) =>

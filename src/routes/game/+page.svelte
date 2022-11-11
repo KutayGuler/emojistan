@@ -88,7 +88,7 @@
     on:mousemove={setCursorEmoji}
   >
     <div
-      class="box-border flex h-[100vh] w-5/6 flex-col items-center justify-center overflow-y-hidden duration-200 ease-out"
+      class="box-border flex h-[100vh] w-5/6 flex-col items-center justify-start overflow-y-hidden duration-200 ease-out"
     >
       <span
         class="flex cursor-pointer flex-row items-center justify-center gap-3 py-6"
@@ -106,7 +106,11 @@
       <p class="text-2xl">{views[viewIndex].title}</p>
       <!-- TODO: Standardize view layout -->
 
-      <svelte:component this={views[viewIndex].component} />
+      <div
+        class="flex h-[80vh] w-full flex-row items-start justify-center gap-4"
+      >
+        <svelte:component this={views[viewIndex].component} />
+      </div>
     </div>
     <aside
       class="h-[100vh] w-1/6 overflow-y-auto rounded-tl-lg rounded-bl-lg  bg-sky-400 p-2 shadow-2xl"

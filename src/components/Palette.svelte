@@ -51,38 +51,43 @@
   }
 </script>
 
-<div>
-  <div class="relative">
-    <button class="statics-add-btn relative bg-white" on:click={addColor}
-      >🎨
-    </button>
-    <input
-      class="absolute -bottom-0 -left-full h-full w-full"
-      type="color"
-      bind:value={pickedColor}
-      on:change={pickedColorChanged}
-    />
-  </div>
-  <div
-    style:background={defaultBackground}
-    class="my-4 flex flex-col-reverse items-start justify-start gap-4 rounded-lg px-4 py-4 pb-4 shadow-lg"
-  >
-    {#each [...$cp] as color (color)}
-      <div
-        class="relative flex flex-row items-center justify-center"
-        transition:scale|local={flipParams}
-        animate:flip={flipParams}
-      >
-        <div style:background={color} class="color" />
-        <button
-          class="absolute -top-2 left-0 hover:scale-125 "
-          on:click={() => setDefaultBackground(color)}>🌍</button
+<div class="flex h-full w-1/6 flex-row justify-end">
+  <div class="h-full w-3/4">
+    <h4 class="text-center text-xl" on:click={() => modal.show("palette")}>
+      Palette 🎨
+    </h4>
+    <div class="relative flex flex-row justify-center">
+      <button class="btn add relative w-full  bg-white" on:click={addColor}
+        >🎨
+      </button>
+      <input
+        class="absolute top-4 left-8 h-4/5 w-6"
+        type="color"
+        bind:value={pickedColor}
+        on:change={pickedColorChanged}
+      />
+    </div>
+    <div
+      style:background={defaultBackground}
+      class="flex h-5/6 flex-col items-center justify-start gap-4 rounded-lg py-4 pb-4 shadow-lg"
+    >
+      {#each [...$cp] as color (color)}
+        <div
+          class="relative flex flex-row items-center justify-center"
+          transition:scale|local={flipParams}
+          animate:flip={flipParams}
         >
-        <button
-          class="absolute -top-2 right-0 hover:scale-125"
-          on:click={() => removeColor(color)}>❌</button
-        >
-      </div>
-    {/each}
+          <div style:background={color} class="color" />
+          <button
+            class="absolute -top-2 left-0 hover:scale-125 "
+            on:click={() => setDefaultBackground(color)}>🌍</button
+          >
+          <button
+            class="absolute -top-2 right-0 hover:scale-125"
+            on:click={() => removeColor(color)}>❌</button
+          >
+        </div>
+      {/each}
+    </div>
   </div>
 </div>

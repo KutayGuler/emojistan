@@ -64,6 +64,8 @@
     }
   });
 
+  // TODO: Debug game logic
+
   let levelCompleted = false;
   let ac: number; // ACTIVE CELL
   let adc: number; // ADJACENT CELL
@@ -94,7 +96,7 @@
 
   let controllables = [];
   for (let c of _map.items.values()) {
-    if (!$statics.has(c.emoji)) controllables.push(c.emoji);
+    if (!$statics.has(c)) controllables.push(c);
   }
 
   for (let [id, { rule }] of [...$merges, ...$pushes]) {
@@ -115,23 +117,23 @@
     }
   }
 
-  function equip(item: string, destroy = false) {
-    if (!items.get(adc)) return;
-    if (item == "") item = items.get(adc).emoji;
-    let player = items.get(ac);
-    if (!player.inventory) {
-      player.inventory = ["", "", "", ""];
-    }
+  // function equip(item: string, destroy = false) {
+  //   if (!items.get(adc)) return;
+  //   if (item == "") item = items.get(adc);
+  //   let player = items.get(ac);
+  //   if (!player.inventory) {
+  //     player.inventory = ["", "", "", ""];
+  //   }
 
-    let inventory = player.inventory;
-    if (inventory.includes("")) {
-      let index = inventory.indexOf("");
-      inventory[index] = item;
-      currentItem = item;
-      if (destroy) items.delete(adc);
-      items = items;
-    }
-  }
+  //   let inventory = player.inventory;
+  //   if (inventory.includes("")) {
+  //     let index = inventory.indexOf("");
+  //     inventory[index] = item;
+  //     currentItem = item;
+  //     if (destroy) items.delete(adc);
+  //     items = items;
+  //   }
+  // }
 
   // MUTATIONS
   const m = {
@@ -145,18 +147,18 @@
     removeBackgroundOf: ({ index }: { index: number }) => {
       backgrounds.delete(index);
     },
-    equipItem: ({ emoji }: { emoji: string }) => equip(emoji),
-    equipInteractedItem: () => equip("", true),
-    consumeEquippedItem: () => {
-      items.get(ac).inventory[inventoryIndex] = "";
-      currentItem = "";
-      items = items;
-    },
+    // equipItem: ({ emoji }: { emoji: string }) => equip(emoji),
+    // equipInteractedItem: () => equip("", true),
+    // consumeEquippedItem: () => {
+    //   items.get(ac).inventory[inventoryIndex] = "";
+    //   currentItem = "";
+    //   items = items;
+    // },
     spawn: (
       { index, emoji }: { index: number; emoji: string },
       _start?: number
     ) => {
-      items.set(_start || index, { emoji });
+      items.set(_start || index, emoji);
       items = items;
     },
     destroy: ({ index }: { index: number }) => {
@@ -203,11 +205,11 @@
         a = () => {
           let interactedItem = items.get(adc);
           if (interactedItem != undefined) {
-            if (!_interactables.has(interactedItem.emoji)) return "";
+            if (!_interactables.has(interactedItem)) return "";
             if (playerInteracted) {
               return [
-                interactedItem.emoji + "," + currentItem,
-                interactedItem.emoji + ",any",
+                interactedItem + "," + currentItem,
+                interactedItem + ",any",
               ];
             } else {
               return "";
@@ -282,10 +284,10 @@
         return;
       }
       let item = items.get(ac);
-      if (item == undefined || $statics.has(item.emoji)) return;
+      if (item == undefined || $statics.has(item)) return;
       let postOpItem = items.get(ac + operation);
       if (postOpItem) {
-        switch (getCollisionType(item.emoji, postOpItem.emoji)) {
+        switch (getCollisionType(item, postOpItem)) {
           case "push":
             let collisionChain = [];
             let i = 1;
@@ -296,8 +298,8 @@
 
             let arr = [];
             for (let i = 0; i < collisionChain.length; i++) {
-              let cur = collisionChain[i]?.emoji;
-              let next = collisionChain[i + 1]?.emoji;
+              let cur = collisionChain[i];
+              let next = collisionChain[i + 1];
               if (cur && next) {
                 arr.push(_collisions.get(cur)?.get(next));
               }
@@ -338,12 +340,12 @@
               );
 
               for (let i = 0; i < arr.length + 2; i++) {
-                let cur = collisionChain[i]?.emoji;
-                let next = collisionChain[i + 1]?.emoji;
+                let cur = collisionChain[i];
+                let next = collisionChain[i + 1];
                 if (next && cur) {
                   let emoji = _collisions.get(cur)?.get(next);
                   if (emoji && emoji != "push") {
-                    items.set(ac + operation * (i + 2), { emoji });
+                    items.set(ac + operation * (i + 2), emoji);
                     items.set(ac + operation, items.get(ac));
                     moveActiveCell(operation, true);
                     break;
@@ -356,17 +358,17 @@
             break;
           default:
             // MERGE
-            postOpItem.emoji = getCollisionType(item.emoji, postOpItem.emoji);
+            postOpItem = getCollisionType(item, postOpItem);
             moveActiveCell(operation, true);
             break;
         }
       } else {
-        if (item.inventory) {
-          let { emoji, inventory } = item;
-          items.set(ac + operation, { emoji, inventory });
-        } else {
-          items.set(ac + operation, { emoji: item.emoji });
-        }
+        // if (item.inventory) {
+        //   let { emoji, inventory } = item;
+        //   items.set(ac + operation, { emoji, inventory });
+        // } else {
+        //   items.set(ac + operation, { emoji: item.emoji });
+        // }
         moveActiveCell(operation, true);
       }
     }
@@ -381,9 +383,7 @@
       let closestDistance = 300;
       let closestID = ac;
 
-      let _items = Array.from(items).filter(
-        ([id, val]) => !$statics.has(val.emoji)
-      );
+      let _items = Array.from(items).filter(([id, val]) => !$statics.has(val));
 
       for (let [id, _] of _items) {
         if (id == ac) continue;
@@ -412,9 +412,7 @@
       let closestDistance = 300;
       let closestID = ac;
 
-      let _items = Array.from(items).filter(
-        ([id, val]) => !$statics.has(val.emoji)
-      );
+      let _items = Array.from(items).filter(([id, val]) => !$statics.has(val));
 
       for (let [id, _] of _items) {
         if (id == ac) continue;
@@ -455,34 +453,36 @@
       return;
     }
 
-    if (e.code == "KeyX") {
-      if (calcOperation(dirKey, adc, true, true) == 0) {
-        playerInteracted = false;
-        return;
-      }
+    // DROP ITEM
+    // if (e.code == "KeyX") {
+    //   if (calcOperation(dirKey, adc, true, true) == 0) {
+    //     playerInteracted = false;
+    //     return;
+    //   }
 
-      if (!items.get(adc)) {
-        items.set(adc, { emoji: currentItem });
-        items.get(ac).inventory[inventoryIndex] = "";
-        currentItem = "";
-        items = items;
-      }
-      return;
-    }
+    //   if (!items.get(adc)) {
+    //     items.set(adc, { emoji: currentItem });
+    //     items.get(ac).inventory[inventoryIndex] = "";
+    //     currentItem = "";
+    //     items = items;
+    //   }
+    //   return;
+    // }
 
-    if (e.code.includes("Digit")) {
-      let num = +e.code.replace("Digit", "");
-      if (num >= 1 && num <= 4) {
-        if (inventoryIndex == num - 1) {
-          inventoryIndex = -1;
-          currentItem = "";
-        } else {
-          inventoryIndex = num - 1;
-          currentItem = items.get(ac).inventory[inventoryIndex];
-        }
-      }
-      return;
-    }
+    // SWITCH ITEM
+    // if (e.code.includes("Digit")) {
+    //   let num = +e.code.replace("Digit", "");
+    //   if (num >= 1 && num <= 4) {
+    //     if (inventoryIndex == num - 1) {
+    //       inventoryIndex = -1;
+    //       currentItem = "";
+    //     } else {
+    //       inventoryIndex = num - 1;
+    //       currentItem = items.get(ac).inventory[inventoryIndex];
+    //     }
+    //   }
+    //   return;
+    // }
   }
 
   // TODO: Switch to canvas
@@ -490,52 +490,44 @@
 
 <svelte:window on:keydown={handle} />
 
-
-<section
-  class="relative flex h-[90vh] w-full flex-col items-center justify-start "
->
-  <!-- <p
+<!-- <p
     class="absolute top-8 right-8 cursor-help text-3xl duration-200 ease-out hover:scale-150"
     on:click={() => modal.show("keyboardPlay")}
   >
     ⌨️
   </p> -->
-  <section>
-    <!-- <p><strong>Objective: </strong>{_map.objective || "?"}</p> -->
+<!-- <p><strong>Objective: </strong>{_map.objective || "?"}</p> -->
 
-    <!-- INVENTORY -->
-    <!-- <div class="flex flex-row items-center justify-center gap-2">
+<!-- INVENTORY -->
+<!-- <div class="flex flex-row items-center justify-center gap-2">
       {#each items.get(ac)?.inventory || [] as item, i}
         <div class:currentItem={i == inventoryIndex}>{item}</div>
       {/each}
     </div> -->
-    <div class="map">
-      {#each { length: 256 } as _, i}
-        {@const active = ac == i}
-        <div
-          class="cell"
-          style:background={backgrounds.get(i) || "var(--default-background)"}
-          class:active
-        >
-          {#if active && calcOperation(dirKey, i, true) != 0}
-            <div class="direction" style={dirs[dirKey].style}>
-              {currentItem || dirs[dirKey].emoji}
-            </div>
-          {/if}
-          {items.get(i)?.emoji || ""}
+<div class="map">
+  {#each { length: 256 } as _, i}
+    {@const active = ac == i}
+    <div
+      class="cell"
+      style:background={backgrounds.get(i) || "var(--default-background)"}
+      class:active
+    >
+      {#if active && calcOperation(dirKey, i, true) != 0}
+        <div class="direction" style={dirs[dirKey].style}>
+          {currentItem || dirs[dirKey].emoji}
         </div>
-      {/each}
-      {#if levelCompleted}
-        <dialog open bind:this={dialog} transition:scale>
-          LEVEL COMPLETED!
-          <button on:click={() => (levelCompleted = !levelCompleted)}>OK</button
-          >
-          <button on:click={m.resetLevel}>REPLAY</button>
-        </dialog>
       {/if}
+      {items.get(i) || ""}
     </div>
-  </section>
-</section>
+  {/each}
+  {#if levelCompleted}
+    <dialog open bind:this={dialog} transition:scale>
+      LEVEL COMPLETED!
+      <button on:click={() => (levelCompleted = !levelCompleted)}>OK</button>
+      <button on:click={m.resetLevel}>REPLAY</button>
+    </dialog>
+  {/if}
+</div>
 
 <style>
   :root {
