@@ -64,8 +64,6 @@
     }
   });
 
-  // TODO: Debug game logic
-
   let levelCompleted = false;
   let ac: number; // ACTIVE CELL
   let adc: number; // ADJACENT CELL
@@ -485,8 +483,6 @@
     //   return;
     // }
   }
-
-  // TODO: Switch to canvas
 </script>
 
 <svelte:window on:keydown={handle} />

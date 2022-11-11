@@ -1,4 +1,6 @@
 <script>
+  import { notifications } from "./notifications";
+  import Toast from "./Toast.svelte";
   import { navigating } from "$app/stores";
   import "../app.css";
 </script>
@@ -11,6 +13,8 @@
     <span class="px-2" id="loading">👾</span>
   </div>
 {/if}
+
+<Toast />
 
 <slot />
 

@@ -1,7 +1,4 @@
 <script lang="ts">
-  // TODO: if in this route and currentSave == "" then redirect to home
-  // TODO: Switch to IndexedDB
-
   // VIEWS
   import Play from "../../views/Play.svelte";
   import Editor from "../../views/Editor.svelte";
@@ -29,7 +26,7 @@
   // quickAcess edit mode
   let editMode = false;
 
-  let viewIndex = 1;
+  let viewIndex = 2;
 
   let views = [
     { component: Play, emoji: "🎬", title: "Play" },
@@ -104,8 +101,6 @@
         {/each}
       </span>
       <p class="text-2xl">{views[viewIndex].title}</p>
-      <!-- TODO: Standardize view layout -->
-
       <div
         class="flex h-[80vh] w-full flex-row items-start justify-center gap-4"
       >

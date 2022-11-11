@@ -4,6 +4,7 @@
   import { scale } from "svelte/transition";
   import { flip } from "svelte/animate";
   import { onMount } from "svelte";
+  import { notifications } from "../routes/notifications";
 
   let r: any;
   let pickedColor = "#000000";
@@ -43,8 +44,7 @@
 
   function addColor() {
     if ($cp.size == 8) {
-      console.log("too long");
-      // TODO: Display error
+      notifications.warning("Number of colors cannot exceed 8");
       return;
     }
     cp.add(pickedColor);

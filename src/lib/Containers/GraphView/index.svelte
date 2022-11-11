@@ -58,7 +58,6 @@
     d3.select(`.Nodes-${key}`).call(d3Zoom).on("dblclick.zoom", null);
   });
 
-  // TODO: Update d3Zoom type (refer to d3Zoom docs)
   let d3Zoom: any = d3
     .zoom()
     .filter(() => !$nodeSelected)
@@ -103,7 +102,7 @@
   }
 
   let z1 = "z-index: 1;";
-  let svgStyle = z1;
+  let svgStyle = "";
 </script>
 
 <button on:click={() => (svgStyle = svgStyle == z1 ? "" : z1)}
