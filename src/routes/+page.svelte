@@ -4,11 +4,12 @@
   import { saves, modal } from "../store";
   import { scale, fly } from "svelte/transition";
   import { clickOutside } from "../utils/clickOutside";
+  import { browser } from "$app/environment";
 
   let navigating = false;
 
   onMount(() => {
-    saves.useStorage();
+    browser && saves.useStorage();
   });
 
   function openSave(id?: string) {

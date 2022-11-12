@@ -61,7 +61,6 @@
   });
 
   // TODO: Shouldn't be able to add global color as condition color
-  // TODO: Check if color palette is being saved on database
 </script>
 
 <div class="if">

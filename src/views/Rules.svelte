@@ -3,13 +3,14 @@
   import { flip } from "svelte/animate";
   import { scale, fly } from "svelte/transition";
   import { onMount } from "svelte/internal";
+  import { browser } from "$app/environment";
 
   // DATA
   import {
     events,
     loopEvents,
     conditions,
-    palette as cp,
+    palette,
     statics,
     currentEmoji,
     modal,
@@ -19,8 +20,11 @@
     rulesIndex,
   } from "../store";
 
-  for (let store of [pushes, merges, events, loopEvents, cp, statics]) {
-    store.useStorage($saves.current);
+  if (browser) {
+    if ($saves.current == "") saves.useStorage();
+    for (let store of [pushes, merges, events, loopEvents, palette, statics]) {
+      store.useStorage($saves.current);
+    }
   }
 
   // COMPONENTS

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { browser } from "$app/environment";
   import { onMount } from "svelte";
   import {
     currentEmoji,
@@ -11,9 +12,8 @@
   import { longpress } from "../utils/longpress";
 
   onMount(() => {
-    if ($saves.current == "") {
-      saves.useStorage();
-    }
+    if (!browser) return;
+    if ($saves.current == "") saves.useStorage();
     map.useStorage($saves.current);
   });
 
@@ -130,7 +130,7 @@
     </div>
   </div>
   <button class="btn mt-2" on:click={fillMap}
-    >Fill With [{$currentEmoji || "___"}]</button
+    >Fill With [{$currentEmoji || "____"}]</button
   >
 </div>
 

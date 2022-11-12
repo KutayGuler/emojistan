@@ -101,6 +101,7 @@ function createSaves() {
     useStorage: () => {
       const current = localStorage.getItem("currentSave");
       const saves = JSON.parse(localStorage.getItem("saves"));
+      console.log(current);
 
       update((state) => {
         state.saves = new Map(saves) || new Map();
@@ -212,17 +213,20 @@ function createSetStore(name: string) {
     set,
     subscribe,
     useStorage: (id: string) => {
-      // const val = JSON.parse(localStorage.getItem(id + "_" + name));
-      // console.log(val);
-      // set(new Set<string>(val || []));
-      // subscribe((state) => {
-      //   localStorage.setItem(id + "_" + name, JSON.stringify(state));
-      // });
+      const val = JSON.parse(localStorage.getItem(id + "_" + name));
+      set(new Set<string>(Array.from(val)));
+      subscribe((state) => {
+        localStorage.setItem(
+          id + "_" + name,
+          JSON.stringify(Array.from(state))
+        );
+      });
     },
     add: (value: string) =>
       value != "" &&
       update((state) => {
         state.add(value);
+        console.log(state);
         return state;
       }),
     remove: (value: string) =>
@@ -279,7 +283,7 @@ export const saves = createSaves();
 
 export const statics = createSetStore("statics");
 export const quickAccess = createSetStore("quickAccess");
-export const palette = createSetStore("cp");
+export const palette = createSetStore("palette");
 
 export const map = createEditableMap();
 
