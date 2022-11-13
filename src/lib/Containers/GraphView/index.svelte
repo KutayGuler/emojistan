@@ -2,14 +2,11 @@
   import { onMount } from "svelte";
   import { zoom, zoomTransform } from "d3-zoom";
   import { select, selectAll } from "d3-selection";
-  import { setContext } from "svelte";
-  setContext("busy", false);
+  import { findOrCreateStore, linker } from "$lib/stores/store";
 
   import SimpleBezierEdge from "$lib/Edges/SimpleBezierEdge.svelte";
   import EdgeAnchor from "$lib/Edges/EdgeAnchor.svelte";
   import Node from "$lib/Nodes/index.svelte";
-
-  import { findOrCreateStore, linker } from "$lib/stores/store";
 
   // leveraging d3 library to zoom/pan
   let d3 = {

@@ -20,6 +20,16 @@
     goto("/game");
   }
 
+  function deleteSave() {
+    saves.delete(id);
+    popup = false;
+  }
+
+  function renameSave() {
+    prevTitle = title;
+    saves.rename(id, title);
+  }
+
   let popup = false;
   let id = "";
   let title = "";
@@ -32,16 +42,6 @@
     id = _id;
     title = _title;
     prevTitle = _title;
-  }
-
-  function deleteSave() {
-    saves.delete(id);
-    popup = false;
-  }
-
-  function renameSave() {
-    prevTitle = title;
-    saves.rename(id, title);
   }
 </script>
 
@@ -118,6 +118,9 @@
     </div>
     {#if $saves.loaded}
       <div class="w-1/4" transition:scale|local>
+        <button class="btn hover:bg-green-400" on:click={() => openSave()}
+          >LOGIN</button
+        >
         <button class="btn hover:bg-green-400" on:click={() => openSave()}
           >NEW GAME</button
         >

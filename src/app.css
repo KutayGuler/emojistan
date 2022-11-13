@@ -20,7 +20,7 @@
   }
 
   .map {
-    @apply grid w-auto grid-cols-16 grid-rows-16 gap-1 bg-gray-200 p-1 shadow-xl;
+    @apply grid w-auto grid-cols-16 grid-rows-16 gap-1 p-1 shadow-xl;
   }
 
   .cell {

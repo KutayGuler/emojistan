@@ -53,10 +53,10 @@
 
 <div class="flex h-full w-1/6 flex-row justify-end">
   <div class="h-full w-3/4">
-    <h4 class="text-center text-xl" on:click={() => modal.show("palette")}>
+    <h4 class="text-center text-2xl" on:click={() => modal.show("palette")}>
       Palette 🎨
     </h4>
-    <div class="relative flex flex-row justify-center">
+    <div class="relative">
       <button class="btn add relative w-full  bg-white" on:click={addColor}
         >🎨
       </button>
@@ -67,27 +67,32 @@
         on:change={pickedColorChanged}
       />
     </div>
-    <div
-      style:background={defaultBackground}
-      class="flex h-5/6 flex-col items-center justify-start gap-4 rounded-lg py-4 pb-4 shadow-lg"
-    >
-      {#each [...$cp] as color (color)}
-        <div
-          class="relative flex flex-row items-center justify-center"
-          transition:scale|local={flipParams}
-          animate:flip={flipParams}
+
+    {#each [...$cp] as color (color)}
+      <div
+        class="relative"
+        transition:scale|local={flipParams}
+        animate:flip={flipParams}
+      >
+        <button
+          class:default={defaultBackground == color}
+          class="absolute -left-6 top-6 opacity-50 hover:scale-125"
+          on:click={() => setDefaultBackground(color)}>🌍</button
         >
-          <div style:background={color} class="color" />
-          <button
-            class="absolute -top-2 left-0 hover:scale-125 "
-            on:click={() => setDefaultBackground(color)}>🌍</button
-          >
-          <button
-            class="absolute -top-2 right-0 hover:scale-125"
-            on:click={() => removeColor(color)}>❌</button
-          >
+        <div
+          on:click={() => removeColor(color)}
+          style:background={color}
+          class="remove btn"
+        >
+          &nbsp;
         </div>
-      {/each}
-    </div>
+      </div>
+    {/each}
   </div>
 </div>
+
+<style>
+  .default {
+    opacity: 1;
+  }
+</style>

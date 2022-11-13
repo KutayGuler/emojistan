@@ -17,7 +17,6 @@
     pushes,
     merges,
     saves,
-    rulesIndex,
   } from "../store";
 
   if (browser) {
@@ -37,11 +36,6 @@
   import Container from "../components/Container.svelte";
   import Spawner from "../Spawner.svelte";
   import Palette from "../components/Palette.svelte";
-
-  let eventIndex = 1;
-  let loopEventIndex = 1;
-
-  let hovering: any = false;
 
   const initialNodes = [
     {
@@ -64,41 +58,6 @@
       height: 80,
       targetPosition: "left",
     },
-    // {
-    //   id: 3,
-    //   position: { x: 390, y: 180 },
-    //   data: { component: Event },
-    //   width: 250,
-    //   height: 80,
-    // },
-    // {
-    //   id: 4,
-    //   position: { x: 390, y: 180 },
-    //   data: { component: Merge },
-    //   width: 125,
-    //   height: 40,
-    // },
-    // {
-    //   id: 4,
-    //   position: { x: 390, y: 180 },
-    //   data: { component: Condition },
-    //   width: 125,
-    //   height: 40,
-    // },
-    // {
-    //   id: 5,
-    //   position: { x: 390, y: 180 },
-    //   data: { component: Event },
-    //   width: 125,
-    //   height: 40,
-    // },
-    // {
-    //   id: 6,
-    //   position: { x: 390, y: 180 },
-    //   data: { component: LoopEvent },
-    //   width: 125,
-    //   height: 40,
-    // },
   ];
 
   const initialEdges = [
@@ -117,15 +76,13 @@
     <button class="btn add" on:click={() => statics.add($currentEmoji)}>
       [ {$currentEmoji == "" ? "____" : $currentEmoji} ]
     </button>
-    <div class="">
-      {#each [...$statics] as item (item)}
-        <div transition:scale|local={flipParams} animate:flip={flipParams}>
-          <button class="btn remove" on:click={() => statics.remove(item)}
-            >{item}</button
-          >
-        </div>
-      {/each}
-    </div>
+    {#each [...$statics] as item (item)}
+      <div transition:scale|local={flipParams} animate:flip={flipParams}>
+        <button class="btn remove" on:click={() => statics.remove(item)}
+          >{item}</button
+        >
+      </div>
+    {/each}
   </div>
 </div>
 

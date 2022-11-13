@@ -285,21 +285,22 @@ function createModal() {
   };
 }
 
-export const modal = createModal();
-
+// VANILLA
 export const currentItem = writable("");
 export const currentColor = writable("");
 export const currentEmoji = writable("");
-export const rulesIndex = writable(0);
 
+// CUSTOM
+export const modal = createModal();
 export const saves = createSaves();
-
-export const statics = createSetStore("statics");
-export const quickAccess = createSetStore("quickAccess");
-export const palette = createSetStore("palette");
-
 export const map = createEditableMap();
 
+// SETS
+export const quickAccess = createSetStore("quickAccess");
+export const statics = createSetStore("statics");
+export const palette = createSetStore("palette");
+
+// MAPS
 export const pushes = createMapStore<TCollision>("pushes");
 export const merges = createMapStore<TCollision>("merges");
 export const collisions = createMapStore<TCollision>("collisions");

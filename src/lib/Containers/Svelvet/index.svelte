@@ -45,7 +45,7 @@
 
 <!-- Now that a store has been created from the initial nodes and initial edges we drill props from the store down to the D3 GraphView along with the unique key -->
 <div
-  class="Svelvet h-[90vh] w-[90vh] border border-black"
+  class="Svelvet shadow-lg"
   style={`width: ${$widthStore}px; height: ${$heightStore}px`}
 >
   <GraphView {nodesStore} {derivedEdges} {key} />
