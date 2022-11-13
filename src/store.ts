@@ -101,15 +101,10 @@ function createSaves() {
     set,
     subscribe,
     useStorage: () => {
+      console.log("use");
       const current = localStorage.getItem("currentSave");
       const saves = JSON.parse(localStorage.getItem("saves"));
       console.log(current);
-      let pageName = "";
-      page.subscribe((val) => (pageName = val.url.pathname));
-      console.log(pageName);
-      // if (!current && pageName == "/game") {
-      //   throw redirect(300, "/");
-      // }
 
       update((state) => {
         state.saves = new Map(saves) || new Map();
@@ -119,6 +114,7 @@ function createSaves() {
       });
 
       subscribe((state) => {
+        console.log(state);
         localStorage.setItem(
           "saves",
           JSON.stringify(Array.from(state.saves.entries()))
@@ -133,13 +129,27 @@ function createSaves() {
       }),
     add: () =>
       update((state) => {
-        let id = Date.now().toString().slice(7);
+        let id = (Math.random() + 1).toString(36).substring(7);
         state.current = id;
         state.saves.set(id, "Game #" + (state.saves.size + 1).toString());
         return state;
       }),
     delete: (id: string) =>
       update((state) => {
+        for (let store of [
+          "pushes",
+          "merges",
+          "events",
+          "loopEvents",
+          "palette",
+          "statics",
+          "items",
+          "backgrounds",
+          "objective",
+        ]) {
+          localStorage.removeItem(id + "_" + store);
+        }
+        state.current = "";
         state.saves.delete(id);
         return state;
       }),

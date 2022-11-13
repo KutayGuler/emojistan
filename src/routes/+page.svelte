@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { goto } from "$app/navigation";
+  import { goto, invalidate } from "$app/navigation";
   import { onMount } from "svelte";
   import { saves, modal } from "../store";
   import { scale, fly } from "svelte/transition";
@@ -20,9 +20,11 @@
     goto("/game");
   }
 
-  function deleteSave() {
+  async function deleteSave() {
     saves.delete(id);
     popup = false;
+    await invalidate("/");
+    // TODO: Form action refresh page
   }
 
   function renameSave() {
@@ -35,6 +37,7 @@
   let title = "";
   let prevTitle = "";
   let mode = "";
+  let view: "saves" | "feed" = "saves";
 
   function showPopup(_id: string, _title: string, _mode: "edit" | "delete") {
     popup = true;
@@ -108,7 +111,7 @@
 {#if !$navigating}
   <main class="noselect">
     <div
-      class="absolute top-16 flex cursor-help flex-col items-end duration-200 hover:scale-125"
+      class="flex cursor-help flex-col items-end py-16 duration-200 hover:scale-125"
       out:scale|local
     >
       <h1 class="text-9xl" on:click={() => modal.show("emojistan")}>
@@ -116,34 +119,43 @@
       </h1>
       <p class="pt-4 pr-4">v0.0.1</p>
     </div>
-    {#if $saves.loaded}
-      <div class="w-1/4" transition:scale|local>
-        <button class="btn hover:bg-green-400" on:click={() => openSave()}
-          >LOGIN</button
-        >
-        <button class="btn hover:bg-green-400" on:click={() => openSave()}
-          >NEW GAME</button
-        >
-        {#each [...$saves.saves] as [id, title]}
-          <div class="relative flex">
-            <button class="btn hover:bg-blue-400" on:click={() => openSave(id)}
-              >{title}</button
-            >
-            <div class="absolute -right-16 top-8">
+    <div class="flex flex-row">
+      <button class="btn" on:click={() => (view = "saves")}>SAVES</button>
+      <button class="btn" on:click={() => (view = "feed")}>FEED</button>
+    </div>
+    {#if view == "saves"}
+      {#if $saves.loaded}
+        <div class="w-1/4" transition:scale|local>
+          <button class="btn hover:bg-green-400" on:click={() => openSave()}
+            >LOGIN</button
+          >
+          <button class="btn hover:bg-green-400" on:click={() => openSave()}
+            >NEW GAME</button
+          >
+          {#each [...$saves.saves] as [id, title]}
+            <div class="relative flex">
               <button
-                class="duration-200 ease-out hover:scale-150"
-                on:click={() => showPopup(id, title, "edit")}>✏️</button
+                class="btn hover:bg-blue-400"
+                on:click={() => openSave(id)}>{title}</button
               >
-              <button
-                class="duration-200 ease-out hover:scale-150"
-                on:click={() => showPopup(id, title, "delete")}>🗑️</button
-              >
+              <div class="absolute -right-16 top-8">
+                <button
+                  class="duration-200 ease-out hover:scale-150"
+                  on:click={() => showPopup(id, title, "edit")}>✏️</button
+                >
+                <button
+                  class="duration-200 ease-out hover:scale-150"
+                  on:click={() => showPopup(id, title, "delete")}>🗑️</button
+                >
+              </div>
             </div>
-          </div>
-        {/each}
-      </div>
-    {:else}
-      <p>Loading...</p>
+          {/each}
+        </div>
+      {:else}
+        <p>Loading...</p>
+      {/if}
+    {:else if view == "feed"}
+      <div>XD</div>
     {/if}
   </main>
 {/if}
@@ -157,7 +169,7 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: start;
     align-items: center;
     width: 100vw;
     height: 100vh;
