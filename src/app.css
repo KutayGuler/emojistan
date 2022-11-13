@@ -4,7 +4,7 @@
 
 @layer components {
   .btn {
-    @apply flex w-full cursor-pointer items-center justify-center rounded-xl border-4 border-solid p-4 text-2xl shadow-lg duration-200 ease-out;
+    @apply my-3 flex w-full cursor-pointer items-center justify-center rounded-xl border-4 border-solid p-4 text-2xl shadow-lg duration-200 ease-out;
   }
 
   .add {

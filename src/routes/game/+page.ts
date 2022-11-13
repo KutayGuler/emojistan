@@ -1,8 +1,11 @@
 import type { PageLoad } from "./$types";
 import { redirect } from "@sveltejs/kit";
+import { browser } from "$app/environment";
 
 export const load: PageLoad = () => {
-  //   if (localStorage.getItem("currentSave") == "") {
-  //     throw redirect(307, "/");
-  //   }
+  // console.log(browser);
+  // return;
+  // if (localStorage.getItem("currentSave") == "") {
+  //   throw redirect(307, "/");
+  // }
 };

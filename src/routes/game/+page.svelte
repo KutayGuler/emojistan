@@ -5,20 +5,22 @@
   import Rules from "../../views/Rules.svelte";
 
   // DATA
-  import { emojis } from "../../emojis";
   import { quickAccess, currentEmoji, currentColor } from "../../store";
-
+  import { notifications } from "../notifications";
+  import { redirect } from "@sveltejs/kit";
+  import { emojis } from "../../emojis";
   import { onMount } from "svelte";
-  // import { redirect } from "@sveltejs/kit";
 
   let loading = true;
 
+  // TODO: redirecting
+
   onMount(() => {
-    let timer = setTimeout(() => (loading = false), 2000);
-    // if (localStorage.getItem("currentSave") == "") {
-    //   throw redirect(307, "/");
-    // }
-    return () => clearTimeout(timer);
+    if (localStorage.getItem("currentSave") == "") {
+      notifications.info("Failed to find save file.");
+      console.log($notifications);
+      throw redirect(307, "/");
+    }
   });
 
   let filter = "";

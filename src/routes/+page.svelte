@@ -5,15 +5,13 @@
   import { scale, fly } from "svelte/transition";
   import { clickOutside } from "../utils/clickOutside";
   import { browser } from "$app/environment";
-
-  let navigating = false;
+  import { navigating } from "$app/stores";
 
   onMount(() => {
     browser && saves.useStorage();
   });
 
   function openSave(id?: string) {
-    navigating = true;
     if (id) {
       $saves.current = id;
     } else {
@@ -25,16 +23,25 @@
   let popup = false;
   let id = "";
   let title = "";
+  let prevTitle = "";
+  let mode = "";
 
-  function showPopup(_id: string, _title: string) {
+  function showPopup(_id: string, _title: string, _mode: "edit" | "delete") {
     popup = true;
+    mode = _mode;
     id = _id;
     title = _title;
+    prevTitle = _title;
   }
 
   function deleteSave() {
     saves.delete(id);
     popup = false;
+  }
+
+  function renameSave() {
+    prevTitle = title;
+    saves.rename(id, title);
   }
 </script>
 
@@ -62,30 +69,47 @@
           />
         </svg>
       </button>
-      <p>Are you sure you want to delete save {title}?</p>
-      <div class="flex">
-        <div
-          on:click={deleteSave}
-          class="btn border-none shadow-none hover:scale-150"
-        >
-          ✔️
+      {#if mode == "edit"}
+        <div class="flex flex-row">
+          <input
+            class="rounded border-2 border-black pl-1 text-start text-2xl"
+            type="text"
+            bind:value={title}
+          />
+          <span
+            class:saved={prevTitle == title}
+            on:click={renameSave}
+            class="btn my-0 ml-4 h-0 w-0 cursor-pointer border-none opacity-50 shadow-none hover:scale-150"
+          >
+            💾
+          </span>
         </div>
-        <div
-          on:click={() => (popup = false)}
-          class="btn border-none shadow-none hover:scale-150"
-        >
-          ❌
+      {:else}
+        <p>Are you sure you want to delete save {title}?</p>
+        <div class="flex">
+          <div
+            on:click={deleteSave}
+            class="btn border-none shadow-none hover:scale-150"
+          >
+            ✔️
+          </div>
+          <div
+            on:click={() => (popup = false)}
+            class="btn border-none shadow-none hover:scale-150"
+          >
+            ❌
+          </div>
         </div>
-      </div>
+      {/if}
     </div>
   </div>
 {/if}
 
-{#if !navigating}
+{#if !$navigating}
   <main class="noselect">
     <div
       class="absolute top-16 flex cursor-help flex-col items-end duration-200 hover:scale-125"
-      out:scale
+      out:scale|local
     >
       <h1 class="text-9xl" on:click={() => modal.show("emojistan")}>
         Emojistan 🏝️
@@ -93,19 +117,25 @@
       <p class="pt-4 pr-4">v0.0.1</p>
     </div>
     {#if $saves.loaded}
-      <div class="w-1/4" transition:scale>
+      <div class="w-1/4" transition:scale|local>
         <button class="btn hover:bg-green-400" on:click={() => openSave()}
           >NEW GAME</button
         >
         {#each [...$saves.saves] as [id, title]}
-          <div class="flex ">
+          <div class="relative flex">
             <button class="btn hover:bg-blue-400" on:click={() => openSave(id)}
               >{title}</button
             >
-            <button
-              class="duration-200 ease-out hover:scale-150"
-              on:click={() => showPopup(id, title)}>❌</button
-            >
+            <div class="absolute -right-16 top-8">
+              <button
+                class="duration-200 ease-out hover:scale-150"
+                on:click={() => showPopup(id, title, "edit")}>✏️</button
+              >
+              <button
+                class="duration-200 ease-out hover:scale-150"
+                on:click={() => showPopup(id, title, "delete")}>🗑️</button
+              >
+            </div>
           </div>
         {/each}
       </div>
@@ -116,6 +146,10 @@
 {/if}
 
 <style>
+  .saved {
+    opacity: 100%;
+  }
+
   main {
     position: relative;
     display: flex;

@@ -1,5 +1,4 @@
 <script>
-  import { notifications } from "./notifications";
   import Toast from "./Toast.svelte";
   import { navigating } from "$app/stores";
   import "../app.css";
