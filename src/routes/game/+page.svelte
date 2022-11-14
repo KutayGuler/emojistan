@@ -19,7 +19,7 @@
     if (localStorage.getItem("currentSave") == "") {
       notifications.info("Failed to find save file.");
       console.log($notifications);
-      throw redirect(307, "/");
+      // throw redirect(307, "/");
     }
   });
 

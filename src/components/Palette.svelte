@@ -61,7 +61,7 @@
         >🎨
       </button>
       <input
-        class="absolute top-4 left-8 h-4/5 w-6"
+        class="absolute -left-6 top-6 h-2/5 w-6"
         type="color"
         bind:value={pickedColor}
         on:change={pickedColorChanged}
