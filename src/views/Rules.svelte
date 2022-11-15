@@ -22,9 +22,9 @@
 <Svelvet nodes={initialNodes} edges={initialEdges} background />
 <div class="flex w-1/6 flex-col justify-start">
   <!-- TODO: Fix spawner positioning -->
-  <Spawner />
+  <!-- <Spawner /> -->
   <div class="w-3/4">
-    <h4 on:click={() => modal.show("statics")}>Statics 🗿</h4>
+    <h4 class="info" on:click={() => modal.show("statics")}>Statics 🗿</h4>
     <button class="btn add" on:click={() => statics.add($currentEmoji)}>
       [ {$currentEmoji == "" ? "____" : $currentEmoji} ]
     </button>
@@ -43,59 +43,9 @@
     --picked-color: black;
   }
 
-  h3 {
-    font-size: 2rem;
-    cursor: pointer;
-  }
-
-  h4 {
-    font-size: 1.5rem;
-    cursor: help;
-  }
-
-  h4,
-  h3 {
-    text-align: center;
-    transition: 200ms ease-out;
-  }
-
-  h3 {
-    opacity: 50%;
-  }
-
-  h3:hover,
-  h4:hover,
-  .currentRule {
-    transform: scale(125%);
-  }
-
-  h3:hover,
-  .currentRule {
-    opacity: 100%;
-  }
-
-  .isDefault::after {
-    content: "🌍";
-    color: white;
-    mix-blend-mode: difference;
-  }
-
   /* BUTTONS */
 
-  .color > button {
-    transition: 50ms ease-out;
-  }
-
-  .color > button:hover {
-    transform: scale(125%);
-  }
-
-  .collision-btn,
-  .condition-btn {
-    color: white;
-  }
-
-  .collision-btn {
+  /* .collision-btn {
     border-color: #3a96dd;
     background: #e9f3fb;
   }
@@ -120,5 +70,5 @@
 
   .event-btn:hover {
     background: #ffc83d;
-  }
+  } */
 </style>

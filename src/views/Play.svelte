@@ -487,20 +487,7 @@
 
 <svelte:window on:keydown={handle} />
 
-<!-- <p
-    class="absolute top-8 right-8 cursor-help text-3xl duration-200 ease-out hover:scale-150"
-    on:click={() => modal.show("keyboardPlay")}
-  >
-    ⌨️
-  </p> -->
-<!-- <p><strong>Objective: </strong>{_map.objective || "?"}</p> -->
-
-<!-- INVENTORY -->
-<!-- <div class="flex flex-row items-center justify-center gap-2">
-      {#each items.get(ac)?.inventory || [] as item, i}
-        <div class:currentItem={i == inventoryIndex}>{item}</div>
-      {/each}
-    </div> -->
+<!-- TODO: Fix moving of non-emojis -->
 <div class="map">
   {#each { length: 256 } as _, i}
     {@const active = ac == i}

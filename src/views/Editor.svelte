@@ -1,10 +1,5 @@
 <script lang="ts">
-  import {
-    currentEmoji,
-    currentColor,
-    map,
-    palette,
-  } from "../store";
+  import { currentEmoji, currentColor, map, palette } from "../store";
   import { longpress } from "../utils/longpress";
 
   let showIndex = false;
@@ -44,6 +39,7 @@
   }
 
   function fillMap() {
+    if ($currentEmoji == "") return;
     for (let i = 0; i < 256; i++) {
       $map.items.set(i, $currentEmoji);
     }
@@ -87,12 +83,11 @@
     placeholder="Objective"
     bind:value={$map.objective}
   />
-  <span class="w-auto">
-    <input type="checkbox" bind:checked={showIndex} /> Show Indexes
-  </span>
-  <hr />
-  <div class="flex flex-col justify-between">
-    <div class="flex flex-col">
+  <div class="flex flex-col gap-16">
+    <span class="w-auto">
+      <input type="checkbox" bind:checked={showIndex} /> Show Indexes
+    </span>
+    <div class="flex flex-col text-2xl">
       <p>Delete Mode</p>
       {#each ["Item", "Background", "Both"] as mode}
         <label>
@@ -107,21 +102,21 @@
       {/each}
     </div>
     <div class="clear flex flex-col">
-      <p>Clear</p>
+      <p class="text-2xl">Clear</p>
       <button class="btn" use:longpress on:longpress={map.clearObjects}>
         Items
       </button>
-      <button class="btn" use:longpress on:longpress={map.clearBackgrounds}>
+      <button class="btn" on:longpress={map.clearBackgrounds}>
         Backgrounds
       </button>
       <button class="btn" use:longpress on:longpress={map.clearAll}>
         All
       </button>
     </div>
+    <button class="btn mt-2" on:click={fillMap}
+      >Fill With [{$currentEmoji || "____"}]</button
+    >
   </div>
-  <button class="btn mt-2" on:click={fillMap}
-    >Fill With [{$currentEmoji || "____"}]</button
-  >
 </div>
 
 <style>
@@ -129,15 +124,14 @@
     --transition: 500ms;
   }
 
+  /* TODO: Clipping css mask */
+
   .clear > button {
-    border-radius: 3px;
     text-decoration: none;
     position: relative;
-    border: 1px solid var(--primary);
+    border: 1px solid var(--danger);
     z-index: 2;
-    width: 7vw;
     transition: var(--transition);
-    border-color: var(--danger);
     color: var(--danger);
   }
 

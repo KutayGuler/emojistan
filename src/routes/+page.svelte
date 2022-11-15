@@ -36,7 +36,7 @@
   let title = "";
   let prevTitle = "";
   let mode = "";
-  let view: "SAVES" | "FEED" = "SAVES";
+  let view: "PROFILE" | "SAVES" | "FEED" = "SAVES";
 
   function showPopup(_id: string, _title: string, _mode: "edit" | "delete") {
     popup = true;
@@ -118,6 +118,11 @@
 
     <div class="flex flex-row items-center justify-center gap-4">
       <button
+        class:current={view == "PROFILE"}
+        class="opacity-50 duration-200 hover:scale-150"
+        on:click={() => (view = "PROFILE")}>👽</button
+      >
+      <button
         class:current={view == "SAVES"}
         class="opacity-50 duration-200 hover:scale-150"
         on:click={() => (view = "SAVES")}>💾</button
@@ -129,7 +134,9 @@
       >
     </div>
     <p class="py-8 text-3xl">{view}</p>
-    {#if view == "SAVES"}
+    {#if view == "PROFILE"}
+      <p>profile</p>
+    {:else if view == "SAVES"}
       <div class="w-1/4">
         <!-- <button class="btn hover:bg-green-400" on:click={() => openSave()}
           >LOGIN</button
