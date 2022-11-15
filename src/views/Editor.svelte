@@ -1,21 +1,11 @@
 <script lang="ts">
-  import { browser } from "$app/environment";
-  import { onMount } from "svelte";
   import {
     currentEmoji,
     currentColor,
     map,
-    modal,
-    saves,
     palette,
   } from "../store";
   import { longpress } from "../utils/longpress";
-
-  onMount(() => {
-    if (!browser) return;
-    if ($saves.current == "") saves.useStorage();
-    map.useStorage($saves.current);
-  });
 
   let showIndex = false;
   let deleteMode = "Both";

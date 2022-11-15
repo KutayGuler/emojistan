@@ -23,7 +23,7 @@
     ({ a, b, _b, eventID } = obj as TCondition);
   });
 
-  const update = () => {
+  function update() {
     let obj = generateCondition();
     conditions.update(id, obj);
 
@@ -37,7 +37,7 @@
       //   return;
       // }
     }
-  };
+  }
 
   function generateCondition() {
     return { a, b, _b, eventID };

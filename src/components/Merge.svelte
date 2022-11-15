@@ -72,5 +72,5 @@
       </div>
     {/each}
   </div>
-  <Error bind:this={error} />
+  <!-- <Error bind:this={error} /> -->
 </Base>

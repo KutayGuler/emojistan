@@ -8,7 +8,7 @@
   import { navigating } from "$app/stores";
 
   onMount(() => {
-    browser && saves.useStorage();
+    if ($saves.current == "") saves.useStorage();
   });
 
   function openSave(id?: string) {
@@ -135,7 +135,7 @@
           >LOGIN</button
           > -->
         <button class="btn hover:bg-green-400" on:click={() => openSave()}
-          >NEW GAME</button
+          >New World</button
         >
         {#if $saves.loaded}
           {#each [...$saves.saves] as [id, title]}

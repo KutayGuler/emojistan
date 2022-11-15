@@ -1,68 +1,19 @@
 <script lang="ts">
   // SVELTE
   import { flip } from "svelte/animate";
-  import { scale, fly } from "svelte/transition";
-  import { onMount } from "svelte/internal";
-  import { browser } from "$app/environment";
+  import { scale } from "svelte/transition";
 
   // DATA
-  import {
-    events,
-    loopEvents,
-    conditions,
-    palette,
-    statics,
-    currentEmoji,
-    modal,
-    pushes,
-    merges,
-    saves,
-  } from "../store";
-
-  if (browser) {
-    if ($saves.current == "") saves.useStorage();
-    for (let store of [pushes, merges, events, loopEvents, palette, statics]) {
-      store.useStorage($saves.current);
-    }
-  }
+  import { statics, currentEmoji, modal } from "../store";
 
   // COMPONENTS
-  import Push from "../components/Push.svelte";
-  import Merge from "../components/Merge.svelte";
-  import Condition from "../components/Condition.svelte";
-  import Event from "../components/Event.svelte";
-  import LoopEvent from "../components/LoopEvent.svelte";
-  import Svelvet from "../lib/index";
-  import Container from "../components/Container.svelte";
   import Spawner from "../Spawner.svelte";
+  import Svelvet from "../lib/index";
   import Palette from "../components/Palette.svelte";
 
-  const initialNodes = [
-    {
-      id: 1,
-      position: { x: 190, y: 80 },
-      component: Condition,
-      bgColor: "#cfc0e3",
-      borderColor: "#644292",
-      width: 250,
-      height: 120,
-      sourcePosition: "right",
-    },
-    {
-      id: 2,
-      position: { x: 390, y: 180 },
-      component: Event,
-      bgColor: "#fff3d6",
-      borderColor: "#ffc83d",
-      width: 250,
-      height: 80,
-      targetPosition: "left",
-    },
-  ];
-
-  const initialEdges = [
-    { id: "e1-2", source: 1, target: 2, label: "edge label" },
-  ];
+  // TODO: Fill them up with localStorage saves
+  const initialNodes = [];
+  const initialEdges = [];
 
   const flipParams = { duration: 300 };
 </script>
@@ -70,7 +21,8 @@
 <Palette />
 <Svelvet nodes={initialNodes} edges={initialEdges} background />
 <div class="flex w-1/6 flex-col justify-start">
-  <!-- <Spawner /> -->
+  <!-- TODO: Fix spawner positioning -->
+  <Spawner />
   <div class="w-3/4">
     <h4 on:click={() => modal.show("statics")}>Statics 🗿</h4>
     <button class="btn add" on:click={() => statics.add($currentEmoji)}>

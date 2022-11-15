@@ -3,9 +3,10 @@ import { redirect } from "@sveltejs/kit";
 import { browser } from "$app/environment";
 
 export const load: PageLoad = () => {
-  // console.log(browser);
-  // return;
-  // if (localStorage.getItem("currentSave") == "") {
-  //   throw redirect(307, "/");
+  // if (browser) {
+  //   let save = localStorage.getItem("currentSave");
+  //   if (save == null || save == "") {
+  //     throw redirect(300, "/");
+  //   }
   // }
 };

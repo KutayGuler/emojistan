@@ -1,6 +1,6 @@
-import { writable } from "svelte/store";
-import { redirect } from "@sveltejs/kit";
+import { goto } from "$app/navigation";
 import { page } from "$app/stores";
+import { writable, get } from "svelte/store";
 
 export interface Interactable {
   emoji: string;
@@ -101,10 +101,13 @@ function createSaves() {
     set,
     subscribe,
     useStorage: () => {
-      console.log("use");
       const current = localStorage.getItem("currentSave");
       const saves = JSON.parse(localStorage.getItem("saves"));
-      console.log(current);
+
+      console.log(get(page).routeId);
+      if (get(page).routeId == "game" && (current == "" || current == null)) {
+        return false;
+      }
 
       update((state) => {
         state.saves = new Map(saves) || new Map();
@@ -115,12 +118,15 @@ function createSaves() {
 
       subscribe((state) => {
         console.log(state);
+        console.log("lol");
         localStorage.setItem(
           "saves",
           JSON.stringify(Array.from(state.saves.entries()))
         );
         localStorage.setItem("currentSave", state.current);
       });
+
+      return true;
     },
     rename: (id: string, title: string) =>
       update((state) => {
@@ -131,7 +137,7 @@ function createSaves() {
       update((state) => {
         let id = (Math.random() + 1).toString(36).substring(7);
         state.current = id;
-        state.saves.set(id, "Game #" + (state.saves.size + 1).toString());
+        state.saves.set(id, "World #" + id);
         return state;
       }),
     delete: (id: string) =>
