@@ -28,7 +28,7 @@
   }
 
   .cell {
-    @apply relative flex h-11 w-11 items-center justify-center;
+    @apply relative flex h-11 w-11 items-center justify-center md:h-7 md:w-7;
   }
 
   .cell > .direction {

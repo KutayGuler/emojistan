@@ -2,9 +2,8 @@
   import { goto } from "$app/navigation";
   import { onMount } from "svelte";
   import { saves, modal } from "../store";
-  import { scale, fly } from "svelte/transition";
+  import { fly } from "svelte/transition";
   import { clickOutside } from "../utils/clickOutside";
-  import { browser } from "$app/environment";
   import { navigating } from "$app/stores";
 
   onMount(() => {
@@ -109,8 +108,8 @@
 
 {#if !$navigating}
   <main class="noselect">
-    <div class="flex flex-col items-end py-16 " out:scale|local>
-      <h1 class="text-9xl" on:click={() => modal.show("emojistan")}>
+    <div class="flex flex-col items-end py-16 sm:py-8">
+      <h1 class="text-9xl sm:text-7xl" on:click={() => modal.show("emojistan")}>
         Emojistan 🏝️
       </h1>
       <p class="pt-4 pr-4">v0.0.1</p>
@@ -133,14 +132,11 @@
         on:click={() => (view = "FEED")}>🌍</button
       >
     </div>
-    <p class="py-8 text-3xl">{view}</p>
+    <p class="py-8 text-3xl sm:py-4">{view}</p>
     {#if view == "PROFILE"}
       <p>profile</p>
     {:else if view == "SAVES"}
       <div class="w-1/4">
-        <!-- <button class="btn hover:bg-green-400" on:click={() => openSave()}
-          >LOGIN</button
-          > -->
         <button class="btn hover:bg-green-400" on:click={() => openSave()}
           >New World</button
         >
