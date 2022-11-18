@@ -6,7 +6,6 @@
     loopEvents,
     conditions,
     currentEmoji,
-    type TCondition,
   } from "../store";
 
   const props = ["playerBackground", "playerInteractsWith"];
@@ -16,15 +15,35 @@
   let b: string;
   let _b: string | "any";
   let eventID: number;
+  let defaultBackground: string;
+
+  interface Condition {
+    a: string;
+    b: string;
+    _b: string;
+    eventID: number;
+  }
+
+  class Condition {
+    constructor(a: string, b: string, _b: string, eventID: number) {
+      this.a = a;
+      this.b = b;
+      this._b = _b;
+      this.eventID = eventID;
+    }
+  }
 
   onMount(() => {
+    let r: any = document.querySelector(":root");
+    let compStyle = getComputedStyle(r);
+    defaultBackground = compStyle.getPropertyValue("--default-background");
     let obj = $conditions.get(id);
     if (!obj) return;
-    ({ a, b, _b, eventID } = obj as TCondition);
+    ({ a, b, _b, eventID } = obj);
   });
 
   function update() {
-    let obj = generateCondition();
+    let obj = new Condition(a, b, _b, eventID);
     conditions.update(id, obj);
 
     for (let [_id, _obj] of $conditions.entries()) {
@@ -37,10 +56,6 @@
       //   return;
       // }
     }
-  }
-
-  function generateCondition() {
-    return { a, b, _b, eventID };
   }
 
   onDestroy(() => {
@@ -78,7 +93,8 @@
   {#if a == "playerBackground"}
     <h4>is</h4>
     <select bind:value={b} style:background={b} on:change={update}>
-      {#each [...$palette] as color}
+      <!-- TODO: Check if this is working as intended -->
+      {#each [...$palette].filter((color) => color != defaultBackground) as color}
         <option value={color} style:background={color} />
       {/each}
     </select>

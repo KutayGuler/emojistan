@@ -118,7 +118,6 @@
 
 <!-- TODO: Fix width & height problem -->
 
-<!-- TODO: Fix z-index problem -->
 <style>
   nav {
     /* background: red; */

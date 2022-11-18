@@ -57,7 +57,7 @@ function createMapStore<T>(name: string) {
     set,
     subscribe,
     useStorage: (id: string) => {
-      const val = JSON.parse(localStorage.getItem(id + "_" + name));
+      const val = JSON.parse(localStorage.getItem(id + "_" + name) || "");
       set(new Map(val) || new Map<number, T>());
       subscribe((state) => {
         localStorage.setItem(
@@ -102,7 +102,7 @@ function createSaves() {
     subscribe,
     useStorage: () => {
       const current = localStorage.getItem("currentSave");
-      const saves = JSON.parse(localStorage.getItem("saves"));
+      const saves = JSON.parse(localStorage.getItem("saves") || "");
 
       console.log(get(page).routeId);
       if (get(page).routeId == "game" && (current == "" || current == null)) {
@@ -174,8 +174,10 @@ function createEditableMap() {
     subscribe,
     useStorage: (id: string) => {
       const objective = localStorage.getItem(id + "_objective");
-      const items = JSON.parse(localStorage.getItem(id + "_items"));
-      const backgrounds = JSON.parse(localStorage.getItem(id + "_backgrounds"));
+      const items = JSON.parse(localStorage.getItem(id + "_items") || "");
+      const backgrounds = JSON.parse(
+        localStorage.getItem(id + "_backgrounds") || ""
+      );
 
       update((state) => {
         state.objective = objective || "";
@@ -242,7 +244,7 @@ function createSetStore(name: string) {
     set,
     subscribe,
     useStorage: (id: string) => {
-      const val = JSON.parse(localStorage.getItem(id + "_" + name));
+      const val = JSON.parse(localStorage.getItem(id + "_" + name) || "");
       set(new Set<string>(Array.from(val || [])));
       subscribe((state) => {
         localStorage.setItem(

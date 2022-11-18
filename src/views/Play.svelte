@@ -115,26 +115,18 @@
     }
   }
 
-  // function equip(item: string, destroy = false) {
-  //   if (!items.get(adc)) return;
-  //   if (item == "") item = items.get(adc);
-  //   let player = items.get(ac);
-  //   if (!player.inventory) {
-  //     player.inventory = ["", "", "", ""];
-  //   }
-
-  //   let inventory = player.inventory;
-  //   if (inventory.includes("")) {
-  //     let index = inventory.indexOf("");
-  //     inventory[index] = item;
-  //     currentItem = item;
-  //     if (destroy) items.delete(adc);
-  //     items = items;
-  //   }
-  // }
-
   // MUTATIONS
-  const m = {
+  interface Mutations {
+    setBackgroundOf: Function;
+    removeBackgroundOf: Function;
+    spawn: Function;
+    destroy: Function;
+    wait: Function;
+    resetLevel: Function;
+    completeLevel: Function;
+  }
+
+  const m: Mutations = {
     setBackgroundOf: (
       { index, background }: { index: number; background: string },
       _start?: number
@@ -145,13 +137,6 @@
     removeBackgroundOf: ({ index }: { index: number }) => {
       backgrounds.delete(index);
     },
-    // equipItem: ({ emoji }: { emoji: string }) => equip(emoji),
-    // equipInteractedItem: () => equip("", true),
-    // consumeEquippedItem: () => {
-    //   items.get(ac).inventory[inventoryIndex] = "";
-    //   currentItem = "";
-    //   items = items;
-    // },
     spawn: (
       { index, emoji }: { index: number; emoji: string },
       _start?: number
@@ -235,11 +220,10 @@
         // TODO: Implement _start
         for (let { type, ...args } of sequence) {
           if (type == "wait") {
-            // @ts-expect-error
             await m["wait"](args.duration);
           } else {
-            // @ts-expect-error
-            m[type](args);
+            //
+            m[type as keyof Mutations](args);
           }
         }
         // @ts-expect-error
