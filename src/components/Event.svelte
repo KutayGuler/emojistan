@@ -2,18 +2,15 @@
   import { MIN_INDEX, MAX_INDEX } from "../constants";
   import { onDestroy } from "svelte/internal";
   import { palette, events, currentEmoji } from "../store";
-  import type { SequenceItem } from "../store";
+  import type { SequenceItem, Mutations } from "../store";
 
   export let id: number;
   export let sequence: Array<SequenceItem> = [];
   let onEndID = 0;
 
-  const types = [
+  const types: Array<keyof Mutations> = [
     "setBackgroundOf",
     "removeBackgroundOf",
-    "equipInteractedItem",
-    "equipItem",
-    "consumeEquippedItem",
     "spawn",
     "destroy",
     "wait",
@@ -69,8 +66,6 @@
         case "wait":
           Object.assign(newItem, { duration });
           break;
-        case "consumeEquippedItem":
-        case "equipInteractedItem":
         case "completeLevel":
         case "resetLevel":
         default:

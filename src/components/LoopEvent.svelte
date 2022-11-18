@@ -5,7 +5,7 @@
   import { palette, loopEvents, currentEmoji, type TLoopEvent } from "../store";
 
   // TYPES
-  import type { SequenceItem, Loop } from "../store";
+  import type { SequenceItem, Loop, Mutations } from "../store";
 
   export let id: number;
   let sequence: Array<SequenceItem> = [];
@@ -18,7 +18,12 @@
     reverse: false,
   };
 
-  const types = ["setBackgroundOf", "removeBackgroundOf", "spawn", "destroy"];
+  const types: Array<keyof Mutations> = [
+    "setBackgroundOf",
+    "removeBackgroundOf",
+    "spawn",
+    "destroy",
+  ];
 
   const MIN_DURATION = 50;
   const MAX_DURATION = 10000;

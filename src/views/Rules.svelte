@@ -7,7 +7,6 @@
   import { statics, currentEmoji, modal } from "../store";
 
   // COMPONENTS
-  import Spawner from "../Spawner.svelte";
   import Svelvet from "../lib/index";
   import Palette from "../components/Palette.svelte";
 
@@ -21,8 +20,6 @@
 <Palette />
 <Svelvet nodes={initialNodes} edges={initialEdges} background />
 <div class="flex w-1/6 flex-col justify-start">
-  <!-- TODO: Fix spawner positioning -->
-  <!-- <Spawner /> -->
   <div class="w-3/4">
     <h4 class="info" on:click={() => modal.show("statics")}>Statics 🗿</h4>
     <button class="btn add" on:click={() => statics.add($currentEmoji)}>

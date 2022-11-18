@@ -13,22 +13,19 @@
   export let id: number;
   let a: string;
   let b: string;
-  let _b: string | "any";
   let eventID: number;
   let defaultBackground: string;
 
   interface Condition {
     a: string;
     b: string;
-    _b: string;
     eventID: number;
   }
 
   class Condition {
-    constructor(a: string, b: string, _b: string, eventID: number) {
+    constructor(a: string, b: string, eventID: number) {
       this.a = a;
       this.b = b;
-      this._b = _b;
       this.eventID = eventID;
     }
   }
@@ -39,11 +36,11 @@
     defaultBackground = compStyle.getPropertyValue("--default-background");
     let obj = $conditions.get(id);
     if (!obj) return;
-    ({ a, b, _b, eventID } = obj);
+    ({ a, b, eventID } = obj);
   });
 
   function update() {
-    let obj = new Condition(a, b, _b, eventID);
+    let obj = new Condition(a, b, eventID);
     conditions.update(id, obj);
 
     for (let [_id, _obj] of $conditions.entries()) {
@@ -100,14 +97,6 @@
     </select>
   {/if}
 </div>
-{#if a == "playerInteractsWith"}
-  <div class="while">
-    <h4>while equipped with</h4>
-    <div class="slot" on:click={() => (_b = $currentEmoji || "any")}>
-      {_b}
-    </div>
-  </div>
-{/if}
 
 <!-- <div class="then">
   <h4>then trigger</h4>
@@ -119,7 +108,6 @@
 </div> -->
 <style>
   .if,
-  .while,
   .is {
     display: flex;
     flex-direction: row;

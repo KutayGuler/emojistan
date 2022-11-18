@@ -1,9 +1,7 @@
 <script lang="ts">
-  import Error from "./Error.svelte";
   import type { SvelteComponent } from "svelte";
   import { onDestroy, onMount } from "svelte";
   import { merges, currentEmoji } from "../store";
-  import Base from "./Base.svelte";
 
   export let id: number;
   export let rule: Array<string> = [];
@@ -60,17 +58,17 @@
   });
 </script>
 
-<Base
+<!-- <Base
   on:remove={() => merges.remove(id)}
   --border-color="#3a96dd"
   --background="#e9f3fb"
->
-  <div class="slots">
-    {#each { length: 3 } as _, i}
-      <div class="slot" on:click={() => !disabled && updateSlot(i)}>
-        <div>{slots[i]}</div>
-      </div>
-    {/each}
-  </div>
-  <!-- <Error bind:this={error} /> -->
-</Base>
+> -->
+<div class="slots">
+  {#each { length: 3 } as _, i}
+    <div class="slot" on:click={() => !disabled && updateSlot(i)}>
+      <div>{slots[i]}</div>
+    </div>
+  {/each}
+</div>
+<!-- <Error bind:this={error} /> -->
+<!-- </Base> -->

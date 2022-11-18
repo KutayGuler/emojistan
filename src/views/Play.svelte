@@ -12,6 +12,8 @@
     currentEmoji,
     modal,
     statics,
+    type Mutations,
+    type SequenceItem,
   } from "../store";
   import type { TLoopEvent, TEvent } from "../store";
 
@@ -81,7 +83,9 @@
 
   /* ## DATA ## */
   let _events = new Map<string, TEvent | TLoopEvent>(
-    [...$events].concat([...$loopEvents])
+    // [...$events].concat([...$loopEvents])
+    // TODO: check if this works
+    [...$events, ...$loopEvents]
   );
   let _map = structuredClone($map);
   let items = new Map(_map.items);
@@ -116,16 +120,6 @@
   }
 
   // MUTATIONS
-  interface Mutations {
-    setBackgroundOf: Function;
-    removeBackgroundOf: Function;
-    spawn: Function;
-    destroy: Function;
-    wait: Function;
-    resetLevel: Function;
-    completeLevel: Function;
-  }
-
   const m: Mutations = {
     setBackgroundOf: (
       { index, background }: { index: number; background: string },
@@ -164,6 +158,36 @@
     completeLevel: () => (levelCompleted = true),
   };
 
+  interface _Condition {
+    condition: Function;
+    event: Function;
+  }
+
+  class _Condition {
+    constructor(
+      a: Function,
+      b: string,
+      sequence: Array<SequenceItem>,
+      isLoop: boolean
+    ) {
+      this.condition = () => {
+        return a() == b;
+      };
+      this.event = async (_start?: number) => {
+        // TODO: Implement loop
+        // TODO: Implement _start
+        for (let { type, ...args } of sequence) {
+          if (type == "wait") {
+            await m["wait"](args.duration);
+          } else {
+            m[type as keyof Mutations](args);
+          }
+        }
+        if (isLoop) this.event(_start);
+      };
+    }
+  }
+
   let _conditions = new Map<number, { condition: Function; event: Function }>();
   let _interactables = new Set<string>();
 
@@ -171,9 +195,8 @@
     let event = _events.get(condition.eventID);
     if (event == undefined) continue;
 
-    let a: Function;
+    let a = () => {};
     let b: string = condition.b;
-    let _b: string = condition._b;
     // if not hex string, add as interactable
     // EDGE interactable
     if (b[0] != "#") {
@@ -190,10 +213,7 @@
           if (interactedItem != undefined) {
             if (!_interactables.has(interactedItem)) return "";
             if (playerInteracted) {
-              return [
-                interactedItem + "," + currentItem,
-                interactedItem + ",any",
-              ];
+              return interactedItem;
             } else {
               return "";
             }
@@ -204,32 +224,10 @@
         break;
     }
 
-    let sequence = event.sequence;
-    let isLoop = event.loop != undefined;
-
-    _conditions.set(+id, {
-      condition: () => {
-        if (condition.a == "playerBackground") {
-          return a() == b;
-        } else {
-          return a().includes(`${b},${_b}`);
-        }
-      },
-      event: async (_start?: number) => {
-        // TODO: Implement loop
-        // TODO: Implement _start
-        for (let { type, ...args } of sequence) {
-          if (type == "wait") {
-            await m["wait"](args.duration);
-          } else {
-            //
-            m[type as keyof Mutations](args);
-          }
-        }
-        // @ts-expect-error
-        if (isLoop) this.event(_start);
-      },
-    });
+    _conditions.set(
+      +id,
+      new _Condition(a, b, event.sequence, event.loop != undefined)
+    );
   }
 
   function getCollisionType(key1: string, key2: string): string {

@@ -2,6 +2,16 @@ import { goto } from "$app/navigation";
 import { page } from "$app/stores";
 import { writable, get } from "svelte/store";
 
+export interface Mutations {
+  setBackgroundOf: Function;
+  removeBackgroundOf: Function;
+  spawn: Function;
+  destroy: Function;
+  wait: Function;
+  resetLevel: Function;
+  completeLevel: Function;
+}
+
 export interface Interactable {
   emoji: string;
   eventID: string;
@@ -38,7 +48,6 @@ export interface TLoopEvent {
 export interface TCondition {
   a: string;
   b: string;
-  _b: string | "any";
   eventID: number;
 }
 
