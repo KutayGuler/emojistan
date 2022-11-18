@@ -101,8 +101,8 @@
     if (!$statics.has(c)) controllables.push(c);
   }
 
-  for (let [id, { rule }] of [...$merges, ...$pushes]) {
-    let [key1, key2, val] = rule;
+  for (let [id, _slots] of [...$merges, ...$pushes]) {
+    let [key1, key2, val] = _slots;
     if (!_collisions.has(key1)) {
       _collisions.set(key1, new Map());
     }
@@ -252,7 +252,6 @@
 
     // MAGIC UPDATE, NECESSARY FOR REACTIVITY
     items = items;
-    console.log(items);
   }
 
   let wasd = ["KeyW", "KeyA", "KeyS", "KeyD"];
@@ -328,7 +327,10 @@
                   let emoji = _collisions.get(cur)?.get(next);
                   if (emoji && emoji != "push") {
                     items.set(ac + operation * (i + 2), emoji);
-                    items.set(ac + operation, items.get(ac));
+                    let item = items.get(ac);
+                    if (item) {
+                      items.set(ac + operation, item);
+                    }
                     moveActiveCell(operation, true);
                     break;
                   }
@@ -433,37 +435,6 @@
       timeouts.push(timer);
       return;
     }
-
-    // DROP ITEM
-    // if (e.code == "KeyX") {
-    //   if (calcOperation(dirKey, adc, true, true) == 0) {
-    //     playerInteracted = false;
-    //     return;
-    //   }
-
-    //   if (!items.get(adc)) {
-    //     items.set(adc, { emoji: currentItem });
-    //     items.get(ac).inventory[inventoryIndex] = "";
-    //     currentItem = "";
-    //     items = items;
-    //   }
-    //   return;
-    // }
-
-    // SWITCH ITEM
-    // if (e.code.includes("Digit")) {
-    //   let num = +e.code.replace("Digit", "");
-    //   if (num >= 1 && num <= 4) {
-    //     if (inventoryIndex == num - 1) {
-    //       inventoryIndex = -1;
-    //       currentItem = "";
-    //     } else {
-    //       inventoryIndex = num - 1;
-    //       currentItem = items.get(ac).inventory[inventoryIndex];
-    //     }
-    //   }
-    //   return;
-    // }
   }
 </script>
 
@@ -490,7 +461,7 @@
     <dialog open bind:this={dialog} transition:scale>
       LEVEL COMPLETED!
       <button on:click={() => (levelCompleted = !levelCompleted)}>OK</button>
-      <button on:click={m.resetLevel}>REPLAY</button>
+      <button on:click={() => m.resetLevel()}>REPLAY</button>
     </dialog>
   {/if}
 </div>
@@ -504,14 +475,6 @@
     box-shadow: black 0 0 5px;
   }
 
-  .emoji {
-    z-index: 3;
-  }
-
-  .adc {
-    animation: scale var(--duration) alternate;
-  }
-
   @keyframes scale {
     50% {
       transform: scale(125%);
@@ -520,9 +483,5 @@
     100% {
       transform: scale(100%);
     }
-  }
-
-  .currentItem {
-    transform: scale(120%);
   }
 </style>

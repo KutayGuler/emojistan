@@ -194,12 +194,6 @@
 
 <style>
   /* TAILWINDED */
-  nav > span > span {
-    transition: 200ms ease-out;
-    opacity: 50%;
-  }
-
-  nav > span > span:hover,
   .currentView {
     opacity: 100%;
     transform: scale(150%);

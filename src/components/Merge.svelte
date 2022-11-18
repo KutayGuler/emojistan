@@ -4,27 +4,25 @@
   import { merges, currentEmoji } from "../store";
 
   export let id: number;
-  export let rule: Array<string> = [];
+  // export let rule: Array<string> = [];
+  export let slots = ["", "", ""];
   export let disabled = false;
 
-  let slots = ["", "", ""];
   let error: SvelteComponent;
 
   onMount(() => {
-    if (rule.length != 0) {
-      slots = rule;
-    }
+    // if (rule.length != 0) {
+    //   slots = rule;
+    // }
   });
 
   function checkCollision() {
     if (
-      [...$merges].some(([_id, _]) => {
-        let _rule = _.rule;
+      [...$merges].some(([_id, _slots]) => {
         if (id == _id) return false;
-        let _firstTwo = [_rule[0], _rule[1]];
+        let _firstTwo = [_slots[0], _slots[1]];
         let firstTwo = [slots[0], slots[1]];
         return (
-          slots.toString() == rule.toString() ||
           _firstTwo.toString() == firstTwo.toString() ||
           _firstTwo.reverse().toString() == firstTwo.toString()
         );
@@ -35,8 +33,8 @@
       return;
     }
 
-    // @ts-expect-error
-    merges.updateValue(id, "rule", slots);
+    // merges.updateValue(id, "rule", slots);
+    merges.update(id, slots);
   }
 
   function updateSlot(i: number) {

@@ -5,7 +5,7 @@ const NOTIFICATION_TIMEOUT = 3000;
 const createNotificationStore = () => {
   const _notifications = writable([]);
 
-  const send = (message, type = "default") => {
+  const send = (message: string, type = "default") => {
     _notifications.update((state) => {
       console.log(state);
       if (state.length && message == state[state.length - 1].message) {
@@ -42,10 +42,10 @@ const createNotificationStore = () => {
   return {
     subscribe,
     send,
-    danger: (msg) => send(msg, "danger"),
-    warning: (msg) => send(msg, "warning"),
-    info: (msg) => send(msg, "info"),
-    success: (msg) => send(msg, "success"),
+    danger: (msg: string) => send(msg, "danger"),
+    warning: (msg: string) => send(msg, "warning"),
+    info: (msg: string) => send(msg, "info"),
+    success: (msg: string) => send(msg, "success"),
   };
 };
 

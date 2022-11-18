@@ -55,9 +55,9 @@ export interface TPush {
   rule: Array<string>;
 }
 
-export interface TCollision {
-  rule: Array<string>;
-}
+// export interface TCollision {
+//   rule: Array<string>;
+// }
 
 function createMapStore<T>(name: string) {
   const { set, subscribe, update } = writable(new Map<number, T>());
@@ -83,12 +83,6 @@ function createMapStore<T>(name: string) {
     update: (id: number, value: T) =>
       update((state) => {
         state.set(id, value);
-        return state;
-      }),
-    updateValue: (id: number, key: string, value: T) =>
-      update((state) => {
-        // @ts-expect-error
-        state.get(id)[key] = value;
         return state;
       }),
     remove: (id: number) =>
@@ -328,9 +322,8 @@ export const statics = createSetStore("statics");
 export const palette = createSetStore("palette");
 
 // MAPS
-export const pushes = createMapStore<TCollision>("pushes");
-export const merges = createMapStore<TCollision>("merges");
-export const collisions = createMapStore<TCollision>("collisions");
+export const pushes = createMapStore<Array<string>>("pushes");
+export const merges = createMapStore<Array<string>>("merges");
 export const loopEvents = createMapStore<TLoopEvent>("loopEvents");
 export const events = createMapStore<TEvent>("events");
 export const conditions = createMapStore<TCondition>("conditions");

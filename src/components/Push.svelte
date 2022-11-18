@@ -3,24 +3,23 @@
   import { onDestroy, onMount } from "svelte";
   import { pushes, currentEmoji } from "../store";
 
-  export let id: string;
-  export let rule: Array<string> = [];
+  export let id: number;
+  export let slots = ["", ""];
   export let disabled = false;
 
-  let slots = ["", ""];
   let error: SvelteComponent;
 
   onMount(() => {
-    if (rule.length != 0) {
-      let [x, y, z] = rule;
-      slots = [x, y];
-    }
+    // if (rule.length != 0) {
+    //   let [x, y, z] = rule;
+    //   slots = [x, y];
+    // }
   });
 
   function checkCollision() {
     if (
       [...$pushes].some(
-        ([k, { rule }]) => rule[0] == slots[0] && rule[1] == slots[1]
+        ([k, _slots]) => _slots[0] == slots[0] && _slots[1] == slots[1]
       )
     ) {
       slots = ["", ""];
@@ -28,8 +27,8 @@
       return;
     }
 
-    // @ts-expect-error
-    pushes.updateValue(id, "rule", [...slots, "push"]);
+    // pushes.updateValue(id, "rule", [...slots, "push"]);
+    pushes.update(id, [...slots, "push"]);
   }
 
   function updateSlot(i: number) {

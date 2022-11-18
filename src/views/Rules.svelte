@@ -2,6 +2,7 @@
   // SVELTE
   import { flip } from "svelte/animate";
   import { scale } from "svelte/transition";
+  import type { Node, Edge } from "$lib/types/types";
 
   // DATA
   import { statics, currentEmoji, modal } from "../store";
@@ -11,8 +12,8 @@
   import Palette from "../components/Palette.svelte";
 
   // TODO: Fill them up with localStorage saves
-  const initialNodes = [];
-  const initialEdges = [];
+  const initialNodes: Array<Node> = [];
+  const initialEdges: Array<Edge> = [];
 
   const flipParams = { duration: 300 };
 </script>
