@@ -2,7 +2,7 @@
   import { MIN_INDEX, MAX_INDEX } from "../constants";
   import { onDestroy } from "svelte/internal";
   import { palette, events, currentEmoji } from "../store";
-  import type { SequenceItem, Mutations } from "../store";
+  import { SequenceItem, type Mutations } from "../store";
 
   export let id: number;
   export let sequence: Array<SequenceItem> = [];
@@ -43,67 +43,68 @@
     }
   }
 
-  function generateSequenceItem(_type: string, vals?: any) {
-    let newItem = { type: _type };
-    if (vals) {
-      let { index, background, emoji, duration } = vals;
-      index = validateInput(index, MIN_INDEX, MAX_INDEX);
-      duration = validateInput(duration, MIN_DURATION, MAX_DURATION);
-      switch (_type) {
-        case "setBackgroundOf":
-          Object.assign(newItem, { index, background });
-          break;
-        case "spawn":
-          Object.assign(newItem, { index, emoji });
-          break;
-        case "destroy":
-        case "removeBackgroundOf":
-          Object.assign(newItem, { index });
-          break;
-        case "equipItem":
-          Object.assign(newItem, { emoji });
-          break;
-        case "wait":
-          Object.assign(newItem, { duration });
-          break;
-        case "completeLevel":
-        case "resetLevel":
-        default:
-          // Object.assign(newItem);
-          break;
-      }
-    } else {
-      switch (_type) {
-        case "setBackgroundOf":
-          Object.assign(newItem, { index, background });
-          break;
-        case "spawn":
-          Object.assign(newItem, { index, emoji });
-          break;
-        case "destroy":
-        case "removeBackgroundOf":
-          Object.assign(newItem, { index });
-          break;
-        case "equipItem":
-          Object.assign(newItem, { emoji });
-          break;
-        case "wait":
-          Object.assign(newItem, { duration });
-          break;
-        case "consumeEquippedItem":
-        case "equipInteractedItem":
-        case "completeLevel":
-        case "resetLevel":
-        default:
-          // Object.assign(newItem);
-          break;
-      }
-    }
+  function generateSequenceItem(_type: keyof Mutations, vals?: any) {
+    let { index, background, emoji, duration } = vals;
+    index = validateInput(index, MIN_INDEX, MAX_INDEX);
+    duration = validateInput(duration, MIN_DURATION, MAX_DURATION);
+    return new SequenceItem(_type, index, background, emoji, duration);
 
-    return newItem;
+    // TODO: Check if this is working
+    // if (vals) {
+    //   let { index, background, emoji, duration } = vals;
+    //   index = validateInput(index, MIN_INDEX, MAX_INDEX);
+    //   duration = validateInput(duration, MIN_DURATION, MAX_DURATION);
+    //   switch (_type) {
+    //     case "setBackgroundOf":
+    //       return new SequenceItem(_type, { index, background });
+    //     case "spawn":
+    //       Object.assign(newItem, { index, emoji });
+    //       break;
+    //     case "destroy":
+    //     case "removeBackgroundOf":
+    //       Object.assign(newItem, { index });
+    //       break;
+    //     case "equipItem":
+    //       Object.assign(newItem, { emoji });
+    //       break;
+    //     case "wait":
+    //       Object.assign(newItem, { duration });
+    //       break;
+    //     case "completeLevel":
+    //     case "resetLevel":
+    //     default:
+    //       // Object.assign(newItem);
+    //       break;
+    //   }
+    // } else {
+    //   switch (_type) {
+    //     case "setBackgroundOf":
+    //       Object.assign(newItem, { index, background });
+    //       break;
+    //     case "spawn":
+    //       Object.assign(newItem, { index, emoji });
+    //       break;
+    //     case "destroy":
+    //     case "removeBackgroundOf":
+    //       Object.assign(newItem, { index });
+    //       break;
+    //     case "wait":
+    //       Object.assign(newItem, { duration });
+    //       break;
+    //     case "completeLevel":
+    //     case "resetLevel":
+    //     default:
+    //       // Object.assign(newItem);
+    //       break;
+    //   }
+    // }
+
+    // return newItem;
   }
 
   function addToSequence() {
+    // sequence = [...sequence, generateSequenceItem(type)];
+    // TODO: Check if this is working
     sequence = [...sequence, generateSequenceItem(type)];
     events.update(id, { sequence });
     [type, duration, index, background] = [types[0], 0, 0, ""];
@@ -166,8 +167,6 @@
         max={MAX_INDEX}
         on:change={() => update(i)}
       />
-    {:else if s.type == "equipItem"}
-      <div class="slot" on:click={() => updateSlot(i)}>{s.emoji || ""}</div>
     {:else if s.type == "destroy"}
       <input
         type="number"
@@ -185,13 +184,16 @@
         on:change={() => update(i)}
       /> ms
     {:else if s.type == "setBackgroundOf" || s.type == "removeBackgroundOf"}
-      <input
+      <!-- <input
         type="number"
         bind:value={s.index}
         min={MIN_INDEX}
         max={MAX_INDEX}
         on:change={() => update(i)}
-      />
+      /> -->
+      <p>{s.index}</p>
+      <button on:click={() => (s.index += 1)}>+</button>
+      <button on:click={() => (s.index -= 1)}>-</button>
       {#if s.type == "setBackgroundOf"}
         to
         <select

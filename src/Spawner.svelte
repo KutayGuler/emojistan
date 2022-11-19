@@ -16,7 +16,7 @@ Inspired from: Context Menu https://svelte.dev/repl/3a33725c3adb4f57b46b597f9dad
     conditions,
     events,
     loopEvents,
-    type TCondition,
+    type Condition as ICondition,
     type TEvent,
     type TLoopEvent,
   } from "./store";
@@ -107,7 +107,7 @@ Inspired from: Context Menu https://svelte.dev/repl/3a33725c3adb4f57b46b597f9dad
 
       name: "Condition",
       onClick: () =>
-        spawn<TCondition>("condition", Condition, conditions, {
+        spawn<ICondition>("condition", Condition, conditions, {
           a: "playerBackground",
           b: "",
           _b: "any",

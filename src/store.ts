@@ -19,11 +19,28 @@ export interface Interactable {
 }
 
 export interface SequenceItem {
-  type: string;
-  background?: string;
-  index?: number;
-  duration?: number;
-  emoji?: string;
+  type: keyof Mutations;
+  index: number;
+  background: string;
+  duration: number;
+  emoji: string;
+}
+
+export class SequenceItem {
+  constructor(
+    _type: keyof Mutations,
+    index: number,
+    background: string,
+    duration: number,
+    emoji: string
+  ) {
+    this.type = _type;
+    this.index = index;
+    this.background = background;
+    this.duration = duration;
+    this.emoji = emoji;
+    console.log(this);
+  }
 }
 
 export interface Loop {
@@ -45,10 +62,20 @@ export interface TLoopEvent {
   loop: Loop;
 }
 
-export interface TCondition {
-  a: string;
+type A = "playerBackground" | "playerInteractsWith";
+
+export interface Condition {
+  a: A;
   b: string;
   eventID: number;
+}
+
+export class Condition {
+  constructor(a: A, b: string, eventID: number) {
+    this.a = a;
+    this.b = b;
+    this.eventID = eventID;
+  }
 }
 
 export interface TPush {
@@ -66,7 +93,7 @@ function createMapStore<T>(name: string) {
     set,
     subscribe,
     useStorage: (id: string) => {
-      const val = JSON.parse(localStorage.getItem(id + "_" + name) || "");
+      const val = JSON.parse(localStorage.getItem(id + "_" + name));
       set(new Map(val) || new Map<number, T>());
       subscribe((state) => {
         localStorage.setItem(
@@ -105,7 +132,7 @@ function createSaves() {
     subscribe,
     useStorage: () => {
       const current = localStorage.getItem("currentSave");
-      const saves = JSON.parse(localStorage.getItem("saves") || "");
+      const saves = JSON.parse(localStorage.getItem("saves"));
 
       console.log(get(page).routeId);
       if (get(page).routeId == "game" && (current == "" || current == null)) {
@@ -177,10 +204,8 @@ function createEditableMap() {
     subscribe,
     useStorage: (id: string) => {
       const objective = localStorage.getItem(id + "_objective");
-      const items = JSON.parse(localStorage.getItem(id + "_items") || "");
-      const backgrounds = JSON.parse(
-        localStorage.getItem(id + "_backgrounds") || ""
-      );
+      const items = JSON.parse(localStorage.getItem(id + "_items"));
+      const backgrounds = JSON.parse(localStorage.getItem(id + "_backgrounds"));
 
       update((state) => {
         state.objective = objective || "";
@@ -247,7 +272,7 @@ function createSetStore(name: string) {
     set,
     subscribe,
     useStorage: (id: string) => {
-      const val = JSON.parse(localStorage.getItem(id + "_" + name) || "");
+      const val = JSON.parse(localStorage.getItem(id + "_" + name));
       set(new Set<string>(Array.from(val || [])));
       subscribe((state) => {
         localStorage.setItem(
@@ -326,4 +351,4 @@ export const pushes = createMapStore<Array<string>>("pushes");
 export const merges = createMapStore<Array<string>>("merges");
 export const loopEvents = createMapStore<TLoopEvent>("loopEvents");
 export const events = createMapStore<TEvent>("events");
-export const conditions = createMapStore<TCondition>("conditions");
+export const conditions = createMapStore<Condition>("conditions");

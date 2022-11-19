@@ -170,9 +170,7 @@
       sequence: Array<SequenceItem>,
       isLoop: boolean
     ) {
-      this.condition = () => {
-        return a() == b;
-      };
+      this.condition = () => a() == b;
       this.event = async (_start?: number) => {
         // TODO: Implement loop
         // TODO: Implement _start
@@ -203,25 +201,18 @@
       _interactables.add(b);
     }
 
-    switch (condition.a) {
-      case "playerBackground":
-        a = () => backgrounds.get(ac);
-        break;
-      case "playerInteractsWith":
-        a = () => {
-          let interactedItem = items.get(adc);
-          if (interactedItem != undefined) {
-            if (!_interactables.has(interactedItem)) return "";
-            if (playerInteracted) {
-              return interactedItem;
-            } else {
-              return "";
-            }
-          } else {
-            return "";
-          }
-        };
-        break;
+    if (condition.a == "playerBackground") {
+      a = () => backgrounds.get(ac);
+    } else if (condition.a == "playerInteractsWith") {
+      a = () => {
+        let interactedItem = items.get(adc);
+        if (interactedItem != undefined) {
+          if (!_interactables.has(interactedItem)) return "";
+          return interactedItem || "";
+        } else {
+          return "";
+        }
+      };
     }
 
     _conditions.set(
@@ -440,7 +431,6 @@
 
 <svelte:window on:keydown={handle} />
 
-<!-- TODO: Fix moving of non-emojis -->
 <div class="map">
   {#each { length: 256 } as _, i}
     {@const active = ac == i}
@@ -473,15 +463,5 @@
 
   .active {
     box-shadow: black 0 0 5px;
-  }
-
-  @keyframes scale {
-    50% {
-      transform: scale(125%);
-    }
-
-    100% {
-      transform: scale(100%);
-    }
   }
 </style>

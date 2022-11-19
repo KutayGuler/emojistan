@@ -6,6 +6,7 @@
     loopEvents,
     conditions,
     currentEmoji,
+    Condition,
   } from "../store";
 
   const props = ["playerBackground", "playerInteractsWith"];
@@ -15,20 +16,6 @@
   let b: string;
   let eventID: number;
   let defaultBackground: string;
-
-  interface Condition {
-    a: string;
-    b: string;
-    eventID: number;
-  }
-
-  class Condition {
-    constructor(a: string, b: string, eventID: number) {
-      this.a = a;
-      this.b = b;
-      this.eventID = eventID;
-    }
-  }
 
   onMount(() => {
     let r: any = document.querySelector(":root");
