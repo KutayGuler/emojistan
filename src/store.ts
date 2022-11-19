@@ -1,4 +1,3 @@
-import { goto } from "$app/navigation";
 import { page } from "$app/stores";
 import { writable, get } from "svelte/store";
 
@@ -10,12 +9,6 @@ export interface Mutations {
   wait: Function;
   resetLevel: Function;
   completeLevel: Function;
-}
-
-export interface Interactable {
-  emoji: string;
-  eventID: string;
-  interacts: string;
 }
 
 export interface SequenceItem {
@@ -78,14 +71,6 @@ export class Condition {
   }
 }
 
-export interface TPush {
-  rule: Array<string>;
-}
-
-// export interface TCollision {
-//   rule: Array<string>;
-// }
-
 function createMapStore<T>(name: string) {
   const { set, subscribe, update } = writable(new Map<number, T>());
 
@@ -134,7 +119,6 @@ function createSaves() {
       const current = localStorage.getItem("currentSave");
       const saves = JSON.parse(localStorage.getItem("saves"));
 
-      console.log(get(page).routeId);
       if (get(page).routeId == "game" && (current == "" || current == null)) {
         return false;
       }
@@ -147,8 +131,6 @@ function createSaves() {
       });
 
       subscribe((state) => {
-        console.log(state);
-        console.log("lol");
         localStorage.setItem(
           "saves",
           JSON.stringify(Array.from(state.saves.entries()))

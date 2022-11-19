@@ -1,12 +1,21 @@
 <script lang="ts">
-  import { MIN_INDEX, MAX_INDEX } from "../constants";
+  import {
+    MIN_INDEX,
+    MAX_INDEX,
+    MIN_DURATION,
+    MAX_DURATION,
+  } from "../constants";
   import { onDestroy } from "svelte/internal";
-  import { palette, events, currentEmoji } from "../store";
-  import { SequenceItem, type Mutations } from "../store";
+  import {
+    palette,
+    events,
+    currentEmoji,
+    SequenceItem,
+    type Mutations,
+  } from "../store";
 
   export let id: number;
   export let sequence: Array<SequenceItem> = [];
-  let onEndID = 0;
 
   const types: Array<keyof Mutations> = [
     "setBackgroundOf",
@@ -18,94 +27,22 @@
     "completeLevel",
   ];
 
-  const MIN_DURATION = 50;
-  const MAX_DURATION = 10000;
-
   let type = types[0];
   let duration = 0;
   let index = 0;
   let background = "";
   let emoji = "";
-  let trigger = false;
 
-  function validateInput(
-    input: number,
-    min: number,
-    max: number
-  ): number | undefined {
-    if (input == undefined) return input;
-    if (input > max) {
-      return max;
-    } else if (input < min) {
-      return min;
-    } else {
-      return input;
-    }
-  }
-
-  function generateSequenceItem(_type: keyof Mutations, vals?: any) {
+  function updateSequenceItem(_type: keyof Mutations, vals?: any) {
     let { index, background, emoji, duration } = vals;
-    index = validateInput(index, MIN_INDEX, MAX_INDEX);
-    duration = validateInput(duration, MIN_DURATION, MAX_DURATION);
     return new SequenceItem(_type, index, background, emoji, duration);
-
-    // TODO: Check if this is working
-    // if (vals) {
-    //   let { index, background, emoji, duration } = vals;
-    //   index = validateInput(index, MIN_INDEX, MAX_INDEX);
-    //   duration = validateInput(duration, MIN_DURATION, MAX_DURATION);
-    //   switch (_type) {
-    //     case "setBackgroundOf":
-    //       return new SequenceItem(_type, { index, background });
-    //     case "spawn":
-    //       Object.assign(newItem, { index, emoji });
-    //       break;
-    //     case "destroy":
-    //     case "removeBackgroundOf":
-    //       Object.assign(newItem, { index });
-    //       break;
-    //     case "equipItem":
-    //       Object.assign(newItem, { emoji });
-    //       break;
-    //     case "wait":
-    //       Object.assign(newItem, { duration });
-    //       break;
-    //     case "completeLevel":
-    //     case "resetLevel":
-    //     default:
-    //       // Object.assign(newItem);
-    //       break;
-    //   }
-    // } else {
-    //   switch (_type) {
-    //     case "setBackgroundOf":
-    //       Object.assign(newItem, { index, background });
-    //       break;
-    //     case "spawn":
-    //       Object.assign(newItem, { index, emoji });
-    //       break;
-    //     case "destroy":
-    //     case "removeBackgroundOf":
-    //       Object.assign(newItem, { index });
-    //       break;
-    //     case "wait":
-    //       Object.assign(newItem, { duration });
-    //       break;
-    //     case "completeLevel":
-    //     case "resetLevel":
-    //     default:
-    //       // Object.assign(newItem);
-    //       break;
-    //   }
-    // }
-
-    // return newItem;
   }
 
   function addToSequence() {
-    // sequence = [...sequence, generateSequenceItem(type)];
-    // TODO: Check if this is working
-    sequence = [...sequence, generateSequenceItem(type)];
+    sequence = [
+      ...sequence,
+      new SequenceItem(type, MIN_INDEX, "", MIN_DURATION, ""),
+    ];
     events.update(id, { sequence });
     [type, duration, index, background] = [types[0], 0, 0, ""];
   }
@@ -122,7 +59,7 @@
 
   function update(i: number) {
     if (i != undefined) {
-      sequence[i] = generateSequenceItem(sequence[i].type, { ...sequence[i] });
+      sequence[i] = updateSequenceItem(sequence[i].type, { ...sequence[i] });
     }
     if (type) events.update(id, { sequence });
   }
@@ -143,6 +80,28 @@
       events.update(id, { sequence: newsequence });
     }
   });
+
+  // TODO: 0 to 256 and 256 to 0 etc.
+  // TODO: can also try dropdown
+  function incrementIndex(i: number) {
+    if (sequence[i].index + 1 >= MAX_INDEX) return;
+    sequence[i].index += 1;
+  }
+
+  function decrementIndex(i: number) {
+    if (sequence[i].index - 1 <= MIN_INDEX) return;
+    sequence[i].index -= 1;
+  }
+
+  function incrementDuration(i: number) {
+    if (sequence[i].duration + 1 >= MAX_DURATION) return;
+    sequence[i].duration += 1;
+  }
+
+  function decrementDuration(i: number) {
+    if (sequence[i].duration - 1 <= MIN_DURATION) return;
+    sequence[i].duration -= 1;
+  }
 </script>
 
 {#each sequence as s, i}
@@ -160,40 +119,21 @@
     {#if s.type == "spawn"}
       <div class="slot" on:click={() => updateSlot(i)}>{s.emoji || ""}</div>
       at
-      <input
-        type="number"
-        bind:value={s.index}
-        min={MIN_INDEX}
-        max={MAX_INDEX}
-        on:change={() => update(i)}
-      />
-    {:else if s.type == "destroy"}
-      <input
-        type="number"
-        bind:value={s.index}
-        min={MIN_INDEX}
-        max={MAX_INDEX}
-        on:change={() => update(i)}
-      />
-    {:else if s.type == "wait"}
-      <input
-        type="number"
-        bind:value={s.duration}
-        min={MIN_DURATION}
-        max={MAX_DURATION}
-        on:change={() => update(i)}
-      /> ms
-    {:else if s.type == "setBackgroundOf" || s.type == "removeBackgroundOf"}
-      <!-- <input
-        type="number"
-        bind:value={s.index}
-        min={MIN_INDEX}
-        max={MAX_INDEX}
-        on:change={() => update(i)}
-      /> -->
       <p>{s.index}</p>
-      <button on:click={() => (s.index += 1)}>+</button>
-      <button on:click={() => (s.index -= 1)}>-</button>
+      <button on:click={() => incrementIndex(i)}>+</button>
+      <button on:click={() => decrementIndex(i)}>-</button>
+    {:else if s.type == "destroy"}
+      <p>{s.index}</p>
+      <button on:click={() => incrementIndex(i)}>+</button>
+      <button on:click={() => decrementIndex(i)}>-</button>
+    {:else if s.type == "wait"}
+      <p>{s.duration} ms</p>
+      <button on:click={() => incrementDuration(i)}>+</button>
+      <button on:click={() => decrementDuration(i)}>-</button>
+    {:else if s.type == "setBackgroundOf" || s.type == "removeBackgroundOf"}
+      <p>{s.index}</p>
+      <button on:click={() => incrementIndex(i)}>+</button>
+      <button on:click={() => decrementIndex(i)}>-</button>
       {#if s.type == "setBackgroundOf"}
         to
         <select
@@ -220,19 +160,6 @@
   <button on:click={addToSequence}>➕</button>
 </label>
 
-<!-- <label>
-      <strong>Trigger on complete</strong>
-      <input type="checkbox" bind:checked={trigger} />
-      {#if trigger}
-        <select bind:value={onEndID}>
-          {#each [...$events] as [_id, { name }]}
-            {#if id != _id}
-              <option value={_id}>{name}</option>
-            {/if}
-          {/each}
-        </select>
-      {/if}
-    </label> -->
 <style>
   span {
     display: flex;

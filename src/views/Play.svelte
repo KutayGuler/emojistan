@@ -230,7 +230,6 @@
 
   function moveActiveCell(operation: number, _delete?: boolean) {
     if (_delete) {
-      console.log("deleted");
       items.delete(ac);
     }
     ac += operation;
@@ -380,7 +379,7 @@
       }
       return;
     }
-    playerInteracted = false;
+    // playerInteracted = false // TODO: is this necessary?
 
     if (e.code == "KeyQ") {
       let closestDistance = 300;

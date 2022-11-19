@@ -1,6 +1,13 @@
 <script lang="ts">
   // DATA
-  import { MIN_INDEX, MAX_INDEX } from "../constants";
+  import {
+    MIN_INDEX,
+    MAX_INDEX,
+    MIN_DURATION,
+    MAX_DURATION,
+    MIN_ITERATION,
+    MAX_ITERATION,
+  } from "../constants";
   import { onDestroy, onMount } from "svelte/internal";
   import { palette, loopEvents, currentEmoji, type TLoopEvent } from "../store";
 
@@ -24,11 +31,6 @@
     "spawn",
     "destroy",
   ];
-
-  const MIN_DURATION = 50;
-  const MAX_DURATION = 10000;
-  const MIN_ITERATION = 1;
-  const MAX_ITERATION = 16;
 
   let type = types[0];
   let index = 0;
