@@ -27,6 +27,14 @@
     "completeLevel",
   ];
 
+  const durations = [50, 100, 200, 500, 1000, 2000, 5000, 10000];
+
+  let indexes: Array<number> = [];
+
+  for (let i = 0; i < 256; i++) {
+    indexes[i] = i;
+  }
+
   let type = types[0];
   let duration = 0;
   let index = 0;
@@ -58,6 +66,7 @@
   }
 
   function update(i: number) {
+    // TODO: Why?
     if (i != undefined) {
       sequence[i] = updateSequenceItem(sequence[i].type, { ...sequence[i] });
     }
@@ -80,28 +89,6 @@
       events.update(id, { sequence: newsequence });
     }
   });
-
-  // TODO: 0 to 256 and 256 to 0 etc.
-  // TODO: can also try dropdown
-  function incrementIndex(i: number) {
-    if (sequence[i].index + 1 >= MAX_INDEX) return;
-    sequence[i].index += 1;
-  }
-
-  function decrementIndex(i: number) {
-    if (sequence[i].index - 1 <= MIN_INDEX) return;
-    sequence[i].index -= 1;
-  }
-
-  function incrementDuration(i: number) {
-    if (sequence[i].duration + 1 >= MAX_DURATION) return;
-    sequence[i].duration += 1;
-  }
-
-  function decrementDuration(i: number) {
-    if (sequence[i].duration - 1 <= MIN_DURATION) return;
-    sequence[i].duration -= 1;
-  }
 </script>
 
 {#each sequence as s, i}
@@ -119,21 +106,49 @@
     {#if s.type == "spawn"}
       <div class="slot" on:click={() => updateSlot(i)}>{s.emoji || ""}</div>
       at
-      <p>{s.index}</p>
-      <button on:click={() => incrementIndex(i)}>+</button>
-      <button on:click={() => decrementIndex(i)}>-</button>
+      <select
+        title="index"
+        id="index"
+        bind:value={s.index}
+        on:change={() => update(i)}
+      >
+        {#each indexes as j}
+          <option value={j}>{j}</option>
+        {/each}
+      </select>
     {:else if s.type == "destroy"}
-      <p>{s.index}</p>
-      <button on:click={() => incrementIndex(i)}>+</button>
-      <button on:click={() => decrementIndex(i)}>-</button>
+      <select
+        title="index"
+        id="index"
+        bind:value={s.index}
+        on:change={() => update(i)}
+      >
+        {#each indexes as j}
+          <option value={j}>{j}</option>
+        {/each}
+      </select>
     {:else if s.type == "wait"}
-      <p>{s.duration} ms</p>
-      <button on:click={() => incrementDuration(i)}>+</button>
-      <button on:click={() => decrementDuration(i)}>-</button>
+      <select
+        title="duration"
+        id="duration"
+        bind:value={s.duration}
+        on:change={() => update(i)}
+      >
+        {#each durations as d}
+          <option value={d}>{d}</option>
+        {/each}
+      </select>
     {:else if s.type == "setBackgroundOf" || s.type == "removeBackgroundOf"}
-      <p>{s.index}</p>
-      <button on:click={() => incrementIndex(i)}>+</button>
-      <button on:click={() => decrementIndex(i)}>-</button>
+      <select
+        title="index"
+        id="index"
+        bind:value={s.index}
+        on:change={() => update(i)}
+      >
+        {#each indexes as j}
+          <option value={j}>{j}</option>
+        {/each}
+      </select>
       {#if s.type == "setBackgroundOf"}
         to
         <select
