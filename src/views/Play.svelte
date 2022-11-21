@@ -83,8 +83,6 @@
 
   /* ## DATA ## */
   let _events = new Map<number, Array<SequenceItem> | TLoopEvent>(
-    // [...$events].concat([...$loopEvents])
-    // TODO: check if this works
     [...$events, ...$loopEvents]
   );
   let _map = structuredClone($map);
@@ -172,8 +170,6 @@
     ) {
       this.condition = () => a() == b;
       this.event = async (_start?: number) => {
-        // TODO: Implement loop
-        // TODO: Implement _start
         for (let { type, ...args } of sequence) {
           if (type == "wait") {
             await m["wait"](args.duration);

@@ -1,5 +1,6 @@
 import { page } from "$app/stores";
 import { writable, get } from "svelte/store";
+import { DEFAULT_BG } from "./constants";
 
 export interface Mutations {
   setBackgroundOf: Function;
@@ -49,7 +50,7 @@ export interface TLoopEvent {
   loop: Loop;
 }
 
-type A = "playerBackground" | "playerInteractsWith";
+export type A = "playerBackground" | "playerInteractsWith";
 
 export interface Condition {
   a: A;
@@ -316,6 +317,7 @@ function createModal() {
 export const currentItem = writable("");
 export const currentColor = writable("");
 export const currentEmoji = writable("");
+export const defaultBackground = writable(DEFAULT_BG);
 
 // CUSTOM
 export const modal = createModal();

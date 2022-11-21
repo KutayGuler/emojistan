@@ -5,11 +5,12 @@
     MIN_DURATION,
     MAX_DURATION,
   } from "../constants";
-  import { onDestroy } from "svelte/internal";
+  import { hasContext, onDestroy } from "svelte/internal";
   import {
     palette,
     events,
     currentEmoji,
+    defaultBackground,
     SequenceItem,
     type Mutations,
   } from "../store";
@@ -122,7 +123,7 @@
         {/each}
       </select>
       {#if s.type == "setBackgroundOf"}
-        {#if $palette.size == 0}
+        {#if $palette.size == 0 || ($palette.size == 1 && $palette.has($defaultBackground))}
           <select title="color">
             <option value="">No colors</option>
           </select>
@@ -134,7 +135,7 @@
             style:background={s.background}
             on:change={update}
           >
-            {#each [...$palette] as color}
+            {#each [...$palette].filter((color) => color != $defaultBackground) as color}
               <option value={color} style:background={color} />
             {/each}
           </select>

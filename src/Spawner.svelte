@@ -16,12 +16,11 @@ Inspired from: Context Menu https://svelte.dev/repl/3a33725c3adb4f57b46b597f9dad
     conditions,
     events,
     loopEvents,
+    SequenceItem,
     type Condition as ICondition,
-    type TEvent,
     type TLoopEvent,
   } from "./store";
   import { findOrCreateStore } from "$lib/stores/store";
-  import type { SvelteComponent } from "svelte";
   import Event from "./components/Event.svelte";
   import LoopEvent from "./components/LoopEvent.svelte";
   import Container from "./components/Container.svelte";
@@ -40,7 +39,7 @@ Inspired from: Context Menu https://svelte.dev/repl/3a33725c3adb4f57b46b597f9dad
 
   function spawn<T>(
     name: string,
-    component: SvelteComponent,
+    component: any, // what is the proper component type?
     store: any,
     value: T,
     receiver = false
@@ -68,7 +67,7 @@ Inspired from: Context Menu https://svelte.dev/repl/3a33725c3adb4f57b46b597f9dad
     $nodesStore = $nodesStore; // NECESSARY FOR REACTIVITY
   }
 
-  function spawnEmojiContainer() {
+  function spawnContainer() {
     let id = Math.max(...$nodesStore.map((n) => n.id)) + 1;
     let obj = {
       id,
@@ -89,18 +88,18 @@ Inspired from: Context Menu https://svelte.dev/repl/3a33725c3adb4f57b46b597f9dad
     $nodesStore = $nodesStore; // NECESSARY FOR REACTIVITY
     console.log($nodesStore);
   }
-  function spawnDoubleEmojiContainer() {}
+  function spawnMerger() {}
 
   let menuItems = [
     {
       id: "ec",
-      name: "Emoji Container",
-      onClick: spawnEmojiContainer,
+      name: "Container",
+      onClick: spawnContainer,
     },
     {
       id: "dec",
-      name: "Double Emoji Container",
-      onClick: spawnDoubleEmojiContainer,
+      name: "Merger",
+      onClick: spawnMerger,
     },
     {
       id: "c",
@@ -110,8 +109,7 @@ Inspired from: Context Menu https://svelte.dev/repl/3a33725c3adb4f57b46b597f9dad
         spawn<ICondition>("condition", Condition, conditions, {
           a: "playerBackground",
           b: "",
-          _b: "any",
-          eventID: "",
+          eventID: 0,
         }),
     },
     {
@@ -119,15 +117,7 @@ Inspired from: Context Menu https://svelte.dev/repl/3a33725c3adb4f57b46b597f9dad
 
       name: "Event",
       onClick: () =>
-        spawn<TEvent>(
-          "event",
-          Event,
-          events,
-          {
-            sequence: [],
-          },
-          true
-        ),
+        spawn<Array<SequenceItem>>("event", Event, events, [], true),
     },
     {
       id: "le",

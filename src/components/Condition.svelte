@@ -7,12 +7,13 @@
     conditions,
     currentEmoji,
     Condition,
+    type A,
   } from "../store";
 
-  const props = ["playerBackground", "playerInteractsWith"];
+  const props: Array<A> = ["playerBackground", "playerInteractsWith"];
 
   export let id: number;
-  let a: string;
+  let a: A;
   let b: string;
   let eventID: number;
   let defaultBackground: string;
@@ -27,8 +28,7 @@
   });
 
   function update() {
-    let obj = new Condition(a, b, eventID);
-    conditions.update(id, obj);
+    conditions.update(id, new Condition(a, b, eventID));
 
     for (let [_id, _obj] of $conditions.entries()) {
       if (_id == id) continue;
@@ -52,14 +52,12 @@
       eventID == undefined ||
       $events.get(eventID) == undefined ||
       $loopEvents.get(eventID) == undefined ||
-      $events.get(eventID)?.sequence.length == 0 ||
+      $events.get(eventID)?.length == 0 ||
       $loopEvents.get(eventID)?.sequence.length == 0
     ) {
       conditions.remove(id);
     }
   });
-
-  // TODO: Shouldn't be able to add global color as condition color
 </script>
 
 <div class="if">
@@ -77,6 +75,7 @@
   {#if a == "playerBackground"}
     <h4>is</h4>
     <select bind:value={b} style:background={b} on:change={update}>
+      <!-- TODO: Shouldn't be able to add global color as condition color -->
       <!-- TODO: Check if this is working as intended -->
       {#each [...$palette].filter((color) => color != defaultBackground) as color}
         <option value={color} style:background={color} />
@@ -85,14 +84,6 @@
   {/if}
 </div>
 
-<!-- <div class="then">
-  <h4>then trigger</h4>
-  <select bind:value={eventID} on:change={update}>
-    {#each [...$events, ...$loopEvents] as [id, { name }]}
-      <option value={id}>{name}</option>
-    {/each}
-  </select>
-</div> -->
 <style>
   .if,
   .is {

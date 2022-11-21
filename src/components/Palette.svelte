@@ -1,6 +1,6 @@
 <script lang="ts">
   // DATA
-  import { palette as cp } from "../store";
+  import { palette as cp, defaultBackground as dbg } from "../store";
   import { scale } from "svelte/transition";
   import { flip } from "svelte/animate";
   import { onMount } from "svelte";
@@ -8,13 +8,14 @@
 
   let r: any;
   let pickedColor = "#000000";
-  let defaultBackground = "#faebd7";
+  let defaultBackground = $dbg;
   const flipParams = { duration: 300 };
 
   onMount(() => {
     r = document.querySelector(":root");
     let compStyle = getComputedStyle(r);
     defaultBackground = compStyle.getPropertyValue("--default-background");
+    $dbg = defaultBackground;
     pickedColor = compStyle.getPropertyValue("--picked-color");
   });
 
@@ -23,11 +24,13 @@
     if (color == defaultBackground) {
       r.style.setProperty("--default-background", "#faebd7");
       defaultBackground = "#faebd7";
+      $dbg = defaultBackground;
       return;
     }
 
     r.style.setProperty("--default-background", color);
     defaultBackground = color;
+    $dbg = defaultBackground;
   }
 
   function removeColor(color: string) {
@@ -35,6 +38,7 @@
     if (!$cp.has(defaultBackground)) {
       r.style.setProperty("--default-background", "#faebd7");
       defaultBackground = "#faebd7";
+      $dbg = defaultBackground;
     }
   }
 

@@ -93,13 +93,16 @@
 <svelte:window on:keydown={handleKeydown} bind:innerWidth bind:innerHeight />
 
 {#if $saves.current != ""}
+  <!-- TODO: Fix this -->
   <div
     class="absolute z-10 h-4 w-4"
     style:display={x + 64 >= innerWidth || y + 64 >= innerHeight ? "none" : ""}
-    style={$currentColor || $currentEmoji
-      ? `translate: ${
-          x + 16
-        }px ${y}px; background: ${$currentColor}; border: 1px solid var(--default-background);`
+    style:background={$currentColor}
+    style:border={$currentColor != ""
+      ? "1px solid var(--default-background);"
+      : ""}
+    style={$currentEmoji || $currentColor
+      ? `translate: ${x + 16}px ${y}px;`
       : ""}
   >
     {$currentEmoji}

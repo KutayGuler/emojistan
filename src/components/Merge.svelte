@@ -4,17 +4,11 @@
   import { merges, currentEmoji } from "../store";
 
   export let id: number;
-  // export let rule: Array<string> = [];
   export let slots = ["", "", ""];
   export let disabled = false;
 
+  // TODO: Migrate errors to notifications
   let error: SvelteComponent;
-
-  onMount(() => {
-    // if (rule.length != 0) {
-    //   slots = rule;
-    // }
-  });
 
   function checkCollision() {
     if (
