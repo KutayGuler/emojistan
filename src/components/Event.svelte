@@ -41,17 +41,12 @@
   let background = "";
   let emoji = "";
 
-  function updateSequenceItem(_type: keyof Mutations, vals?: any) {
-    let { index, background, emoji, duration } = vals;
-    return new SequenceItem(_type, index, background, emoji, duration);
-  }
-
   function addToSequence() {
     sequence = [
       ...sequence,
       new SequenceItem(type, MIN_INDEX, "", MIN_DURATION, ""),
     ];
-    events.update(id, { sequence });
+    events.update(id, sequence);
     [type, duration, index, background] = [types[0], 0, 0, ""];
   }
 
@@ -61,20 +56,17 @@
     if (sequence.length == 0) {
       events.remove(id);
     } else {
-      events.update(id, { sequence });
+      events.update(id, sequence);
     }
   }
 
-  function update(i: number) {
-    // TODO: Why?
-    if (i != undefined) {
-      sequence[i] = updateSequenceItem(sequence[i].type, { ...sequence[i] });
-    }
-    if (type) events.update(id, { sequence });
+  function update() {
+    events.update(id, sequence);
   }
 
   function updateSlot(i: number) {
     sequence[i].emoji = $currentEmoji;
+    update();
   }
 
   onDestroy(() => {
@@ -86,19 +78,14 @@
     if (sequence.length == 0) {
       events.remove(id);
     } else if (newsequence.length < sequence.length) {
-      events.update(id, { sequence: newsequence });
+      events.update(id, newsequence);
     }
   });
 </script>
 
 {#each sequence as s, i}
   <span>
-    <select
-      title="event type"
-      id="type"
-      bind:value={s.type}
-      on:change={() => update(i)}
-    >
+    <select title="event type" id="type" bind:value={s.type} on:change={update}>
       {#each types as t}
         <option value={t}>{t}</option>
       {/each}
@@ -106,23 +93,13 @@
     {#if s.type == "spawn"}
       <div class="slot" on:click={() => updateSlot(i)}>{s.emoji || ""}</div>
       at
-      <select
-        title="index"
-        id="index"
-        bind:value={s.index}
-        on:change={() => update(i)}
-      >
+      <select title="index" id="index" bind:value={s.index} on:change={update}>
         {#each indexes as j}
           <option value={j}>{j}</option>
         {/each}
       </select>
     {:else if s.type == "destroy"}
-      <select
-        title="index"
-        id="index"
-        bind:value={s.index}
-        on:change={() => update(i)}
-      >
+      <select title="index" id="index" bind:value={s.index} on:change={update}>
         {#each indexes as j}
           <option value={j}>{j}</option>
         {/each}
@@ -132,35 +109,36 @@
         title="duration"
         id="duration"
         bind:value={s.duration}
-        on:change={() => update(i)}
+        on:change={update}
       >
         {#each durations as d}
           <option value={d}>{d}</option>
         {/each}
       </select>
     {:else if s.type == "setBackgroundOf" || s.type == "removeBackgroundOf"}
-      <select
-        title="index"
-        id="index"
-        bind:value={s.index}
-        on:change={() => update(i)}
-      >
+      <select title="index" id="index" bind:value={s.index} on:change={update}>
         {#each indexes as j}
           <option value={j}>{j}</option>
         {/each}
       </select>
       {#if s.type == "setBackgroundOf"}
-        to
-        <select
-          title="color"
-          bind:value={s.background}
-          style:background={s.background}
-          on:change={() => update(i)}
-        >
-          {#each [...$palette] as color}
-            <option value={color} style:background={color} />
-          {/each}
-        </select>
+        {#if $palette.size == 0}
+          <select title="color">
+            <option value="">No colors</option>
+          </select>
+        {:else}
+          to
+          <select
+            title="color"
+            bind:value={s.background}
+            style:background={s.background}
+            on:change={update}
+          >
+            {#each [...$palette] as color}
+              <option value={color} style:background={color} />
+            {/each}
+          </select>
+        {/if}
       {/if}
     {/if}
     <button id="remove" on:click={() => removeFromSequence(i)}>❌</button>

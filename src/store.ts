@@ -32,7 +32,6 @@ export class SequenceItem {
     this.background = background;
     this.duration = duration;
     this.emoji = emoji;
-    console.log(this);
   }
 }
 
@@ -43,11 +42,6 @@ export interface Loop {
   iterationType: "increment" | "decrement";
   timeGap: number;
   reverse: boolean;
-}
-
-export interface TEvent {
-  sequence: Array<SequenceItem>;
-  loop?: Loop;
 }
 
 export interface TLoopEvent {
@@ -78,6 +72,7 @@ function createMapStore<T>(name: string) {
     set,
     subscribe,
     useStorage: (id: string) => {
+      // @ts-expect-error
       const val = JSON.parse(localStorage.getItem(id + "_" + name));
       set(new Map(val) || new Map<number, T>());
       subscribe((state) => {
@@ -117,6 +112,7 @@ function createSaves() {
     subscribe,
     useStorage: () => {
       const current = localStorage.getItem("currentSave");
+      // @ts-expect-error
       const saves = JSON.parse(localStorage.getItem("saves"));
 
       if (get(page).routeId == "game" && (current == "" || current == null)) {
@@ -186,7 +182,9 @@ function createEditableMap() {
     subscribe,
     useStorage: (id: string) => {
       const objective = localStorage.getItem(id + "_objective");
+      // @ts-expect-error
       const items = JSON.parse(localStorage.getItem(id + "_items"));
+      // @ts-expect-error
       const backgrounds = JSON.parse(localStorage.getItem(id + "_backgrounds"));
 
       update((state) => {
@@ -254,6 +252,7 @@ function createSetStore(name: string) {
     set,
     subscribe,
     useStorage: (id: string) => {
+      // @ts-expect-error
       const val = JSON.parse(localStorage.getItem(id + "_" + name));
       set(new Set<string>(Array.from(val || [])));
       subscribe((state) => {
@@ -332,5 +331,5 @@ export const palette = createSetStore("palette");
 export const pushes = createMapStore<Array<string>>("pushes");
 export const merges = createMapStore<Array<string>>("merges");
 export const loopEvents = createMapStore<TLoopEvent>("loopEvents");
-export const events = createMapStore<TEvent>("events");
+export const events = createMapStore<Array<SequenceItem>>("events");
 export const conditions = createMapStore<Condition>("conditions");

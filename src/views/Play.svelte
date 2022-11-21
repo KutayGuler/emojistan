@@ -12,10 +12,12 @@
     currentEmoji,
     modal,
     statics,
+    palette,
     type Mutations,
     type SequenceItem,
+    type TLoopEvent,
+    type Loop,
   } from "../store";
-  import type { TLoopEvent, TEvent } from "../store";
 
   let r: any;
   let defaultBackground = "";
@@ -78,11 +80,9 @@
     KeyD: { style: `right: -30%;`, emoji: "➡️", operation: 1 },
   };
   let dirKey = "KeyD";
-  let currentItem = "";
-  let inventoryIndex = 0;
 
   /* ## DATA ## */
-  let _events = new Map<string, TEvent | TLoopEvent>(
+  let _events = new Map<number, Array<SequenceItem> | TLoopEvent>(
     // [...$events].concat([...$loopEvents])
     // TODO: check if this works
     [...$events, ...$loopEvents]
@@ -168,7 +168,7 @@
       a: Function,
       b: string,
       sequence: Array<SequenceItem>,
-      isLoop: boolean
+      loop?: Loop
     ) {
       this.condition = () => a() == b;
       this.event = async (_start?: number) => {
@@ -178,10 +178,18 @@
           if (type == "wait") {
             await m["wait"](args.duration);
           } else {
-            m[type as keyof Mutations](args);
+            m[type](args);
           }
         }
-        if (isLoop) this.event(_start);
+
+        if (loop) {
+          if (_start) {
+            if (_start == loop.end) return;
+            this.event(_start + 1);
+          } else {
+            this.event(loop.start);
+          }
+        }
       };
     }
   }
@@ -192,6 +200,17 @@
   for (let [id, condition] of $conditions.entries()) {
     let event = _events.get(condition.eventID);
     if (event == undefined) continue;
+    if ($palette.size == 0) {
+      if (Array.isArray(event)) {
+        event = event.filter((s) => s.type != "setBackgroundOf");
+        if (event.length == 0) continue;
+      } else {
+        event.sequence = event.sequence.filter(
+          (s) => s.type != "setBackgroundOf"
+        );
+        if (event.sequence.length == 0) continue;
+      }
+    }
 
     let a = () => {};
     let b: string = condition.b;
@@ -215,10 +234,11 @@
       };
     }
 
-    _conditions.set(
-      +id,
-      new _Condition(a, b, event.sequence, event.loop != undefined)
-    );
+    if (Array.isArray(event)) {
+      _conditions.set(+id, new _Condition(a, b, event));
+    } else {
+      _conditions.set(+id, new _Condition(a, b, event.sequence, event.loop));
+    }
   }
 
   function getCollisionType(key1: string, key2: string): string {
@@ -440,7 +460,7 @@
     >
       {#if active && calcOperation(dirKey, i, true) != 0}
         <div class="direction" style={dirs[dirKey].style}>
-          {currentItem || dirs[dirKey].emoji}
+          {dirs[dirKey].emoji}
         </div>
       {/if}
       {items.get(i) || ""}
