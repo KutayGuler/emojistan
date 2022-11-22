@@ -5,6 +5,7 @@
   import { fly } from "svelte/transition";
   import { clickOutside } from "../utils/clickOutside";
   import { navigating } from "$app/stores";
+  import Simulator from "../components/Simulator.svelte";
 
   onMount(() => {
     if ($saves.current == "") saves.useStorage();
@@ -44,7 +45,18 @@
     title = _title;
     prevTitle = _title;
   }
+
+  let items = new Map<number, string>();
+  items.set(0, "X");
+  items.set(1, "Y");
+  let collisions = new Map<string, Map<string, string>>();
+
+  // let col = new Map();
+  // col.set("Y", "bump");
+  // collisions.set("X", col);
 </script>
+
+<Simulator {items} {collisions} />
 
 {#if popup}
   <div transition:fly class="modal-background x-modal">
