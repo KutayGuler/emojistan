@@ -2,13 +2,11 @@
   import type { SvelteComponent } from "svelte";
   import { onDestroy, onMount } from "svelte";
   import { merges, currentEmoji } from "../store";
+  import { notifications } from "../routes/notifications";
 
   export let id: number;
   export let slots = ["", "", ""];
   export let disabled = false;
-
-  // TODO: Migrate errors to notifications
-  let error: SvelteComponent;
 
   function checkCollision() {
     if (
@@ -23,11 +21,12 @@
       })
     ) {
       slots = ["", "", ""];
-      error.display("Merges are bidirectional and can only have one outcome");
+      notifications.warning(
+        "Merges are bidirectional and can only have one outcome"
+      );
       return;
     }
 
-    // merges.updateValue(id, "rule", slots);
     merges.update(id, slots);
   }
 
@@ -36,7 +35,7 @@
     if (slots.includes("")) return;
     if (slots[0] == slots[2] || slots[1] == slots[2]) {
       slots[2] = "";
-      error.display("Inputs cannot be the same with output");
+      notifications.warning("Inputs cannot be the same with output");
       return;
     }
 

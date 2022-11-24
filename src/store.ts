@@ -14,10 +14,10 @@ export interface Mutations {
 
 export interface SequenceItem {
   type: keyof Mutations;
-  index: number;
-  background: string;
-  duration: number;
-  emoji: string;
+  index?: number;
+  background?: string;
+  duration?: number;
+  emoji?: string;
 }
 
 export class SequenceItem {

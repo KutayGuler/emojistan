@@ -82,9 +82,10 @@
   let dirKey = "KeyD";
 
   /* ## DATA ## */
-  let _events = new Map<number, Array<SequenceItem> | TLoopEvent>(
-    [...$events, ...$loopEvents]
-  );
+  let _events = new Map<number, Array<SequenceItem> | TLoopEvent>([
+    ...$events,
+    ...$loopEvents,
+  ]);
   let _map = structuredClone($map);
   let items = new Map(_map.items);
   let backgrounds = new Map(_map.backgrounds);
@@ -209,7 +210,7 @@
     }
 
     let a = () => {};
-    let b: string = condition.b;
+    let b = condition.b;
     // if not hex string, add as interactable
     // EDGE interactable
     if (b[0] != "#") {
@@ -395,7 +396,6 @@
       }
       return;
     }
-    // playerInteracted = false // TODO: is this necessary?
 
     if (e.code == "KeyQ") {
       let closestDistance = 300;

@@ -2,6 +2,7 @@
   import type { SvelteComponent } from "svelte";
   import { onDestroy, onMount } from "svelte";
   import { pushes, currentEmoji } from "../store";
+  import { notifications } from "../routes/notifications";
 
   export let id: number;
   export let slots = ["", ""];

@@ -1,12 +1,63 @@
 <script lang="ts">
   import { onDestroy } from "svelte/internal";
+  import type { A, Mutations, SequenceItem } from "../store";
 
+  interface Condition {
+    a: A;
+    b: string;
+  }
+
+  export let mutation: SequenceItem = {
+    type: "setBackgroundOf",
+    index: 5,
+    background: "#ffffff",
+  };
   export let items: Map<number, string>;
   export let statics = new Set<string>();
-  export let condition = () => false;
-  export let event: () => {};
+  export let condition: Condition = { a: "playerBackground", b: "#ff00ff" };
   export let collisions = new Map<string, Map<string, string>>();
   export let backgrounds = new Map<number, string>();
+
+  backgrounds.set(2, "#ff00ff");
+  // MUTATIONS
+  // @ts-expect-error
+  const m: Mutations = {
+    setBackgroundOf: (
+      { index, background }: { index: number; background: string },
+      _start?: number
+    ) => {
+      backgrounds.set(_start || index, background);
+      backgrounds = backgrounds;
+    },
+    removeBackgroundOf: ({ index }: { index: number }) => {
+      backgrounds.delete(index);
+    },
+    spawn: (
+      { index, emoji }: { index: number; emoji: string },
+      _start?: number
+    ) => {
+      items.set(_start || index, emoji);
+      items = items;
+    },
+    destroy: ({ index }: { index: number }) => {
+      items.delete(index);
+    },
+    wait: async (duration: number) => {
+      return new Promise((resolve) => {
+        let timer = setTimeout(resolve, duration);
+        timeouts.push(timer);
+      });
+    },
+    // resetLevel: () => {
+    //   backgrounds = new Map(_map.backgrounds);
+    //   items = new Map(_map.items);
+    //   ac = items.entries().next().value[0];
+    //   adc = ac + 1;
+    //   dirKey = "KeyD";
+    //   levelCompleted = false;
+    // },
+    // completeLevel: () => (levelCompleted = true),
+  };
 
   let ac: number;
   let adc: number;
@@ -48,8 +99,11 @@
     ac += operation;
     adc = ac + dirs[dirKey].operation;
     if (items.has(ac)) {
-      if (condition()) {
-        event();
+      if (condition.a == "playerBackground") {
+        if (backgrounds.get(ac) == condition.b) {
+          let { type, ...args } = mutation;
+          m[type](args);
+        }
       }
     }
 
@@ -199,13 +253,11 @@
       }
 
       playerInteracted = true;
-      if (items.has(ac)) {
-        if (condition()) {
-          event();
+      if (items.has(ac) && condition.a == "playerBackground") {
+        if (backgrounds.get(ac) == condition.b) {
+          let { type, ...args } = mutation;
+          m[type](args);
         }
-        // for (let c of _conditions.values()) {
-        //   if (c.condition()) c.event();
-        // }
       }
       let timer = setTimeout(() => (playerInteracted = false), 100);
       timeouts.push(timer);

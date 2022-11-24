@@ -8,8 +8,8 @@
   import { statics, currentEmoji, modal } from "../store";
 
   // COMPONENTS
-  import Svelvet from "../lib/index";
-  import Palette from "../components/Palette.svelte";
+  import Svelvet from "$lib/index";
+  import Palette from "$components/Palette.svelte";
 
   // TODO: Fill them up with localStorage saves
   const initialNodes: Array<Node> = [];
@@ -17,6 +17,8 @@
 
   const flipParams = { duration: 300 };
 </script>
+
+<!-- TODO: Fix nodes moving together -->
 
 <Palette />
 <Svelvet nodes={initialNodes} edges={initialEdges} background />

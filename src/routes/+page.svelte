@@ -5,7 +5,7 @@
   import { fly } from "svelte/transition";
   import { clickOutside } from "../utils/clickOutside";
   import { navigating } from "$app/stores";
-  import Simulator from "../components/Simulator.svelte";
+  import Simulator from "$components/Simulator.svelte";
 
   onMount(() => {
     if ($saves.current == "") saves.useStorage();
@@ -36,7 +36,7 @@
   let title = "";
   let prevTitle = "";
   let mode = "";
-  let view: "PROFILE" | "SAVES" | "FEED" = "SAVES";
+  let view: "PROFILE" | "SAVES" = "SAVES";
 
   function showPopup(_id: string, _title: string, _mode: "edit" | "delete") {
     popup = true;
@@ -54,9 +54,24 @@
   // let col = new Map();
   // col.set("Y", "bump");
   // collisions.set("X", col);
+
+  const rotations = [
+    "rotate-1",
+    "rotate-2",
+    "rotate-3",
+    "-rotate-1",
+    "-rotate-2",
+    "-rotate-3",
+  ];
+
+  function random() {
+    return rotations[Math.floor(Math.random() * 5)];
+  }
 </script>
 
-<Simulator {items} {collisions} />
+<!-- TODO: Add daisyUI and friends on right side -->
+
+<!-- <Simulator {items} {collisions} /> -->
 
 {#if popup}
   <div transition:fly class="modal-background x-modal">
@@ -120,14 +135,7 @@
 
 {#if !$navigating}
   <main class="noselect">
-    <div class="flex flex-col items-end py-16 sm:py-8">
-      <h1 class="text-9xl sm:text-7xl" on:click={() => modal.show("emojistan")}>
-        Emojistan 🏝️
-      </h1>
-      <p class="pt-4 pr-4">v0.0.1</p>
-    </div>
-
-    <div class="flex flex-row items-center justify-center gap-4">
+    <!-- <div class="flex flex-row items-center justify-center gap-4 pt-8">
       <button
         class:current={view == "PROFILE"}
         class="opacity-50 duration-200 hover:scale-150"
@@ -138,28 +146,24 @@
         class="opacity-50 duration-200 hover:scale-150"
         on:click={() => (view = "SAVES")}>💾</button
       >
-      <button
-        class:current={view == "FEED"}
-        class="opacity-50 duration-200 hover:scale-150"
-        on:click={() => (view = "FEED")}>🌍</button
-      >
-    </div>
-    <p class="py-8 text-3xl sm:py-4">{view}</p>
-    {#if view == "PROFILE"}
-      <p>profile</p>
-    {:else if view == "SAVES"}
-      <div class="w-1/4">
-        <button class="btn hover:bg-green-400" on:click={() => openSave()}
-          >New World</button
+    </div> -->
+    <!-- <p class="py-8 text-3xl sm:py-4">{view}</p> -->
+    <!-- TODO: revise ui -->
+    <!-- TODO: Add coconut physics -->
+    <p class="text-9xl">🏝️</p>
+    <p>Welcome back, username!</p>
+    {#if $saves.loaded}
+      <div class="grid w-auto grid-cols-3 grid-rows-3 gap-8">
+        <button
+          class="btn h-32 w-32 border-dashed hover:bg-green-400 "
+          on:click={() => openSave}>New World</button
         >
-        {#if $saves.loaded}
-          {#each [...$saves.saves] as [id, title]}
-            <div class="relative flex">
-              <button
-                class="btn hover:bg-blue-400"
-                on:click={() => openSave(id)}>{title}</button
-              >
-              <div class="absolute -right-24 top-8 flex gap-2">
+        {#each [...$saves.saves] as [id, title]}
+          <button
+            class="btn h-32 w-32 {random()} hover:bg-blue-400"
+            on:click={() => openSave(id)}>{title}</button
+          >
+          <!-- <div class="absolute -right-24 top-8 flex gap-2">
                 <button
                   class="duration-200 ease-out hover:scale-150"
                   on:click={() => showPopup(id, title, "edit")}>✏️</button
@@ -172,15 +176,11 @@
                   class="duration-200 ease-out hover:scale-150"
                   on:click={() => showPopup(id, title, "delete")}>☁️</button
                 >
-              </div>
-            </div>
-          {/each}
-        {:else}
-          <p>Loading...</p>
-        {/if}
+              </div> -->
+        {/each}
       </div>
-    {:else if view == "FEED"}
-      <div>feed</div>
+    {:else}
+      <p>Loading...</p>
     {/if}
   </main>
 {/if}

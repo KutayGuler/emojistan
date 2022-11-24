@@ -11,7 +11,6 @@ Known bug:
 Inspired from: Context Menu https://svelte.dev/repl/3a33725c3adb4f57b46b597f9dade0c1?version=3.25.0
 -->
 <script lang="ts">
-  import Condition from "./components/Condition.svelte";
   import {
     conditions,
     events,
@@ -19,11 +18,12 @@ Inspired from: Context Menu https://svelte.dev/repl/3a33725c3adb4f57b46b597f9dad
     SequenceItem,
     type Condition as ICondition,
     type TLoopEvent,
-  } from "./store";
+  } from "../../../store";
   import { findOrCreateStore } from "$lib/stores/store";
-  import Event from "./components/Event.svelte";
-  import LoopEvent from "./components/LoopEvent.svelte";
-  import Container from "./components/Container.svelte";
+  import Event from "$components/Event.svelte";
+  import Condition from "$components/Condition.svelte";
+  import LoopEvent from "$components/LoopEvent.svelte";
+  import Container from "$components/Container.svelte";
   import { _key as key } from "$lib/stores/store";
   import { fly } from "svelte/transition";
 

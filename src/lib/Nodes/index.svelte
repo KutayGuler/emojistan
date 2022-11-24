@@ -43,7 +43,6 @@
   }}
 />
 
-<!-- TODO: Fix input getting stuck -->
 <!-- TODO: Prevent moving the grid on mousedown move -->
 
 <div

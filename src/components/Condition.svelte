@@ -75,8 +75,6 @@
   {#if a == "playerBackground"}
     <h4>is</h4>
     <select bind:value={b} style:background={b} on:change={update}>
-      <!-- TODO: Shouldn't be able to add global color as condition color -->
-      <!-- TODO: Check if this is working as intended -->
       {#each [...$palette].filter((color) => color != defaultBackground) as color}
         <option value={color} style:background={color} />
       {/each}

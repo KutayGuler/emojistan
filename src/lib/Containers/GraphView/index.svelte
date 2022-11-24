@@ -7,7 +7,7 @@
   import SimpleBezierEdge from "$lib/Edges/SimpleBezierEdge.svelte";
   import EdgeAnchor from "$lib/Edges/EdgeAnchor.svelte";
   import Node from "$lib/Nodes/index.svelte";
-  import Spawner from "../../../Spawner.svelte";
+  import Spawner from "./Spawner.svelte";
 
   // leveraging d3 library to zoom/pan
   let d3 = {
