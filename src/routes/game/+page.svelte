@@ -51,10 +51,9 @@
   // quickAcess edit mode
   let editMode = false;
 
-  let viewIndex = 2;
+  let viewIndex = 1;
 
   let views = [
-    { component: Play, emoji: "🎬", title: "Play" },
     { component: Editor, emoji: "🏗️", title: "Editor" },
     { component: Rules, emoji: "📜", title: "Rules" },
   ];

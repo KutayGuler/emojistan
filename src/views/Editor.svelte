@@ -1,6 +1,7 @@
 <script lang="ts">
   import { currentEmoji, currentColor, map, palette } from "../store";
-  import { longpress } from "../utils/longpress";
+  import Play from "./Play.svelte";
+  import Rules from "./Rules.svelte";
 
   let showIndex = false;
 
@@ -65,6 +66,8 @@
         break;
     }
   }
+
+  let test = false;
 </script>
 
 <!-- <p
@@ -83,17 +86,22 @@
     />
   {/each}
 </div>
-<div class="map">
-  {#each { length: 256 } as _, i}
-    <div
-      class="cell"
-      style:background={$map.backgrounds.get(i) || "var(--default-background)"}
-      on:click={() => clickedCell(i)}
-    >
-      {$map?.items.get(i) || (showIndex ? i : "")}
-    </div>
-  {/each}
-</div>
+{#if test}
+  <Play />
+{:else}
+  <div class="map">
+    {#each { length: 256 } as _, i}
+      <div
+        class="cell"
+        style:background={$map.backgrounds.get(i) ||
+          "var(--default-background)"}
+        on:click={() => clickedCell(i)}
+      >
+        {$map?.items.get(i) || (showIndex ? i : "")}
+      </div>
+    {/each}
+  </div>
+{/if}
 <div class="flex w-1/6 flex-col">
   <div class="form-control">
     <label class="label">
@@ -140,9 +148,13 @@
     <button class="btn" on:click={fillMap}
       >Fill With [{$currentEmoji || "____"}]</button
     >
+    <button class="btn bg-primary" on:click={() => (test = !test)}
+      >{test ? "EDIT" : "TEST"}</button
+    >
   </div>
 </div>
 
+<!-- <Rules></Rules> -->
 <style>
   :root {
     --transition: 500ms;

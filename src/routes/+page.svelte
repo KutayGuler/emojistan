@@ -54,19 +54,6 @@
   // let col = new Map();
   // col.set("Y", "bump");
   // collisions.set("X", col);
-
-  const rotations = [
-    "rotate-1",
-    "rotate-2",
-    "rotate-3",
-    "-rotate-1",
-    "-rotate-2",
-    "-rotate-3",
-  ];
-
-  function random() {
-    return rotations[Math.floor(Math.random() * 5)];
-  }
 </script>
 
 <!-- TODO: Add friends on right side -->
@@ -135,24 +122,46 @@
 
 {#if !$navigating}
   <main class="noselect">
+    <div class="dropdown-end dropdown dropdown-bottom absolute right-4 top-4">
+      <label tabindex="0">
+        <div class="avatar placeholder">
+          <div class="w-12 rounded-full bg-neutral-focus text-neutral-content">
+            <span class="text-3xl">K</span>
+          </div>
+        </div>
+      </label>
+      <ul
+        tabindex="0"
+        class="dropdown-content menu rounded-box mt-2 w-52 bg-base-100 p-2 shadow"
+      >
+        <li><a>Friends</a></li>
+        <li><a>Logout</a></li>
+      </ul>
+    </div>
     <!-- TODO: revise ui -->
     <!-- TODO: Add coconut physics -->
-    <p class="text-9xl">🏝️</p>
-    <p>Welcome back, username!</p>
-    <input type="text" placeholder="Search" class="input w-full max-w-xs" />
+    <p class="py-8 text-9xl">Emojistan 🏝️</p>
+    <div class="tabs">
+      <a class="tab tab-bordered">Home</a>
+      <a class="tab tab-active tab-bordered">Favorites</a>
+    </div>
+    <div />
     {#if $saves.loaded}
-      <div class="grid w-auto grid-cols-3 grid-rows-3 gap-8">
+      <div class="flex w-1/3 flex-col gap-8 py-8">
         <button
-          class="btn my-0 h-32 w-32 border-dashed hover:scale-125 hover:bg-green-400"
+          class="btn my-0 h-16 w-full  hover:bg-primary"
           on:click={() => openSave()}>New World</button
         >
         {#each [...$saves.saves] as [id, title]}
-          <div class="relative h-32 w-32 duration-200 ease-out hover:scale-125">
+          <div class="relative text-lg">
             <button
-              class="btn my-0 h-32 w-32 hover:bg-blue-400"
-              on:click={() => openSave(id)}>{title}</button
+              class="my-0 flex h-20 w-full flex-row items-center justify-start rounded-md border-r-2 p-4 duration-200 ease-out hover:bg-secondary hover:text-white"
+              on:click={() => openSave(id)}
             >
-            <button class=" absolute top-2 right-2"
+              <div>{title}</div>
+            </button>
+            <div class="absolute bottom-1 right-2">username</div>
+            <button class=" absolute top-2 right-2 flex flex-row"
               ><svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -165,6 +174,20 @@
                   stroke-linecap="round"
                   stroke-linejoin="round"
                   d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
+                />
+              </svg>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="h-6 w-6"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
                 />
               </svg>
             </button>
