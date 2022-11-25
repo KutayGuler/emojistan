@@ -25,7 +25,6 @@ Inspired from: Context Menu https://svelte.dev/repl/3a33725c3adb4f57b46b597f9dad
   import LoopEvent from "$components/LoopEvent.svelte";
   import Container from "$components/Container.svelte";
   import { _key as key } from "$lib/stores/store";
-  import { fly } from "svelte/transition";
 
   const svelvetStore = findOrCreateStore($key);
   const { nodesStore } = svelvetStore;
@@ -34,8 +33,6 @@ Inspired from: Context Menu https://svelte.dev/repl/3a33725c3adb4f57b46b597f9dad
     condition: ["#cfc0e3", "#644292"],
     event: ["#f6fafd", "#ffc83d"],
   };
-
-  let open = false;
 
   function spawn<T>(
     name: string,
@@ -146,21 +143,19 @@ Inspired from: Context Menu https://svelte.dev/repl/3a33725c3adb4f57b46b597f9dad
 </script>
 
 <div class="absolute top-0 right-0 z-10">
-  <button on:click={() => (open = !open)} class="btn w-36">Spawner</button>
-  {#if open}
-    <nav class="" transition:fly={{ y: -25, duration: 200 }}>
-      <ul>
-        {#each menuItems as { name, onClick }, i}
-          <li class="h-8">
-            <button
-              class="add w-36 rounded-md pl-2 text-left hover:bg-slate-200"
-              on:click={onClick}>{name}</button
-            >
-          </li>
-        {/each}
-      </ul>
-    </nav>
-  {/if}
+  <div class="dropdown-end dropdown">
+    <label tabindex="0" class="btn m-1">Spawner</label>
+    <ul
+      tabindex="0"
+      class="dropdown-content menu rounded-box w-52 bg-base-100 p-2 shadow"
+    >
+      {#each menuItems as { name, onClick }, i}
+        <li class="add h-8 hover:bg-base-200" on:click={onClick}>
+          {name}
+        </li>
+      {/each}
+    </ul>
+  </div>
 </div>
 
 <style>

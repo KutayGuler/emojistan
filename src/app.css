@@ -3,9 +3,9 @@
 @tailwind utilities;
 
 @layer components {
-  .btn {
+  /* .btn {
     @apply my-3 flex w-full cursor-pointer items-center justify-center rounded-xl border-4 border-solid p-4 text-2xl shadow-lg duration-200 ease-out;
-  }
+  } */
 
   .info {
     @apply cursor-help text-center text-lg duration-200 ease-out hover:scale-150;
@@ -28,7 +28,7 @@
   }
 
   .cell {
-    @apply relative flex h-11 w-11 items-center justify-center md:h-7 md:w-7;
+    @apply relative flex h-11 w-11 items-center justify-center bg-base-300 md:h-7 md:w-7;
   }
 
   .cell > .direction {
@@ -57,7 +57,7 @@
 
   /* COLOR PALETTE */
 
-  --default-background: #fff3d6;
+  --default-background: #cfcfcf;
   --primary: #f6fafd;
 
   --dark: #676778;

@@ -31,6 +31,7 @@
   "type": "module",
   "dependencies": {
     "d3-selection": "^3.0.0",
-    "d3-zoom": "^3.0.0"
+    "d3-zoom": "^3.0.0",
+    "daisyui": "^2.42.1"
   }
 }

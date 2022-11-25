@@ -3,7 +3,12 @@
   import { longpress } from "../utils/longpress";
 
   let showIndex = false;
-  let deleteMode = "Both";
+
+  const deleteModes = ["Item", "Background", "Both"];
+  const clearModes = ["Items", "Backgrounds", "All"];
+
+  let deleteMode = deleteModes[2];
+  let clearMode = clearModes[2];
 
   function pickColor(color: string) {
     console.log(color);
@@ -46,6 +51,20 @@
     $map = $map;
     console.log($map);
   }
+
+  function clearMap() {
+    switch (clearMode) {
+      case "Items":
+        map.clearObjects();
+        break;
+      case "Backgrounds":
+        map.clearBackgrounds();
+        break;
+      case "All":
+        map.clearAll();
+        break;
+    }
+  }
 </script>
 
 <!-- <p
@@ -76,44 +95,49 @@
   {/each}
 </div>
 <div class="flex w-1/6 flex-col">
-  <!-- <textarea name="" id="" cols="30" rows="10"></textarea> -->
-  <textarea
-    class="min-h-40 max-h-96 w-full"
-    type="text"
-    placeholder="Objective"
-    bind:value={$map.objective}
-  />
-  <div class="flex flex-col gap-16">
-    <span class="w-auto">
-      <input type="checkbox" bind:checked={showIndex} /> Show Indexes
-    </span>
-    <div class="flex flex-col text-2xl">
-      <p>Delete Mode</p>
-      {#each ["Item", "Background", "Both"] as mode}
-        <label>
-          <input
-            type="radio"
-            bind:group={deleteMode}
-            name="delete-mode"
-            value={mode}
-          />
-          {mode}
-        </label>
-      {/each}
+  <div class="form-control">
+    <label class="label">
+      <span class="label-text">Objective</span>
+    </label>
+    <textarea
+      class="textarea textarea-bordered h-24"
+      placeholder="Describe the goal"
+      bind:value={$map.objective}
+    />
+  </div>
+  <div class="form-control">
+    <label class="label cursor-pointer">
+      <span class="label-text">Show Indexes</span>
+      <input
+        type="checkbox"
+        class="checkbox checkbox-secondary"
+        bind:checked={showIndex}
+      />
+    </label>
+  </div>
+  <div class="flex flex-col gap-2">
+    <div class="form-control w-full max-w-xs">
+      <label class="label">
+        <span class="label-text">Delete Mode</span>
+      </label>
+      <select class="select select-bordered" bind:value={deleteMode}>
+        {#each deleteModes as mode}
+          <option value={mode}>{mode}</option>
+        {/each}
+      </select>
     </div>
-    <div class="clear flex flex-col">
-      <p class="text-2xl">Clear</p>
-      <button class="btn" use:longpress on:longpress={map.clearObjects}>
-        Items
-      </button>
-      <button class="btn" on:longpress={map.clearBackgrounds}>
-        Backgrounds
-      </button>
-      <button class="btn" use:longpress on:longpress={map.clearAll}>
-        All
-      </button>
+    <div class="form-control w-full max-w-xs">
+      <label class="label">
+        <span class="label-text">Clear Mode</span>
+      </label>
+      <select class="select select-bordered" bind:value={clearMode}>
+        {#each clearModes as mode}
+          <option value={mode}>{mode}</option>
+        {/each}
+      </select>
     </div>
-    <button class="btn mt-2" on:click={fillMap}
+    <button class="btn bg-accent" on:click={clearMap}>CLEAR</button>
+    <button class="btn" on:click={fillMap}
       >Fill With [{$currentEmoji || "____"}]</button
     >
   </div>
