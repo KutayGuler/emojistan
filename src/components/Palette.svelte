@@ -55,11 +55,11 @@
   }
 </script>
 
-<div class="flex h-full w-1/6 flex-row justify-end">
+<div class="flex h-1/2 w-1/6 flex-row justify-end">
   <div class="h-full w-3/4">
     <h4 class="info" on:click={() => modal.show("palette")}>Palette 🎨</h4>
     <div class="relative">
-      <button class="btn add relative w-full  bg-white" on:click={addColor}
+      <button class="add btn relative w-full  bg-white" on:click={addColor}
         >🎨
       </button>
       <input

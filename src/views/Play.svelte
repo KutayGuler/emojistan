@@ -265,6 +265,7 @@
   let playerInteracted = false;
 
   function handle(e: KeyboardEvent) {
+    e.preventDefault();
     if (e.code.includes("Arrow")) {
       let operation = calcOperation(e.code, ac);
       if (!items.has(ac)) {

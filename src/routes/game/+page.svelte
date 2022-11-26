@@ -1,8 +1,17 @@
 <script lang="ts">
   // VIEWS
-  import Play from "../../views/Play.svelte";
   import Editor from "../../views/Editor.svelte";
   import Rules from "../../views/Rules.svelte";
+
+  import { flip } from "svelte/animate";
+  import { scale } from "svelte/transition";
+  import type { Node, Edge } from "$lib/types/types";
+
+  // TODO: Fill them up with localStorage saves
+  const initialNodes: Array<Node> = [];
+  const initialEdges: Array<Edge> = [];
+
+  const flipParams = { duration: 300 };
 
   // DATA
   import {
@@ -17,11 +26,13 @@
     loopEvents,
     palette,
     statics,
+    modal,
   } from "../../store";
   import { notifications } from "../notifications";
   import { emojis } from "../../emojis";
   import { onMount } from "svelte";
   import { goto } from "$app/navigation";
+  import Palette from "$components/Palette.svelte";
 
   onMount(() => {
     if ($saves.current == "") {
@@ -107,100 +118,103 @@
     {$currentEmoji}
   </div>
 
-  <main class="noselect box-border flex flex-col items-center justify-start">
-    <div
-      class="playground flex w-full flex-row items-start justify-center"
-      on:mousemove={setCursorEmoji}
+  <main
+    class="noselect box-border flex flex-row items-end justify-end"
+    on:mousemove={setCursorEmoji}
+  >
+    <aside
+      class="right-0 h-[100vh] w-1/5 overflow-y-auto rounded-tl-lg rounded-bl-lg  bg-sky-400 p-2 shadow-2xl"
     >
-      <div
-        class="box-border flex h-[100vh] w-5/6 flex-col items-center justify-start overflow-y-hidden duration-200 ease-out"
-      >
-        <span
-          class="flex cursor-pointer flex-row items-center justify-center gap-3 py-6"
-        >
-          {#each views as view, i}
-            <span
-              class="opacity-50 duration-200 hover:scale-150"
-              on:click={() => changeView(i)}
-              class:currentView={viewIndex == i}
-            >
-              {view.emoji}
-            </span>
-          {/each}
-        </span>
-        <p class="text-2xl">{views[viewIndex].title}</p>
-        <div
-          class="flex h-[80vh] w-full flex-row items-start justify-center gap-4"
-        >
-          <svelte:component this={views[viewIndex].component} />
-        </div>
-      </div>
-      <aside
-        class="h-[100vh] w-1/6 overflow-y-auto rounded-tl-lg rounded-bl-lg  bg-sky-400 p-2 shadow-2xl"
-      >
-        <input
-          class="w-full rounded-lg pl-1"
-          type="text"
-          placeholder="Search"
-          bind:value={filter}
-        />
-        <div id="emoji-container">
-          <h4 class="pt-4 pb-4 text-lg">
-            Quick Access <button on:click={() => (editMode = !editMode)}
-              >Edit {editMode ? "❌" : ""}</button
-            >
+      <Palette />
+      <div class="flex h-1/2 w-1/6 flex-col justify-start">
+        <div class="w-3/4">
+          <h4 class="info" on:click={() => modal.show("statics")}>
+            Statics 🗿
           </h4>
-          {#if editMode}
-            <span
-              ><button on:click={() => quickAccess.add($currentEmoji)}
-                >Add ( {$currentEmoji || "____"} )</button
-              ><button on:click={() => quickAccess.remove($currentEmoji)}
-                >Remove ( {$currentEmoji || "____"} )</button
-              ></span
-            >
-          {/if}
-          <div class="flex">
-            {#each [...$quickAccess] as emoji}
-              <div
-                class:selected={$currentEmoji == emoji}
-                on:click={() => pickEmoji(emoji)}
+          <button class="add btn" on:click={() => statics.add($currentEmoji)}>
+            [ {$currentEmoji == "" ? "____" : $currentEmoji} ]
+          </button>
+          {#each [...$statics] as item (item)}
+            <div transition:scale|local={flipParams} animate:flip={flipParams}>
+              <button class="remove btn" on:click={() => statics.remove(item)}
+                >{item}</button
               >
-                {emoji}
-              </div>
-            {/each}
-          </div>
-          {#each Object.keys(emojis) as category}
-            {#if emojis[category].some((item) => item.name.includes(filter))}
-              <h4 class="pt-16 pb-4 text-lg">{category}</h4>
-            {/if}
-            <div class="flex flex-wrap">
-              {#each emojis[category] as { emoji, name }}
-                {#if name.includes(filter)}
-                  <div
-                    class="duration-75 ease-out hover:scale-150"
-                    class:selected={$currentEmoji == emoji}
-                    on:click={() => pickEmoji(emoji)}
-                    title={name}
-                  >
-                    {emoji}
-                  </div>
-                {/if}
-              {/each}
             </div>
           {/each}
         </div>
-      </aside>
+      </div>
+    </aside>
+    <div
+      class="box-border flex h-[100vh] w-full flex-col items-center justify-start overflow-y-auto"
+    >
+      {#each [Editor, Rules] as component}
+        <div
+          class="flex w-full flex-row items-center justify-center gap-4 pt-16"
+        >
+          <svelte:component this={component} />
+        </div>
+      {/each}
     </div>
+    <aside
+      class="right-0 h-[100vh] w-1/5 overflow-y-auto rounded-tl-lg rounded-bl-lg  bg-sky-400 p-2 shadow-2xl"
+    >
+      <input
+        class="w-full rounded-lg pl-1"
+        type="text"
+        placeholder="Search"
+        bind:value={filter}
+      />
+      <div id="emoji-container">
+        <h4 class="pt-4 pb-4 text-lg">
+          Quick Access <button on:click={() => (editMode = !editMode)}
+            >Edit {editMode ? "❌" : ""}</button
+          >
+        </h4>
+        {#if editMode}
+          <span
+            ><button on:click={() => quickAccess.add($currentEmoji)}
+              >Add ( {$currentEmoji || "____"} )</button
+            ><button on:click={() => quickAccess.remove($currentEmoji)}
+              >Remove ( {$currentEmoji || "____"} )</button
+            ></span
+          >
+        {/if}
+        <div class="flex">
+          {#each [...$quickAccess] as emoji}
+            <div
+              class:selected={$currentEmoji == emoji}
+              on:click={() => pickEmoji(emoji)}
+            >
+              {emoji}
+            </div>
+          {/each}
+        </div>
+        {#each Object.keys(emojis) as category}
+          {#if emojis[category].some((item) => item.name.includes(filter))}
+            <h4 class="pt-16 pb-4 text-lg">{category}</h4>
+          {/if}
+          <div class="flex flex-wrap">
+            {#each emojis[category] as { emoji, name }}
+              {#if name.includes(filter)}
+                <div
+                  class="duration-75 ease-out hover:scale-150"
+                  class:selected={$currentEmoji == emoji}
+                  on:click={() => pickEmoji(emoji)}
+                  title={name}
+                >
+                  {emoji}
+                </div>
+              {/if}
+            {/each}
+          </div>
+        {/each}
+      </div>
+    </aside>
   </main>
 {/if}
 
 <style>
   /* TAILWINDED */
-  .currentView {
-    opacity: 100%;
-    transform: scale(150%);
-  }
-
   #emoji-container * {
     font-size: 1.25rem;
   }

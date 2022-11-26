@@ -20,23 +20,7 @@
 
 <!-- TODO: Fix nodes moving together -->
 
-<Palette />
 <Svelvet nodes={initialNodes} edges={initialEdges} background />
-<div class="flex w-1/6 flex-col justify-start">
-  <div class="w-3/4">
-    <h4 class="info" on:click={() => modal.show("statics")}>Statics 🗿</h4>
-    <button class="btn add" on:click={() => statics.add($currentEmoji)}>
-      [ {$currentEmoji == "" ? "____" : $currentEmoji} ]
-    </button>
-    {#each [...$statics] as item (item)}
-      <div transition:scale|local={flipParams} animate:flip={flipParams}>
-        <button class="btn remove" on:click={() => statics.remove(item)}
-          >{item}</button
-        >
-      </div>
-    {/each}
-  </div>
-</div>
 
 <style>
   :root {

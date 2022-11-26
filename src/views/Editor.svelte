@@ -70,22 +70,6 @@
   let test = false;
 </script>
 
-<!-- <p
-    class="absolute top-8 right-8 cursor-help text-3xl duration-200 ease-out hover:scale-150"
-    on:click={() => modal.show("keyboardEditor")}
-  >
-    ⌨️
-  </p> -->
-<div class="flex w-1/6 flex-col items-end justify-center gap-2">
-  {#each [...$palette] as c}
-    <div
-      class="color"
-      class:currentColor={c == $currentColor}
-      style:background={c}
-      on:click={() => pickColor(c)}
-    />
-  {/each}
-</div>
 {#if test}
   <Play />
 {:else}
@@ -102,7 +86,7 @@
     {/each}
   </div>
 {/if}
-<div class="flex w-1/6 flex-col">
+<div class="flex flex-col">
   <div class="form-control">
     <label class="label">
       <span class="label-text">Objective</span>
@@ -154,56 +138,12 @@
   </div>
 </div>
 
-<!-- <Rules></Rules> -->
 <style>
   :root {
     --transition: 500ms;
   }
 
-  /* TODO: Clipping css mask */
-
-  .clear > button {
-    text-decoration: none;
-    position: relative;
-    border: 1px solid var(--danger);
-    z-index: 2;
-    transition: var(--transition);
-    color: var(--danger);
-  }
-
-  label,
-  .clear > button {
+  label {
     cursor: pointer;
-  }
-
-  .clear > button:active {
-    color: var(--primary);
-  }
-
-  .clear > button::before,
-  .clear > button::after {
-    background: var(--danger);
-    content: "";
-    position: absolute;
-    z-index: -1;
-    transition: var(--transition);
-  }
-
-  .clear > button::after {
-    height: 100%;
-    width: 0;
-    top: 0;
-    left: 0;
-  }
-
-  .clear > button:active::after {
-    width: 100%;
-  }
-
-  .remove-actions {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    width: 100%;
   }
 </style>
