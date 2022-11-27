@@ -61,12 +61,12 @@
         loop.start = 16;
         loop.end = 0;
       }
-      // error.display("starting index and ending index cannot be the same");
+      // notifcations.warning("starting index and ending index cannot be the same");
     }
 
     if (loop.iterationType == "increment") {
       if (loop.start > loop.end) {
-        // error.display(
+        // notifcations.warning(
         //   "starting index cannot be bigger than ending index on increment"
         // );
         loop.start = 0;
@@ -78,7 +78,7 @@
       }
     } else if (loop.iterationType == "decrement") {
       if (loop.end > loop.start) {
-        // error.display(
+        // notifcations.warning(
         //   "ending index cannot be bigger than starting index on decrement"
         // );
         loop.start = 16;

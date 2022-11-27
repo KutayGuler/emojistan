@@ -5,6 +5,7 @@
   import { flip } from "svelte/animate";
   import { onMount } from "svelte";
   import { notifications } from "../routes/notifications";
+  import { DEFAULT_BG } from "../constants";
 
   let r: any;
   let pickedColor = "#000000";
@@ -22,8 +23,8 @@
   function setDefaultBackground(color: string) {
     if (color == "") return;
     if (color == defaultBackground) {
-      r.style.setProperty("--default-background", "#faebd7");
-      defaultBackground = "#faebd7";
+      r.style.setProperty("--default-background", DEFAULT_BG);
+      defaultBackground = DEFAULT_BG;
       $dbg = defaultBackground;
       return;
     }
@@ -36,8 +37,8 @@
   function removeColor(color: string) {
     cp.remove(color);
     if (!$cp.has(defaultBackground)) {
-      r.style.setProperty("--default-background", "#faebd7");
-      defaultBackground = "#faebd7";
+      r.style.setProperty("--default-background", DEFAULT_BG);
+      defaultBackground = DEFAULT_BG;
       $dbg = defaultBackground;
     }
   }
@@ -55,21 +56,21 @@
   }
 </script>
 
-<div class="flex h-1/2 w-1/6 flex-row justify-end">
-  <div class="h-full w-3/4">
-    <h4 class="info" on:click={() => modal.show("palette")}>Palette 🎨</h4>
-    <div class="relative">
-      <button class="add btn relative w-full  bg-white" on:click={addColor}
-        >🎨
-      </button>
-      <input
-        class="absolute -left-6 top-6 h-2/5 w-6"
-        type="color"
-        bind:value={pickedColor}
-        on:change={pickedColorChanged}
-      />
-    </div>
-
+<h4>
+  Palette 🎨 <input
+    class=""
+    type="color"
+    bind:value={pickedColor}
+    on:change={pickedColorChanged}
+  />
+</h4>
+<div class="relative w-full">
+  <button class="add btn relative w-full  bg-white" on:click={addColor}
+    >🎨
+  </button>
+</div>
+<div class="flex h-1/3 w-full flex-row justify-end overflow-y-auto">
+  <div class="h-full w-full">
     {#each [...$cp] as color (color)}
       <div
         class="relative"
@@ -84,7 +85,7 @@
         <div
           on:click={() => removeColor(color)}
           style:background={color}
-          class="remove btn"
+          class="remove btn w-full"
         >
           &nbsp;
         </div>

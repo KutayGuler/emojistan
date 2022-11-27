@@ -1,5 +1,4 @@
 <script lang="ts">
-  import type { SvelteComponent } from "svelte";
   import { onDestroy, onMount } from "svelte";
   import { merges, currentEmoji } from "../store";
   import { notifications } from "../routes/notifications";
@@ -61,5 +60,4 @@
     </div>
   {/each}
 </div>
-<!-- <Error bind:this={error} /> -->
 <!-- </Base> -->

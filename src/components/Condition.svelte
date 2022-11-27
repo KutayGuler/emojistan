@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
+  import { notifications } from "../routes/notifications";
   import {
     palette,
     events,
@@ -33,7 +34,7 @@
     for (let [_id, _obj] of $conditions.entries()) {
       if (_id == id) continue;
       // if (JSON.stringify(obj) == JSON.stringify(_obj)) {
-      //   error.display("Cannot have duplicate conditions");
+      //   notifications.warning("Cannot have duplicate conditions");
       //   eventID = "";
       //   obj.eventID = "";
       //   conditions.update(id, obj);

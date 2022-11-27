@@ -116,7 +116,7 @@ function createSaves() {
       // @ts-expect-error
       const saves = JSON.parse(localStorage.getItem("saves"));
 
-      if (get(page).routeId == "game" && (current == "" || current == null)) {
+      if (get(page).routeId == "editor" && (current == "" || current == null)) {
         return false;
       }
 
@@ -279,40 +279,6 @@ function createSetStore(name: string) {
   };
 }
 
-export type ModalType =
-  | "keyboardPlay"
-  | "keyboardEditor"
-  | "pushes"
-  | "merges"
-  | "conditions"
-  | "events"
-  | "statics"
-  | "palette"
-  | "emojistan";
-
-function createModal() {
-  const modal: { open: boolean; type: ModalType } = {
-    open: false,
-    type: "keyboardPlay",
-  };
-  const { subscribe, update } = writable(modal);
-
-  return {
-    subscribe,
-    show: (type: ModalType) =>
-      update((state) => {
-        state.type = type;
-        state.open = true;
-        return state;
-      }),
-    close: () =>
-      update((state) => {
-        state.open = false;
-        return state;
-      }),
-  };
-}
-
 // VANILLA
 export const currentItem = writable("");
 export const currentColor = writable("");
@@ -320,7 +286,6 @@ export const currentEmoji = writable("");
 export const defaultBackground = writable(DEFAULT_BG);
 
 // CUSTOM
-export const modal = createModal();
 export const saves = createSaves();
 export const map = createEditableMap();
 

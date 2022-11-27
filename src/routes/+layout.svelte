@@ -4,7 +4,7 @@
   import "../app.css";
 </script>
 
-{#if $navigating?.from.pathname == "/" && $navigating?.to.pathname == "/game"}
+{#if $navigating?.from.pathname == "/" && $navigating?.to.pathname == "/editor"}
   <div
     class="absolute z-10 flex h-full w-full items-center justify-center bg-white text-2xl"
   >

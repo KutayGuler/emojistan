@@ -1,7 +1,6 @@
 <script lang="ts">
   import { currentEmoji, currentColor, map, palette } from "../store";
   import Play from "./Play.svelte";
-  import Rules from "./Rules.svelte";
 
   let showIndex = false;
 
@@ -70,9 +69,20 @@
   let test = false;
 </script>
 
+<svelte:window
+  on:keydown={(e) => {
+    console.log(e);
+    e.preventDefault();
+    if (e.code == "Tab") {
+      test = !test;
+    }
+  }}
+/>
+
 {#if test}
   <Play />
 {:else}
+  <!-- TODO: Add palette to left side -->
   <div class="map">
     {#each { length: 256 } as _, i}
       <div
@@ -88,6 +98,7 @@
 {/if}
 <div class="flex flex-col">
   <div class="form-control">
+    <!-- TODO: Change objective to modal -->
     <label class="label">
       <span class="label-text">Objective</span>
     </label>
@@ -132,18 +143,14 @@
     <button class="btn" on:click={fillMap}
       >Fill With [{$currentEmoji || "____"}]</button
     >
-    <button class="btn bg-primary" on:click={() => (test = !test)}
-      >{test ? "EDIT" : "TEST"}</button
+    <button
+      class="btn bg-primary"
+      on:click={() => {
+        test = !test;
+        if (!test) {
+          $currentEmoji = "";
+        }
+      }}>{test ? "EDIT" : "TEST"}</button
     >
   </div>
 </div>
-
-<style>
-  :root {
-    --transition: 500ms;
-  }
-
-  label {
-    cursor: pointer;
-  }
-</style>

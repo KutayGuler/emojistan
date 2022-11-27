@@ -1,9 +1,8 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
   import { onMount } from "svelte";
-  import { saves, modal } from "../store";
+  import { saves } from "../store";
   import { fly } from "svelte/transition";
-  import { clickOutside } from "../utils/clickOutside";
   import { navigating } from "$app/stores";
   import Simulator from "$components/Simulator.svelte";
 
@@ -17,7 +16,7 @@
     } else {
       saves.add();
     }
-    goto("/game");
+    goto("/editor");
   }
 
   async function deleteSave() {
@@ -60,11 +59,29 @@
 
 <!-- <Simulator {items} {collisions} /> -->
 
+<!-- TODO: Change with daisyUI modal -->
+
+<!-- The button to open modal -->
+<label for="my-modal-4" class="btn">open modal</label>
+
+<!-- Put this part before </body> tag -->
+<input type="checkbox" id="my-modal-4" class="modal-toggle" />
+<label for="my-modal-4" class="modal cursor-pointer">
+  <label class="modal-box relative" for="">
+    <label for="my-modal-4" class="btn btn-circle btn-sm absolute right-2 top-2"
+      >✕</label
+    >
+    <h3 class="text-lg font-bold">Congratulations random Internet user!</h3>
+    <p class="py-4">
+      You've been selected for a chance to get one year of subscription to use
+      Wikipedia for free!
+    </p>
+  </label>
+</label>
+
 {#if popup}
   <div transition:fly class="modal-background x-modal">
     <div
-      use:clickOutside
-      on:outsideclick={() => (popup = false)}
       class="relative flex h-1/4 w-1/2 flex-col items-center justify-center bg-white"
     >
       <button class="modal-close x-modal" on:click={() => (popup = false)}>
@@ -122,7 +139,7 @@
 
 {#if !$navigating}
   <main class="noselect">
-    <div class="dropdown-end dropdown dropdown-bottom absolute right-4 top-4">
+    <div class="dropdown-end dropdown-bottom dropdown absolute right-4 top-4">
       <label tabindex="0">
         <div class="avatar placeholder">
           <div class="w-12 rounded-full bg-neutral-focus text-neutral-content">
@@ -138,8 +155,6 @@
         <li><a>Logout</a></li>
       </ul>
     </div>
-    <!-- TODO: revise ui -->
-    <!-- TODO: Add coconut physics -->
     <p class="py-8 text-9xl">Emojistan 🏝️</p>
     <div class="tabs">
       <a class="tab tab-bordered">Home</a>

@@ -24,7 +24,7 @@
       )
     ) {
       slots = ["", ""];
-      error.display("Can't have duplicate pushes.");
+      notifications.warning("Can't have duplicate pushes.");
       return;
     }
 
@@ -57,5 +57,4 @@
     </div>
   {/each}
 </div>
-<!-- <Error bind:this={error} /> -->
 <!-- </Base> -->

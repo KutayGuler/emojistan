@@ -1,6 +1,7 @@
 <script lang="ts">
   import { scale } from "svelte/transition";
   import { onDestroy, onMount } from "svelte/internal";
+  import { DEFAULT_BG } from "../constants";
   import {
     map,
     pushes,
@@ -10,7 +11,6 @@
     loopEvents,
     currentColor,
     currentEmoji,
-    modal,
     statics,
     palette,
     type Mutations,
@@ -25,7 +25,7 @@
   onMount(() => {
     r = document.querySelector(":root");
     defaultBackground = r.style.getPropertyValue("--default-background");
-    if (defaultBackground == "") defaultBackground = "#faebd7";
+    if (defaultBackground == "") defaultBackground = DEFAULT_BG;
     [$currentColor, $currentEmoji] = ["", ""];
   });
 

@@ -1,7 +1,6 @@
 <script lang="ts">
   // VIEWS
   import Editor from "../../views/Editor.svelte";
-  import Rules from "../../views/Rules.svelte";
 
   import { flip } from "svelte/animate";
   import { scale } from "svelte/transition";
@@ -26,13 +25,13 @@
     loopEvents,
     palette,
     statics,
-    modal,
   } from "../../store";
   import { notifications } from "../notifications";
   import { emojis } from "../../emojis";
   import { onMount } from "svelte";
   import { goto } from "$app/navigation";
   import Palette from "$components/Palette.svelte";
+  import Svelvet from "$lib";
 
   onMount(() => {
     if ($saves.current == "") {
@@ -62,13 +61,6 @@
   // quickAcess edit mode
   let editMode = false;
 
-  let viewIndex = 1;
-
-  let views = [
-    { component: Editor, emoji: "🏗️", title: "Editor" },
-    { component: Rules, emoji: "📜", title: "Rules" },
-  ];
-
   let [x, y] = [0, 0];
 
   function setCursorEmoji(e: MouseEvent) {
@@ -81,10 +73,6 @@
       $currentEmoji = "";
       $currentColor = "";
     }
-  }
-
-  function changeView(i: number) {
-    viewIndex = i;
   }
 
   function pickEmoji(emoji: string) {
@@ -126,34 +114,33 @@
       class="right-0 h-[100vh] w-1/5 overflow-y-auto rounded-tl-lg rounded-bl-lg  bg-sky-400 p-2 shadow-2xl"
     >
       <Palette />
-      <div class="flex h-1/2 w-1/6 flex-col justify-start">
-        <div class="w-3/4">
-          <h4 class="info" on:click={() => modal.show("statics")}>
-            Statics 🗿
-          </h4>
-          <button class="add btn" on:click={() => statics.add($currentEmoji)}>
-            [ {$currentEmoji == "" ? "____" : $currentEmoji} ]
-          </button>
-          {#each [...$statics] as item (item)}
-            <div transition:scale|local={flipParams} animate:flip={flipParams}>
-              <button class="remove btn" on:click={() => statics.remove(item)}
-                >{item}</button
-              >
-            </div>
-          {/each}
-        </div>
+      <h4 class="pt-8">Statics 🗿</h4>
+      <button
+        class="add btn w-full"
+        on:click={() => statics.add($currentEmoji)}
+      >
+        [ {$currentEmoji == "" ? "____" : $currentEmoji} ]
+      </button>
+      <div class="flex h-1/3 w-full flex-col justify-start overflow-y-auto">
+        {#each [...$statics] as item (item)}
+          <div transition:scale|local={flipParams} animate:flip={flipParams}>
+            <button
+              class="remove btn w-full"
+              on:click={() => statics.remove(item)}>{item}</button
+            >
+          </div>
+        {/each}
       </div>
     </aside>
     <div
       class="box-border flex h-[100vh] w-full flex-col items-center justify-start overflow-y-auto"
     >
-      {#each [Editor, Rules] as component}
-        <div
-          class="flex w-full flex-row items-center justify-center gap-4 pt-16"
-        >
-          <svelte:component this={component} />
-        </div>
-      {/each}
+      <div class="flex w-full flex-row items-center justify-center gap-4 pt-16">
+        <Editor />
+      </div>
+      <div class="flex w-full flex-row items-center justify-center gap-4 pt-16">
+        <Svelvet nodes={initialNodes} edges={initialEdges} background />
+      </div>
     </div>
     <aside
       class="right-0 h-[100vh] w-1/5 overflow-y-auto rounded-tl-lg rounded-bl-lg  bg-sky-400 p-2 shadow-2xl"
