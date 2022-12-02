@@ -2,6 +2,11 @@
   import Toast from "./Toast.svelte";
   import { navigating } from "$app/stores";
   import "../app.css";
+  import supabase from "../supabase";
+
+  supabase.auth.onAuthStateChange((event, session) => {
+    console.log(event, session);
+  });
 </script>
 
 {#if $navigating?.from.pathname == "/" && $navigating?.to.pathname == "/editor"}

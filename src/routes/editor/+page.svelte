@@ -164,7 +164,7 @@
 
 {#if $saves.current != ""}
   <!-- TODO: Fix this -->
-  <div
+  <!-- <div
     class="absolute z-10 h-4 w-4"
     style:display={x + 64 >= innerWidth || y + 64 >= innerHeight ? "none" : ""}
     style:background={$currentColor}
@@ -176,7 +176,7 @@
       : ""}
   >
     {$currentEmoji}
-  </div>
+  </div> -->
 
   <main
     class="noselect box-border flex flex-row items-end justify-end"
@@ -185,6 +185,8 @@
     <aside
       class="right-0 h-[100vh] w-1/5 overflow-y-auto rounded-tr-lg rounded-bl-lg  bg-base-200 p-2 text-lg shadow-2xl"
     >
+      <button class="btn w-full">SAVE MAP</button>
+      <p>Last saved:</p>
       <div class="flex flex-col pb-8">
         <div class="form-control">
           <label class="label">
@@ -260,6 +262,15 @@
           </div>
         {/each}
       </div>
+      <!-- TODO: Dropdown -->
+      <h4>Settings</h4>
+      <!-- Island name -->
+      <input
+        type="text"
+        placeholder="Type here"
+        class="input w-full max-w-xs"
+      />
+      <button class="btn">DELETE ISLAND</button>
     </aside>
     <div
       class="box-border flex h-[100vh] w-full flex-col items-center justify-start overflow-y-auto"
@@ -271,6 +282,7 @@
           <Editor />
         {/if}
       </div>
+      <!-- TODO: Shouldn't be able to see svelvet on test mode -->
       <Svelvet nodes={initialNodes} edges={initialEdges} background />
     </div>
     <aside

@@ -34,6 +34,10 @@ Inspired from: Context Menu https://svelte.dev/repl/3a33725c3adb4f57b46b597f9dad
     event: ["#f6fafd", "#ffc83d"],
   };
 
+  function id() {
+    return Math.max(...$nodesStore.map((n) => n.id), 0) + 1;
+  }
+
   function spawn<T>(
     name: string,
     component: any, // what is the proper component type?
@@ -41,9 +45,8 @@ Inspired from: Context Menu https://svelte.dev/repl/3a33725c3adb4f57b46b597f9dad
     value: T,
     receiver = false
   ) {
-    let id = Math.max(...$nodesStore.map((n) => n.id)) + 1;
     let obj = {
-      id,
+      id: id(),
       component,
       position: { x: 190, y: 80 },
       width: 250,
@@ -65,9 +68,8 @@ Inspired from: Context Menu https://svelte.dev/repl/3a33725c3adb4f57b46b597f9dad
   }
 
   function spawnContainer() {
-    let id = Math.max(...$nodesStore.map((n) => n.id)) + 1;
     let obj = {
-      id,
+      id: id(),
       component: Container,
       position: { x: 190, y: 80 },
       width: 50,

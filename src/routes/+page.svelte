@@ -1,9 +1,21 @@
 <script lang="ts">
+  import supabase from "../supabase";
   import { goto } from "$app/navigation";
   import { onMount } from "svelte";
-  import { saves } from "../store";
+  import {
+    saves,
+    map,
+    statics,
+    palette,
+    pushes,
+    merges,
+    loopEvents,
+    events,
+    conditions,
+  } from "../store";
   import { fly } from "svelte/transition";
   import { navigating } from "$app/stores";
+  import { dataset_dev } from "svelte/internal";
 
   onMount(() => {
     if ($saves.current == "") saves.useStorage();
@@ -43,13 +55,82 @@
     title = _title;
     prevTitle = _title;
   }
+
+  async function signInWithGoogle() {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+    });
+  }
+
+  console.log(supabase.auth.getUser());
+
+  function showData() {
+    let data = {
+      map: $map,
+      statics: $statics,
+      palette: $palette,
+      pushes: $pushes,
+      merges: $merges,
+      loopEvents: $loopEvents,
+      events: $events,
+      conditions: $conditions,
+    };
+    console.log(data);
+  }
+
+  async function addIsland() {
+    let owner = await supabase.auth.getUser();
+    if (!owner.data.user) {
+      return;
+    }
+    const { data, error } = await supabase.from("islands").insert([
+      {
+        data: {
+          map: {
+            items: Object.fromEntries($map.items),
+            backgrounds: Object.fromEntries($map.backgrounds),
+            objective: $map.objective,
+          },
+          statics: Array.from($statics),
+          palette: Array.from($palette),
+          pushes: Object.fromEntries($pushes),
+          merges: Object.fromEntries($merges),
+          loopEvents: Object.fromEntries($loopEvents),
+          events: Object.fromEntries($events),
+          conditions: Object.fromEntries($conditions),
+        },
+        owner: owner.data.user.id,
+      },
+    ]);
+    console.log(data, error);
+  }
+
+  async function getIslands() {
+    let user = await supabase.auth.getUser();
+    let { data: islands, error } = await supabase
+      .from("islands")
+      .select("data")
+      .eq("owner", user.data.user?.id);
+    console.log(islands, error);
+  }
 </script>
 
+<div class="flex flex-col">
+  <button on:click={getIslands}>GET ISLANDS</button>
+  <button on:click={showData}>show data</button>
+  <button on:click={addIsland}>add island</button>
+  <button on:click={signInWithGoogle}>SIGN IN</button>
+</div>
+
+<!-- {#await supabase.auth.getUser() then { data, error }}
+  <p>{JSON.stringify(data)}</p>
+{/await} -->
+
 <!-- The button to open modal -->
-<label for="my-modal-4" class="btn">open modal</label>
+<!-- <label for="my-modal-4" class="btn">open modal</label> -->
 
 <!-- Put this part before </body> tag -->
-<input type="checkbox" id="my-modal-4" class="modal-toggle" />
+<!-- <input type="checkbox" id="my-modal-4" class="modal-toggle" />
 <label for="my-modal-4" class="modal cursor-pointer">
   <label class="modal-box relative" for="">
     <label for="my-modal-4" class="btn btn-circle btn-sm absolute right-2 top-2"
@@ -61,7 +142,7 @@
       Wikipedia for free!
     </p>
   </label>
-</label>
+</label> -->
 
 {#if popup}
   <div transition:fly class="modal-background x-modal">
@@ -123,7 +204,7 @@
 
 {#if !$navigating}
   <main class="noselect">
-    <div class="dropdown dropdown-end dropdown-bottom absolute right-4 top-4">
+    <div class="dropdown-end dropdown-bottom dropdown absolute right-4 top-4">
       <label tabindex="0">
         <div class="avatar placeholder">
           <div class="w-12 rounded-full bg-neutral-focus text-neutral-content">
@@ -140,16 +221,16 @@
       </ul>
     </div>
     <p class="py-8 text-9xl">Emojistan 🏝️</p>
-    <div class="tabs">
+    <!-- <div class="tabs">
       <a class="tab tab-bordered">Home</a>
       <a class="tab tab-active tab-bordered">Favorites</a>
-    </div>
+    </div> -->
     <div />
     {#if $saves.loaded}
       <div class="flex w-1/3 flex-col gap-8 py-8">
         <button
           class="btn my-0 h-16 w-full  hover:bg-primary"
-          on:click={() => openSave()}>New World</button
+          on:click={() => openSave()}>New Island</button
         >
         {#each [...$saves.saves] as [id, title]}
           <div class="relative text-lg">
@@ -159,7 +240,7 @@
             >
               <div>{title}</div>
             </button>
-            <div class="absolute bottom-1 right-2">username</div>
+            <!-- <div class="absolute bottom-1 right-2">username</div> -->
             <button class=" absolute top-2 right-2 flex flex-row"
               ><svg
                 xmlns="http://www.w3.org/2000/svg"
