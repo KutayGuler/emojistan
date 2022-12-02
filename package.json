@@ -17,6 +17,7 @@
     "@sveltejs/adapter-auto": "next",
     "@sveltejs/kit": "next",
     "autoprefixer": "^10.4.8",
+    "daisyui": "^2.42.1",
     "postcss": "^8.4.16",
     "prettier": "^2.7.1",
     "prettier-plugin-tailwindcss": "^0.1.13",
@@ -31,7 +32,6 @@
   "type": "module",
   "dependencies": {
     "d3-selection": "^3.0.0",
-    "d3-zoom": "^3.0.0",
-    "daisyui": "^2.42.1"
+    "d3-zoom": "^3.0.0"
   }
 }

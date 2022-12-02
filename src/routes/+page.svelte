@@ -4,7 +4,6 @@
   import { saves } from "../store";
   import { fly } from "svelte/transition";
   import { navigating } from "$app/stores";
-  import Simulator from "$components/Simulator.svelte";
 
   onMount(() => {
     if ($saves.current == "") saves.useStorage();
@@ -44,22 +43,7 @@
     title = _title;
     prevTitle = _title;
   }
-
-  let items = new Map<number, string>();
-  items.set(0, "X");
-  items.set(1, "Y");
-  let collisions = new Map<string, Map<string, string>>();
-
-  // let col = new Map();
-  // col.set("Y", "bump");
-  // collisions.set("X", col);
 </script>
-
-<!-- TODO: Add friends on right side -->
-
-<!-- <Simulator {items} {collisions} /> -->
-
-<!-- TODO: Change with daisyUI modal -->
 
 <!-- The button to open modal -->
 <label for="my-modal-4" class="btn">open modal</label>
@@ -139,7 +123,7 @@
 
 {#if !$navigating}
   <main class="noselect">
-    <div class="dropdown-end dropdown-bottom dropdown absolute right-4 top-4">
+    <div class="dropdown dropdown-end dropdown-bottom absolute right-4 top-4">
       <label tabindex="0">
         <div class="avatar placeholder">
           <div class="w-12 rounded-full bg-neutral-focus text-neutral-content">

@@ -44,11 +44,13 @@
 </script>
 
 <!-- Now that a store has been created from the initial nodes and initial edges we drill props from the store down to the D3 GraphView along with the unique key -->
-<div
-  class="Svelvet shadow-lg"
-  style={`width: ${$widthStore}px; height: ${$heightStore}px`}
->
-  <GraphView {nodesStore} {derivedEdges} {key} />
+<div class="flex w-full flex-row items-center justify-center gap-4 pt-16">
+  <div
+    class="Svelvet shadow-lg"
+    style={`width: ${$widthStore}px; height: ${$heightStore}px`}
+  >
+    <GraphView {nodesStore} {derivedEdges} {key} />
+  </div>
 </div>
 
 <style>

@@ -32,6 +32,7 @@
   import { goto } from "$app/navigation";
   import Palette from "$components/Palette.svelte";
   import Svelvet from "$lib";
+  import Play from "../../views/Play.svelte";
 
   onMount(() => {
     if ($saves.current == "") {
@@ -69,6 +70,12 @@
   }
 
   function handleKeydown(e: KeyboardEvent) {
+    if (e.code == "Tab") {
+      e.preventDefault();
+      test = !test;
+      return;
+    }
+
     if (e.code == "Escape") {
       $currentEmoji = "";
       $currentColor = "";
@@ -82,6 +89,71 @@
 
   let innerWidth: number;
   let innerHeight: number;
+
+  let showIndex = false;
+
+  const deleteModes = ["Item", "Background", "Both"];
+  const clearModes = ["Items", "Backgrounds", "All"];
+
+  let deleteMode = deleteModes[2];
+  let clearMode = clearModes[2];
+
+  function pickColor(color: string) {
+    console.log(color);
+    $currentColor = color == $currentColor ? "" : color;
+  }
+
+  function clickedCell(index: number) {
+    if ($currentColor == "" && $currentEmoji == "") {
+      switch (deleteMode) {
+        case "Item":
+          map.removeEmoji(index);
+          break;
+        case "Background":
+          map.deleteBackground(index);
+          break;
+        default:
+        case "Both":
+          map.removeEmoji(index);
+          map.deleteBackground(index);
+          break;
+      }
+      return;
+    }
+
+    if ($currentColor != "") {
+      map.updateBackground(index, $currentColor);
+    }
+
+    if ($currentEmoji != "") {
+      map.addEmoji(index, $currentEmoji);
+    }
+  }
+
+  function fillMap() {
+    if ($currentEmoji == "") return;
+    for (let i = 0; i < 256; i++) {
+      $map.items.set(i, $currentEmoji);
+    }
+    $map = $map;
+    console.log($map);
+  }
+
+  function clearMap() {
+    switch (clearMode) {
+      case "Items":
+        map.clearObjects();
+        break;
+      case "Backgrounds":
+        map.clearBackgrounds();
+        break;
+      case "All":
+        map.clearAll();
+        break;
+    }
+  }
+
+  let test = false;
 </script>
 
 <svelte:head>
@@ -111,8 +183,65 @@
     on:mousemove={setCursorEmoji}
   >
     <aside
-      class="right-0 h-[100vh] w-1/5 overflow-y-auto rounded-tl-lg rounded-bl-lg  bg-sky-400 p-2 shadow-2xl"
+      class="right-0 h-[100vh] w-1/5 overflow-y-auto rounded-tr-lg rounded-bl-lg  bg-base-200 p-2 text-lg shadow-2xl"
     >
+      <div class="flex flex-col pb-8">
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text">Objective</span>
+          </label>
+          <textarea
+            class="textarea textarea-bordered h-24"
+            placeholder="Describe the goal"
+            bind:value={$map.objective}
+          />
+        </div>
+        <div class="form-control">
+          <label class="label cursor-pointer">
+            <span class="label-text">Show Indexes</span>
+            <input
+              type="checkbox"
+              class="checkbox checkbox-secondary"
+              bind:checked={showIndex}
+            />
+          </label>
+        </div>
+        <div class="flex flex-col gap-2">
+          <div class="form-control w-full max-w-xs">
+            <label class="label">
+              <span class="label-text">Delete Mode</span>
+            </label>
+            <select class="select select-bordered" bind:value={deleteMode}>
+              {#each deleteModes as mode}
+                <option value={mode}>{mode}</option>
+              {/each}
+            </select>
+          </div>
+          <div class="form-control w-full max-w-xs">
+            <label class="label">
+              <span class="label-text">Clear Mode</span>
+            </label>
+            <select class="select select-bordered" bind:value={clearMode}>
+              {#each clearModes as mode}
+                <option value={mode}>{mode}</option>
+              {/each}
+            </select>
+          </div>
+          <button class="btn bg-accent" on:click={clearMap}>CLEAR</button>
+          <button class="btn" on:click={fillMap}
+            >Fill With [{$currentEmoji || "____"}]</button
+          >
+          <button
+            class="btn bg-primary"
+            on:click={() => {
+              test = !test;
+              if (!test) {
+                $currentEmoji = "";
+              }
+            }}>{test ? "EDIT" : "TEST"}</button
+          >
+        </div>
+      </div>
       <Palette />
       <h4 class="pt-8">Statics 🗿</h4>
       <button
@@ -135,12 +264,14 @@
     <div
       class="box-border flex h-[100vh] w-full flex-col items-center justify-start overflow-y-auto"
     >
-      <div class="flex w-full flex-row items-center justify-center gap-4 pt-16">
-        <Editor />
+      <div class="flex w-full flex-col items-center justify-start gap-4 pt-16">
+        {#if test}
+          <Play />
+        {:else}
+          <Editor />
+        {/if}
       </div>
-      <div class="flex w-full flex-row items-center justify-center gap-4 pt-16">
-        <Svelvet nodes={initialNodes} edges={initialEdges} background />
-      </div>
+      <Svelvet nodes={initialNodes} edges={initialEdges} background />
     </div>
     <aside
       class="right-0 h-[100vh] w-1/5 overflow-y-auto rounded-tl-lg rounded-bl-lg  bg-sky-400 p-2 shadow-2xl"
