@@ -7,7 +7,6 @@
   import SimpleBezierEdge from "$lib/Edges/SimpleBezierEdge.svelte";
   import EdgeAnchor from "$lib/Edges/EdgeAnchor.svelte";
   import Node from "$lib/Nodes/index.svelte";
-  import Spawner from "./Spawner.svelte";
 
   // leveraging d3 library to zoom/pan
   let d3 = {
@@ -102,8 +101,6 @@
   let z1 = "z-index: 1;";
   let svgStyle = "";
 </script>
-
-<Spawner />
 
 <button on:click={() => (svgStyle = svgStyle == z1 ? "" : z1)}
   >{svgStyle == z1 ? "EDIT NODES" : "EDIT EDGES"}</button

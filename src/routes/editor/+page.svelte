@@ -25,6 +25,7 @@
     loopEvents,
     palette,
     statics,
+    defaultBackground,
   } from "../../store";
   import { notifications } from "../notifications";
   import { emojis } from "../../emojis";
@@ -33,6 +34,7 @@
   import Palette from "$components/Palette.svelte";
   import Svelvet from "$lib";
   import Play from "../../views/Play.svelte";
+  import Spawner from "$lib/Containers/GraphView/Spawner.svelte";
 
   onMount(() => {
     if ($saves.current == "") {
@@ -154,6 +156,7 @@
   }
 
   let test = false;
+  let view: "editor" | "rules" = "editor";
 </script>
 
 <svelte:head>
@@ -162,22 +165,17 @@
 
 <svelte:window on:keydown={handleKeydown} bind:innerWidth bind:innerHeight />
 
+<button
+  class="btn"
+  on:click={() => {
+    if (view == "editor") {
+      view = "rules";
+    } else {
+      view = "editor";
+    }
+  }}>CHANGE VIEW</button
+>
 {#if $saves.current != ""}
-  <!-- TODO: Fix this -->
-  <!-- <div
-    class="absolute z-10 h-4 w-4"
-    style:display={x + 64 >= innerWidth || y + 64 >= innerHeight ? "none" : ""}
-    style:background={$currentColor}
-    style:border={$currentColor != ""
-      ? "1px solid var(--default-background);"
-      : ""}
-    style={$currentEmoji || $currentColor
-      ? `translate: ${x + 16}px ${y}px;`
-      : ""}
-  >
-    {$currentEmoji}
-  </div> -->
-
   <main
     class="noselect box-border flex flex-row items-end justify-end"
     on:mousemove={setCursorEmoji}
@@ -185,105 +183,118 @@
     <aside
       class="right-0 h-[100vh] w-1/5 overflow-y-auto rounded-tr-lg rounded-bl-lg  bg-base-200 p-2 text-lg shadow-2xl"
     >
-      <button class="btn w-full">SAVE MAP</button>
-      <p>Last saved:</p>
-      <div class="flex flex-col pb-8">
-        <div class="form-control">
-          <label class="label">
-            <span class="label-text">Objective</span>
-          </label>
-          <textarea
-            class="textarea textarea-bordered h-24"
-            placeholder="Describe the goal"
-            bind:value={$map.objective}
-          />
-        </div>
-        <div class="form-control">
-          <label class="label cursor-pointer">
-            <span class="label-text">Show Indexes</span>
-            <input
-              type="checkbox"
-              class="checkbox checkbox-secondary"
-              bind:checked={showIndex}
+      {#if view == "editor"}
+        <button class="btn w-full">SAVE MAP</button>
+        <p>Last saved:</p>
+        <div class="flex flex-col pb-8">
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text">Objective</span>
+            </label>
+            <textarea
+              class="textarea textarea-bordered h-24"
+              placeholder="Describe the goal"
+              bind:value={$map.objective}
             />
-          </label>
-        </div>
-        <div class="flex flex-col gap-2">
-          <div class="form-control w-full max-w-xs">
-            <label class="label">
-              <span class="label-text">Delete Mode</span>
-            </label>
-            <select class="select select-bordered" bind:value={deleteMode}>
-              {#each deleteModes as mode}
-                <option value={mode}>{mode}</option>
-              {/each}
-            </select>
           </div>
-          <div class="form-control w-full max-w-xs">
-            <label class="label">
-              <span class="label-text">Clear Mode</span>
+          <div class="form-control">
+            <label class="label cursor-pointer">
+              <span class="label-text">Show Indexes</span>
+              <input
+                type="checkbox"
+                class="checkbox checkbox-secondary"
+                bind:checked={showIndex}
+              />
             </label>
-            <select class="select select-bordered" bind:value={clearMode}>
-              {#each clearModes as mode}
-                <option value={mode}>{mode}</option>
-              {/each}
-            </select>
           </div>
-          <button class="btn bg-accent" on:click={clearMap}>CLEAR</button>
-          <button class="btn" on:click={fillMap}
-            >Fill With [{$currentEmoji || "____"}]</button
-          >
-          <button
-            class="btn bg-primary"
-            on:click={() => {
-              test = !test;
-              if (!test) {
-                $currentEmoji = "";
-              }
-            }}>{test ? "EDIT" : "TEST"}</button
-          >
-        </div>
-      </div>
-      <Palette />
-      <h4 class="pt-8">Statics 🗿</h4>
-      <button
-        class="add btn w-full"
-        on:click={() => statics.add($currentEmoji)}
-      >
-        [ {$currentEmoji == "" ? "____" : $currentEmoji} ]
-      </button>
-      <div class="flex h-1/3 w-full flex-col justify-start overflow-y-auto">
-        {#each [...$statics] as item (item)}
-          <div transition:scale|local={flipParams} animate:flip={flipParams}>
+          <div class="flex flex-col gap-2">
+            <div class="form-control w-full max-w-xs">
+              <label class="label">
+                <span class="label-text">Delete Mode</span>
+              </label>
+              <select class="select select-bordered" bind:value={deleteMode}>
+                {#each deleteModes as mode}
+                  <option value={mode}>{mode}</option>
+                {/each}
+              </select>
+            </div>
+            <div class="form-control w-full max-w-xs">
+              <label class="label">
+                <span class="label-text">Clear Mode</span>
+              </label>
+              <select class="select select-bordered" bind:value={clearMode}>
+                {#each clearModes as mode}
+                  <option value={mode}>{mode}</option>
+                {/each}
+              </select>
+            </div>
+            <button class="btn bg-accent" on:click={clearMap}>CLEAR</button>
+            <button class="btn" on:click={fillMap}
+              >Fill With [{$currentEmoji || "____"}]</button
+            >
             <button
-              class="remove btn w-full"
-              on:click={() => statics.remove(item)}>{item}</button
+              class="btn bg-primary"
+              on:click={() => {
+                test = !test;
+                if (!test) {
+                  $currentEmoji = "";
+                }
+              }}>{test ? "EDIT" : "TEST"}</button
             >
           </div>
-        {/each}
-      </div>
-      <!-- TODO: Dropdown -->
-      <h4>Settings</h4>
-      <!-- Island name -->
-      <input
-        type="text"
-        placeholder="Type here"
-        class="input w-full max-w-xs"
-      />
-      <button class="btn">DELETE ISLAND</button>
+        </div>
+        <Palette />
+        <h4 class="pt-8">Statics 🗿</h4>
+        <button
+          class="add btn w-full"
+          on:click={() => statics.add($currentEmoji)}
+        >
+          [ {$currentEmoji == "" ? "____" : $currentEmoji} ]
+        </button>
+        <div class="flex h-1/3 w-full flex-col justify-start overflow-y-auto">
+          {#each [...$statics] as item (item)}
+            <div transition:scale|local={flipParams} animate:flip={flipParams}>
+              <button
+                class="remove btn w-full"
+                on:click={() => statics.remove(item)}>{item}</button
+              >
+            </div>
+          {/each}
+        </div>
+        <!-- TODO: Dropdown -->
+        <h4>Settings</h4>
+        <!-- Island name -->
+        <input
+          type="text"
+          placeholder="Type here"
+          class="input w-full max-w-xs"
+        />
+        <button class="btn">DELETE ISLAND</button>
+      {:else if view == "rules"}
+        <Spawner />
+      {/if}
     </aside>
     <div
-      class="box-border flex h-[100vh] w-full flex-col items-center justify-start overflow-y-auto"
+      class="relative box-border flex h-[100vh] w-full flex-col items-center justify-start overflow-y-auto"
     >
-      <div class="flex w-full flex-col items-center justify-start gap-4 pt-16">
+      <p
+        class="sticky top-0 flex h-20 w-20 flex-col items-center justify-center self-end p-10 text-4xl"
+        style:background={$currentColor || $defaultBackground}
+      >
+        {$currentEmoji}
+      </p>
+      <div class="flex w-full flex-col items-center justify-start gap-4">
         {#if test}
           <Play />
-        {:else}
+        {:else if view == "editor"}
+          <!-- content here -->
           <Editor />
+        {:else}
+          <!-- else content here -->
+          <Svelvet nodes={initialNodes} edges={initialEdges} background />
         {/if}
       </div>
       <!-- TODO: Shouldn't be able to see svelvet on test mode -->
-      <Svelvet nodes={initialNodes} edges={initialEdges} background />
     </div>
     <aside
       class="right-0 h-[100vh] w-1/5 overflow-y-auto rounded-tl-lg rounded-bl-lg  bg-sky-400 p-2 shadow-2xl"

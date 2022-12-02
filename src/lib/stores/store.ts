@@ -1,6 +1,7 @@
 import { writable, derived, get } from "svelte/store";
 import type { Readable, Writable } from "svelte/store";
 import type { Node, Edge } from "../types/types";
+import { GRAPH_SIZE } from "../../constants";
 
 interface Linker {
   source: number;
@@ -84,8 +85,8 @@ export function findOrCreateStore(key: string): SvelvetStore {
   const coreSvelvetStore: CoreSvelvetStore = {
     nodesStore: writable([]),
     edgesStore: writable([]),
-    widthStore: writable(772),
-    heightStore: writable(772),
+    widthStore: writable(GRAPH_SIZE),
+    heightStore: writable(GRAPH_SIZE),
     backgroundStore: writable(false),
     movementStore: writable(true),
     nodeSelected: writable(false),

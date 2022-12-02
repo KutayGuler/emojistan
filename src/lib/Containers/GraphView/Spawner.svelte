@@ -144,21 +144,13 @@ Inspired from: Context Menu https://svelte.dev/repl/3a33725c3adb4f57b46b597f9dad
   ];
 </script>
 
-<div class="absolute top-0 right-0 z-10">
-  <div class="dropdown-end dropdown">
-    <label tabindex="0" class="btn m-1">Spawner</label>
-    <ul
-      tabindex="0"
-      class="dropdown-content menu rounded-box w-52 bg-base-100 p-2 shadow"
-    >
-      {#each menuItems as { name, onClick }, i}
-        <li class="add h-8 hover:bg-base-200" on:click={onClick}>
-          {name}
-        </li>
-      {/each}
-    </ul>
-  </div>
-</div>
+<ul>
+  {#each menuItems as { name, onClick }, i}
+    <li class="add h-8 hover:bg-base-200" on:click={onClick}>
+      {name}
+    </li>
+  {/each}
+</ul>
 
 <style>
 </style>

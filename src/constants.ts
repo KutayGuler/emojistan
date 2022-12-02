@@ -6,3 +6,5 @@ export const MIN_ITERATION = 1;
 export const MAX_ITERATION = 16;
 
 export const DEFAULT_BG = "#cfcfcf";
+
+export const GRAPH_SIZE = 836;

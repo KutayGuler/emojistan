@@ -5,12 +5,13 @@
   import { afterUpdate, onMount } from "svelte";
   import type { Node, Edge } from "$lib/types/index.js";
   import { _key } from "$lib/stores/store";
+  import { GRAPH_SIZE } from "../../../constants";
 
   // Declaring variables for Svelvet components which will be usable in other files
   export let nodes: Node[];
   export let edges: Edge[];
-  export let width: number = 772;
-  export let height: number = 772;
+  export let width: number = GRAPH_SIZE;
+  export let height: number = GRAPH_SIZE;
   export let background: boolean = false;
   export let movement: boolean = true;
 
@@ -44,15 +45,15 @@
 </script>
 
 <!-- Now that a store has been created from the initial nodes and initial edges we drill props from the store down to the D3 GraphView along with the unique key -->
-<div class="flex w-full flex-row items-center justify-center gap-4 pt-16">
-  <div
-    class="Svelvet shadow-lg"
-    style={`width: ${$widthStore}px; height: ${$heightStore}px`}
-  >
-    <GraphView {nodesStore} {derivedEdges} {key} />
-  </div>
+<!-- <div class="flex w-full flex-row items-center justify-center gap-4 py-16"> -->
+<div
+  class="Svelvet shadow-lg"
+  style={`width: ${$widthStore}px; height: ${$heightStore}px`}
+>
+  <GraphView {nodesStore} {derivedEdges} {key} />
 </div>
 
+<!-- </div> -->
 <style>
   .Svelvet {
     position: relative;
