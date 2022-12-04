@@ -1,8 +1,10 @@
 import type { XYPosition, Position } from "./utils";
 
+export type NodeComponent = "container" | "condition" | "event";
+
 export interface Node<T = any> {
   id: number;
-  component: any;
+  component: NodeComponent;
   position: XYPosition;
   data: T;
   width: number;
@@ -24,19 +26,13 @@ export class Node<T = any> {
     id: number,
     component: any,
     position: { x: number; y: number },
-    width: number,
-    height: number,
-    bgColor: string,
-    borderColor: string,
+
     receiver: boolean
   ) {
     this.id = id;
     this.component = component;
     this.position = position;
-    this.width = width;
-    this.height = height;
-    this.bgColor = bgColor;
-    this.borderColor = borderColor;
+
     if (receiver) {
       this.targetPosition = "left";
     } else {

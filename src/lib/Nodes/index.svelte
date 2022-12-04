@@ -31,6 +31,19 @@
 
   console.log(node.component);
 
+  let [borderColor, bgColor, width, height] = ["", "", 50, 50];
+
+  switch (node.component) {
+    case "condition":
+      [borderColor, bgColor, width, height] = ["#cfc0e3", "#644292", 250, 180];
+      break;
+    case "event":
+      [borderColor, bgColor, width, height] = ["#f6fafd", "#ffc83d", 250, 180];
+      break;
+    case "container":
+      break;
+  }
+
   // derived from node.component
   // borderColor
   // bgColor
@@ -56,11 +69,10 @@
   class="Node"
   style="left: {node.position.x}px;
     top: {node.position.y}px;
-    width: {node.width}px;
-    height: {node.height}px;
-    background-color: {node.bgColor};
-    border-color: {node.borderColor};
-    border-radius: {node.borderRadius}px;"
+    width: {width}px;
+    height: {height}px;
+    background-color: {bgColor};
+    border-color: {borderColor};
   id="svelvet-{node.id}"
 >
   <nav
