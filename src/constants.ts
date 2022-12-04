@@ -6,5 +6,14 @@ export const MIN_ITERATION = 1;
 export const MAX_ITERATION = 16;
 
 export const DEFAULT_BG = "#cfcfcf";
-
 export const GRAPH_SIZE = 836;
+
+// COMPONENT COLORS
+export const EVENT_BG = "#ffc83d";
+export const CONDITION_BG = "#644292";
+export const CONTAINER_BG = "#ffc83d";
+
+// COMPONENT DIMENSIONS
+export const EVENT_W = 250;
+export const EVENT_H = 100;
+export const CONTAINER_W = 50;

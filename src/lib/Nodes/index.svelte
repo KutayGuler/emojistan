@@ -1,4 +1,7 @@
 <script lang="ts">
+  import Condition from "$components/Condition.svelte";
+  import Container from "$components/Container.svelte";
+  import Event from "$components/Event.svelte";
   import { findOrCreateStore } from "$lib/stores/store";
   import type { Node } from "$lib/types/types";
   import { scale } from "svelte/transition";
@@ -28,28 +31,6 @@
   // moving local boolean specific to node selected, to change position of individual node once selected
   let moving = false;
   let moved = false;
-
-  console.log(node.component);
-
-  let [borderColor, bgColor, width, height] = ["", "", 50, 50];
-
-  switch (node.component) {
-    case "condition":
-      [borderColor, bgColor, width, height] = ["#cfc0e3", "#644292", 250, 180];
-      break;
-    case "event":
-      [borderColor, bgColor, width, height] = ["#f6fafd", "#ffc83d", 250, 180];
-      break;
-    case "container":
-      break;
-  }
-
-  // derived from node.component
-  // borderColor
-  // bgColor
-  // width
-  // height
-  // borderRadius
 </script>
 
 <svelte:window
@@ -69,10 +50,10 @@
   class="Node"
   style="left: {node.position.x}px;
     top: {node.position.y}px;
-    width: {width}px;
-    height: {height}px;
-    background-color: {bgColor};
-    border-color: {borderColor};
+    width: {node.width}px;
+    height: {node.height}px;
+    background-color: {node.bgColor};
+    border-color: {node.borderColor};"
   id="svelvet-{node.id}"
 >
   <nav
@@ -128,7 +109,13 @@
     </svg>
   </button>
   <div class="flex flex-col ">
-    <svelte:component this={node.component} id={node.id} />
+    {#if node.component == "condition"}
+      <Condition id={node.id} />
+    {:else if node.component == "container"}
+      <Container id={node.id} />
+    {:else if node.component == "event"}
+      <Event id={node.id} />
+    {/if}
   </div>
 </div>
 

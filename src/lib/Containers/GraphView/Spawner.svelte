@@ -28,6 +28,7 @@
     store.add(_id, value);
     $nodesStore.push(new Node(_id, component, { x: 190, y: 80 }, receiver));
     $nodesStore = $nodesStore; // NECESSARY FOR REACTIVITY
+    console.log($nodesStore);
   }
 
   function spawnContainer() {

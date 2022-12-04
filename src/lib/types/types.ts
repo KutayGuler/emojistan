@@ -1,3 +1,10 @@
+import {
+  CONDITION_BG,
+  CONTAINER_W,
+  EVENT_BG,
+  EVENT_H,
+  EVENT_W,
+} from "$src/constants";
 import type { XYPosition, Position } from "./utils";
 
 export type NodeComponent = "container" | "condition" | "event";
@@ -24,14 +31,40 @@ export interface Node<T = any> {
 export class Node<T = any> {
   constructor(
     id: number,
-    component: any,
+    component: NodeComponent,
     position: { x: number; y: number },
-
     receiver: boolean
   ) {
     this.id = id;
     this.component = component;
     this.position = position;
+
+    switch (component) {
+      case "condition":
+      case "event":
+        this.width = EVENT_W;
+        this.height = EVENT_H;
+        break;
+      case "container":
+        this.width = CONTAINER_W;
+        this.height = CONTAINER_W;
+        break;
+    }
+
+    switch (component) {
+      case "condition":
+        this.borderColor = "#cfc0e3";
+        this.bgColor = CONDITION_BG;
+        break;
+      case "event":
+        this.borderColor = "#f6fafd";
+        this.bgColor = EVENT_BG;
+        break;
+      case "container":
+        this.borderColor = "#f6fafd";
+        this.bgColor = "#ffc83d";
+        break;
+    }
 
     if (receiver) {
       this.targetPosition = "left";

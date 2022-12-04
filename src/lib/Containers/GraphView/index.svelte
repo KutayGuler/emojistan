@@ -3,6 +3,7 @@
   import { zoom, zoomTransform } from "d3-zoom";
   import { select, selectAll } from "d3-selection";
   import { findOrCreateStore, linker } from "$lib/stores/store";
+  import { Node as INode } from "$src/lib/types";
 
   import SimpleBezierEdge from "$lib/Edges/SimpleBezierEdge.svelte";
   import EdgeAnchor from "$lib/Edges/EdgeAnchor.svelte";
@@ -101,16 +102,38 @@
 
   let z1 = "z-index: 1;";
   let svgStyle = "";
+
+  let ctxMenu = false;
+
+  function id() {
+    return Math.max(...$nodesStore.map((n) => n.id), 0) + 1;
+  }
 </script>
 
 <button on:click={() => (svgStyle = svgStyle == z1 ? "" : z1)}
   >{svgStyle == z1 ? "EDIT NODES" : "EDIT EDGES"}</button
 >
 
+<svelte:window
+  on:contextmenu={(e) => {
+    console.log(e);
+    e.preventDefault();
+    // ctxMenu = true;
+
+    // TODO: Figure out ctxmenu
+
+    $nodesStore.push(
+      new INode(id(), "event", { x: e.layerX, y: e.layerY }, false)
+    );
+    $nodesStore = $nodesStore;
+  }}
+/>
+
 <!-- This is the container that holds GraphView and we have disabled right click functionality to prevent a sticking behavior -->
 <div class={`Nodes Nodes-${key}`}>
   <!-- This container is transformed by d3zoom -->
   <div class={`Node Node-${key}`}>
+    <!-- <ContextMenu /> -->
     {#each $nodesStore as node}
       <Node {node} {key} />
     {/each}
