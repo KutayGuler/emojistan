@@ -60,8 +60,7 @@
     height: {node.height}px;
     background-color: {node.bgColor};
     border-color: {node.borderColor};
-    border-radius: {node.borderRadius}px;
-    color: {node.textColor};"
+    border-radius: {node.borderRadius}px;"
   id="svelvet-{node.id}"
 >
   <nav
