@@ -15,7 +15,6 @@
   } from "../store";
   import { fly } from "svelte/transition";
   import { navigating } from "$app/stores";
-  import { dataset_dev } from "svelte/internal";
 
   onMount(() => {
     if ($saves.current == "") saves.useStorage();
@@ -204,7 +203,7 @@
 
 {#if !$navigating}
   <main class="noselect">
-    <div class="dropdown-end dropdown-bottom dropdown absolute right-4 top-4">
+    <div class="dropdown dropdown-end dropdown-bottom absolute right-4 top-4">
       <label tabindex="0">
         <div class="avatar placeholder">
           <div class="w-12 rounded-full bg-neutral-focus text-neutral-content">

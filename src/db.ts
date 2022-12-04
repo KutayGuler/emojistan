@@ -6,45 +6,45 @@ const currentIslandID = "";
 
 // USER SETTINGS
 
-async function changeUsername() {}
+export async function changeUsername() {}
 
-async function deleteAccount() {}
+export async function deleteAccount() {}
 
 // AUTH
 
-async function signIn() {}
+export async function signIn() {}
 
-async function signOut() {}
+export async function signOut() {}
 
 // RELATIONS
 
-async function followUser() {}
+export async function followUser() {}
 
-async function searchUser() {}
+export async function searchUser() {}
 
 // GET ISLANDS
 
-async function getUserIslands() {}
+export async function getUserIslands() {}
 
-async function getFavoriteIslands() {}
+export async function getFavoriteIslands() {}
 
 // FAVORITES
 
-async function addToFavorites() {}
+export async function addToFavorites() {}
 
-async function removeFromFavorites() {}
+export async function removeFromFavorites() {}
 
 // MODIFY SPECIFIC ISLAND DATA
 
-async function saveIsland() {
+export async function saveIsland() {
   const { data, error } = await supabase
     .from("islands")
     .update({ other_column: "otherValue" })
     .eq("some_column", "someValue");
 }
 
-async function changeIslandName() {}
+export async function changeIslandName() {}
 
-async function changeIslandStatus() {}
+export async function changeIslandStatus() {}
 
-async function deleteIsland() {}
+export async function deleteIsland() {}

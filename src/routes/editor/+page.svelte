@@ -331,11 +331,11 @@
           {/each}
         </div>
         {#each Object.keys(emojis) as category}
-          {#if emojis[category].some((item) => item.name.includes(filter))}
+          {#if emojis[category].some((item) => item[0].includes(filter))}
             <h4 class="pt-16 pb-4 text-lg">{category}</h4>
           {/if}
           <div class="flex flex-wrap">
-            {#each emojis[category] as { emoji, name }}
+            {#each emojis[category] as [emoji, name]}
               {#if name.includes(filter)}
                 <div
                   class="duration-75 ease-out hover:scale-150"

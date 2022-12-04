@@ -108,6 +108,9 @@ function createSaves() {
     loaded: false,
   });
 
+  // if logged in, save on server
+  // if not, save on localstorage
+
   return {
     set,
     subscribe,
@@ -146,7 +149,7 @@ function createSaves() {
       update((state) => {
         let id = (Math.random() + 1).toString(36).substring(7);
         state.current = id;
-        state.saves.set(id, "World #" + id);
+        state.saves.set(id, "Island #" + id);
         return state;
       }),
     delete: (id: string) =>
