@@ -66,11 +66,6 @@
 
   let [x, y] = [0, 0];
 
-  function setCursorEmoji(e: MouseEvent) {
-    x = e.clientX;
-    y = e.clientY;
-  }
-
   function handleKeydown(e: KeyboardEvent) {
     if (e.code == "Tab") {
       e.preventDefault();
@@ -160,26 +155,13 @@
 </script>
 
 <svelte:head>
-  <title>Emojistan / Game</title>
+  <title>Emojistan / Editor</title>
 </svelte:head>
 
 <svelte:window on:keydown={handleKeydown} bind:innerWidth bind:innerHeight />
 
-<button
-  class="btn"
-  on:click={() => {
-    if (view == "editor") {
-      view = "rules";
-    } else {
-      view = "editor";
-    }
-  }}>CHANGE VIEW</button
->
 {#if $saves.current != ""}
-  <main
-    class="noselect box-border flex flex-row items-end justify-end"
-    on:mousemove={setCursorEmoji}
-  >
+  <main class="noselect box-border flex flex-row items-end justify-end">
     <aside
       class="right-0 h-[100vh] w-1/5 overflow-y-auto rounded-tr-lg rounded-bl-lg  bg-base-200 p-2 text-lg shadow-2xl"
     >
@@ -275,10 +257,20 @@
       {/if}
     </aside>
     <div
-      class="relative box-border flex h-[100vh] w-full flex-col items-center justify-start overflow-y-auto"
+      class="relative box-border flex h-[100vh] w-full flex-col items-center justify-center overflow-y-auto"
     >
+      <button
+        class="btn absolute top-0 left-0"
+        on:click={() => {
+          if (view == "editor") {
+            view = "rules";
+          } else {
+            view = "editor";
+          }
+        }}>CHANGE VIEW</button
+      >
       <p
-        class="sticky top-0 flex h-20 w-20 flex-col items-center justify-center self-end p-10 text-4xl"
+        class="absolute top-0 flex h-20 w-20 flex-col items-center justify-center self-end p-10 text-4xl"
         style:background={$currentColor || $defaultBackground}
       >
         {$currentEmoji}
@@ -294,7 +286,6 @@
           <Svelvet nodes={initialNodes} edges={initialEdges} background />
         {/if}
       </div>
-      <!-- TODO: Shouldn't be able to see svelvet on test mode -->
     </div>
     <aside
       class="right-0 h-[100vh] w-1/5 overflow-y-auto rounded-tl-lg rounded-bl-lg  bg-sky-400 p-2 shadow-2xl"

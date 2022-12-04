@@ -1,6 +1,6 @@
 import supabase from "./supabase";
 
-// TODO: subscribable currentIsland
+// TODO: subscribable saves.current
 // TODO: Get uuid type of supabase
 const currentIslandID = "";
 
