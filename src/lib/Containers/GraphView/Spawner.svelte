@@ -13,6 +13,7 @@
   import LoopEvent from "$components/LoopEvent.svelte";
   import Container from "$components/Container.svelte";
   import { _key as key } from "$lib/stores/store";
+  import { Node } from "$lib/types";
 
   const svelvetStore = findOrCreateStore($key);
   const { nodesStore } = svelvetStore;
@@ -33,47 +34,28 @@
     value: T,
     receiver = false
   ) {
-    let obj = {
-      id: id(),
-      component,
-      position: { x: 190, y: 80 },
-      width: 250,
-      height: 120,
-    };
-
-    Object.assign(
-      obj,
-      receiver ? { targetPosition: "left" } : { sourcePosition: "right" }
+    let _id = id();
+    store.add(_id, value);
+    $nodesStore.push(
+      new Node(
+        _id,
+        component,
+        { x: 190, y: 80 },
+        250,
+        180,
+        colors[name][0],
+        colors[name][1],
+        receiver
+      )
     );
-    Object.assign(obj, {
-      bgColor: colors[name][0],
-      borderColor: colors[name][1],
-    });
-
-    store.add(id, value);
-    $nodesStore.push(obj);
     $nodesStore = $nodesStore; // NECESSARY FOR REACTIVITY
   }
 
   function spawnContainer() {
-    let obj = {
-      id: id(),
-      component: Container,
-      position: { x: 190, y: 80 },
-      width: 50,
-      height: 50,
-      borderColor: "#40b3ff",
-      sourcePosition: "right",
-    };
-
-    // Object.assign(
-    //   obj,
-    //   receiver ? { targetPosition: "left" } : { sourcePosition: "right" }
-    // );
-
-    $nodesStore.push(obj);
+    $nodesStore.push(
+      new Node(id(), Container, { x: 190, y: 80 }, 50, 50, "#40b3ff", "", false)
+    );
     $nodesStore = $nodesStore; // NECESSARY FOR REACTIVITY
-    console.log($nodesStore);
   }
   function spawnMerger() {}
 
@@ -139,6 +121,3 @@
     </li>
   {/each}
 </ul>
-
-<style>
-</style>

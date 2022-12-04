@@ -96,7 +96,6 @@ export function findOrCreateStore(key: string): SvelvetStore {
 
   // This is the function handler for the mouseMove event to update the position of the selected node.
   const onMouseMove = (e: any, nodeID: number) => {
-    console.log("onMouseMove");
     coreSvelvetStore.nodesStore.update((n) => {
       n.forEach((node: Node) => {
         if (node.id === nodeID) {
@@ -113,7 +112,6 @@ export function findOrCreateStore(key: string): SvelvetStore {
 
   // This is the function handler for the touch event on mobile to select a node.
   const onTouchMove = (e: any, nodeID: number) => {
-    console.log("onTouchMove");
     coreSvelvetStore.nodesStore.update((n) => {
       n.forEach((node: Node) => {
         if (node.id === nodeID) {
@@ -134,7 +132,6 @@ export function findOrCreateStore(key: string): SvelvetStore {
   const nodeIdSelected = coreSvelvetStore.nodeIdSelected;
   // if the user clicks a node without moving it, this function fires allowing a user to invoke the callback function
   const onNodeClick = (e: any, nodeID: number) => {
-    console.log("nodeClick");
     get(nodesStore).forEach((node) => {
       if (node.id === get(nodeIdSelected)) {
         node.clickCallback?.(node);

@@ -6,9 +6,6 @@
   export let node: Node;
   export let key: string;
 
-  const _store = findOrCreateStore(key);
-  console.log(_store);
-
   const {
     edgesStore,
     nodesStore,
@@ -31,6 +28,15 @@
   // moving local boolean specific to node selected, to change position of individual node once selected
   let moving = false;
   let moved = false;
+
+  console.log(node.component);
+
+  // derived from node.component
+  // borderColor
+  // bgColor
+  // width
+  // height
+  // borderRadius
 </script>
 
 <svelte:window
@@ -111,12 +117,11 @@
     </svg>
   </button>
   <div class="flex flex-col ">
-    <slot />
+    <svelte:component this={node.component} id={node.id} />
   </div>
 </div>
 
-<!-- TODO: Fix width & height problem -->
-
+<!-- TODO: Fix width & height on Event component when new SequenceItem is added -->
 <style>
   nav {
     /* background: red; */

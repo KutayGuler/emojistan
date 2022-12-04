@@ -43,6 +43,11 @@ export async function saveIsland() {
     .eq("some_column", "someValue");
 }
 
+/**
+ * Inserts a save that is stored on localstorage to database.
+ */
+export async function migrateIslandToServer() {}
+
 export async function changeIslandName() {}
 
 export async function changeIslandStatus() {}

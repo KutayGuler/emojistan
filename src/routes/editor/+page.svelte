@@ -64,8 +64,6 @@
   // quickAcess edit mode
   let editMode = false;
 
-  let [x, y] = [0, 0];
-
   function handleKeydown(e: KeyboardEvent) {
     if (e.code == "Tab") {
       e.preventDefault();
@@ -243,15 +241,19 @@
             </div>
           {/each}
         </div>
-        <!-- TODO: Dropdown -->
-        <h4>Settings</h4>
+        <div class="collapse">
+          <input type="checkbox" />
+          <div class="collapse-title text-xl font-medium">Settings</div>
+          <div class="collapse-content">
+            <input
+              type="text"
+              placeholder="Type here"
+              class="input w-full max-w-xs"
+            />
+            <button class="btn">DELETE ISLAND</button>
+          </div>
+        </div>
         <!-- Island name -->
-        <input
-          type="text"
-          placeholder="Type here"
-          class="input w-full max-w-xs"
-        />
-        <button class="btn">DELETE ISLAND</button>
       {:else if view == "rules"}
         <Spawner />
       {/if}
@@ -279,10 +281,8 @@
         {#if test}
           <Play />
         {:else if view == "editor"}
-          <!-- content here -->
           <Editor />
-        {:else}
-          <!-- else content here -->
+        {:else if view == "rules"}
           <Svelvet nodes={initialNodes} edges={initialEdges} background />
         {/if}
       </div>

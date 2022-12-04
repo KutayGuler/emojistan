@@ -1,9 +1,8 @@
 import type { XYPosition, Position } from "./utils";
-import type { SvelteComponent } from "svelte";
 
 export interface Node<T = any> {
   id: number;
-  component: SvelteComponent;
+  component: any;
   position: XYPosition;
   data: T;
   width: number;
@@ -18,6 +17,32 @@ export interface Node<T = any> {
   src?: string;
   sourcePosition?: "left" | "right" | "top" | "bottom";
   targetPosition?: "left" | "right" | "top" | "bottom";
+}
+
+export class Node<T = any> {
+  constructor(
+    id: number,
+    component: any,
+    position: { x: number; y: number },
+    width: number,
+    height: number,
+    bgColor: string,
+    borderColor: string,
+    receiver: boolean
+  ) {
+    this.id = id;
+    this.component = component;
+    this.position = position;
+    this.width = width;
+    this.height = height;
+    this.bgColor = bgColor;
+    this.borderColor = borderColor;
+    if (receiver) {
+      this.targetPosition = "left";
+    } else {
+      this.sourcePosition = "right";
+    }
+  }
 }
 
 export interface Edge {

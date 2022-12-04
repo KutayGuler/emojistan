@@ -39,8 +39,9 @@
     $edgesStore = $edgesStore.filter((edge) => id != edge.id);
   }
 
-  function attemptLink(node) {
-    let type = node.sourcePosition != undefined ? "source" : "target";
+  function attemptLink(node: Node) {
+    let type: "source" | "target" =
+      node.sourcePosition != undefined ? "source" : "target";
     if (linker.link(key, node.id, type)) {
       $nodesStore = $nodesStore;
     }
@@ -111,9 +112,7 @@
   <!-- This container is transformed by d3zoom -->
   <div class={`Node Node-${key}`}>
     {#each $nodesStore as node}
-      <Node {node} {key}>
-        <svelte:component this={node.component} id={node.id} />
-      </Node>
+      <Node {node} {key} />
     {/each}
   </div>
 </div>
