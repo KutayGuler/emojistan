@@ -1,61 +1,37 @@
 <script lang="ts">
-  import {
-    conditions,
-    events,
-    loopEvents,
+  import type {
     SequenceItem,
-    type Condition as ICondition,
-    type TLoopEvent,
+    Condition as ICondition,
+    TLoopEvent,
   } from "../store";
-  import { findOrCreateStore } from "$lib/stores/store";
-  import { _key as key } from "$lib/stores/store";
-  import { Node, type NodeComponent } from "$lib/types";
+  import type { NodeComponent } from "$lib/types";
+  import { createEventDispatcher } from "svelte";
+  const dispatch = createEventDispatcher();
 
   export let position: { x: number; y: number };
 
-  const svelvetStore = findOrCreateStore($key);
-  const { nodesStore } = svelvetStore;
-
-  function generateID() {
-    return Math.max(...$nodesStore.map((n) => n.id), 0) + 1;
+  function spawn<T>(component: NodeComponent, value: T, receiver = false) {
+    dispatch("spawnNode", {
+      component,
+      position: { x: position.x, y: position.y },
+      receiver,
+      value,
+    });
   }
-
-  function spawn<T>(
-    component: NodeComponent,
-    store: any,
-    value: T,
-    receiver = false
-  ) {
-    let _id = generateID();
-    store.add(_id, value);
-    console.log(position);
-    $nodesStore.push(new Node(_id, component, position, receiver));
-    $nodesStore = $nodesStore.filter((node) => node.component != "spawner");
-    console.log($nodesStore);
-    // $nodesStore = $nodesStore; // NECESSARY FOR REACTIVITY
-  }
-
-  function spawnContainer() {
-    $nodesStore.push(
-      new Node(generateID(), "container", { x: 190, y: 80 }, false)
-    );
-    $nodesStore = $nodesStore; // NECESSARY FOR REACTIVITY
-  }
-  function spawnMerger() {}
 
   let menuItems = [
     {
       name: "Container",
-      onClick: spawnContainer,
+      onClick: () => {},
     },
     {
       name: "Merger",
-      onClick: spawnMerger,
+      onClick: () => {},
     },
     {
       name: "Condition",
       onClick: () =>
-        spawn<ICondition>("condition", conditions, {
+        spawn<ICondition>("condition", {
           a: "playerBackground",
           b: "",
           eventID: 0,
@@ -63,14 +39,13 @@
     },
     {
       name: "Event",
-      onClick: () => spawn<Array<SequenceItem>>("event", events, [], true),
+      onClick: () => spawn<Array<SequenceItem>>("event", [], true),
     },
     {
       name: "Loop Event",
       onClick: () =>
         spawn<TLoopEvent>(
-          "event",
-          loopEvents,
+          "loopEvent",
           {
             sequence: [],
             loop: {

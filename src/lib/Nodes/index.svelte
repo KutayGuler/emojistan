@@ -1,34 +1,31 @@
 <script lang="ts">
   import Condition from "$components/Condition.svelte";
+  import LoopEvent from "$components/LoopEvent.svelte";
   import Container from "$components/Container.svelte";
+  import Spawner from "$components/Spawner.svelte";
   import Event from "$components/Event.svelte";
+
   import { findOrCreateStore } from "$lib/stores/store";
   import type { Node } from "$lib/types/types";
   import { scale } from "svelte/transition";
-  import Spawner from "$components/Spawner.svelte";
+  import { createEventDispatcher, onDestroy, onMount } from "svelte";
+  const dispatch = createEventDispatcher();
 
   export let node: Node;
   export let key: string;
 
+  onMount(() => console.log("mount"));
+  onDestroy(() => console.log("destroy"));
+  // TODO: Fix components not getting destroyed
+
   const {
-    edgesStore,
-    nodesStore,
     onMouseMove,
     onNodeClick,
     onTouchMove,
     nodeSelected,
     nodeIdSelected,
     movementStore,
-    d3Scale,
   } = findOrCreateStore(key);
-
-  function removeSelf() {
-    $edgesStore = $edgesStore.filter((e) => !e.id.includes(node.id.toString()));
-    $nodesStore = $nodesStore.filter((n) => n.id != node.id);
-    $nodesStore = $nodesStore;
-    console.log($nodesStore);
-    console.log("remove");
-  }
 
   $: shouldMove = moving && $movementStore;
 
@@ -47,8 +44,6 @@
     }
   }}
 />
-
-<!-- TODO: Prevent moving the grid on mousedown move -->
 
 <div
   transition:scale|local
@@ -96,7 +91,8 @@
   <button
     style="border-color: {node.borderColor}"
     class="absolute -top-1 right-1 cursor-pointer rounded border-2 bg-white"
-    on:click={removeSelf}
+    on:click={() =>
+      dispatch("removeNode", { id: node.id, component: node.component })}
   >
     <svg
       class="w-3"
@@ -120,8 +116,10 @@
       <Container id={node.id} />
     {:else if node.component == "event"}
       <Event id={node.id} />
+    {:else if node.component == "loopEvent"}
+      <LoopEvent id={node.id} />
     {:else if node.component == "spawner"}
-      <Spawner position={node.position} />
+      <Spawner position={node.position} on:spawnNode />
     {/if}
   </div>
 </div>

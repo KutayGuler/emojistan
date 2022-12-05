@@ -38,7 +38,6 @@
   onMount(() => {
     if ($saves.current == "") {
       let saveExists = saves.useStorage();
-      console.log(saveExists);
       if (!saveExists) {
         goto("/", { replaceState: true });
         notifications.info("Failed to find save file.");
@@ -253,8 +252,6 @@
           </div>
         </div>
         <!-- Island name -->
-      {:else if view == "rules"}
-        <!-- <Spawner /> -->
       {/if}
     </aside>
     <div

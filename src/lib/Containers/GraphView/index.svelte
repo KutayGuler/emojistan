@@ -8,6 +8,7 @@
   import SimpleBezierEdge from "$lib/Edges/SimpleBezierEdge.svelte";
   import EdgeAnchor from "$lib/Edges/EdgeAnchor.svelte";
   import Node from "$lib/Nodes/index.svelte";
+  import { conditions, events } from "$src/store";
 
   // leveraging d3 library to zoom/pan
   let d3 = {
@@ -40,6 +41,49 @@
     $edgesStore = $edgesStore.filter((edge) => id != edge.id);
   }
 
+  function generateID() {
+    return Math.max(...$nodesStore.map((n) => n.id), 0) + 1;
+  }
+
+  function removeNode({ detail }) {
+    let { id, component } = detail;
+    switch (component) {
+      case "container":
+      case "spawner":
+        break;
+      case "condition":
+        conditions.remove(id);
+        break;
+      case "event":
+        events.remove(id);
+        break;
+    }
+    console.log("BEFORE:", $nodesStore);
+    $edgesStore = $edgesStore.filter((e) => !e.id.includes(id.toString()));
+    $nodesStore = $nodesStore.filter((n) => n.id != id);
+    $nodesStore = $nodesStore;
+    console.log("AFTER:", $nodesStore);
+  }
+
+  function spawnNode({ detail }) {
+    let id = generateID();
+    let { component, position, receiver, value } = detail;
+    switch (component) {
+      case "container":
+      case "spawner":
+        break;
+      case "condition":
+        conditions.add(id, value);
+        break;
+      case "event":
+        events.add(id, value);
+        break;
+    }
+    $nodesStore.push(new INode(id, component, position, receiver));
+    $nodesStore = $nodesStore;
+    console.log($nodesStore);
+  }
+
   function attemptLink(node: Node) {
     let type: "source" | "target" =
       node.sourcePosition != undefined ? "source" : "target";
@@ -58,16 +102,19 @@
     d3.select(`.Edges-${key}`).call(d3Zoom).on("dblclick.zoom", null);
     d3.select(`.Nodes-${key}`).call(d3Zoom).on("dblclick.zoom", null);
     d3.select(`.Nodes-${key}`).on("contextmenu", function (e) {
-      // Preventing multiple instances of Spawner
-      // $nodesStore = $nodesStore.filter((node) => node.component != "spawner");
-      console.log($nodesStore);
-
+      e.preventDefault();
+      for (let n of $nodesStore) {
+        if (n.component == "spawner") {
+          removeNode({ detail: { id: n.id, component: n.component } });
+          break;
+        }
+      }
       let { x, y, k } = d3.zoomTransform(nodesDiv);
       y = (-y + e.layerY) / k;
       x = (-x + e.layerX) / k;
-      // $nodesStore.push();
-      $nodesStore = [new INode(-1, "spawner", { x, y }, false), ...$nodesStore];
-      console.log($nodesStore);
+      spawnNode({
+        detail: { component: "spawner", position: { x, y } },
+      });
     });
   });
 
@@ -127,7 +174,7 @@
   <!-- This container is transformed by d3zoom -->
   <div class={`Node Node-${key}`}>
     {#each $nodesStore as node}
-      <Node {node} {key} />
+      <Node {node} {key} on:spawnNode={spawnNode} on:removeNode={removeNode} />
     {/each}
   </div>
 </div>
