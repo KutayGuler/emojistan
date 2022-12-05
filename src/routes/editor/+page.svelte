@@ -34,7 +34,6 @@
   import Palette from "$components/Palette.svelte";
   import Svelvet from "$lib";
   import Play from "../../views/Play.svelte";
-  import Spawner from "$lib/Containers/GraphView/Spawner.svelte";
 
   onMount(() => {
     if ($saves.current == "") {
@@ -255,7 +254,7 @@
         </div>
         <!-- Island name -->
       {:else if view == "rules"}
-        <Spawner />
+        <!-- <Spawner /> -->
       {/if}
     </aside>
     <div

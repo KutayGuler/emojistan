@@ -52,9 +52,23 @@
   const gridSize = 15;
   const dotSize = 10;
 
+  let nodesDiv;
+
   onMount(() => {
     d3.select(`.Edges-${key}`).call(d3Zoom).on("dblclick.zoom", null);
     d3.select(`.Nodes-${key}`).call(d3Zoom).on("dblclick.zoom", null);
+    d3.select(`.Nodes-${key}`).on("contextmenu", function (e) {
+      // Preventing multiple instances of Spawner
+      // $nodesStore = $nodesStore.filter((node) => node.component != "spawner");
+      console.log($nodesStore);
+
+      let { x, y, k } = d3.zoomTransform(nodesDiv);
+      y = (-y + e.layerY) / k;
+      x = (-x + e.layerX) / k;
+      // $nodesStore.push();
+      $nodesStore = [new INode(-1, "spawner", { x, y }, false), ...$nodesStore];
+      console.log($nodesStore);
+    });
   });
 
   let d3Zoom: any = d3
@@ -102,38 +116,16 @@
 
   let z1 = "z-index: 1;";
   let svgStyle = "";
-
-  let ctxMenu = false;
-
-  function id() {
-    return Math.max(...$nodesStore.map((n) => n.id), 0) + 1;
-  }
 </script>
 
 <button on:click={() => (svgStyle = svgStyle == z1 ? "" : z1)}
   >{svgStyle == z1 ? "EDIT NODES" : "EDIT EDGES"}</button
 >
 
-<svelte:window
-  on:contextmenu={(e) => {
-    console.log(e);
-    e.preventDefault();
-    // ctxMenu = true;
-
-    // TODO: Figure out ctxmenu
-
-    $nodesStore.push(
-      new INode(id(), "event", { x: e.layerX, y: e.layerY }, false)
-    );
-    $nodesStore = $nodesStore;
-  }}
-/>
-
 <!-- This is the container that holds GraphView and we have disabled right click functionality to prevent a sticking behavior -->
-<div class={`Nodes Nodes-${key}`}>
+<div class={`Nodes Nodes-${key}`} bind:this={nodesDiv}>
   <!-- This container is transformed by d3zoom -->
   <div class={`Node Node-${key}`}>
-    <!-- <ContextMenu /> -->
     {#each $nodesStore as node}
       <Node {node} {key} />
     {/each}

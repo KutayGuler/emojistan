@@ -7,7 +7,7 @@ import {
 } from "$src/constants";
 import type { XYPosition, Position } from "./utils";
 
-export type NodeComponent = "container" | "condition" | "event";
+export type NodeComponent = "container" | "condition" | "event" | "spawner";
 
 export interface Node<T = any> {
   id: number;
@@ -40,6 +40,7 @@ export class Node<T = any> {
     this.position = position;
 
     switch (component) {
+      case "spawner":
       case "condition":
       case "event":
         this.width = EVENT_W;
@@ -52,6 +53,7 @@ export class Node<T = any> {
     }
 
     switch (component) {
+      case "spawner":
       case "condition":
         this.borderColor = "#cfc0e3";
         this.bgColor = CONDITION_BG;
@@ -65,6 +67,8 @@ export class Node<T = any> {
         this.bgColor = "#ffc83d";
         break;
     }
+
+    if (component == "spawner") return;
 
     if (receiver) {
       this.targetPosition = "left";

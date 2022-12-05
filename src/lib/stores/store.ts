@@ -96,6 +96,7 @@ export function findOrCreateStore(key: string): SvelvetStore {
 
   // This is the function handler for the mouseMove event to update the position of the selected node.
   const onMouseMove = (e: any, nodeID: number) => {
+    console.log("mouse move");
     coreSvelvetStore.nodesStore.update((n) => {
       n.forEach((node: Node) => {
         if (node.id === nodeID) {
@@ -112,6 +113,7 @@ export function findOrCreateStore(key: string): SvelvetStore {
 
   // This is the function handler for the touch event on mobile to select a node.
   const onTouchMove = (e: any, nodeID: number) => {
+    console.log("touchmove");
     coreSvelvetStore.nodesStore.update((n) => {
       n.forEach((node: Node) => {
         if (node.id === nodeID) {

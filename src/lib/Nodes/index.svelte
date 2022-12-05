@@ -5,6 +5,7 @@
   import { findOrCreateStore } from "$lib/stores/store";
   import type { Node } from "$lib/types/types";
   import { scale } from "svelte/transition";
+  import Spawner from "$components/Spawner.svelte";
 
   export let node: Node;
   export let key: string;
@@ -18,11 +19,15 @@
     nodeSelected,
     nodeIdSelected,
     movementStore,
+    d3Scale,
   } = findOrCreateStore(key);
 
   function removeSelf() {
     $edgesStore = $edgesStore.filter((e) => !e.id.includes(node.id.toString()));
     $nodesStore = $nodesStore.filter((n) => n.id != node.id);
+    $nodesStore = $nodesStore;
+    console.log($nodesStore);
+    console.log("remove");
   }
 
   $: shouldMove = moving && $movementStore;
@@ -115,6 +120,8 @@
       <Container id={node.id} />
     {:else if node.component == "event"}
       <Event id={node.id} />
+    {:else if node.component == "spawner"}
+      <Spawner position={node.position} />
     {/if}
   </div>
 </div>

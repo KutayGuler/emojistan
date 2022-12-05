@@ -5,7 +5,7 @@
     MIN_DURATION,
     MAX_DURATION,
   } from "../constants";
-  import { hasContext, onDestroy } from "svelte/internal";
+  import { onDestroy } from "svelte/internal";
   import {
     palette,
     events,
