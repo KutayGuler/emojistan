@@ -2,7 +2,7 @@
   import { onMount } from "svelte";
   import { zoom, zoomTransform } from "d3-zoom";
   import { select, selectAll } from "d3-selection";
-  import { findOrCreateStore, linker } from "$lib/stores/store";
+  import { svelvetStore, linker } from "$lib/stores/store";
   import { Node as INode } from "$src/lib/types";
 
   import SimpleBezierEdge from "$lib/Edges/SimpleBezierEdge.svelte";
@@ -19,13 +19,12 @@
   };
 
   //these are typscripted as any, however they have been transformed inside of store.ts
-  export let nodesStore: any;
+  // export let nodesStore: any;
   export let derivedEdges: any;
-  export let key: string;
 
   // here we lookup the store using the unique key
-  const svelvetStore = findOrCreateStore(key);
   const {
+    nodesStore,
     edgesStore,
     nodeSelected,
     backgroundStore,
@@ -37,32 +36,11 @@
 
   function removeEdge(e) {
     let id = e.detail;
-    console.log($edgesStore);
     $edgesStore = $edgesStore.filter((edge) => id != edge.id);
   }
 
   function generateID() {
     return Math.max(...$nodesStore.map((n) => n.id), 0) + 1;
-  }
-
-  function removeNode({ detail }) {
-    let { id, component } = detail;
-    switch (component) {
-      case "container":
-      case "spawner":
-        break;
-      case "condition":
-        conditions.remove(id);
-        break;
-      case "event":
-        events.remove(id);
-        break;
-    }
-    console.log("BEFORE:", $nodesStore);
-    $edgesStore = $edgesStore.filter((e) => !e.id.includes(id.toString()));
-    $nodesStore = $nodesStore.filter((n) => n.id != id);
-    $nodesStore = $nodesStore;
-    console.log("AFTER:", $nodesStore);
   }
 
   function spawnNode({ detail }) {
@@ -79,15 +57,14 @@
         events.add(id, value);
         break;
     }
-    $nodesStore.push(new INode(id, component, position, receiver));
-    $nodesStore = $nodesStore;
-    console.log($nodesStore);
+
+    nodesStore.spawn(new INode(id, component, position, receiver));
   }
 
   function attemptLink(node: Node) {
     let type: "source" | "target" =
       node.sourcePosition != undefined ? "source" : "target";
-    if (linker.link(key, node.id, type)) {
+    if (linker.link(node.id, type)) {
       $nodesStore = $nodesStore;
     }
   }
@@ -99,16 +76,10 @@
   let nodesDiv;
 
   onMount(() => {
-    d3.select(`.Edges-${key}`).call(d3Zoom).on("dblclick.zoom", null);
-    d3.select(`.Nodes-${key}`).call(d3Zoom).on("dblclick.zoom", null);
-    d3.select(`.Nodes-${key}`).on("contextmenu", function (e) {
+    d3.select(`.Edges`).call(d3Zoom).on("dblclick.zoom", null);
+    d3.select(`.Nodes`).call(d3Zoom).on("dblclick.zoom", null);
+    d3.select(`.Nodes`).on("contextmenu", function (e) {
       e.preventDefault();
-      for (let n of $nodesStore) {
-        if (n.component == "spawner") {
-          removeNode({ detail: { id: n.id, component: n.component } });
-          break;
-        }
-      }
       let { x, y, k } = d3.zoomTransform(nodesDiv);
       y = (-y + e.layerY) / k;
       x = (-x + e.layerX) / k;
@@ -132,7 +103,7 @@
     d3Scale.set(e.transform.k);
     // should not run d3.select below if backgroundStore is false
     if ($backgroundStore) {
-      d3.select(`#background-${key}`)
+      d3.select(`#background`)
         .attr("x", e.transform.x)
         .attr("y", e.transform.y)
         .attr("width", gridSize * e.transform.k)
@@ -143,11 +114,11 @@
         .attr("opacity", Math.min(e.transform.k, 1));
     }
     // transform 'g' SVG elements (edge, edge text, edge anchor)
-    d3.select(`.Edges-${key} g`).attr("transform", e.transform);
+    d3.select(`.Edges g`).attr("transform", e.transform);
     // transform div elements (nodes)
     let transform = d3.zoomTransform(this);
     // selects and transforms all node divs from class 'Node' and performs transformation
-    d3.select(`.Node-${key}`)
+    d3.select(`.Node`)
       .style(
         "transform",
         "translate(" +
@@ -170,11 +141,11 @@
 >
 
 <!-- This is the container that holds GraphView and we have disabled right click functionality to prevent a sticking behavior -->
-<div class={`Nodes Nodes-${key}`} bind:this={nodesDiv}>
+<div class={`Nodes`} bind:this={nodesDiv}>
   <!-- This container is transformed by d3zoom -->
-  <div class={`Node Node-${key}`}>
+  <div class={`Node`}>
     {#each $nodesStore as node}
-      <Node {node} {key} on:spawnNode={spawnNode} on:removeNode={removeNode} />
+      <Node {node} on:spawnNode={spawnNode} />
     {/each}
   </div>
 </div>
@@ -182,12 +153,12 @@
 <!-- rendering dots on the background depending on the zoom level -->
 <svg
   style={svgStyle}
-  class={`Edges Edges-${key}`}
+  class={`Edges`}
   viewBox="0 0 {$widthStore} {$heightStore}"
 >
   <defs>
     <pattern
-      id={`background-${key}`}
+      id={`background`}
       x="0"
       y="0"
       width={gridSize}
@@ -205,7 +176,7 @@
   </defs>
 
   {#if $backgroundStore}
-    <rect width="100%" height="100%" style="fill: url(#background-{key});" />
+    <rect width="100%" height="100%" style="fill: url(#background);" />
   {/if}
 
   <!-- <g> tag defines which edge type to render depending on properties of edge object -->

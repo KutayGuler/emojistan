@@ -21,38 +21,13 @@ class Linker {
 
 // TODO: Figure out how to save nodes and edges on localstorage
 
-function createLinker() {
-  const { subscribe, update } = writable(new Linker(-1, -1));
-
-  return {
-    subscribe,
-    link: (key: string, id: number, type: "source" | "target") => {
-      let linkSuccess = false;
-      update((state) => {
-        state[type] = id;
-        console.log(state);
-        if (state.source != -1 && state.target != -1) {
-          let { edgesStore } = findOrCreateStore(key);
-          get(edgesStore).push({
-            id: `e${state.source}-${state.target}`,
-            source: state.source,
-            target: state.target,
-            label: "labelski",
-          });
-          state.reset();
-          linkSuccess = true;
-        }
-        return state;
-      });
-      return linkSuccess;
-    },
-  };
+interface Removable<T> extends Writable<T> {
+  remove: Function;
+  spawn: Function;
 }
 
-export const linker = createLinker();
-
 interface CoreSvelvetStore {
-  nodesStore: Writable<Node[]>;
+  nodesStore: Removable<Node[]>;
   edgesStore: Writable<Edge[]>;
   widthStore: Writable<number>;
   heightStore: Writable<number>;
@@ -70,18 +45,54 @@ interface SvelvetStore extends CoreSvelvetStore {
   derivedEdges: Readable<Edge[]>;
 }
 
-const svelvetStores: { [key: string]: SvelvetStore } = {};
+function createNodes() {
+  const arr: Array<Node> = [];
+  const { set, subscribe, update } = writable(arr);
+
+  return {
+    set,
+    subscribe,
+    update,
+    // useStorage: (id: string) => {
+    //   // @ts-expect-error
+    //   const val = JSON.parse(localStorage.getItem(id + "_" + name));
+    //   set(new Map(val) || new Map<number, T>());
+    //   subscribe((state) => {
+    //     localStorage.setItem(
+    //       id + "_" + name,
+    //       JSON.stringify(Array.from(state.entries()))
+    //     );
+    //   });
+    // },
+    spawn: (node: Node) =>
+      update((state) => {
+        console.log(state);
+        state = state.filter((n) => n.component != "spawner");
+        state.push(node);
+        state = state;
+        return state;
+      }),
+    remove: (id: number) =>
+      update((state) => {
+        console.log(state);
+        state = state.filter((n) => n.id != id);
+        console.log(state);
+        return state;
+      }),
+  };
+}
 
 // refer to Svelvet/index, if store does not exist, then create one.
 // Creates one Svelvet component store using the unique key
-export function findOrCreateStore(key: string): SvelvetStore {
-  const existing = svelvetStores[key];
-  if (existing) {
-    return existing;
-  }
+function createStore(): SvelvetStore {
+  // const existing = svelvetStores[key];
+  // if (existing) {
+  //   return existing;
+  // }
   //Setting defaults of core svelvet store and making them a store using writable
   const coreSvelvetStore: CoreSvelvetStore = {
-    nodesStore: writable([]),
+    // nodesStore: writable([]),
+    nodesStore: createNodes(),
     edgesStore: writable([]),
     widthStore: writable(GRAPH_SIZE),
     heightStore: writable(GRAPH_SIZE),
@@ -256,6 +267,37 @@ export function findOrCreateStore(key: string): SvelvetStore {
     derivedEdges,
   };
 
-  svelvetStores[key] = svelvetStore;
   return svelvetStore;
 }
+
+export const svelvetStore = createStore();
+
+function createLinker() {
+  const { subscribe, update } = writable(new Linker(-1, -1));
+
+  return {
+    subscribe,
+    link: (id: number, type: "source" | "target") => {
+      let linkSuccess = false;
+      update((state) => {
+        state[type] = id;
+        console.log(state);
+        if (state.source != -1 && state.target != -1) {
+          let { edgesStore } = svelvetStore;
+          get(edgesStore).push({
+            id: `e${state.source}-${state.target}`,
+            source: state.source,
+            target: state.target,
+            label: "labelski",
+          });
+          state.reset();
+          linkSuccess = true;
+        }
+        return state;
+      });
+      return linkSuccess;
+    },
+  };
+}
+
+export const linker = createLinker();

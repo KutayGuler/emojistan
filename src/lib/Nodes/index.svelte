@@ -5,27 +5,21 @@
   import Spawner from "$components/Spawner.svelte";
   import Event from "$components/Event.svelte";
 
-  import { findOrCreateStore } from "$lib/stores/store";
+  import { svelvetStore } from "$lib/stores/store";
   import type { Node } from "$lib/types/types";
   import { scale } from "svelte/transition";
-  import { createEventDispatcher, onDestroy, onMount } from "svelte";
-  const dispatch = createEventDispatcher();
 
   export let node: Node;
-  export let key: string;
-
-  onMount(() => console.log("mount"));
-  onDestroy(() => console.log("destroy"));
-  // TODO: Fix components not getting destroyed
 
   const {
     onMouseMove,
     onNodeClick,
     onTouchMove,
+    nodesStore,
     nodeSelected,
     nodeIdSelected,
     movementStore,
-  } = findOrCreateStore(key);
+  } = svelvetStore;
 
   $: shouldMove = moving && $movementStore;
 
@@ -91,8 +85,11 @@
   <button
     style="border-color: {node.borderColor}"
     class="absolute -top-1 right-1 cursor-pointer rounded border-2 bg-white"
-    on:click={() =>
-      dispatch("removeNode", { id: node.id, component: node.component })}
+    on:click={() => {
+      nodesStore.remove(node.id);
+      // TODO: remove corresponding stores
+      // remove edges
+    }}
   >
     <svg
       class="w-3"
