@@ -103,12 +103,23 @@
 
   let z1 = "z-index: 1;";
   let svgStyle = "";
+
+  function changeZ() {
+    svgStyle = svgStyle == z1 ? "" : z1;
+  }
+
+  function handleKeydown(e: KeyboardEvent) {
+    console.log(e.code);
+    if (e.code == "Tab") {
+      e.preventDefault();
+      changeZ();
+    }
+  }
 </script>
 
-<button
-  style="z-index: 2"
-  class="absolute top-2"
-  on:click={() => (svgStyle = svgStyle == z1 ? "" : z1)}
+<svelte:window on:keydown={handleKeydown} />
+
+<button style="z-index: 2" class="absolute top-2" on:click={changeZ}
   >{svgStyle == z1 ? "EDIT NODES" : "EDIT EDGES"}</button
 >
 

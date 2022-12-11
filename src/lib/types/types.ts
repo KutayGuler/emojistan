@@ -4,6 +4,8 @@ import {
   EVENT_BG,
   EVENT_H,
   EVENT_W,
+  LOOPEVENT_H,
+  LOOPEVENT_W,
 } from "$src/constants";
 import type { XYPosition, Position } from "./utils";
 
@@ -53,6 +55,12 @@ export class Node<T = any> {
         this.height = EVENT_H;
         this.borderColor = "#cfc0e3";
         this.bgColor = CONDITION_BG;
+        break;
+      case "loopEvent":
+        this.width = LOOPEVENT_W;
+        this.height = LOOPEVENT_H;
+        this.borderColor = "#f6fafd";
+        this.bgColor = EVENT_BG;
         break;
       case "event":
         this.width = EVENT_W;

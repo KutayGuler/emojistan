@@ -1,11 +1,6 @@
 <script lang="ts">
   // DATA
-  import {
-    palette as cp,
-    defaultBackground as dbg,
-    currentColor,
-    map,
-  } from "../store";
+  import { palette as cp, currentColor, map } from "../store";
   import { scale } from "svelte/transition";
   import { flip } from "svelte/animate";
   import { notifications } from "../routes/notifications";
@@ -16,7 +11,7 @@
 
   function setDefaultBackground(color: string) {
     if (color == "") return;
-    if (color == $dbg) {
+    if (color == $map.dbg) {
       // $dbg = DEFAULT_BG;
       map.updateDbg(DEFAULT_BG);
       return;
@@ -29,7 +24,7 @@
 
   function removeColor(color: string) {
     cp.remove(color);
-    if (!$cp.has($dbg)) {
+    if (!$cp.has($map.dbg)) {
       // $dbg = DEFAULT_BG;
       map.updateDbg(DEFAULT_BG);
     }
@@ -69,11 +64,11 @@
         </button> -->
         <!-- TODO: create dev and prod branches on github -->
         <button
-          class:default={$dbg == color}
+          class:default={$map.dbg == color}
           class="w-1/3 opacity-50 hover:scale-125"
           on:click={() => setDefaultBackground(color)}>🌍</button
         >
-        {#if color != $dbg}
+        {#if color != $map.dbg}
           <button
             class="w-1/3 opacity-50 hover:scale-125"
             class:selected={$currentColor == color}

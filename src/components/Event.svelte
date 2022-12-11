@@ -4,6 +4,8 @@
     MAX_INDEX,
     MIN_DURATION,
     MAX_DURATION,
+    DURATIONS,
+    EVENT_H,
   } from "../constants";
   import { onDestroy, onMount } from "svelte/internal";
   import {
@@ -14,6 +16,9 @@
     SequenceItem,
     type Mutations,
   } from "../store";
+
+  import { svelvetStore } from "$src/lib/stores/store";
+  const { nodesStore } = svelvetStore;
 
   let defaultBackground = $map.dbg;
 
@@ -34,8 +39,6 @@
     "completeLevel",
   ];
 
-  const durations = [50, 100, 200, 500, 1000, 2000, 5000, 10000];
-
   let indexes: Array<number> = [];
 
   for (let i = 0; i < 256; i++) {
@@ -54,6 +57,8 @@
       new SequenceItem(type, MIN_INDEX, "", MIN_DURATION, ""),
     ];
     events.update(id, sequence);
+    nodesStore.adjustHeight(id, sequence.length, EVENT_H);
+
     console.log($events);
 
     [type, duration, index, background] = [types[0], 0, 0, ""];
@@ -66,6 +71,7 @@
       events.remove(id);
     } else {
       events.update(id, sequence);
+      nodesStore.adjustHeight(id, sequence.length, EVENT_H);
     }
   }
 
@@ -122,7 +128,7 @@
         bind:value={s.duration}
         on:change={update}
       >
-        {#each durations as d}
+        {#each DURATIONS as d}
           <option value={d}>{d}</option>
         {/each}
       </select>

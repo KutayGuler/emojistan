@@ -2,17 +2,19 @@
   // DATA
   import {
     MIN_INDEX,
-    MAX_INDEX,
     MIN_DURATION,
-    MAX_DURATION,
     MIN_ITERATION,
-    MAX_ITERATION,
+    LOOPEVENT_H,
+    DURATIONS,
   } from "../constants";
+  import { notifications } from "$src/routes/notifications";
   import { onDestroy, onMount } from "svelte/internal";
   import { palette, loopEvents, currentEmoji, type TLoopEvent } from "../store";
+  import { svelvetStore } from "$lib/stores/store";
+  const { nodesStore } = svelvetStore;
 
   // TYPES
-  import type { SequenceItem, Loop, Mutations } from "../store";
+  import { SequenceItem, type Loop, type Mutations } from "../store";
 
   export let id: number;
   let sequence: Array<SequenceItem> = [];
@@ -24,6 +26,17 @@
     timeGap: 50,
     reverse: false,
   };
+
+  let indexes: Array<number> = [];
+  let iterations: Array<number> = [];
+
+  for (let i = 0; i < 256; i++) {
+    indexes[i] = i;
+  }
+
+  for (let i = 0; i < 16; i++) {
+    iterations[i] = i + 1;
+  }
 
   const types: Array<keyof Mutations> = [
     "setBackgroundOf",
@@ -43,15 +56,6 @@
     ({ sequence, loop } = obj as TLoopEvent);
   });
 
-  function validateInput(input: number, min: number, max: number) {
-    if (input == undefined) return input;
-    if (input > max) {
-      return max;
-    } else if (input < min) {
-      return min;
-    }
-  }
-
   function validateLoop() {
     if (loop.start == loop.end) {
       if (loop.iterationType == "increment") {
@@ -61,14 +65,16 @@
         loop.start = 16;
         loop.end = 0;
       }
-      // notifcations.warning("starting index and ending index cannot be the same");
+      notifications.warning(
+        "starting index and ending index cannot be the same"
+      );
     }
 
     if (loop.iterationType == "increment") {
       if (loop.start > loop.end) {
-        // notifcations.warning(
-        //   "starting index cannot be bigger than ending index on increment"
-        // );
+        notifications.warning(
+          "starting index cannot be bigger than ending index on increment"
+        );
         loop.start = 0;
         loop.end = 16;
       }
@@ -78,9 +84,9 @@
       }
     } else if (loop.iterationType == "decrement") {
       if (loop.end > loop.start) {
-        // notifcations.warning(
-        //   "ending index cannot be bigger than starting index on decrement"
-        // );
+        notifications.warning(
+          "ending index cannot be bigger than starting index on decrement"
+        );
         loop.start = 16;
         loop.end = 0;
       }
@@ -90,71 +96,17 @@
       }
     }
 
-    if (loop.start < MIN_INDEX) loop.start = MIN_INDEX;
-    if (loop.start > MAX_INDEX) loop.start = MAX_INDEX;
-
-    if (loop.end < MIN_INDEX) loop.end = MIN_INDEX;
-    if (loop.end > MAX_INDEX) loop.end = MAX_INDEX;
-
-    if (loop.timeGap < MIN_DURATION) loop.timeGap = MIN_DURATION;
-    if (loop.timeGap > MAX_DURATION) loop.timeGap = MAX_DURATION;
-
-    if (loop.iterationNumber < MIN_ITERATION) {
-      loop.iterationNumber = MIN_ITERATION;
-    }
-
-    if (loop.iterationNumber > MAX_ITERATION) {
-      loop.iterationNumber = MAX_ITERATION;
-    }
-
     loopEvents.update(id, { sequence, loop });
-  }
-
-  function generateSequenceItem(_type: string, vals?: any) {
-    let newItem: SequenceItem = { type: _type };
-    if (vals) {
-      let { index, background, emoji } = vals;
-      index = validateInput(index, MIN_INDEX, MAX_INDEX);
-      switch (_type) {
-        case "setBackgroundOf":
-          Object.assign(newItem, { index, background });
-          break;
-        case "spawn":
-          Object.assign(newItem, { index, emoji });
-          break;
-        case "destroy":
-        case "removeBackgroundOf":
-          Object.assign(newItem, { index });
-          break;
-        default:
-          // Object.assign(newItem);
-          break;
-      }
-    } else {
-      switch (_type) {
-        case "setBackgroundOf":
-          Object.assign(newItem, { index, background });
-          break;
-        case "spawn":
-          Object.assign(newItem, { index, emoji });
-          break;
-        case "destroy":
-        case "removeBackgroundOf":
-          Object.assign(newItem, { index });
-          break;
-        default:
-          // Object.assign(newItem);
-          break;
-      }
-    }
-
-    return newItem;
   }
 
   function addToSequence() {
-    sequence = [...sequence, generateSequenceItem(type)];
+    sequence = [
+      ...sequence,
+      new SequenceItem(type, MIN_INDEX, "", MIN_DURATION, ""),
+    ];
     validateLoop();
     loopEvents.update(id, { sequence, loop });
+    nodesStore.adjustHeight(id, sequence.length, LOOPEVENT_H);
     [type, index, background] = [types[0], 0, ""];
   }
 
@@ -165,12 +117,14 @@
       loopEvents.remove(id);
     } else {
       loopEvents.update(id, { sequence, loop });
+      nodesStore.adjustHeight(id, sequence.length, LOOPEVENT_H);
     }
   }
 
   function update(i?: number | "name") {
     if (i != undefined && i != "name") {
-      sequence[i] = generateSequenceItem(sequence[i].type, { ...sequence[i] });
+      let { type, index, background, duration } = sequence[i];
+      sequence[i] = new SequenceItem(type, index, background, duration, "");
     }
     if (type) {
       validateLoop();
@@ -181,39 +135,36 @@
     sequence[i].emoji = $currentEmoji;
   }
 
-  onDestroy(() => {
-    let newsequence = sequence.filter((item) => {
-      let vals = Object.values(item);
-      return !(vals.includes("") || vals.includes(undefined));
-    });
+  // onDestroy(() => {
+  //   let newsequence = sequence.filter((item) => {
+  //     let vals = Object.values(item);
+  //     return !(vals.includes("") || vals.includes(undefined));
+  //   });
 
-    if (sequence.length == 0) {
-      loopEvents.remove(id);
-    } else if (newsequence.length < sequence.length) {
-      loopEvents.update(id, { loop, sequence: newsequence });
-    }
-  });
+  //   if (sequence.length == 0) {
+  //     loopEvents.remove(id);
+  //   } else if (newsequence.length < sequence.length) {
+  //     loopEvents.update(id, { loop, sequence: newsequence });
+  //   }
+  // });
 </script>
 
 <label>
   start <strong>i</strong> from
-  <input
-    type="number"
+  <select
+    title="loop starting index"
     bind:value={loop.start}
-    min={MIN_INDEX}
-    max={MAX_INDEX}
-    on:input={() => update()}
-  />
+    on:change={() => update()}
+  >
+    {#each indexes as i}
+      <option value={i}>{i}</option>
+    {/each}
+  </select>
 </label>
-<div class="step">
+<div class="step w-full">
   {#each sequence as q, i}
     <div>
-      <select
-        title="event type"
-        id="type"
-        bind:value={q.type}
-        on:input={() => update(i)}
-      >
+      <select title="event type" bind:value={q.type} on:input={() => update(i)}>
         {#each types as t}
           <option value={t}>{t}</option>
         {/each}
@@ -261,34 +212,40 @@
       {/each}
     </select>
     <strong>i by</strong>
-    <input
-      type="number"
+    <select
+      title="loop iteration number"
       bind:value={loop.iterationNumber}
-      min={MIN_ITERATION}
-      max={MAX_ITERATION}
-      on:input={() => update()}
-    />
+      on:change={() => update()}
+    >
+      {#each iterations as i}
+        <option value={i}>{i}</option>
+      {/each}
+    </select>
   </div>
   <br />
   <div class="inline">
-    Wait <input
-      type="number"
+    Wait <select
+      title="loop iteration number"
       bind:value={loop.timeGap}
       on:change={() => update()}
-      min={MIN_DURATION}
-      max={MAX_DURATION}
-    /> ms
+    >
+      {#each [0, ...DURATIONS] as d}
+        <option value={d}>{d}</option>
+      {/each}
+    </select> ms
   </div>
 </div>
 <label>
   end <strong>i</strong> at
-  <input
-    type="number"
+  <select
+    title="loop iteration number"
     bind:value={loop.end}
-    min={MIN_INDEX}
-    max={MAX_INDEX}
-    on:input={() => update()}
-  />
+    on:change={() => update()}
+  >
+    {#each indexes as i}
+      <option value={i}>{i}</option>
+    {/each}
+  </select>
 </label>
 
 <style>

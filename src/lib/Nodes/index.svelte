@@ -136,7 +136,6 @@
   </div>
 </div>
 
-<!-- TODO: Fix width & height on Event component when new SequenceItem is added -->
 <style>
   nav {
     /* background: red; */

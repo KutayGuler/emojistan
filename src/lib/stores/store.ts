@@ -1,13 +1,14 @@
 import { writable, derived, get } from "svelte/store";
 import type { Readable, Writable } from "svelte/store";
 import { Node, type Edge, type NodeComponent } from "../types/types";
-import { GRAPH_SIZE } from "../../constants";
+import { EVENT_H, GRAPH_SIZE } from "../../constants";
 import { Condition, conditions } from "$src/store";
 
 interface NodesStore<T> extends Writable<T> {
   remove: Function;
   spawn: Function;
   useStorage: Function;
+  adjustHeight: Function;
 }
 
 interface EdgesStore<T> extends Writable<T> {
@@ -72,6 +73,16 @@ function createNodes() {
     remove: (id: number) =>
       update((state) => {
         state = state.filter((n) => n.id != id);
+        return state;
+      }),
+    adjustHeight: (id: number, sequenceLength: number, defaultHeight: number) =>
+      update((state) => {
+        for (let node of state) {
+          if (node.id == id) {
+            node.height = defaultHeight + sequenceLength * 32;
+            break;
+          }
+        }
         return state;
       }),
   };
@@ -356,13 +367,22 @@ function createLinker() {
 
           if (
             state.source.component == "condition" &&
-            state.target.component == "event"
+            (state.target.component == "event" ||
+              state.target.component == "loopEvent")
           ) {
             let condition = get(conditions).get(state.source.id);
             condition.eventID = state.target.id;
             conditions.update(state.source.id, condition);
             console.log(get(conditions));
           }
+
+          // TODO: add other relations
+          // container -> container
+          //
+          // errors
+          // condition <-> container
+          // event | loopEvent <-> event | loopEvent
+          // condition <-> condition
           state.reset();
           linkSuccess = true;
         }

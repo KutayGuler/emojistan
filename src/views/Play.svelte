@@ -120,6 +120,7 @@
     ) => {
       backgrounds.set(_start || index, background);
       backgrounds = backgrounds;
+      console.log(_start, backgrounds);
     },
     removeBackgroundOf: ({ index }: { index: number }) => {
       backgrounds.delete(index);
@@ -165,18 +166,26 @@
     ) {
       this.condition = () => a() == b;
       this.event = async (_start?: number) => {
+        console.log(_start);
         for (let { type, ...args } of sequence) {
+          console.log(type);
           if (type == "wait") {
             await m["wait"](args.duration);
           } else {
-            m[type](args);
+            m[type](args, _start);
+            console.log(args);
           }
         }
 
         if (loop) {
-          if (_start) {
-            if (_start == loop.end) return;
-            this.event(_start + 1);
+          if (_start != undefined) {
+            if (_start >= loop.end) return;
+            let x = loop.iterationType == "increment" ? 1 : -1;
+            if (loop.timeGap != 0) {
+              await m["wait"](loop.timeGap);
+            }
+            this.event(_start + loop.iterationNumber * x);
+            // console.log(_start + 1);
           } else {
             this.event(loop.start);
           }
@@ -185,7 +194,7 @@
     }
   }
 
-  let _conditions = new Map<number, { condition: Function; event: Function }>();
+  let _conditions = new Map<number, _Condition>();
   let _interactables = new Set<string>();
 
   for (let [id, condition] of $conditions.entries()) {
@@ -226,15 +235,15 @@
     }
 
     if (Array.isArray(event)) {
-      _conditions.set(+id, new _Condition(a, b, event));
+      _conditions.set(id, new _Condition(a, b, event));
     } else {
-      _conditions.set(+id, new _Condition(a, b, event.sequence, event.loop));
+      _conditions.set(id, new _Condition(a, b, event.sequence, event.loop));
     }
   }
 
-  console.log($events);
-  console.log($conditions);
-  console.log(_conditions);
+  // TODO: Possible optimizations
+  // trigger once option (_conditions.delete(id) after event is fired);
+  // switch to canvas
 
   function getCollisionType(key1: string, key2: string): string {
     if (_collisions.has(key1)) {

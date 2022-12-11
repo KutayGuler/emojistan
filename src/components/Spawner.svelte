@@ -5,6 +5,7 @@
     type TLoopEvent,
     conditions,
     events,
+    loopEvents,
   } from "../store";
   import type { NodeComponent } from "$lib/types";
   import { svelvetStore } from "$lib/stores/store";
@@ -15,6 +16,9 @@
   function spawn<T>(component: NodeComponent, value: T, receiver = false) {
     const id = nodesStore.spawn(component, position, receiver);
 
+    // TODO: add merger
+    // TODO: add container
+
     switch (component) {
       case "container":
       case "spawner":
@@ -24,6 +28,9 @@
         break;
       case "event":
         events.add(id, value);
+        break;
+      case "loopEvent":
+        loopEvents.add(id, value);
         break;
     }
   }
@@ -74,7 +81,10 @@
 
 <ul class="w-full">
   {#each menuItems as { name, onClick }}
-    <li class="add h-8 w-full hover:bg-base-200" on:click={onClick}>
+    <li
+      class="add box-border h-8 w-full pl-2 text-start hover:bg-base-200"
+      on:click={onClick}
+    >
       {name}
     </li>
   {/each}

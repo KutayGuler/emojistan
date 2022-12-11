@@ -65,12 +65,6 @@
   let editMode = false;
 
   function handleKeydown(e: KeyboardEvent) {
-    if (e.code == "Tab") {
-      e.preventDefault();
-      test = !test;
-      return;
-    }
-
     if (e.code == "Escape") {
       $currentEmoji = "";
       $currentColor = "";
@@ -134,9 +128,9 @@
       <button
         class="btn w-full"
         on:click={() => {
+          test = false;
           if (view == "editor") {
             view = "rules";
-            test = false;
           } else {
             view = "editor";
           }
@@ -250,7 +244,7 @@
         {#if test}
           <Play />
         {:else if view == "editor"}
-          <Editor />
+          <Editor {showIndex} />
         {:else if view == "rules"}
           <Svelvet />
         {/if}

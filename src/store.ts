@@ -14,10 +14,10 @@ export interface Mutations {
 
 export interface SequenceItem {
   type: keyof Mutations;
-  index?: number;
-  background?: string;
-  duration?: number;
-  emoji?: string;
+  index: number;
+  background: string;
+  duration: number;
+  emoji: string;
 }
 
 export class SequenceItem {
@@ -191,7 +191,7 @@ function createEditableMap() {
     subscribe,
     useStorage: (id: string) => {
       const objective = localStorage.getItem(id + "_objective");
-      const dbg = localStorage.getItem(id + "_dbg");
+      const dbg = localStorage.getItem(id + "_dbg") || DEFAULT_BG;
       // @ts-expect-error
       const items = JSON.parse(localStorage.getItem(id + "_items"));
       // @ts-expect-error
@@ -307,7 +307,6 @@ function createSetStore(name: string) {
 export const currentItem = writable("");
 export const currentColor = writable("");
 export const currentEmoji = writable("");
-export const defaultBackground = writable(DEFAULT_BG);
 
 // CUSTOM
 export const saves = createSaves();

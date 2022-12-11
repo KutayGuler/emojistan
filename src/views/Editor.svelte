@@ -1,8 +1,9 @@
 <script lang="ts">
   import { currentEmoji, currentColor, map } from "../store";
-  let showIndex = false;
   const deleteModes = ["Item", "Background", "Both"];
   let deleteMode = deleteModes[2];
+
+  export let showIndex = false;
 
   function clickedCell(index: number) {
     if ($currentColor == "" && $currentEmoji == "") {
