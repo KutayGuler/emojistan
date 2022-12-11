@@ -6,12 +6,15 @@ import {
   EVENT_W,
   LOOPEVENT_H,
   LOOPEVENT_W,
+  MERGER_BG,
+  MERGER_BORDER,
 } from "$src/constants";
 import type { XYPosition, Position } from "./utils";
 
 export type NodeComponent =
   | "container"
   | "condition"
+  | "merger"
   | "event"
   | "loopEvent"
   | "spawner";
@@ -50,6 +53,11 @@ export class Node<T = any> {
       case "spawner":
         this.width = EVENT_W / 2;
         break;
+      case "merger":
+        this.width = EVENT_W / 2;
+        this.height = EVENT_H / 2;
+        this.borderColor = MERGER_BORDER;
+        this.bgColor = MERGER_BG;
       case "condition":
         this.width = EVENT_W;
         this.height = EVENT_H;
@@ -76,7 +84,7 @@ export class Node<T = any> {
         break;
     }
 
-    if (component == "spawner") return;
+    if (component == "spawner" || component == "merger") return;
 
     if (receiver) {
       this.targetPosition = "left";

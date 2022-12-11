@@ -203,17 +203,22 @@
         >
           [ {$currentEmoji == "" ? "____" : $currentEmoji} ]
         </button>
-        <div
-          class="mt-2 grid h-1/3 w-full grid-flow-row grid-cols-2 gap-2 overflow-y-auto "
-        >
-          {#each [...$statics] as item (item)}
-            <div transition:scale|local={flipParams} animate:flip={flipParams}>
-              <button
-                class="remove btn h-full w-full text-2xl"
-                on:click={() => statics.remove(item)}>{item}</button
+        <div class="h-1/3 overflow-y-auto">
+          <div
+            class="mt-2 grid w-full grid-flow-row grid-cols-2 justify-center gap-2 overflow-y-auto "
+          >
+            {#each [...$statics] as item (item)}
+              <div
+                transition:scale|local={flipParams}
+                animate:flip={flipParams}
               >
-            </div>
-          {/each}
+                <button
+                  class="remove btn h-full w-full text-2xl"
+                  on:click={() => statics.remove(item)}>{item}</button
+                >
+              </div>
+            {/each}
+          </div>
         </div>
         <!-- <div class="collapse">
           <input type="checkbox" />

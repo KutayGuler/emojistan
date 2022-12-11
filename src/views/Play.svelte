@@ -241,7 +241,7 @@
     }
   }
 
-  // TODO: Possible optimizations
+  // Possible optimizations
   // trigger once option (_conditions.delete(id) after event is fired);
   // switch to canvas
 

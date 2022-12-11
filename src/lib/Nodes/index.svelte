@@ -8,6 +8,7 @@
   import { svelvetStore } from "$lib/stores/store";
   import type { Node } from "$lib/types/types";
   import { conditions, events, loopEvents } from "$src/store";
+  import Merger from "$components/Merger.svelte";
 
   export let node: Node;
 
@@ -122,10 +123,12 @@
   <div
     class="flex flex-col {node.component == 'spawner' ? 'w-full bg-white' : ''}"
   >
-    {#if node.component == "condition"}
-      <Condition id={node.id} />
-    {:else if node.component == "container"}
+    {#if node.component == "container"}
       <Container id={node.id} />
+    {:else if node.component == "condition"}
+      <Condition id={node.id} />
+    {:else if node.component == "merger"}
+      <Merger id={node.id} />
     {:else if node.component == "event"}
       <Event id={node.id} />
     {:else if node.component == "loopEvent"}

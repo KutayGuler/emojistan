@@ -13,6 +13,8 @@ export const GRAPH_SIZE = 836;
 export const EVENT_BG = "#ffc83d";
 export const CONDITION_BG = "#644292";
 export const CONTAINER_BG = "#ffc83d";
+export const MERGER_BG = "#e9f3fb";
+export const MERGER_BORDER = "#3a96dd";
 
 // COMPONENT DIMENSIONS
 export const EVENT_W = 250;

@@ -4,8 +4,11 @@
   import { notifications } from "../routes/notifications";
 
   export let id: number;
-  export let slots = ["", "", ""];
-  export let disabled = false;
+  let slots = ["", "", ""];
+
+  onMount(() => {
+    slots = $merges.get(id) || ["", "", ""];
+  });
 
   function checkCollision() {
     if (
@@ -48,16 +51,10 @@
   });
 </script>
 
-<!-- <Base
-  on:remove={() => merges.remove(id)}
-  --border-color="#3a96dd"
-  --background="#e9f3fb"
-> -->
 <div class="slots">
   {#each { length: 3 } as _, i}
-    <div class="slot" on:click={() => !disabled && updateSlot(i)}>
+    <div class="slot" on:click={() => updateSlot(i)}>
       <div>{slots[i]}</div>
     </div>
   {/each}
 </div>
-<!-- </Base> -->

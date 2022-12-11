@@ -6,6 +6,7 @@
     conditions,
     events,
     loopEvents,
+    merges,
   } from "../store";
   import type { NodeComponent } from "$lib/types";
   import { svelvetStore } from "$lib/stores/store";
@@ -16,11 +17,10 @@
   function spawn<T>(component: NodeComponent, value: T, receiver = false) {
     const id = nodesStore.spawn(component, position, receiver);
 
-    // TODO: add merger
-    // TODO: add container
-
     switch (component) {
-      case "container":
+      case "merger":
+        merges.add(id, value);
+        break;
       case "spawner":
         break;
       case "condition":
@@ -38,11 +38,11 @@
   let menuItems = [
     {
       name: "Container",
-      onClick: () => {},
+      onClick: () => spawn("container", undefined),
     },
     {
       name: "Merger",
-      onClick: () => {},
+      onClick: () => spawn<Array<string>>("merger", ["", "", ""]),
     },
     {
       name: "Condition",
