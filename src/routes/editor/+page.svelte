@@ -137,7 +137,6 @@
         }}>CHANGE VIEW</button
       >
       {#if view == "editor"}
-        <!-- <p>Last saved:</p> -->
         <button
           class="btn mt-2 w-full bg-primary"
           on:click={() => {
@@ -220,19 +219,6 @@
             {/each}
           </div>
         </div>
-        <!-- <div class="collapse">
-          <input type="checkbox" />
-          <div class="collapse-title text-xl font-medium">Settings</div>
-          <div class="collapse-content">
-            <input
-              type="text"
-              placeholder="Type here"
-              class="input w-full max-w-xs"
-            />
-            <button class="btn">DELETE ISLAND</button>
-          </div>
-        </div> -->
-        <!-- Island name -->
       {/if}
     </aside>
     <div

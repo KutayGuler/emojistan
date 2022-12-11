@@ -59,10 +59,6 @@
           class="remove btn w-3/5"
           on:click={() => removeColor(color)}
         />
-        <!-- <button class="hover:scale-125" >
-          ❌
-        </button> -->
-        <!-- TODO: create dev and prod branches on github -->
         <button
           class:default={$map.dbg == color}
           class="w-1/3 opacity-50 hover:scale-125"
