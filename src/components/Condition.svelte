@@ -8,8 +8,11 @@
     conditions,
     currentEmoji,
     Condition,
+    map,
     type A,
   } from "../store";
+
+  let defaultBackground = $map.dbg;
 
   const props: Array<A> = ["playerBackground", "playerInteractsWith"];
 
@@ -17,12 +20,8 @@
   let a: A;
   let b: string;
   let eventID: number;
-  let defaultBackground: string;
 
   onMount(() => {
-    let r: any = document.querySelector(":root");
-    let compStyle = getComputedStyle(r);
-    defaultBackground = compStyle.getPropertyValue("--default-background");
     let obj = $conditions.get(id);
     if (!obj) return;
     ({ a, b, eventID } = obj);
@@ -33,32 +32,31 @@
 
     for (let [_id, _obj] of $conditions.entries()) {
       if (_id == id) continue;
-      // if (JSON.stringify(obj) == JSON.stringify(_obj)) {
-      //   notifications.warning("Cannot have duplicate conditions");
-      //   eventID = "";
-      //   obj.eventID = "";
-      //   conditions.update(id, obj);
-      //   return;
-      // }
+      if (_obj.a == a && _obj.b == b) {
+        notifications.warning("Cannot have duplicate conditions");
+        b = "";
+        conditions.update(id, new Condition(a, b, eventID));
+      }
     }
   }
 
-  onDestroy(() => {
-    /*
-      0 is the default eventID value, which means
-      no event has been assigned for the condition
-    */
-    if (
-      [a, b].includes("") ||
-      eventID == undefined ||
-      $events.get(eventID) == undefined ||
-      $loopEvents.get(eventID) == undefined ||
-      $events.get(eventID)?.length == 0 ||
-      $loopEvents.get(eventID)?.sequence.length == 0
-    ) {
-      conditions.remove(id);
-    }
-  });
+  // TODO:
+  // onDestroy(() => {
+  //   /*
+  //     0 is the default eventID value, which means
+  //     no event has been assigned for the condition
+  //   */
+  //   if (
+  //     [a, b].includes("") ||
+  //     eventID == undefined ||
+  //     $events.get(eventID) == undefined ||
+  //     $loopEvents.get(eventID) == undefined ||
+  //     $events.get(eventID)?.length == 0 ||
+  //     $loopEvents.get(eventID)?.sequence.length == 0
+  //   ) {
+  //     conditions.remove(id);
+  //   }
+  // });
 </script>
 
 <div class="if">
@@ -69,7 +67,15 @@
     {/each}
   </select>
   {#if a == "playerInteractsWith"}
-    <div class="slot" on:click={() => (b = $currentEmoji)}>{b}</div>
+    <div
+      class="slot"
+      on:click={() => {
+        b = $currentEmoji;
+        update();
+      }}
+    >
+      {b}
+    </div>
   {/if}
 </div>
 <div class="is">

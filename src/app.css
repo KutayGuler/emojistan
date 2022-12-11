@@ -3,6 +3,13 @@
 @tailwind utilities;
 
 @layer components {
+  .btn,
+  .input,
+  .select,
+  .label-text {
+    @apply text-lg;
+  }
+
   .info {
     @apply cursor-help text-center text-lg duration-200 ease-out hover:scale-150;
   }
@@ -53,7 +60,6 @@
 
   /* COLOR PALETTE */
 
-  --default-background: #cfcfcf;
   --primary: #f6fafd;
 
   background-color: var(--primary);

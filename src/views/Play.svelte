@@ -19,13 +19,7 @@
     type Loop,
   } from "../store";
 
-  let r: any;
-  let defaultBackground = "";
-
   onMount(() => {
-    r = document.querySelector(":root");
-    defaultBackground = r.style.getPropertyValue("--default-background");
-    if (defaultBackground == "") defaultBackground = DEFAULT_BG;
     [$currentColor, $currentEmoji] = ["", ""];
   });
 
@@ -238,6 +232,10 @@
     }
   }
 
+  console.log($events);
+  console.log($conditions);
+  console.log(_conditions);
+
   function getCollisionType(key1: string, key2: string): string {
     if (_collisions.has(key1)) {
       return _collisions.get(key1)?.get(key2) || "bump";
@@ -447,12 +445,12 @@
 
 <svelte:window on:keydown={handle} />
 
-<div class="map">
+<div class="map shadow-2xl shadow-primary">
   {#each { length: 256 } as _, i}
     {@const active = ac == i}
     <div
       class="cell"
-      style:background={backgrounds.get(i) || "var(--default-background)"}
+      style:background={backgrounds.get(i) || $map.dbg}
       class:active
     >
       {#if active && calcOperation(dirKey, i, true) != 0}

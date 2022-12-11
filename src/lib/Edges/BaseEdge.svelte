@@ -1,8 +1,8 @@
 <script lang="ts">
   import EdgeText from "$lib/Edges/EdgeText.svelte";
   import type { EdgeProps } from "$lib/types/types";
-  import { createEventDispatcher } from "svelte";
-  const dispatch = createEventDispatcher();
+  import { svelvetStore } from "../stores/store";
+  const { edgesStore } = svelvetStore;
 
   export let baseEdgeProps: EdgeProps;
 
@@ -29,7 +29,7 @@
 </script>
 
 <path
-  on:click={() => dispatch("removeEdge", id)}
+  on:click={() => edgesStore.remove(id)}
   d={path}
   fill="transparent"
   stroke={edgeColor ? edgeColor : "gray"}

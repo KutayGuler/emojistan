@@ -7,7 +7,7 @@
 
   import { svelvetStore } from "$lib/stores/store";
   import type { Node } from "$lib/types/types";
-  import { scale } from "svelte/transition";
+  import { conditions, events, loopEvents } from "$src/store";
 
   export let node: Node;
 
@@ -16,6 +16,7 @@
     onNodeClick,
     onTouchMove,
     nodesStore,
+    edgesStore,
     nodeSelected,
     nodeIdSelected,
     movementStore,
@@ -40,7 +41,6 @@
 />
 
 <div
-  transition:scale|local
   class="Node"
   style="left: {node.position.x}px;
     top: {node.position.y}px;
@@ -87,8 +87,21 @@
     class="absolute -top-1 right-1 cursor-pointer rounded border-2 bg-white"
     on:click={() => {
       nodesStore.remove(node.id);
-      // TODO: remove corresponding stores
-      // remove edges
+      edgesStore.filter(node.id);
+
+      switch (node.component) {
+        case "condition":
+          conditions.remove(node.id);
+          break;
+        case "event":
+          events.remove(node.id);
+          break;
+        case "loopEvent":
+          loopEvents.remove(node.id);
+          break;
+        default:
+          break;
+      }
     }}
   >
     <svg
@@ -106,7 +119,9 @@
       />
     </svg>
   </button>
-  <div class="flex flex-col ">
+  <div
+    class="flex flex-col {node.component == 'spawner' ? 'w-full bg-white' : ''}"
+  >
     {#if node.component == "condition"}
       <Condition id={node.id} />
     {:else if node.component == "container"}
@@ -116,7 +131,7 @@
     {:else if node.component == "loopEvent"}
       <LoopEvent id={node.id} />
     {:else if node.component == "spawner"}
-      <Spawner position={node.position} on:spawnNode />
+      <Spawner position={node.position} />
     {/if}
   </div>
 </div>

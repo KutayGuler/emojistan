@@ -1,50 +1,38 @@
 <script lang="ts">
   // DATA
-  import { palette as cp, defaultBackground as dbg } from "../store";
+  import {
+    palette as cp,
+    defaultBackground as dbg,
+    currentColor,
+    map,
+  } from "../store";
   import { scale } from "svelte/transition";
   import { flip } from "svelte/animate";
-  import { onMount } from "svelte";
   import { notifications } from "../routes/notifications";
   import { DEFAULT_BG } from "../constants";
 
-  let r: any;
   let pickedColor = "#000000";
-  let defaultBackground = $dbg;
   const flipParams = { duration: 300 };
-
-  onMount(() => {
-    r = document.querySelector(":root");
-    let compStyle = getComputedStyle(r);
-    defaultBackground = compStyle.getPropertyValue("--default-background");
-    $dbg = defaultBackground;
-    pickedColor = compStyle.getPropertyValue("--picked-color");
-  });
 
   function setDefaultBackground(color: string) {
     if (color == "") return;
-    if (color == defaultBackground) {
-      r.style.setProperty("--default-background", DEFAULT_BG);
-      defaultBackground = DEFAULT_BG;
-      $dbg = defaultBackground;
+    if (color == $dbg) {
+      // $dbg = DEFAULT_BG;
+      map.updateDbg(DEFAULT_BG);
       return;
     }
 
-    r.style.setProperty("--default-background", color);
-    defaultBackground = color;
-    $dbg = defaultBackground;
+    // $dbg = color;
+    map.updateDbg(color);
+    map.filterBackgrounds();
   }
 
   function removeColor(color: string) {
     cp.remove(color);
-    if (!$cp.has(defaultBackground)) {
-      r.style.setProperty("--default-background", DEFAULT_BG);
-      defaultBackground = DEFAULT_BG;
-      $dbg = defaultBackground;
+    if (!$cp.has($dbg)) {
+      // $dbg = DEFAULT_BG;
+      map.updateDbg(DEFAULT_BG);
     }
-  }
-
-  function pickedColorChanged() {
-    r.style.setProperty("--picked-color", pickedColor);
   }
 
   function addColor() {
@@ -56,16 +44,10 @@
   }
 </script>
 
-<h4>
-  Palette 🎨 <input
-    class=""
-    type="color"
-    bind:value={pickedColor}
-    on:change={pickedColorChanged}
-  />
-</h4>
-<div class="relative w-full">
-  <button class="add btn relative w-full  bg-white" on:click={addColor}
+<h4>Palette 🎨</h4>
+<div class="relative flex w-full flex-row">
+  <input class="h-12 w-full" type="color" bind:value={pickedColor} />
+  <button class="add btn relative w-24  bg-white" on:click={addColor}
     >🎨
   </button>
 </div>
@@ -73,29 +55,49 @@
   <div class="h-full w-full">
     {#each [...$cp] as color (color)}
       <div
-        class="relative"
+        class="relative mt-2 flex flex-row justify-start gap-2"
         transition:scale|local={flipParams}
         animate:flip={flipParams}
       >
+        <div
+          style:background={color}
+          class="remove btn w-3/5"
+          on:click={() => removeColor(color)}
+        />
+        <!-- <button class="hover:scale-125" >
+          ❌
+        </button> -->
+        <!-- TODO: create dev and prod branches on github -->
         <button
-          class:default={defaultBackground == color}
-          class="absolute -left-6 top-6 opacity-50 hover:scale-125"
+          class:default={$dbg == color}
+          class="w-1/3 opacity-50 hover:scale-125"
           on:click={() => setDefaultBackground(color)}>🌍</button
         >
-        <div
-          on:click={() => removeColor(color)}
-          style:background={color}
-          class="remove btn w-full"
-        >
-          &nbsp;
-        </div>
+        {#if color != $dbg}
+          <button
+            class="w-1/3 opacity-50 hover:scale-125"
+            class:selected={$currentColor == color}
+            on:click={() => {
+              if ($currentColor == color) {
+                $currentColor = "";
+              } else {
+                $currentColor = color;
+              }
+            }}
+          >
+            🖌️
+          </button>
+        {:else}
+          <button class="w-1/3 cursor-default">&nbsp;</button>
+        {/if}
       </div>
     {/each}
   </div>
 </div>
 
 <style>
-  .default {
+  .default,
+  .selected {
     opacity: 1;
   }
 </style>

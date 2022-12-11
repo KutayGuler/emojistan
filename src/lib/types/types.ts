@@ -46,6 +46,8 @@ export class Node<T = any> {
 
     switch (component) {
       case "spawner":
+        this.width = EVENT_W / 2;
+        break;
       case "condition":
         this.width = EVENT_W;
         this.height = EVENT_H;

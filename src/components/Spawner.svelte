@@ -1,22 +1,31 @@
 <script lang="ts">
-  import type {
-    SequenceItem,
-    Condition as ICondition,
-    TLoopEvent,
+  import {
+    type SequenceItem,
+    type Condition as ICondition,
+    type TLoopEvent,
+    conditions,
+    events,
   } from "../store";
   import type { NodeComponent } from "$lib/types";
-  import { createEventDispatcher } from "svelte";
-  const dispatch = createEventDispatcher();
+  import { svelvetStore } from "$lib/stores/store";
+  const { nodesStore } = svelvetStore;
 
   export let position: { x: number; y: number };
 
   function spawn<T>(component: NodeComponent, value: T, receiver = false) {
-    dispatch("spawnNode", {
-      component,
-      position: { x: position.x, y: position.y },
-      receiver,
-      value,
-    });
+    const id = nodesStore.spawn(component, position, receiver);
+
+    switch (component) {
+      case "container":
+      case "spawner":
+        break;
+      case "condition":
+        conditions.add(id, value);
+        break;
+      case "event":
+        events.add(id, value);
+        break;
+    }
   }
 
   let menuItems = [
@@ -63,9 +72,9 @@
   ];
 </script>
 
-<ul>
+<ul class="w-full">
   {#each menuItems as { name, onClick }}
-    <li class="add h-8 hover:bg-base-200" on:click={onClick}>
+    <li class="add h-8 w-full hover:bg-base-200" on:click={onClick}>
       {name}
     </li>
   {/each}

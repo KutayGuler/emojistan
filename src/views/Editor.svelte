@@ -22,7 +22,7 @@
       return;
     }
 
-    if ($currentColor != "") {
+    if ($currentColor != "" && $currentColor != $map.dbg) {
       map.updateBackground(index, $currentColor);
     }
 
@@ -37,7 +37,7 @@
   {#each { length: 256 } as _, i}
     <div
       class="cell"
-      style:background={$map.backgrounds.get(i) || "var(--default-background)"}
+      style:background={$map.backgrounds.get(i) || $map.dbg}
       on:click={() => clickedCell(i)}
     >
       {$map?.items.get(i) || (showIndex ? i : "")}

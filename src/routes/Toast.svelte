@@ -19,11 +19,11 @@
     <div
       animate:flip
       class:shake={notification.shake}
-      class="btn"
+      class="btn h-fit"
       style="background: {themes[notification.type]};"
       transition:fly={{ y: -30 }}
     >
-      <div class="p-4">{notification.message}</div>
+      <div class="p-4 text-4xl">{notification.message}</div>
       {#if notification.icon}<i class={notification.icon} />{/if}
     </div>
   {/each}

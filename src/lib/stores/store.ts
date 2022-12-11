@@ -1,34 +1,24 @@
 import { writable, derived, get } from "svelte/store";
 import type { Readable, Writable } from "svelte/store";
-import type { Node, Edge } from "../types/types";
+import { Node, type Edge, type NodeComponent } from "../types/types";
 import { GRAPH_SIZE } from "../../constants";
+import { Condition, conditions } from "$src/store";
 
-interface Linker {
-  source: number;
-  target: number;
-}
-
-class Linker {
-  constructor(source: number, target: number) {
-    this.source = source;
-    this.target = target;
-  }
-  reset() {
-    this.source = -1;
-    this.target = -1;
-  }
-}
-
-// TODO: Figure out how to save nodes and edges on localstorage
-
-interface Removable<T> extends Writable<T> {
+interface NodesStore<T> extends Writable<T> {
   remove: Function;
   spawn: Function;
+  useStorage: Function;
+}
+
+interface EdgesStore<T> extends Writable<T> {
+  filter: Function;
+  remove: Function;
+  useStorage: Function;
 }
 
 interface CoreSvelvetStore {
-  nodesStore: Removable<Node[]>;
-  edgesStore: Writable<Edge[]>;
+  nodesStore: NodesStore<Node[]>;
+  edgesStore: EdgesStore<Edge[]>;
   widthStore: Writable<number>;
   heightStore: Writable<number>;
   backgroundStore: Writable<boolean>;
@@ -53,30 +43,66 @@ function createNodes() {
     set,
     subscribe,
     update,
-    // useStorage: (id: string) => {
-    //   // @ts-expect-error
-    //   const val = JSON.parse(localStorage.getItem(id + "_" + name));
-    //   set(new Map(val) || new Map<number, T>());
-    //   subscribe((state) => {
-    //     localStorage.setItem(
-    //       id + "_" + name,
-    //       JSON.stringify(Array.from(state.entries()))
-    //     );
-    //   });
-    // },
-    spawn: (node: Node) =>
+    useStorage: (id: string) => {
+      // @ts-expect-error
+      const val = JSON.parse(localStorage.getItem(id + "_nodes"));
+      console.log(val);
+      set(val || []);
+      subscribe((state) => {
+        localStorage.setItem(id + "_nodes", JSON.stringify(Array.from(state)));
+      });
+    },
+
+    spawn: (
+      component: NodeComponent,
+      position: { x: number; y: number },
+      receiver: boolean = false
+    ) => {
+      let id;
+
       update((state) => {
-        console.log(state);
         state = state.filter((n) => n.component != "spawner");
-        state.push(node);
-        state = state;
+        id = Math.max(...state.map((n) => n.id), 0) + 1;
+        state.push(new Node(id, component, position, receiver));
         return state;
-      }),
+      });
+
+      return id;
+    },
     remove: (id: number) =>
       update((state) => {
-        console.log(state);
         state = state.filter((n) => n.id != id);
+        return state;
+      }),
+  };
+}
+
+function createEdges() {
+  const arr: Array<Edge> = [];
+  const { set, subscribe, update } = writable(arr);
+
+  return {
+    set,
+    subscribe,
+    update,
+    useStorage: (id: string) => {
+      // @ts-expect-error
+      const val = JSON.parse(localStorage.getItem(id + "_edges"));
+      console.log(val);
+      set(val || []);
+      subscribe((state) => {
         console.log(state);
+        localStorage.setItem(id + "_edges", JSON.stringify(Array.from(state)));
+      });
+    },
+    remove: (edgeID: string) =>
+      update((state) => {
+        state = state.filter((e) => e.id != edgeID);
+        return state;
+      }),
+    filter: (nodeID: number) =>
+      update((state) => {
+        state = state.filter((e) => !e.id.includes(nodeID.toString()));
         return state;
       }),
   };
@@ -93,10 +119,10 @@ function createStore(): SvelvetStore {
   const coreSvelvetStore: CoreSvelvetStore = {
     // nodesStore: writable([]),
     nodesStore: createNodes(),
-    edgesStore: writable([]),
+    edgesStore: createEdges(),
     widthStore: writable(GRAPH_SIZE),
     heightStore: writable(GRAPH_SIZE),
-    backgroundStore: writable(false),
+    backgroundStore: writable(true),
     movementStore: writable(true),
     nodeSelected: writable(false),
     nodeIdSelected: writable(-1),
@@ -272,29 +298,77 @@ function createStore(): SvelvetStore {
 
 export const svelvetStore = createStore();
 
+interface LinkerElement {
+  id: number;
+  component: NodeComponent | "";
+}
+
+class LinkerElement {
+  constructor() {
+    this.id = -1;
+    this.component = "";
+  }
+}
+
+interface Linker {
+  source: LinkerElement;
+  target: LinkerElement;
+}
+
+class Linker {
+  constructor(source: LinkerElement, target: LinkerElement) {
+    this.source = source;
+    this.target = target;
+  }
+  reset() {
+    this.source = { id: -1, component: "" };
+    this.target = { id: -1, component: "" };
+  }
+}
+
 function createLinker() {
-  const { subscribe, update } = writable(new Linker(-1, -1));
+  const { subscribe, update } = writable(
+    new Linker(new LinkerElement(), new LinkerElement())
+  );
 
   return {
     subscribe,
-    link: (id: number, type: "source" | "target") => {
+    link: (id: number, component: NodeComponent) => {
       let linkSuccess = false;
       update((state) => {
-        state[type] = id;
-        console.log(state);
-        if (state.source != -1 && state.target != -1) {
+        let type: "source" | "target" = "source";
+        if (component == "event" || component == "loopEvent") type = "target";
+        state[type].id = id;
+        state[type].component = component;
+        if (state.source.id != -1 && state.target.id != -1) {
           let { edgesStore } = svelvetStore;
-          get(edgesStore).push({
-            id: `e${state.source}-${state.target}`,
-            source: state.source,
-            target: state.target,
-            label: "labelski",
+          edgesStore.update((_state) => {
+            _state.push({
+              id: `e${state.source.id}-${state.target.id}`,
+              source: state.source.id,
+              target: state.target.id,
+              label: "labelski",
+            });
+            return _state;
           });
+
+          console.log(state.source.component, state.target.component);
+
+          if (
+            state.source.component == "condition" &&
+            state.target.component == "event"
+          ) {
+            let condition = get(conditions).get(state.source.id);
+            condition.eventID = state.target.id;
+            conditions.update(state.source.id, condition);
+            console.log(get(conditions));
+          }
           state.reset();
           linkSuccess = true;
         }
         return state;
       });
+
       return linkSuccess;
     },
   };

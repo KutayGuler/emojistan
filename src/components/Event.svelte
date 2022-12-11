@@ -5,18 +5,24 @@
     MIN_DURATION,
     MAX_DURATION,
   } from "../constants";
-  import { onDestroy } from "svelte/internal";
+  import { onDestroy, onMount } from "svelte/internal";
   import {
     palette,
     events,
     currentEmoji,
-    defaultBackground,
+    map,
     SequenceItem,
     type Mutations,
   } from "../store";
 
+  let defaultBackground = $map.dbg;
+
   export let id: number;
-  export let sequence: Array<SequenceItem> = [];
+  let sequence: Array<SequenceItem> = [];
+
+  onMount(() => {
+    sequence = $events.get(id) || [];
+  });
 
   const types: Array<keyof Mutations> = [
     "setBackgroundOf",
@@ -48,6 +54,8 @@
       new SequenceItem(type, MIN_INDEX, "", MIN_DURATION, ""),
     ];
     events.update(id, sequence);
+    console.log($events);
+
     [type, duration, index, background] = [types[0], 0, 0, ""];
   }
 
@@ -63,6 +71,7 @@
 
   function update() {
     events.update(id, sequence);
+    console.log($events);
   }
 
   function updateSlot(i: number) {
@@ -70,18 +79,19 @@
     update();
   }
 
-  onDestroy(() => {
-    let newsequence = sequence.filter((item) => {
-      let vals = Object.values(item);
-      return !(vals.includes("") || vals.includes(undefined));
-    });
+  // TODO:
+  // onDestroy(() => {
+  //   let newsequence = sequence.filter((item) => {
+  //     let vals = Object.values(item);
+  //     return !(vals.includes("") || vals.includes(undefined));
+  //   });
 
-    if (sequence.length == 0) {
-      events.remove(id);
-    } else if (newsequence.length < sequence.length) {
-      events.update(id, newsequence);
-    }
-  });
+  //   if (sequence.length == 0) {
+  //     events.remove(id);
+  //   } else if (newsequence.length < sequence.length) {
+  //     events.update(id, newsequence);
+  //   }
+  // });
 </script>
 
 {#each sequence as s, i}
@@ -123,7 +133,7 @@
         {/each}
       </select>
       {#if s.type == "setBackgroundOf"}
-        {#if $palette.size == 0 || ($palette.size == 1 && $palette.has($defaultBackground))}
+        {#if $palette.size == 0 || ($palette.size == 1 && $palette.has(defaultBackground))}
           <select title="color">
             <option value="">No colors</option>
           </select>
@@ -135,7 +145,7 @@
             style:background={s.background}
             on:change={update}
           >
-            {#each [...$palette].filter((color) => color != $defaultBackground) as color}
+            {#each [...$palette].filter((color) => color != defaultBackground) as color}
               <option value={color} style:background={color} />
             {/each}
           </select>

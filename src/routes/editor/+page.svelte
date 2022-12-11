@@ -6,10 +6,6 @@
   import { scale } from "svelte/transition";
   import type { Node, Edge } from "$lib/types/types";
 
-  // TODO: Fill them up with localStorage saves
-  const initialNodes: Array<Node> = [];
-  const initialEdges: Array<Edge> = [];
-
   const flipParams = { duration: 300 };
 
   // DATA
@@ -17,6 +13,7 @@
     quickAccess,
     currentEmoji,
     currentColor,
+    conditions,
     saves,
     map,
     pushes,
@@ -25,7 +22,6 @@
     loopEvents,
     palette,
     statics,
-    defaultBackground,
   } from "../../store";
   import { notifications } from "../notifications";
   import { emojis } from "../../emojis";
@@ -34,6 +30,9 @@
   import Palette from "$components/Palette.svelte";
   import Svelvet from "$lib";
   import Play from "../../views/Play.svelte";
+  import { svelvetStore } from "$lib/stores/store";
+
+  const { edgesStore, nodesStore } = svelvetStore;
 
   onMount(() => {
     if ($saves.current == "") {
@@ -48,10 +47,13 @@
       map,
       pushes,
       merges,
+      conditions,
       events,
       loopEvents,
       palette,
       statics,
+      nodesStore,
+      edgesStore,
     ]) {
       store.useStorage($saves.current);
     }
@@ -91,38 +93,6 @@
   let deleteMode = deleteModes[2];
   let clearMode = clearModes[2];
 
-  function pickColor(color: string) {
-    console.log(color);
-    $currentColor = color == $currentColor ? "" : color;
-  }
-
-  function clickedCell(index: number) {
-    if ($currentColor == "" && $currentEmoji == "") {
-      switch (deleteMode) {
-        case "Item":
-          map.removeEmoji(index);
-          break;
-        case "Background":
-          map.deleteBackground(index);
-          break;
-        default:
-        case "Both":
-          map.removeEmoji(index);
-          map.deleteBackground(index);
-          break;
-      }
-      return;
-    }
-
-    if ($currentColor != "") {
-      map.updateBackground(index, $currentColor);
-    }
-
-    if ($currentEmoji != "") {
-      map.addEmoji(index, $currentEmoji);
-    }
-  }
-
   function fillMap() {
     if ($currentEmoji == "") return;
     for (let i = 0; i < 256; i++) {
@@ -157,13 +127,32 @@
 <svelte:window on:keydown={handleKeydown} bind:innerWidth bind:innerHeight />
 
 {#if $saves.current != ""}
-  <main class="noselect box-border flex flex-row items-end justify-end">
-    <aside
-      class="right-0 h-[100vh] w-1/5 overflow-y-auto rounded-tr-lg rounded-bl-lg  bg-base-200 p-2 text-lg shadow-2xl"
-    >
+  <main
+    class="noselect box-border flex flex-row items-end justify-end text-2xl"
+  >
+    <aside class="right-0 h-[100vh] w-1/5 overflow-y-auto  bg-base-200 p-2">
+      <button
+        class="btn w-full"
+        on:click={() => {
+          if (view == "editor") {
+            view = "rules";
+            test = false;
+          } else {
+            view = "editor";
+          }
+        }}>CHANGE VIEW</button
+      >
       {#if view == "editor"}
-        <button class="btn w-full">SAVE MAP</button>
-        <p>Last saved:</p>
+        <!-- <p>Last saved:</p> -->
+        <button
+          class="btn mt-2 w-full bg-primary"
+          on:click={() => {
+            test = !test;
+            if (!test) {
+              $currentEmoji = "";
+            }
+          }}>{test ? "EDIT" : "TEST"}</button
+        >
         <div class="flex flex-col pb-8">
           <div class="form-control">
             <label class="label">
@@ -197,7 +186,7 @@
               </select>
             </div>
             <div class="form-control w-full max-w-xs">
-              <label class="label">
+              <label for="clearMode" class="label">
                 <span class="label-text">Clear Mode</span>
               </label>
               <select class="select select-bordered" bind:value={clearMode}>
@@ -210,36 +199,29 @@
             <button class="btn" on:click={fillMap}
               >Fill With [{$currentEmoji || "____"}]</button
             >
-            <button
-              class="btn bg-primary"
-              on:click={() => {
-                test = !test;
-                if (!test) {
-                  $currentEmoji = "";
-                }
-              }}>{test ? "EDIT" : "TEST"}</button
-            >
           </div>
         </div>
         <Palette />
         <h4 class="pt-8">Statics 🗿</h4>
         <button
-          class="add btn w-full"
+          class="add btn h-24 w-full text-2xl"
           on:click={() => statics.add($currentEmoji)}
         >
           [ {$currentEmoji == "" ? "____" : $currentEmoji} ]
         </button>
-        <div class="flex h-1/3 w-full flex-col justify-start overflow-y-auto">
+        <div
+          class="mt-2 grid h-1/3 w-full grid-flow-row grid-cols-2 gap-2 overflow-y-auto "
+        >
           {#each [...$statics] as item (item)}
             <div transition:scale|local={flipParams} animate:flip={flipParams}>
               <button
-                class="remove btn w-full"
+                class="remove btn h-full w-full text-2xl"
                 on:click={() => statics.remove(item)}>{item}</button
               >
             </div>
           {/each}
         </div>
-        <div class="collapse">
+        <!-- <div class="collapse">
           <input type="checkbox" />
           <div class="collapse-title text-xl font-medium">Settings</div>
           <div class="collapse-content">
@@ -250,41 +232,33 @@
             />
             <button class="btn">DELETE ISLAND</button>
           </div>
-        </div>
+        </div> -->
         <!-- Island name -->
       {/if}
     </aside>
     <div
       class="relative box-border flex h-[100vh] w-full flex-col items-center justify-center overflow-y-auto"
     >
-      <button
-        class="btn absolute top-0 left-0"
-        on:click={() => {
-          if (view == "editor") {
-            view = "rules";
-          } else {
-            view = "editor";
-          }
-        }}>CHANGE VIEW</button
-      >
-      <p
+      <div
+        style:background={$currentColor || $map.dbg}
         class="absolute top-0 flex h-20 w-20 flex-col items-center justify-center self-end p-10 text-4xl"
-        style:background={$currentColor || $defaultBackground}
+        on:click={() => ($currentEmoji = "")}
       >
         {$currentEmoji}
-      </p>
+      </div>
       <div class="flex w-full flex-col items-center justify-start gap-4">
         {#if test}
           <Play />
         {:else if view == "editor"}
           <Editor />
         {:else if view == "rules"}
-          <Svelvet nodes={initialNodes} edges={initialEdges} background />
+          <Svelvet />
         {/if}
       </div>
     </div>
     <aside
-      class="right-0 h-[100vh] w-1/5 overflow-y-auto rounded-tl-lg rounded-bl-lg  bg-sky-400 p-2 shadow-2xl"
+      style:background={$map.dbg}
+      class="right-0 h-[100vh] w-1/5 overflow-y-auto p-2"
     >
       <input
         class="w-full rounded-lg pl-1"
@@ -321,11 +295,10 @@
           {#if emojis[category].some((item) => item[0].includes(filter))}
             <h4 class="pt-16 pb-4 text-lg">{category}</h4>
           {/if}
-          <div class="flex flex-wrap">
+          <div class="emojis flex flex-wrap">
             {#each emojis[category] as [emoji, name]}
               {#if name.includes(filter)}
                 <div
-                  class="duration-75 ease-out hover:scale-150"
                   class:selected={$currentEmoji == emoji}
                   on:click={() => pickEmoji(emoji)}
                   title={name}
@@ -345,6 +318,14 @@
   /* TAILWINDED */
   #emoji-container * {
     font-size: 1.25rem;
+  }
+
+  .emojis > div {
+    transition: 75ms ease-out;
+  }
+
+  .emojis > div:hover {
+    scale: 1.5;
   }
 
   .selected {

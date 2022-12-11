@@ -158,12 +158,16 @@ function createSaves() {
           "pushes",
           "merges",
           "events",
+          "conditions",
           "loopEvents",
           "palette",
           "statics",
           "items",
           "backgrounds",
           "objective",
+          "nodes",
+          "edges",
+          "dbg",
         ]) {
           localStorage.removeItem(id + "_" + store);
         }
@@ -179,6 +183,7 @@ function createEditableMap() {
     items: new Map<number, string>(),
     backgrounds: new Map<number, string>(),
     objective: "",
+    dbg: DEFAULT_BG,
   });
 
   return {
@@ -186,6 +191,7 @@ function createEditableMap() {
     subscribe,
     useStorage: (id: string) => {
       const objective = localStorage.getItem(id + "_objective");
+      const dbg = localStorage.getItem(id + "_dbg");
       // @ts-expect-error
       const items = JSON.parse(localStorage.getItem(id + "_items"));
       // @ts-expect-error
@@ -195,6 +201,7 @@ function createEditableMap() {
         state.objective = objective || "";
         state.items = new Map(items) || new Map();
         state.backgrounds = new Map(backgrounds) || new Map();
+        state.dbg = dbg || "";
         return state;
       });
 
@@ -208,8 +215,14 @@ function createEditableMap() {
           JSON.stringify(Array.from(state.backgrounds.entries()))
         );
         localStorage.setItem(id + "_objective", state.objective);
+        localStorage.setItem(id + "_dbg", state.dbg);
       });
     },
+    updateDbg: (color: string) =>
+      update((state) => {
+        state.dbg = color;
+        return state;
+      }),
     updateBackground: (index: number, color: string) =>
       update((state) => {
         state.backgrounds.set(index, color);
@@ -223,6 +236,14 @@ function createEditableMap() {
     clearBackgrounds: () =>
       update((state) => {
         state.backgrounds.clear();
+        return state;
+      }),
+
+    filterBackgrounds: () =>
+      update((state) => {
+        for (let [id, color] of state.backgrounds) {
+          if (color == state.dbg) state.backgrounds.delete(id);
+        }
         return state;
       }),
     addEmoji: (index: number, emoji: string) =>

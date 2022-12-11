@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { DEFAULT_BG } from "$src/constants";
   import { onDestroy } from "svelte/internal";
   import type { A, Mutations, SequenceItem } from "../store";
 
@@ -273,7 +274,7 @@
     {@const active = ac == i}
     <div
       class="cell"
-      style:background={backgrounds.get(i) || "var(--default-background)"}
+      style:background={backgrounds.get(i) || DEFAULT_BG}
       class:active
     >
       {#if active && calcOperation(dirKey, i, true) != 0}

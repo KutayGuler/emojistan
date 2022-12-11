@@ -3,12 +3,10 @@
   import { zoom, zoomTransform } from "d3-zoom";
   import { select, selectAll } from "d3-selection";
   import { svelvetStore, linker } from "$lib/stores/store";
-  import { Node as INode } from "$src/lib/types";
 
   import SimpleBezierEdge from "$lib/Edges/SimpleBezierEdge.svelte";
   import EdgeAnchor from "$lib/Edges/EdgeAnchor.svelte";
   import Node from "$lib/Nodes/index.svelte";
-  import { conditions, events } from "$src/store";
 
   // leveraging d3 library to zoom/pan
   let d3 = {
@@ -34,37 +32,10 @@
     d3Scale,
   } = svelvetStore;
 
-  function removeEdge(e) {
-    let id = e.detail;
-    $edgesStore = $edgesStore.filter((edge) => id != edge.id);
-  }
-
-  function generateID() {
-    return Math.max(...$nodesStore.map((n) => n.id), 0) + 1;
-  }
-
-  function spawnNode({ detail }) {
-    let id = generateID();
-    let { component, position, receiver, value } = detail;
-    switch (component) {
-      case "container":
-      case "spawner":
-        break;
-      case "condition":
-        conditions.add(id, value);
-        break;
-      case "event":
-        events.add(id, value);
-        break;
-    }
-
-    nodesStore.spawn(new INode(id, component, position, receiver));
-  }
-
   function attemptLink(node: Node) {
-    let type: "source" | "target" =
-      node.sourcePosition != undefined ? "source" : "target";
-    if (linker.link(node.id, type)) {
+    // let type: "source" | "target" =
+    //   node.sourcePosition != undefined ? "source" : "target";
+    if (linker.link(node.id, node.component)) {
       $nodesStore = $nodesStore;
     }
   }
@@ -83,9 +54,7 @@
       let { x, y, k } = d3.zoomTransform(nodesDiv);
       y = (-y + e.layerY) / k;
       x = (-x + e.layerX) / k;
-      spawnNode({
-        detail: { component: "spawner", position: { x, y } },
-      });
+      nodesStore.spawn("spawner", { x, y });
     });
   });
 
@@ -136,16 +105,21 @@
   let svgStyle = "";
 </script>
 
-<button on:click={() => (svgStyle = svgStyle == z1 ? "" : z1)}
+<button
+  style="z-index: 2"
+  class="absolute top-2"
+  on:click={() => (svgStyle = svgStyle == z1 ? "" : z1)}
   >{svgStyle == z1 ? "EDIT NODES" : "EDIT EDGES"}</button
 >
+
+<!-- TODO: Save camera position and zoom level -->
 
 <!-- This is the container that holds GraphView and we have disabled right click functionality to prevent a sticking behavior -->
 <div class={`Nodes`} bind:this={nodesDiv}>
   <!-- This container is transformed by d3zoom -->
   <div class={`Node`}>
     {#each $nodesStore as node}
-      <Node {node} on:spawnNode={spawnNode} />
+      <Node {node} />
     {/each}
   </div>
 </div>
@@ -182,15 +156,17 @@
   <!-- <g> tag defines which edge type to render depending on properties of edge object -->
   <g>
     {#each $derivedEdges as edge}
-      <SimpleBezierEdge {edge} on:removeEdge={removeEdge} />
+      <SimpleBezierEdge {edge} />
     {/each}
     {#each $nodesStore as node}
       {@const target = node.targetPosition != undefined}
-      <EdgeAnchor
-        on:linkAttempt={() => attemptLink(node)}
-        x={node.position.x + (target ? 0 : node.width)}
-        y={node.position.y + node.height / 2}
-      />
+      {#if node.component != "spawner"}
+        <EdgeAnchor
+          on:linkAttempt={() => attemptLink(node)}
+          x={node.position.x + (target ? 0 : node.width)}
+          y={node.position.y + node.height / 2}
+        />
+      {/if}
     {/each}
   </g>
 </svg>
@@ -205,11 +181,5 @@
     color: black; /* remove this once color is set to default via types */
     width: 100%;
     height: 100%;
-  }
-
-  button {
-    z-index: 2;
-    position: absolute;
-    top: 10px;
   }
 </style>

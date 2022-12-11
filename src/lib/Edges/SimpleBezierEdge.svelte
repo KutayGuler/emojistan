@@ -169,4 +169,4 @@
   };
 </script>
 
-<BaseEdge {baseEdgeProps} on:removeEdge />
+<BaseEdge {baseEdgeProps} />
