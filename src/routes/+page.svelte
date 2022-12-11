@@ -121,10 +121,7 @@
       </ul>
     </div> -->
     <p class="py-8 text-9xl">Emojistan 🏝️</p>
-    <!-- <div class="tabs">
-      <a class="tab tab-bordered">Home</a>
-      <a class="tab tab-active tab-bordered">Favorites</a>
-    </div> -->
+    <p>test</p>
     <div />
     {#if $saves.loaded}
       <div class="flex w-1/3 flex-col gap-8 py-8">
@@ -140,7 +137,7 @@
             >
               <div>{title}</div>
             </button>
-            <!-- <div class="absolute bottom-1 right-2">username</div> -->
+
             <!-- The button to open modal -->
             <label
               for="my-modal-4"
