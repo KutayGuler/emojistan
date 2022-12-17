@@ -115,6 +115,10 @@
       changeZ();
     }
   }
+
+  function removeSpawner() {
+    $nodesStore = $nodesStore.filter((n) => n.component != "spawner");
+  }
 </script>
 
 <svelte:window on:keydown={handleKeydown} />
@@ -126,7 +130,7 @@
 <!-- TODO: Save camera position and zoom level -->
 
 <!-- This is the container that holds GraphView and we have disabled right click functionality to prevent a sticking behavior -->
-<div class={`Nodes`} bind:this={nodesDiv}>
+<div class={`Nodes`} bind:this={nodesDiv} on:click={removeSpawner}>
   <!-- This container is transformed by d3zoom -->
   <div class={`Node`}>
     {#each $nodesStore as node}

@@ -454,7 +454,7 @@
 
 <svelte:window on:keydown={handle} />
 
-<div class="map shadow-2xl shadow-primary">
+<div class="map shadow-2xl">
   {#each { length: 256 } as _, i}
     {@const active = ac == i}
     <div

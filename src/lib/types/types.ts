@@ -52,12 +52,13 @@ export class Node<T = any> {
     switch (component) {
       case "spawner":
         this.width = EVENT_W / 2;
-        break;
+        return;
       case "merger":
         this.width = EVENT_W / 2;
         this.height = EVENT_H / 2;
         this.borderColor = MERGER_BORDER;
         this.bgColor = MERGER_BG;
+        return;
       case "condition":
         this.width = EVENT_W;
         this.height = EVENT_H;
@@ -81,10 +82,12 @@ export class Node<T = any> {
         this.height = CONTAINER_W;
         this.borderColor = "#f6fafd";
         this.bgColor = "#ffc83d";
-        break;
+        this.targetPosition = "right";
+        this.sourcePosition = "right";
+        return;
     }
 
-    if (component == "spawner" || component == "merger") return;
+    console.log(receiver);
 
     if (receiver) {
       this.targetPosition = "left";

@@ -122,30 +122,32 @@
 
 {#if $saves.current != ""}
   <main
-    class="noselect box-border flex flex-row items-end justify-end text-2xl"
+    class="noselect relative box-border flex flex-row items-end justify-end overflow-x-hidden text-2xl"
   >
-    <aside class="right-0 h-[100vh] w-1/5 overflow-y-auto  bg-base-200 p-2">
-      <button
-        class="btn w-full"
-        on:click={() => {
-          test = false;
-          if (view == "editor") {
-            view = "rules";
-          } else {
-            view = "editor";
-          }
-        }}>CHANGE VIEW</button
-      >
-      {#if view == "editor"}
-        <button
-          class="btn mt-2 w-full bg-primary"
-          on:click={() => {
-            test = !test;
-            if (!test) {
-              $currentEmoji = "";
-            }
-          }}>{test ? "EDIT" : "TEST"}</button
+    <aside
+      class="absolute {test
+        ? '-left-64'
+        : '-left-0'} z-10 h-[100vh] w-64  overflow-y-auto bg-base-200 p-2"
+    >
+      <div class="flex flex-row items-center justify-center gap-8 py-4">
+        <div
+          class="{view == 'editor'
+            ? 'scale-150 opacity-100'
+            : 'opacity-50'} duration-200 ease-out hover:scale-150 hover:opacity-100"
+          on:click={() => (view = "editor")}
         >
+          🏗️
+        </div>
+        <div
+          class="{view == 'rules'
+            ? 'scale-150 opacity-100'
+            : 'opacity-50'} duration-200 hover:scale-150 hover:opacity-100"
+          on:click={() => (view = "rules")}
+        >
+          📜
+        </div>
+      </div>
+      {#if view == "editor"}
         <div class="flex flex-col pb-8">
           <div class="form-control">
             <label class="label">
@@ -221,17 +223,22 @@
         </div>
       {/if}
     </aside>
+
     <div
       class="relative box-border flex h-[100vh] w-full flex-col items-center justify-center overflow-y-auto"
     >
-      <div
-        style:background={$currentColor || $map.dbg}
-        class="absolute top-0 flex h-20 w-20 flex-col items-center justify-center self-end p-10 text-4xl"
-        on:click={() => ($currentEmoji = "")}
-      >
-        {$currentEmoji}
-      </div>
       <div class="flex w-full flex-col items-center justify-start gap-4">
+        {#if view != "rules"}
+          <button
+            class="btn z-10 w-32 bg-primary"
+            on:click={() => {
+              test = !test;
+              if (!test) {
+                $currentEmoji = "";
+              }
+            }}>{test ? "EDIT" : "TEST"}</button
+          >
+        {/if}
         {#if test}
           <Play />
         {:else if view == "editor"}
@@ -241,9 +248,21 @@
         {/if}
       </div>
     </div>
+    <!-- w-1/5 -->
+    <div
+      style:background={$currentColor || $map.dbg}
+      class="absolute {test
+        ? '-right-20'
+        : 'right-64'} top-0 flex h-20 w-20 flex-col items-center justify-center self-end p-10 text-4xl duration-200 ease-in-out"
+      on:click={() => ($currentEmoji = "")}
+    >
+      {$currentEmoji}
+    </div>
     <aside
       style:background={$map.dbg}
-      class="right-0 h-[100vh] w-1/5 overflow-y-auto p-2"
+      class="absolute {test
+        ? '-right-64'
+        : '-right-0'} h-[100vh] w-64 overflow-y-auto p-2"
     >
       <input
         class="w-full rounded-lg pl-1"
@@ -315,5 +334,9 @@
 
   .selected {
     border: 2px solid red;
+  }
+
+  aside {
+    transition: 200ms ease-out;
   }
 </style>
