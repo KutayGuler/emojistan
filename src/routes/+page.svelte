@@ -121,7 +121,6 @@
       </ul>
     </div> -->
     <p class="py-8 text-9xl">Emojistan 🏝️</p>
-    <p>test</p>
     <div />
     {#if $saves.loaded}
       <div class="flex w-1/3 flex-col gap-8 py-8">

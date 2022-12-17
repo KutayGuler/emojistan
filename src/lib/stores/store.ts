@@ -322,18 +322,18 @@ class LinkerElement {
 }
 
 interface Linker {
-  source: LinkerElement;
-  target: LinkerElement;
+  current: LinkerElement;
+  prev: LinkerElement;
 }
 
 class Linker {
   constructor(source: LinkerElement, target: LinkerElement) {
-    this.source = source;
-    this.target = target;
+    this.current = source;
+    this.prev = target;
   }
   reset() {
-    this.source = { id: -1, component: "" };
-    this.target = { id: -1, component: "" };
+    this.current = { id: -1, component: "" };
+    this.prev = { id: -1, component: "" };
   }
 }
 
@@ -347,44 +347,138 @@ function createLinker() {
     link: (id: number, component: NodeComponent) => {
       let linkSuccess = false;
       update((state) => {
+        state.prev.id = state.current.id;
+        state.prev.component = state.current.component;
+        state.current.id = id;
+        state.current.component = component;
+
+        if (state.current.id == state.prev.id) {
+          console.log("can't link with itself");
+          state.reset();
+          return state;
+        }
+
         let type: "source" | "target" = "source";
+        let prevType: "source" | "target" = "source";
         if (component == "event" || component == "loopEvent") type = "target";
-        state[type].id = id;
-        state[type].component = component;
-        if (state.source.id != -1 && state.target.id != -1) {
+        if (
+          state.prev.component == "event" ||
+          state.prev.component == "loopEvent"
+        )
+          prevType = "target";
+
+        // state[type].id = id;
+        // state[type].component = component;
+
+        // if (Object.keys(state.previousState).length != 0) {
+        //   console.log(
+        //     state.previousState.source.id,
+        //     id,
+        //     component,
+        //     state.previousState.source.component
+        //   );
+        //   if (
+        //     state.previousState.source.id != id &&
+        //     component == "container" &&
+        //     state.previousState.source.component == "container"
+        //   ) {
+        //     // edge case: both are containers
+        //     console.log("both are containers");
+        //     state.reset();
+        //   } else if (
+        //     type == "source" &&
+        //     state.previousState.target.id == state.prev.id
+        //   ) {
+        //     if (state.previousState.source.id == state.current.id) {
+        //       console.log("itself");
+        //     } else {
+        //       console.log("both are source");
+        //     }
+        //     state.reset();
+        //   } else if (
+        //     type == "target" &&
+        //     state.previousState.source.id == state.current.id
+        //   ) {
+        //     if (state.previousState.target.id == state.prev.id) {
+        //       console.log("itself");
+        //     } else {
+        //       console.log("both are target");
+        //     }
+        //     state.reset();
+        //   }
+        // } else {
+        //   let { prev: target, current: source } = state;
+        //   state.previousState = { target, source };
+        // }
+
+        let [sourceComp, targetComp] = [
+          state.current.component,
+          state.prev.component,
+        ];
+        // TODO: Edge case: container <-> container should work
+
+        // UNLINKABLE COMPONENT RELATIONS
+        if (
+          // condition <-> container
+          (sourceComp == "condition" && targetComp == "container") ||
+          (sourceComp == "container" && targetComp == "condition") ||
+          // condition <-> condition
+          (sourceComp == "condition" && targetComp == sourceComp) ||
+          // event || loopEvent <-> event || loopEvent
+          ((sourceComp == "event" || sourceComp == "loopEvent") &&
+            (targetComp == "event" || targetComp == "loopEvent"))
+        ) {
+          console.log(
+            `Cannot link ${sourceComp} and ${targetComp} components.`
+          );
+
+          state.reset();
+          linkSuccess = false;
+          return state;
+        }
+
+        console.log(type, prevType);
+        console.log(state);
+
+        if (state.current.id != -1 && state.prev.id != -1) {
           let { edgesStore } = svelvetStore;
           edgesStore.update((_state) => {
-            _state.push({
-              id: `e${state.source.id}-${state.target.id}`,
-              source: state.source.id,
-              target: state.target.id,
-              label: "labelski",
-            });
+            if (type == "source" && prevType == "target") {
+              _state.push({
+                id: `e${state.current.id}-${state.prev.id}`,
+                source: state.current.id,
+                target: state.prev.id,
+                label: "labelski",
+              });
+            } else if (type == "target" && prevType == "source") {
+              _state.push({
+                id: `e${state.prev.id}-${state.current.id}`,
+                source: state.prev.id,
+                target: state.current.id,
+                label: "labelski",
+              });
+            }
+            console.log(_state);
+
             return _state;
           });
 
-          console.log(state.source.component, state.target.component);
-
           if (
-            state.source.component == "condition" &&
-            (state.target.component == "event" ||
-              state.target.component == "loopEvent")
+            sourceComp == "condition" &&
+            (targetComp == "event" || targetComp == "loopEvent")
           ) {
-            let condition = get(conditions).get(state.source.id);
-            condition.eventID = state.target.id;
-            conditions.update(state.source.id, condition);
-            console.log(get(conditions));
+            let condition = get(conditions).get(state.current.id);
+            condition.eventID = state.prev.id;
+            conditions.update(state.current.id, condition);
+            state.reset();
+            linkSuccess = true;
+          } else if (
+            state.current.component == "container" &&
+            state.current.component == state.prev.component
+          ) {
+            // both container
+            // container -> container
           }
-
-          // TODO: add other relations
-          // container -> container
-          //
-          // errors
-          // condition <-> container
-          // event | loopEvent <-> event | loopEvent
-          // condition <-> condition
-          state.reset();
-          linkSuccess = true;
         }
         return state;
       });
