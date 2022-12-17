@@ -1,14 +1,14 @@
 <script lang="ts">
   import Condition from "$components/Condition.svelte";
   import LoopEvent from "$components/LoopEvent.svelte";
-  import Container from "$components/Container.svelte";
   import Spawner from "$components/Spawner.svelte";
   import Event from "$components/Event.svelte";
+  import Pusher from "$components/Pusher.svelte";
+  import Merger from "$components/Merger.svelte";
 
   import { svelvetStore } from "$lib/stores/store";
   import type { Node } from "$lib/types/types";
-  import { conditions, events, loopEvents } from "$src/store";
-  import Merger from "$components/Merger.svelte";
+  import { conditions, events, loopEvents, merges, pushes } from "$src/store";
 
   export let node: Node;
 
@@ -91,6 +91,12 @@
       edgesStore.filter(node.id);
 
       switch (node.component) {
+        case "pusher":
+          pushes.remove(node.id);
+          break;
+        case "merger":
+          merges.remove(node.id);
+          break;
         case "condition":
           conditions.remove(node.id);
           break;
@@ -123,10 +129,10 @@
   <div
     class="flex flex-col {node.component == 'spawner' ? 'w-full bg-white' : ''}"
   >
-    {#if node.component == "container"}
-      <Container id={node.id} />
-    {:else if node.component == "condition"}
+    {#if node.component == "condition"}
       <Condition id={node.id} />
+    {:else if node.component == "pusher"}
+      <Pusher id={node.id} />
     {:else if node.component == "merger"}
       <Merger id={node.id} />
     {:else if node.component == "event"}
@@ -141,7 +147,6 @@
 
 <style>
   nav {
-    /* background: red; */
     position: absolute;
     top: 0px;
     width: 100%;

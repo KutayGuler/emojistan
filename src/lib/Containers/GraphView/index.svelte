@@ -175,7 +175,7 @@
     {/each}
     {#each $nodesStore as node}
       {@const target = node.targetPosition != undefined}
-      {#if node.component != "spawner"}
+      {#if !["spawner", "pusher", "merger"].includes(node.component)}
         <EdgeAnchor
           on:linkAttempt={() => attemptLink(node)}
           x={node.position.x + (target ? 0 : node.width)}

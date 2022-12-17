@@ -7,6 +7,7 @@
     events,
     loopEvents,
     merges,
+    pushes,
   } from "../store";
   import type { NodeComponent } from "$lib/types";
   import { svelvetStore } from "$lib/stores/store";
@@ -18,6 +19,8 @@
     const id = nodesStore.spawn(component, position, receiver);
 
     switch (component) {
+      case "pusher":
+        pushes.add(id, value);
       case "merger":
         merges.add(id, value);
         break;
@@ -37,8 +40,8 @@
 
   let menuItems = [
     {
-      name: "Container",
-      onClick: () => spawn("container", undefined),
+      name: "Pusher",
+      onClick: () => spawn("pusher", ["", "", "push"]),
     },
     {
       name: "Merger",

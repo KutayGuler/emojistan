@@ -1,7 +1,9 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
-  import { merges, currentEmoji } from "../store";
+  import { merges, pushes, currentEmoji } from "../store";
   import { notifications } from "../routes/notifications";
+  import { svelvetStore } from "$src/lib/stores/store";
+  const { nodesStore } = svelvetStore;
 
   export let id: number;
   let slots = ["", "", ""];
@@ -11,22 +13,30 @@
   });
 
   function checkCollision() {
-    if (
-      [...$merges].some(([_id, _slots]) => {
-        if (id == _id) return false;
-        let _firstTwo = [_slots[0], _slots[1]];
-        let firstTwo = [slots[0], slots[1]];
-        return (
-          _firstTwo.toString() == firstTwo.toString() ||
-          _firstTwo.reverse().toString() == firstTwo.toString()
+    for (let [_id, _slots] of $pushes.entries()) {
+      if (_slots[0] == slots[0] && _slots[1] == slots[1]) {
+        slots = ["", "", ""];
+        notifications.warning("Cannot have conflicting behaviours.");
+        break;
+      }
+    }
+
+    for (let [_id, _slots] of $merges.entries()) {
+      console.log(id, _id);
+
+      if (id == _id) continue;
+      let _firstTwo = [_slots[0], _slots[1]];
+      let firstTwo = [slots[0], slots[1]];
+      if (
+        _firstTwo.toString() == firstTwo.toString() ||
+        _firstTwo.reverse().toString() == firstTwo.toString()
+      ) {
+        slots = ["", "", ""];
+        notifications.warning(
+          "Merges are bidirectional and can only have one outcome"
         );
-      })
-    ) {
-      slots = ["", "", ""];
-      notifications.warning(
-        "Merges are bidirectional and can only have one outcome"
-      );
-      return;
+        break;
+      }
     }
 
     merges.update(id, slots);
@@ -36,7 +46,7 @@
     slots[i] = $currentEmoji;
     if (slots.includes("")) return;
     if (slots[0] == slots[2] || slots[1] == slots[2]) {
-      slots[2] = "";
+      slots = ["", "", ""];
       notifications.warning("Inputs cannot be the same with output");
       return;
     }
@@ -47,6 +57,7 @@
   onDestroy(() => {
     if (slots.includes("")) {
       merges.remove(id);
+      nodesStore.remove(id);
     }
   });
 </script>

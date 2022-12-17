@@ -72,6 +72,8 @@ function createNodes() {
     },
     remove: (id: number) =>
       update((state) => {
+        // There is a bug in event components
+        // if first spawned is removed then second transforms
         state = state.filter((n) => n.id != id);
         return state;
       }),
@@ -383,7 +385,8 @@ function createLinker() {
 
           console.log(sourceComp, targetComp);
 
-          // TODO: Multiple events or just one event?
+          // TODO: Trigger only one event
+          // TODO: delete relation on edge remove
 
           // UNLINKABLE COMPONENT RELATIONS
           if (

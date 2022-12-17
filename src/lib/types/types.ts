@@ -13,6 +13,7 @@ import type { XYPosition, Position } from "./utils";
 
 export type NodeComponent =
   | "container"
+  | "pusher"
   | "condition"
   | "merger"
   | "event"
@@ -53,6 +54,12 @@ export class Node<T = any> {
       case "spawner":
         this.width = EVENT_W / 2;
         return;
+      case "pusher":
+        this.width = EVENT_W / 2;
+        this.height = EVENT_H / 2;
+        this.borderColor = MERGER_BORDER;
+        this.bgColor = MERGER_BG;
+        return;
       case "merger":
         this.width = EVENT_W / 2;
         this.height = EVENT_H / 2;
@@ -77,13 +84,15 @@ export class Node<T = any> {
         this.borderColor = "#f6fafd";
         this.bgColor = EVENT_BG;
         break;
-      case "container":
-        this.width = CONTAINER_W;
-        this.height = CONTAINER_W;
-        this.borderColor = "#f6fafd";
-        this.bgColor = "#ffc83d";
-        this.targetPosition = "right";
-        this.sourcePosition = "right";
+      // case "container":
+      //   this.width = CONTAINER_W;
+      //   this.height = CONTAINER_W;
+      //   this.borderColor = "#f6fafd";
+      //   this.bgColor = "#ffc83d";
+      //   this.targetPosition = "right";
+      //   this.sourcePosition = "left";
+      //   return;
+      default:
         return;
     }
 

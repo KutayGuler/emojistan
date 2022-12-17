@@ -133,7 +133,7 @@
         <div
           class="{view == 'editor'
             ? 'scale-150 opacity-100'
-            : 'opacity-50'} duration-200 ease-out hover:scale-150 hover:opacity-100"
+            : 'opacity-50'} cursor-pointer duration-200 ease-out hover:scale-150 hover:opacity-100"
           on:click={() => (view = "editor")}
         >
           🏗️
@@ -141,7 +141,7 @@
         <div
           class="{view == 'rules'
             ? 'scale-150 opacity-100'
-            : 'opacity-50'} duration-200 hover:scale-150 hover:opacity-100"
+            : 'opacity-50'} cursor-pointer duration-200 hover:scale-150 hover:opacity-100"
           on:click={() => (view = "rules")}
         >
           📜

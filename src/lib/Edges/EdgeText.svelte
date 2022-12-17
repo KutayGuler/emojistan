@@ -23,6 +23,9 @@
 {#if typeof label === "undefined" || !label}
   {null}
 {:else}
+  <div class="absolute" style="top: {textCenterY}; left: {textCenterX};">
+    {label}
+  </div>
   <g>
     <rect
       class="EdgeTextBg"
@@ -33,6 +36,7 @@
       width={labelPx}
       height={16}
     />
+    <div>XD</div>
     <text
       class="EdgeText"
       x={textCenterX}
@@ -42,7 +46,7 @@
       text-anchor="middle"
       fill="black"
     >
-      💨
+      {label}
     </text>
   </g>
 {/if}

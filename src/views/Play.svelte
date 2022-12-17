@@ -112,6 +112,8 @@
     }
   }
 
+  console.log(_collisions);
+
   // MUTATIONS
   const m: Mutations = {
     setBackgroundOf: (
@@ -180,11 +182,11 @@
         if (loop) {
           if (_start != undefined) {
             if (_start >= loop.end) return;
-            let x = loop.iterationType == "increment" ? 1 : -1;
             if (loop.timeGap != 0) {
               await m["wait"](loop.timeGap);
             }
-            this.event(_start + loop.iterationNumber * x);
+            let sign = loop.iterationType == "increment" ? 1 : -1;
+            this.event(_start + loop.iterationNumber * sign);
             // console.log(_start + 1);
           } else {
             this.event(loop.start);
@@ -283,6 +285,8 @@
       if (item == undefined || $statics.has(item)) return;
       let postOpItem = items.get(ac + operation);
       if (postOpItem) {
+        console.log(getCollisionType(item, postOpItem));
+
         switch (getCollisionType(item, postOpItem)) {
           case "push":
             let collisionChain = [];
@@ -310,6 +314,8 @@
             if (operation == -16) code = "ArrowUp";
 
             if (calcOperation(code, finalIndex) == 0) break;
+
+            // TODO: Fix collision chain
 
             if (arr.every((str) => str == "push")) {
               while (collisionChain.length != 0) {
@@ -359,6 +365,7 @@
             // MERGE
             postOpItem = getCollisionType(item, postOpItem);
             moveActiveCell(operation, true);
+            items.set(ac, postOpItem);
             break;
         }
       } else {

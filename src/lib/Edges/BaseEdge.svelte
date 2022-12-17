@@ -36,9 +36,10 @@
   aria-label="svg-path"
 />
 
-<!-- {#if edgeTextProps.label}
+{#if edgeTextProps.label}
   <EdgeText {edgeTextProps} />
-{/if} -->
+{/if}
+
 <style>
   path:hover {
     stroke: red;
