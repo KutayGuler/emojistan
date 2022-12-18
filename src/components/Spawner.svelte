@@ -10,8 +10,7 @@
     pushes,
   } from "../store";
   import type { NodeComponent } from "$lib/types";
-  import { svelvetStore } from "$lib/stores/store";
-  const { nodesStore } = svelvetStore;
+  import { nodesStore } from "$lib/stores/store";
 
   export let position: { x: number; y: number };
 

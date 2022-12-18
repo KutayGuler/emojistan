@@ -30,9 +30,7 @@
   import Palette from "$components/Palette.svelte";
   import Svelvet from "$lib";
   import Play from "../../views/Play.svelte";
-  import { svelvetStore } from "$lib/stores/store";
-
-  const { edgesStore, nodesStore } = svelvetStore;
+  import {  edgesStore, nodesStore  } from "$lib/stores/store";
 
   onMount(() => {
     if ($saves.current == "") {

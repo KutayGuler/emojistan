@@ -10,8 +10,7 @@
   import { notifications } from "$src/routes/notifications";
   import { onDestroy, onMount } from "svelte/internal";
   import { palette, loopEvents, currentEmoji, type TLoopEvent } from "../store";
-  import { svelvetStore } from "$lib/stores/store";
-  const { nodesStore } = svelvetStore;
+  import { nodesStore } from "$lib/stores/store";
 
   // TYPES
   import { SequenceItem, type Loop, type Mutations } from "../store";

@@ -2,8 +2,7 @@
   import { onDestroy, onMount } from "svelte";
   import { merges, pushes, currentEmoji } from "../store";
   import { notifications } from "../routes/notifications";
-  import { svelvetStore } from "$src/lib/stores/store";
-  const { nodesStore } = svelvetStore;
+  import { nodesStore } from "$src/lib/stores/store";
 
   export let id: number;
   let slots = ["", "", ""];

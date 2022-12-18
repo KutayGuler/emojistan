@@ -2,7 +2,14 @@
   import { onDestroy, onMount } from "svelte";
   import { zoom, zoomTransform } from "d3-zoom";
   import { select, selectAll } from "d3-selection";
-  import { svelvetStore, linker } from "$lib/stores/store";
+  import {     nodesStore,
+    edgesStore,
+    nodeSelected,
+    backgroundStore,
+    movementStore,
+    widthStore,
+    heightStore,
+    d3Scale, linker } from "$lib/stores/store";
 
   import SimpleBezierEdge from "$lib/Edges/SimpleBezierEdge.svelte";
   import EdgeAnchor from "$lib/Edges/EdgeAnchor.svelte";
@@ -19,18 +26,6 @@
   //these are typscripted as any, however they have been transformed inside of store.ts
   // export let nodesStore: any;
   export let derivedEdges: any;
-
-  // here we lookup the store using the unique key
-  const {
-    nodesStore,
-    edgesStore,
-    nodeSelected,
-    backgroundStore,
-    movementStore,
-    widthStore,
-    heightStore,
-    d3Scale,
-  } = svelvetStore;
 
   // declaring the grid and dot size for d3's transformations and zoom
   const gridSize = 15;

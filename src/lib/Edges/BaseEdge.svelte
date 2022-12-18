@@ -1,8 +1,7 @@
 <script lang="ts">
   // import EdgeText from "$lib/Edges/EdgeText.svelte";
   import type { EdgeProps } from "$lib/types/types";
-  import { svelvetStore } from "../stores/store";
-  const { edgesStore } = svelvetStore;
+  import { edgesStore } from "../stores/store";
 
   export let baseEdgeProps: EdgeProps;
 

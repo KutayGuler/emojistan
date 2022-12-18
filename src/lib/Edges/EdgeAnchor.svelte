@@ -1,7 +1,6 @@
 <script lang="ts">
   import { linker } from "../stores/store";
-  import { svelvetStore } from "../stores/store";
-  const { nodesStore } = svelvetStore;
+  import { nodesStore } from "../stores/store";
 
   export let node: Node;
   export let x: number;

@@ -6,22 +6,29 @@
   import Pusher from "$components/Pusher.svelte";
   import Merger from "$components/Merger.svelte";
 
-  import { svelvetStore } from "$lib/stores/store";
-  import type { Node } from "$lib/types/types";
-  import { conditions, events, loopEvents, merges, pushes } from "$src/store";
-
-  export let node: Node;
-
-  const {
-    onMouseMove,
+  import {     onMouseMove,
     onNodeClick,
     onTouchMove,
     nodesStore,
     edgesStore,
     nodeSelected,
     nodeIdSelected,
-    movementStore,
-  } = svelvetStore;
+    movementStore, } from "$lib/stores/store";
+  import type { Node } from "$lib/types/types";
+  import { conditions, events, loopEvents, merges, pushes } from "$src/store";
+
+  export let node: Node;
+
+  // const {
+  //   onMouseMove,
+  //   onNodeClick,
+  //   onTouchMove,
+  //   nodesStore,
+  //   edgesStore,
+  //   nodeSelected,
+  //   nodeIdSelected,
+  //   movementStore,
+  // } = svelvetStore;
 
   $: shouldMove = moving && $movementStore;
 

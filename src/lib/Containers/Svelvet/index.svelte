@@ -1,10 +1,7 @@
 <!--Note: Import / export in svelvet is used for passing props  -->
 <script lang="ts">
   import GraphView from "$lib/Containers/GraphView/index.svelte";
-  import { svelvetStore } from "$lib/stores/store";
-
-  // stores (state) within stores, so that we cannot access values from everywhere
-  const { widthStore, heightStore, derivedEdges } = svelvetStore;
+  import { widthStore, heightStore, derivedEdges} from "$lib/stores/store";
 </script>
 
 <!-- Now that a store has been created from the initial nodes and initial edges we drill props from the store down to the D3 GraphView along with the unique key -->

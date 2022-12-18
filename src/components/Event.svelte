@@ -1,9 +1,7 @@
 <script lang="ts">
   import {
     MIN_INDEX,
-    MAX_INDEX,
     MIN_DURATION,
-    MAX_DURATION,
     DURATIONS,
     EVENT_H,
   } from "../constants";
@@ -17,8 +15,7 @@
     type Mutations,
   } from "../store";
 
-  import { svelvetStore } from "$src/lib/stores/store";
-  const { nodesStore } = svelvetStore;
+  import { nodesStore } from "$lib/stores/store";
 
   let defaultBackground = $map.dbg;
 

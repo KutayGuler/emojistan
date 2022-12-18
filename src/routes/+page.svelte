@@ -14,8 +14,7 @@
     conditions,
   } from "../store";
   import { navigating } from "$app/stores";
-  import { svelvetStore } from "$lib/stores/store";
-  const { nodesStore, edgesStore } = svelvetStore;
+  import {  nodesStore, edgesStore  } from "$lib/stores/store";
 
   onMount(() => {
     if ($saves.current == "") saves.useStorage();
