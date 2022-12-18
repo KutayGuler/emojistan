@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import { zoom, zoomTransform } from "d3-zoom";
   import { select, selectAll } from "d3-selection";
   import { svelvetStore, linker } from "$lib/stores/store";
@@ -31,14 +31,6 @@
     heightStore,
     d3Scale,
   } = svelvetStore;
-
-  function attemptLink(node: Node) {
-    // let type: "source" | "target" =
-    //   node.sourcePosition != undefined ? "source" : "target";
-    if (linker.link(node.id, node.component)) {
-      $nodesStore = $nodesStore;
-    }
-  }
 
   // declaring the grid and dot size for d3's transformations and zoom
   const gridSize = 15;
@@ -116,9 +108,26 @@
     }
   }
 
-  function removeSpawner() {
-    $nodesStore = $nodesStore.filter((n) => n.component != "spawner");
+  function clickedOnNodes() {
+    console.log("clickedOnNodes");
+    nodesStore.removeSpawner();
   }
+
+  function clickedOnEdges() {
+    console.log("clickedOnEdges");
+    if (nodesStore.hasTracker()) {
+      console.log("has Tracker");
+
+      // let trackerID = nodesStore.removeTracker();
+      // edgesStore.filter(trackerID);
+      // linker.reset();
+    }
+  }
+
+  onDestroy(() => {
+    nodesStore.removeTracker();
+    linker.reset();
+  });
 </script>
 
 <svelte:window on:keydown={handleKeydown} />
@@ -130,7 +139,7 @@
 <!-- TODO: Save camera position and zoom level -->
 
 <!-- This is the container that holds GraphView and we have disabled right click functionality to prevent a sticking behavior -->
-<div class={`Nodes`} bind:this={nodesDiv} on:click={removeSpawner}>
+<div class={`Nodes`} bind:this={nodesDiv} on:click={clickedOnNodes}>
   <!-- This container is transformed by d3zoom -->
   <div class={`Node`}>
     {#each $nodesStore as node}
@@ -144,6 +153,7 @@
   style={svgStyle}
   class={`Edges`}
   viewBox="0 0 {$widthStore} {$heightStore}"
+  on:click={clickedOnEdges}
 >
   <defs>
     <pattern
@@ -175,9 +185,9 @@
     {/each}
     {#each $nodesStore as node}
       {@const target = node.targetPosition != undefined}
-      {#if !["spawner", "pusher", "merger"].includes(node.component)}
+      {#if !["spawner", "pusher", "merger", "tracker"].includes(node.component)}
         <EdgeAnchor
-          on:linkAttempt={() => attemptLink(node)}
+          {node}
           x={node.position.x + (target ? 0 : node.width)}
           y={node.position.y + node.height / 2}
         />

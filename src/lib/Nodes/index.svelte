@@ -34,7 +34,7 @@
 <svelte:window
   on:mousemove={(e) => {
     e.preventDefault();
-    if (shouldMove) {
+    if (node.component == "tracker" || shouldMove) {
       onMouseMove(e, node.id);
       moved = true;
     }
@@ -85,7 +85,9 @@
   />
   <button
     style="border-color: {node.borderColor}"
-    class="absolute -top-1 right-1 cursor-pointer rounded border-2 bg-white"
+    class="{node.component == 'tracker'
+      ? 'hidden'
+      : ''} absolute -top-1 right-1 cursor-pointer rounded border-2 bg-white"
     on:click={() => {
       nodesStore.remove(node.id);
       edgesStore.filter(node.id);
@@ -131,7 +133,9 @@
       ? 'w-full bg-white'
       : 'pt-2'}"
   >
-    {#if node.component == "condition"}
+    {#if node.component == "tracker"}
+      <!-- -->
+    {:else if node.component == "condition"}
       <Condition id={node.id} />
     {:else if node.component == "pusher"}
       <Pusher id={node.id} />

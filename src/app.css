@@ -31,7 +31,7 @@
   }
 
   .cell {
-    @apply relative flex h-4 w-4 items-center justify-center bg-base-300 sm:h-6 sm:w-6 md:h-8 md:w-8 lg:h-10 lg:w-10 xl:h-12 xl:w-12;
+    @apply relative flex h-6 w-6 items-center justify-center bg-base-300 md:h-8 md:w-8 lg:h-10 lg:w-10;
   }
 
   .cell > .direction {

@@ -227,10 +227,12 @@
     <div
       class="relative box-border flex h-[100vh] w-full flex-col items-center justify-center overflow-y-auto"
     >
-      <div class="flex w-full flex-col items-center justify-start gap-4">
+      <div
+        class="relative flex w-full flex-col items-center justify-start gap-4"
+      >
         {#if view != "rules"}
           <button
-            class="btn z-10 w-32 bg-primary"
+            class="btn absolute -top-24 z-10 h-20 w-40 bg-primary text-5xl"
             on:click={() => {
               test = !test;
               if (!test) {
@@ -241,6 +243,15 @@
         {/if}
         {#if test}
           <Play />
+          <div
+            in:scale
+            class="absolute -bottom-16 flex flex-row gap-2 bg-white"
+          >
+            {#each { length: 4 } as _}
+              <!--  TODO: Display items -->
+              <div class="cell" />
+            {/each}
+          </div>
         {:else if view == "editor"}
           <Editor {showIndex} />
         {:else if view == "rules"}
@@ -252,7 +263,7 @@
     <div
       style:background={$currentColor || $map.dbg}
       class="absolute {test
-        ? '-right-20'
+        ? '-right-24'
         : 'right-64'} top-0 m-4 flex h-20 w-20 flex-col items-center justify-center self-end rounded-full p-10 text-4xl duration-200 ease-in-out"
       on:click={() => ($currentEmoji = "")}
     >

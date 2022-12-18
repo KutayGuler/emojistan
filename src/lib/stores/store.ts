@@ -1,19 +1,27 @@
 import { writable, derived, get } from "svelte/store";
 import type { Readable, Writable } from "svelte/store";
 import { Node, type Edge, type NodeComponent } from "../types/types";
-import { EVENT_H, GRAPH_SIZE } from "../../constants";
-import { Condition, conditions } from "$src/store";
+import { GRAPH_SIZE } from "../../constants";
+import { conditions } from "$src/store";
 
 interface NodesStore<T> extends Writable<T> {
-  remove: Function;
-  spawn: Function;
+  remove: (id: number) => void;
+  spawn: (
+    component: NodeComponent,
+    position: { x: number; y: number },
+    receiver?: boolean
+  ) => number;
+  removeSpawner: () => void;
+  removeTracker: () => void;
+  hasTracker: () => boolean;
   useStorage: Function;
   adjustHeight: Function;
 }
 
 interface EdgesStore<T> extends Writable<T> {
   filter: Function;
-  remove: Function;
+  remove: (id: number) => void;
+  add: (sourceID: number, targetID: number) => void;
   useStorage: Function;
 }
 
@@ -62,7 +70,9 @@ function createNodes() {
       let id;
 
       update((state) => {
-        state = state.filter((n) => n.component != "spawner");
+        state = state.filter(
+          (n) => n.component != "spawner" && n.component != "tracker"
+        );
         id = Math.max(...state.map((n) => n.id), 0) + 1;
         state.push(new Node(id, component, position, receiver));
         return state;
@@ -72,11 +82,40 @@ function createNodes() {
     },
     remove: (id: number) =>
       update((state) => {
+        // FIXME
         // There is a bug in event components
         // if first spawned is removed then second transforms
         state = state.filter((n) => n.id != id);
         return state;
       }),
+    removeTracker: () => {
+      let trackerID;
+
+      update((state) => {
+        state = state.filter((n) => {
+          if (n.component == "tracker") trackerID = n.id;
+          return n.component != "tracker";
+        });
+        return state;
+      });
+
+      return trackerID;
+    },
+    removeSpawner: () =>
+      update((state) => {
+        state = state.filter((n) => n.component != "spawner");
+        return state;
+      }),
+    hasTracker: () => {
+      let val = false;
+
+      update((state) => {
+        val = state.some((n) => n.component == "tracker");
+        return state;
+      });
+
+      return val;
+    },
     adjustHeight: (id: number, sequenceLength: number, defaultHeight: number) =>
       update((state) => {
         for (let node of state) {
@@ -108,6 +147,15 @@ function createEdges() {
         localStorage.setItem(id + "_edges", JSON.stringify(Array.from(state)));
       });
     },
+    add: (sourceID: number, targetID: number) =>
+      update((state) => {
+        state.push({
+          id: `e${sourceID}-${targetID}`,
+          source: sourceID,
+          target: targetID,
+        });
+        return state;
+      }),
     remove: (edgeID: string) =>
       update((state) => {
         state = state.filter((e) => e.id != edgeID);
@@ -340,6 +388,7 @@ class Linker {
 }
 
 import { notifications } from "$src/routes/notifications";
+let { edgesStore, nodesStore } = svelvetStore;
 
 function createLinker() {
   const { subscribe, update } = writable(
@@ -348,8 +397,23 @@ function createLinker() {
 
   return {
     subscribe,
-    link: (id: number, component: NodeComponent) => {
+    link: (
+      id: number,
+      component: NodeComponent,
+      position: { x: number; y: number }
+    ) => {
       let linkSuccess = false;
+
+      let trackerID = -1;
+      if (!nodesStore.hasTracker()) {
+        trackerID = nodesStore.spawn("tracker", position);
+        if (["condition"].includes(component)) {
+          edgesStore.add(id, trackerID);
+        } else {
+          edgesStore.add(trackerID, id);
+        }
+      }
+
       update((state) => {
         state.prev.id = state.current.id;
         state.prev.component = state.current.component;
@@ -359,6 +423,8 @@ function createLinker() {
         if (state.current.id == state.prev.id) {
           notifications.warning("Can't link components with themselves");
           state.reset();
+          nodesStore.removeTracker();
+          edgesStore.filter(trackerID);
           return state;
         }
 
@@ -377,62 +443,33 @@ function createLinker() {
             state.prev.component,
           ];
 
-          let isContainerLink = false;
-
-          if (sourceComp == "container" && targetComp == "container") {
-            isContainerLink = true;
-          }
-
-          console.log(sourceComp, targetComp);
-
           // TODO: Trigger only one event
           // TODO: delete relation on edge remove
 
           // UNLINKABLE COMPONENT RELATIONS
           if (
-            !isContainerLink &&
-            // condition <-> container
-            ((sourceComp == "condition" && targetComp == "container") ||
-              (sourceComp == "container" && targetComp == "condition") ||
-              (sourceComp == "container" &&
-                (targetComp == "event" || targetComp == "loopEvent")) ||
-              ((sourceComp == "event" || sourceComp == "loopEvent") &&
-                targetComp == "event") ||
-              // condition <-> condition
-              (sourceComp == "condition" && targetComp == sourceComp) ||
-              // event || loopEvent <-> event || loopEvent
-              ((sourceComp == "event" || sourceComp == "loopEvent") &&
-                (targetComp == "event" || targetComp == "loopEvent")))
+            // condition <-> condition
+            (sourceComp == "condition" && targetComp == sourceComp) ||
+            // event || loopEvent <-> event || loopEvent
+            ((sourceComp == "event" || sourceComp == "loopEvent") &&
+              (targetComp == "event" || targetComp == "loopEvent"))
           ) {
             notifications.warning(
               `Cannot link ${sourceComp}s with ${targetComp}s.`
             );
 
             state.reset();
+            nodesStore.removeTracker();
+            edgesStore.filter(trackerID);
             linkSuccess = false;
             return state;
           }
 
-          let { edgesStore } = svelvetStore;
-          edgesStore.update((_state) => {
-            if (isContainerLink || (type == "source" && prevType == "target")) {
-              _state.push({
-                id: `e${state.current.id}-${state.prev.id}`,
-                source: state.current.id,
-                target: state.prev.id,
-                label: "labelski",
-              });
-            } else if (type == "target" && prevType == "source") {
-              _state.push({
-                id: `e${state.prev.id}-${state.current.id}`,
-                source: state.prev.id,
-                target: state.current.id,
-                label: "labelski",
-              });
-            }
-
-            return _state;
-          });
+          if (isContainerLink || (type == "source" && prevType == "target")) {
+            edgesStore.add(state.current.id, state.prev.id);
+          } else if (type == "target" && prevType == "source") {
+            edgesStore.add(state.prev.id, state.current.id);
+          }
 
           if (
             sourceComp == "condition" &&
@@ -441,6 +478,9 @@ function createLinker() {
             let condition = get(conditions).get(state.current.id);
             condition.eventID = state.prev.id;
             conditions.update(state.current.id, condition);
+            edgesStore.filter(state.prev.id);
+            edgesStore.filter(trackerID);
+            nodesStore.removeTracker();
             state.reset();
             linkSuccess = true;
           } else if (
@@ -456,6 +496,11 @@ function createLinker() {
 
       return linkSuccess;
     },
+    reset: () =>
+      update((state) => {
+        state.reset();
+        return state;
+      }),
   };
 }
 

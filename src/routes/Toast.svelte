@@ -19,7 +19,7 @@
     <div
       animate:flip
       class:shake={notification.shake}
-      class="btn h-fit"
+      class="btn mt-2 h-fit"
       style="background: {themes[notification.type]};"
       transition:fly={{ y: -30 }}
     >

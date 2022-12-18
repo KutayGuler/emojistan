@@ -1,5 +1,5 @@
 <script lang="ts">
-  import EdgeText from "$lib/Edges/EdgeText.svelte";
+  // import EdgeText from "$lib/Edges/EdgeText.svelte";
   import type { EdgeProps } from "$lib/types/types";
   import { svelvetStore } from "../stores/store";
   const { edgesStore } = svelvetStore;
@@ -36,10 +36,9 @@
   aria-label="svg-path"
 />
 
-{#if edgeTextProps.label}
+<!-- {#if edgeTextProps.label}
   <EdgeText {edgeTextProps} />
-{/if}
-
+{/if} -->
 <style>
   path:hover {
     stroke: red;
