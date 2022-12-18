@@ -63,9 +63,15 @@
 </script>
 
 <div class="slots">
-  {#each { length: 3 } as _, i}
-    <div class="slot" on:click={() => updateSlot(i)}>
-      <div>{slots[i]}</div>
-    </div>
-  {/each}
+  <div class="slot" on:click={() => updateSlot(0)}>
+    {slots[0]}
+  </div>
+  <div>➕</div>
+  <div class="slot" on:click={() => updateSlot(1)}>
+    {slots[1]}
+  </div>
+  <div>➡️</div>
+  <div class="slot" on:click={() => updateSlot(2)}>
+    {slots[2]}
+  </div>
 </div>

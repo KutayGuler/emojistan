@@ -42,9 +42,11 @@
 </script>
 
 <div class="slots">
-  {#each { length: 2 } as _, i}
-    <div class="slot" on:click={() => !disabled && updateSlot(i)}>
-      <div>{slots[i]}</div>
-    </div>
-  {/each}
+  <div class="slot" on:click={() => !disabled && updateSlot(0)}>
+    {slots[0]}
+  </div>
+  <div>💨</div>
+  <div class="slot" on:click={() => !disabled && updateSlot(1)}>
+    {slots[1]}
+  </div>
 </div>

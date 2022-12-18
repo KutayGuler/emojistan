@@ -127,7 +127,9 @@
     </svg>
   </button>
   <div
-    class="flex flex-col {node.component == 'spawner' ? 'w-full bg-white' : ''}"
+    class="flex flex-col {node.component == 'spawner'
+      ? 'w-full bg-white'
+      : 'pt-2'}"
   >
     {#if node.component == "condition"}
       <Condition id={node.id} />

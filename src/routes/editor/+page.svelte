@@ -253,10 +253,12 @@
       style:background={$currentColor || $map.dbg}
       class="absolute {test
         ? '-right-20'
-        : 'right-64'} top-0 flex h-20 w-20 flex-col items-center justify-center self-end p-10 text-4xl duration-200 ease-in-out"
+        : 'right-64'} top-0 m-4 flex h-20 w-20 flex-col items-center justify-center self-end rounded-full p-10 text-4xl duration-200 ease-in-out"
       on:click={() => ($currentEmoji = "")}
     >
-      {$currentEmoji}
+      {#key $currentEmoji}
+        <span in:scale>{$currentEmoji}</span>
+      {/key}
     </div>
     <aside
       style:background={$map.dbg}

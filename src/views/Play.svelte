@@ -112,8 +112,6 @@
     }
   }
 
-  console.log(_collisions);
-
   // MUTATIONS
   const m: Mutations = {
     setBackgroundOf: (
@@ -122,7 +120,6 @@
     ) => {
       backgrounds.set(_start || index, background);
       backgrounds = backgrounds;
-      console.log(_start, backgrounds);
     },
     removeBackgroundOf: ({ index }: { index: number }) => {
       backgrounds.delete(index);
@@ -168,14 +165,11 @@
     ) {
       this.condition = () => a() == b;
       this.event = async (_start?: number) => {
-        console.log(_start);
         for (let { type, ...args } of sequence) {
-          console.log(type);
           if (type == "wait") {
             await m["wait"](args.duration);
           } else {
             m[type](args, _start);
-            console.log(args);
           }
         }
 
@@ -187,7 +181,6 @@
             }
             let sign = loop.iterationType == "increment" ? 1 : -1;
             this.event(_start + loop.iterationNumber * sign);
-            // console.log(_start + 1);
           } else {
             this.event(loop.start);
           }
@@ -285,12 +278,10 @@
       if (item == undefined || $statics.has(item)) return;
       let postOpItem = items.get(ac + operation);
       if (postOpItem) {
-        console.log(getCollisionType(item, postOpItem));
-
         switch (getCollisionType(item, postOpItem)) {
           case "push":
             let collisionChain = [];
-            let i = 1;
+            let i = 0;
             while (items.get(ac + operation * i)) {
               collisionChain.push(items.get(ac + operation * i));
               i++;
@@ -298,10 +289,10 @@
 
             let arr = [];
             for (let i = 0; i < collisionChain.length; i++) {
-              let cur = collisionChain[i];
+              let current = collisionChain[i];
               let next = collisionChain[i + 1];
-              if (cur && next) {
-                arr.push(_collisions.get(cur)?.get(next));
+              if (current && next) {
+                arr.push(_collisions.get(current)?.get(next));
               }
             }
 
@@ -314,8 +305,6 @@
             if (operation == -16) code = "ArrowUp";
 
             if (calcOperation(code, finalIndex) == 0) break;
-
-            // TODO: Fix collision chain
 
             if (arr.every((str) => str == "push")) {
               while (collisionChain.length != 0) {
@@ -341,13 +330,13 @@
                 ) + 1
               );
 
-              for (let i = 0; i < arr.length + 2; i++) {
+              for (let i = 0; i < arr.length + 1; i++) {
                 let cur = collisionChain[i];
                 let next = collisionChain[i + 1];
                 if (next && cur) {
                   let emoji = _collisions.get(cur)?.get(next);
                   if (emoji && emoji != "push") {
-                    items.set(ac + operation * (i + 2), emoji);
+                    items.set(ac + operation * (i + 1), emoji);
                     let item = items.get(ac);
                     if (item) {
                       items.set(ac + operation, item);

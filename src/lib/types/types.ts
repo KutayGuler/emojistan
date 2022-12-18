@@ -1,6 +1,5 @@
 import {
   CONDITION_BG,
-  CONTAINER_W,
   EVENT_BG,
   EVENT_H,
   EVENT_W,
@@ -8,6 +7,10 @@ import {
   LOOPEVENT_W,
   MERGER_BG,
   MERGER_BORDER,
+  MERGER_H,
+  MERGER_W,
+  PUSHER_H,
+  PUSHER_W,
 } from "$src/constants";
 import type { XYPosition, Position } from "./utils";
 
@@ -55,14 +58,14 @@ export class Node<T = any> {
         this.width = EVENT_W / 2;
         return;
       case "pusher":
-        this.width = EVENT_W / 2;
-        this.height = EVENT_H / 2;
+        this.width = PUSHER_W;
+        this.height = PUSHER_H;
         this.borderColor = MERGER_BORDER;
         this.bgColor = MERGER_BG;
         return;
       case "merger":
-        this.width = EVENT_W / 2;
-        this.height = EVENT_H / 2;
+        this.width = MERGER_W;
+        this.height = MERGER_H;
         this.borderColor = MERGER_BORDER;
         this.bgColor = MERGER_BG;
         return;
@@ -84,19 +87,7 @@ export class Node<T = any> {
         this.borderColor = "#f6fafd";
         this.bgColor = EVENT_BG;
         break;
-      // case "container":
-      //   this.width = CONTAINER_W;
-      //   this.height = CONTAINER_W;
-      //   this.borderColor = "#f6fafd";
-      //   this.bgColor = "#ffc83d";
-      //   this.targetPosition = "right";
-      //   this.sourcePosition = "left";
-      //   return;
-      default:
-        return;
     }
-
-    console.log(receiver);
 
     if (receiver) {
       this.targetPosition = "left";
