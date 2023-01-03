@@ -30,7 +30,7 @@
   import Palette from "$components/Palette.svelte";
   import Svelvet from "$lib";
   import Play from "../../views/Play.svelte";
-  import {  edgesStore, nodesStore  } from "$lib/stores/store";
+  import { edgesStore, nodesStore } from "$lib/stores/store";
 
   onMount(() => {
     if ($saves.current == "") {
@@ -225,9 +225,7 @@
     <div
       class="relative box-border flex h-[100vh] w-full flex-col items-center justify-center overflow-y-auto"
     >
-      <div
-        class="relative flex w-full flex-col items-center justify-start gap-4"
-      >
+      <div class="relative flex w-full flex-col items-center justify-center">
         {#if view != "rules"}
           <button
             class="btn absolute -top-24 z-10 h-20 w-40 bg-primary text-5xl"
@@ -257,7 +255,6 @@
         {/if}
       </div>
     </div>
-    <!-- w-1/5 -->
     <div
       style:background={$currentColor || $map.dbg}
       class="absolute {test
@@ -298,10 +295,7 @@
         {/if}
         <div class="flex">
           {#each [...$quickAccess] as emoji}
-            <div
-              class:selected={$currentEmoji == emoji}
-              on:click={() => pickEmoji(emoji)}
-            >
+            <div on:click={() => pickEmoji(emoji)}>
               {emoji}
             </div>
           {/each}
@@ -313,11 +307,7 @@
           <div class="emojis flex flex-wrap">
             {#each emojis[category] as [emoji, name]}
               {#if name.includes(filter)}
-                <div
-                  class:selected={$currentEmoji == emoji}
-                  on:click={() => pickEmoji(emoji)}
-                  title={name}
-                >
+                <div on:click={() => pickEmoji(emoji)} title={name}>
                   {emoji}
                 </div>
               {/if}
@@ -341,10 +331,6 @@
 
   .emojis > div:hover {
     scale: 1.5;
-  }
-
-  .selected {
-    border: 2px solid red;
   }
 
   aside {
