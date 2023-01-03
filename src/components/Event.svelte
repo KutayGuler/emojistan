@@ -4,6 +4,7 @@
     MIN_DURATION,
     DURATIONS,
     EVENT_H,
+    SIZE,
   } from "../constants";
   import { onDestroy, onMount } from "svelte/internal";
   import {
@@ -38,7 +39,7 @@
 
   let indexes: Array<number> = [];
 
-  for (let i = 0; i < 256; i++) {
+  for (let i = 0; i < SIZE * SIZE; i++) {
     indexes[i] = i;
   }
 
@@ -82,19 +83,19 @@
     update();
   }
 
-  // TODO:
-  // onDestroy(() => {
-  //   let newsequence = sequence.filter((item) => {
-  //     let vals = Object.values(item);
-  //     return !(vals.includes("") || vals.includes(undefined));
-  //   });
+  onDestroy(() => {
+    let newsequence = sequence.filter((item) => {
+      let vals = Object.values(item);
+      return !(vals.includes("") || vals.includes(undefined));
+    });
 
-  //   if (sequence.length == 0) {
-  //     events.remove(id);
-  //   } else if (newsequence.length < sequence.length) {
-  //     events.update(id, newsequence);
-  //   }
-  // });
+    if (sequence.length == 0) {
+      events.remove(id);
+      nodesStore.remove(id);
+    } else if (newsequence.length < sequence.length) {
+      events.update(id, newsequence);
+    }
+  });
 </script>
 
 {#each sequence as s, i}

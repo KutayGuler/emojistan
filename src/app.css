@@ -27,7 +27,7 @@
   }
 
   .map {
-    @apply grid w-auto grid-cols-16 grid-rows-16 gap-1 p-1 shadow-xl;
+    @apply grid w-auto grid-cols-12 grid-rows-12 gap-1 p-1 shadow-xl;
   }
 
   .cell {
@@ -43,11 +43,6 @@
 @font-face {
   font-family: regular;
   src: url("/fonts/MouseMemoirs.ttf") format("truetype");
-}
-
-@font-face {
-  font-family: emoji;
-  src: url("/fonts/TwemojiMozilla.ttf") format("truetype");
 }
 
 :root {

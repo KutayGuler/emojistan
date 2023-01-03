@@ -17,6 +17,7 @@
     type TLoopEvent,
     type Loop,
   } from "../store";
+  import { SIZE } from "$src/constants";
 
   onMount(() => {
     [$currentColor, $currentEmoji] = ["", ""];
@@ -45,12 +46,12 @@
           break;
       }
     }
-    if (code == "ArrowLeft" && index % 16 == 0) return 0;
-    if (code == "ArrowUp" && index < 16) return 0;
-    if (code == "ArrowRight" && (index + 1) % 16 == 0) return 0;
-    if (code == "ArrowDown" && index >= 240) return 0;
+    if (code == "ArrowLeft" && index % SIZE == 0) return 0;
+    if (code == "ArrowUp" && index < SIZE) return 0;
+    if (code == "ArrowRight" && (index + 1) % SIZE == 0) return 0;
+    if (code == "ArrowDown" && index >= SIZE * SIZE - SIZE) return 0;
     return (
-      (["ArrowUp", "ArrowDown"].includes(code) ? 16 : 1) *
+      (["ArrowUp", "ArrowDown"].includes(code) ? SIZE : 1) *
       (["ArrowRight", "ArrowDown"].includes(code) ? 1 : -1)
     );
   }
@@ -77,10 +78,10 @@
   let dirs: {
     [key: string]: { style: string; emoji: string; operation: number };
   } = {
-    KeyW: { style: `top: -30%;`, emoji: "⬆️", operation: -16 },
-    KeyA: { style: `left: -30%;`, emoji: "⬅️", operation: -1 },
-    KeyS: { style: `bottom: -30%;`, emoji: "⬇️", operation: 16 },
-    KeyD: { style: `right: -30%;`, emoji: "➡️", operation: 1 },
+    KeyW: { style: `top: -50%;`, emoji: "⬆️", operation: -SIZE },
+    KeyA: { style: `left: -50%;`, emoji: "⬅️", operation: -1 },
+    KeyS: { style: `bottom: -50%;`, emoji: "⬇️", operation: SIZE },
+    KeyD: { style: `right: -50%;`, emoji: "➡️", operation: 1 },
   };
   let dirKey = "KeyD";
 
@@ -458,8 +459,8 @@
 
 <svelte:window on:keydown={handle} />
 
-<div class="map shadow-2xl">
-  {#each { length: 256 } as _, i}
+<div class="map">
+  {#each { length: SIZE * SIZE } as _, i}
     {@const active = ac == i}
     <div
       class="cell"
@@ -467,7 +468,7 @@
       class:active
     >
       {#if active && calcOperation(dirKey, i, true) != 0}
-        <div class="direction" style={dirs[dirKey].style}>
+        <div class="direction scale-75" style={dirs[dirKey].style}>
           {dirs[dirKey].emoji}
         </div>
       {/if}

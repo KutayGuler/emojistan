@@ -6,14 +6,16 @@
   import Pusher from "$components/Pusher.svelte";
   import Merger from "$components/Merger.svelte";
 
-  import {     onMouseMove,
+  import {
+    onMouseMove,
     onNodeClick,
     onTouchMove,
     nodesStore,
     edgesStore,
     nodeSelected,
     nodeIdSelected,
-    movementStore, } from "$lib/stores/store";
+    movementStore,
+  } from "$lib/stores/store";
   import type { Node } from "$lib/types/types";
   import { conditions, events, loopEvents, merges, pushes } from "$src/store";
 
@@ -41,7 +43,7 @@
 <svelte:window
   on:mousemove={(e) => {
     e.preventDefault();
-    if (node.component == "tracker" || shouldMove) {
+    if (shouldMove) {
       onMouseMove(e, node.id);
       moved = true;
     }
@@ -92,9 +94,7 @@
   />
   <button
     style="border-color: {node.borderColor}"
-    class="{node.component == 'tracker'
-      ? 'hidden'
-      : ''} absolute -top-1 right-1 cursor-pointer rounded border-2 bg-white"
+    class="absolute -top-1 right-1 cursor-pointer rounded border-2 bg-white"
     on:click={() => {
       nodesStore.remove(node.id);
       edgesStore.filter(node.id);
@@ -140,8 +140,8 @@
       ? 'w-full bg-white'
       : 'pt-2'}"
   >
-    {#if node.component == "tracker"}
-      <!-- -->
+    {#if node.component == "spawner"}
+      <Spawner position={node.position} />
     {:else if node.component == "condition"}
       <Condition id={node.id} />
     {:else if node.component == "pusher"}
@@ -152,8 +152,6 @@
       <Event id={node.id} />
     {:else if node.component == "loopEvent"}
       <LoopEvent id={node.id} />
-    {:else if node.component == "spawner"}
-      <Spawner position={node.position} />
     {/if}
   </div>
 </div>

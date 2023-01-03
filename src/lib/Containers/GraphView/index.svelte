@@ -2,14 +2,17 @@
   import { onDestroy, onMount } from "svelte";
   import { zoom, zoomTransform } from "d3-zoom";
   import { select, selectAll } from "d3-selection";
-  import {     nodesStore,
+  import {
+    nodesStore,
     edgesStore,
     nodeSelected,
     backgroundStore,
     movementStore,
     widthStore,
     heightStore,
-    d3Scale, linker } from "$lib/stores/store";
+    d3Scale,
+    linker,
+  } from "$lib/stores/store";
 
   import SimpleBezierEdge from "$lib/Edges/SimpleBezierEdge.svelte";
   import EdgeAnchor from "$lib/Edges/EdgeAnchor.svelte";
@@ -110,17 +113,9 @@
 
   function clickedOnEdges() {
     console.log("clickedOnEdges");
-    if (nodesStore.hasTracker()) {
-      console.log("has Tracker");
-
-      // let trackerID = nodesStore.removeTracker();
-      // edgesStore.filter(trackerID);
-      // linker.reset();
-    }
   }
 
   onDestroy(() => {
-    nodesStore.removeTracker();
     linker.reset();
   });
 </script>
@@ -130,8 +125,6 @@
 <button style="z-index: 2" class="absolute top-2" on:click={changeZ}
   >{svgStyle == z1 ? "EDIT NODES" : "EDIT EDGES"}</button
 >
-
-<!-- TODO: Save camera position and zoom level -->
 
 <!-- This is the container that holds GraphView and we have disabled right click functionality to prevent a sticking behavior -->
 <div class={`Nodes`} bind:this={nodesDiv} on:click={clickedOnNodes}>
@@ -180,7 +173,7 @@
     {/each}
     {#each $nodesStore as node}
       {@const target = node.targetPosition != undefined}
-      {#if !["spawner", "pusher", "merger", "tracker"].includes(node.component)}
+      {#if !["spawner", "pusher", "merger"].includes(node.component)}
         <EdgeAnchor
           {node}
           x={node.position.x + (target ? 0 : node.width)}

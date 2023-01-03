@@ -4,7 +4,6 @@
 
   import { flip } from "svelte/animate";
   import { scale } from "svelte/transition";
-  import type { Node, Edge } from "$lib/types/types";
 
   const flipParams = { duration: 300 };
 
@@ -30,6 +29,7 @@
   import Svelvet from "$lib";
   import Play from "../../views/Play.svelte";
   import { edgesStore, nodesStore } from "$lib/stores/store";
+  import { SIZE } from "$src/constants";
 
   onMount(() => {
     if ($saves.current == "") {
@@ -84,7 +84,7 @@
 
   function fillMap() {
     if ($currentEmoji == "") return;
-    for (let i = 0; i < 256; i++) {
+    for (let i = 0; i < SIZE * SIZE; i++) {
       $map.items.set(i, $currentEmoji);
     }
     $map = $map;
@@ -290,7 +290,7 @@
       <div id="flex flex-col">
         {#each Object.keys(emojis) as category}
           {#if currentCategory == category}
-            <div class="emojis flex flex-wrap pb-16">
+            <div class="emojis flex flex-wrap">
               {#each emojis[category] as [emoji, name]}
                 {#if name.includes(filter)}
                   <div on:click={() => pickEmoji(emoji)} title={name}>

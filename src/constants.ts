@@ -1,9 +1,11 @@
+export const SIZE = 12;
+
 export const MIN_INDEX = 0;
-export const MAX_INDEX = 256;
+export const MAX_INDEX = SIZE * SIZE;
 export const MIN_DURATION = 50;
 export const MAX_DURATION = 10000;
 export const MIN_ITERATION = 1;
-export const MAX_ITERATION = 16;
+export const MAX_ITERATION = SIZE;
 export const DURATIONS = [50, 100, 200, 500, 1000, 2000, 5000, 10000];
 
 export const DEFAULT_BG = "#cfcfcf";

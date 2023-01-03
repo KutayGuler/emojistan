@@ -71,7 +71,7 @@ function createNodes() {
 
       update((state) => {
         state = state.filter(
-          (n) => n.component != "spawner" && n.component != "tracker"
+          (n) => n.component != "spawner"
         );
         id = Math.max(...state.map((n) => n.id), 0) + 1;
         state.push(new Node(id, component, position, receiver));
@@ -88,34 +88,11 @@ function createNodes() {
         state = state.filter((n) => n.id != id);
         return state;
       }),
-    removeTracker: () => {
-      let trackerID;
-
-      update((state) => {
-        state = state.filter((n) => {
-          if (n.component == "tracker") trackerID = n.id;
-          return n.component != "tracker";
-        });
-        return state;
-      });
-
-      return trackerID;
-    },
     removeSpawner: () =>
       update((state) => {
         state = state.filter((n) => n.component != "spawner");
         return state;
       }),
-    hasTracker: () => {
-      let val = false;
-
-      update((state) => {
-        val = state.some((n) => n.component == "tracker");
-        return state;
-      });
-
-      return val;
-    },
     adjustHeight: (id: number, sequenceLength: number, defaultHeight: number) =>
       update((state) => {
         for (let node of state) {
@@ -557,17 +534,6 @@ function createLinker() {
     ) => {
       let linkSuccess = false;
 
-      let trackerID = -1;
-      if (!nodesStore.hasTracker()) {
-        // @ts-expect-error
-        trackerID = nodesStore.spawn("tracker", position);
-        if (["condition"].includes(component)) {
-          edgesStore.add(id, trackerID);
-        } else {
-          edgesStore.add(trackerID, id);
-        }
-      }
-
       update((state) => {
         state.prev.id = state.current.id;
         state.prev.component = state.current.component;
@@ -577,8 +543,6 @@ function createLinker() {
         if (state.current.id == state.prev.id) {
           notifications.warning("Can't link components with themselves");
           state.reset();
-          nodesStore.removeTracker();
-          edgesStore.filter(trackerID);
           return state;
         }
 
@@ -613,8 +577,6 @@ function createLinker() {
             );
 
             state.reset();
-            nodesStore.removeTracker();
-            edgesStore.filter(trackerID);
             linkSuccess = false;
             return state;
           }
@@ -634,8 +596,6 @@ function createLinker() {
             condition.eventID = state.prev.id;
             conditions.update(state.current.id, condition);
             edgesStore.filter(state.prev.id);
-            edgesStore.filter(trackerID);
-            nodesStore.removeTracker();
             state.reset();
             linkSuccess = true;
           }

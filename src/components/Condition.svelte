@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { nodesStore } from "$src/lib/stores/store";
   import { onDestroy, onMount } from "svelte";
   import { notifications } from "../routes/notifications";
   import {
@@ -40,23 +41,23 @@
     }
   }
 
-  // TODO:
-  // onDestroy(() => {
-  //   /*
-  //     0 is the default eventID value, which means
-  //     no event has been assigned for the condition
-  //   */
-  //   if (
-  //     [a, b].includes("") ||
-  //     eventID == undefined ||
-  //     $events.get(eventID) == undefined ||
-  //     $loopEvents.get(eventID) == undefined ||
-  //     $events.get(eventID)?.length == 0 ||
-  //     $loopEvents.get(eventID)?.sequence.length == 0
-  //   ) {
-  //     conditions.remove(id);
-  //   }
-  // });
+  onDestroy(() => {
+    /*
+      0 is the default eventID value, which means
+      no event has been assigned for the condition
+    */
+    if (
+      [a, b].includes("") ||
+      eventID == undefined ||
+      $events.get(eventID) == undefined ||
+      $loopEvents.get(eventID) == undefined ||
+      $events.get(eventID)?.length == 0 ||
+      $loopEvents.get(eventID)?.sequence.length == 0
+    ) {
+      conditions.remove(id);
+      nodesStore.remove(id);
+    }
+  });
 </script>
 
 <div class="if">

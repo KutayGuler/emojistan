@@ -15,7 +15,6 @@ import {
 import type { XYPosition, Position } from "./utils";
 
 export type NodeComponent =
-  | "tracker"
   | "pusher"
   | "condition"
   | "merger"
@@ -54,12 +53,6 @@ export class Node<T = any> {
     this.position = position;
 
     switch (component) {
-      case "tracker":
-        this.width = 1;
-        this.height = 1;
-        this.targetPosition = "top";
-        this.sourcePosition = "bottom";
-        return;
       case "spawner":
         this.width = EVENT_W / 2;
         return;

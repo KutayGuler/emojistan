@@ -6,6 +6,7 @@
     MIN_ITERATION,
     LOOPEVENT_H,
     DURATIONS,
+    SIZE,
   } from "../constants";
   import { notifications } from "$src/routes/notifications";
   import { onDestroy, onMount } from "svelte/internal";
@@ -29,7 +30,7 @@
   let indexes: Array<number> = [];
   let iterations: Array<number> = [];
 
-  for (let i = 0; i < 256; i++) {
+  for (let i = 0; i < SIZE * SIZE; i++) {
     indexes[i] = i;
   }
 

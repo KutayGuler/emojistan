@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { SIZE } from "$src/constants";
   import { currentEmoji, currentColor, map } from "../store";
   const deleteModes = ["Item", "Background", "Both"];
   let deleteMode = deleteModes[2];
@@ -35,7 +36,7 @@
 </script>
 
 <div class="map">
-  {#each { length: 256 } as _, i}
+  {#each { length: SIZE * SIZE } as _, i}
     <div
       class="cell"
       style:background={$map.backgrounds.get(i) || $map.dbg}
