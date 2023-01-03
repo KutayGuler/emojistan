@@ -18,111 +18,9 @@
     type Loop,
   } from "../store";
 
-  let canvas: HTMLCanvasElement;
-  let itemCanvas: HTMLCanvasElement;
-  let backgroundCanvas: HTMLCanvasElement;
-
-  let width = 540;
-  let height = 540;
-  let ctx: CanvasRenderingContext2D;
-  let itemCtx: CanvasRenderingContext2D;
-  let backgroundCtx: CanvasRenderingContext2D;
-
-  let index = 0;
-  let x = 0,
-    y = 0;
-
-  let size = 32;
-  let padding = 4;
-  let box = size + padding;
-
   onMount(() => {
     [$currentColor, $currentEmoji] = ["", ""];
-
-    // ctx = canvas.getContext("2d");
-    // ctx.font = "16px serif";
-
-    // for (let i = 0; i < 16; i++) {
-    //   for (let j = 0; j < 16; j++) {
-    //     ctx.beginPath();
-    //     ctx.fillStyle = "antiquewhite";
-    //     ctx.fillRect(box * j, box * i, size, size);
-    //     ctx.stroke();
-    //   }
-    // }
   });
-
-  let fontPaddingX = -20;
-  let fontPaddingY = 18;
-
-  /**
-   * Updates item layer on canvas
-   *
-   * == LAYERS ==
-   * ui
-   * items
-   * background
-   */
-  function updateItems() {
-    // TODO:
-    for (let [id, emoji] of items) {
-      let row = Math.floor(id / 16);
-      let col = id % 16;
-
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      let x = box * col + fontPaddingX;
-      let y = box * row + fontPaddingY;
-
-      ctx.fillText(emoji, x, y);
-    }
-  }
-
-  /**
-   * Updates background layer on canvas
-   * == LAYERS ==
-   * ui
-   * items
-   * background
-   */
-  function updateBackground() {
-    // TODO:
-  }
-
-  /**
-   * Updates UI layer on canvas
-   * == LAYERS ==
-   * ui
-   * items
-   * background
-   */
-  function updateUI() {}
-
-  function updateCanvas() {
-    console.log("update");
-
-    for (let [id, emoji] of items) {
-      let row = Math.floor(id / 16);
-      let col = id % 16;
-      console.log(row, col);
-
-      // col = 5;
-      // row = 5;
-
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      let x = box * col + fontPaddingX;
-      let y = box * row + fontPaddingY;
-
-      ctx.fillText(emoji, x, y);
-
-      // TODO: PAINTING
-      // ctx.beginPath();
-      // ctx.fillStyle = "black";
-      // ctx.fillRect(box * col, box * row, size, size);
-      // ctx.stroke();
-    }
-  }
 
   function calcOperation(
     _code: string,
@@ -560,7 +458,7 @@
 
 <svelte:window on:keydown={handle} />
 
-<!-- <div class="map shadow-2xl">
+<div class="map shadow-2xl">
   {#each { length: 256 } as _, i}
     {@const active = ac == i}
     <div
@@ -583,34 +481,4 @@
       <button on:click={() => m.resetLevel()}>REPLAY</button>
     </dialog>
   {/if}
-</div> -->
-
-<main class="relative flex h-full w-full flex-col items-center justify-center">
-  <canvas id="ui" bind:this={canvas} {width} {height} on:click={updateCanvas} />
-  <canvas id="items" bind:this={itemCanvas} {width} {height} />
-  <canvas id="background" bind:this={backgroundCanvas} {width} {height} />
-</main>
-
-<style>
-  main {
-    position: relative;
-  }
-
-  canvas {
-    position: absolute;
-    background-color: transparent;
-    padding: 4px;
-  }
-
-  #ui {
-    z-index: 3;
-  }
-
-  #items {
-    z-index: 2;
-  }
-
-  #background {
-    z-index: 1;
-  }
-</style>
+</div>

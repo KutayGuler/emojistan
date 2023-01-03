@@ -10,7 +10,6 @@
 
   // DATA
   import {
-    quickAccess,
     currentEmoji,
     currentColor,
     conditions,
@@ -24,7 +23,7 @@
     statics,
   } from "../../store";
   import { notifications } from "../notifications";
-  import { emojis } from "../../emojis";
+  import { emojis } from "./emojis";
   import { onMount } from "svelte";
   import { goto } from "$app/navigation";
   import Palette from "$components/Palette.svelte";
@@ -57,10 +56,8 @@
     }
   });
 
+  let currentCategory = "😀";
   let filter = "";
-
-  // quickAcess edit mode
-  let editMode = false;
 
   function handleKeydown(e: KeyboardEvent) {
     if (e.code == "Escape") {
@@ -273,46 +270,36 @@
         : '-right-0'} h-[100vh] w-64 overflow-y-auto p-2"
     >
       <input
-        class="w-full rounded-lg pl-1"
+        class="input input-bordered w-full"
         type="text"
         placeholder="Search"
         bind:value={filter}
       />
-      <div id="emoji-container">
-        <h4 class="pt-4 pb-4 text-lg">
-          Quick Access <button on:click={() => (editMode = !editMode)}
-            >Edit {editMode ? "❌" : ""}</button
-          >
-        </h4>
-        {#if editMode}
-          <span
-            ><button on:click={() => quickAccess.add($currentEmoji)}
-              >Add ( {$currentEmoji || "____"} )</button
-            ><button on:click={() => quickAccess.remove($currentEmoji)}
-              >Remove ( {$currentEmoji || "____"} )</button
-            ></span
-          >
-        {/if}
-        <div class="flex">
-          {#each [...$quickAccess] as emoji}
-            <div on:click={() => pickEmoji(emoji)}>
-              {emoji}
-            </div>
-          {/each}
-        </div>
+      <div class="my-4 grid grid-cols-4 grid-rows-2 gap-4 p-4">
         {#each Object.keys(emojis) as category}
-          {#if emojis[category].some((item) => item[0].includes(filter))}
-            <h4 class="pt-16 pb-4 text-lg">{category}</h4>
-          {/if}
-          <div class="emojis flex flex-wrap">
-            {#each emojis[category] as [emoji, name]}
-              {#if name.includes(filter)}
-                <div on:click={() => pickEmoji(emoji)} title={name}>
-                  {emoji}
-                </div>
-              {/if}
-            {/each}
+          <div
+            class="{category == currentCategory
+              ? 'scale-150 opacity-100'
+              : 'hover:scale-150 hover:opacity-100'} cursor-pointer opacity-50 duration-75 ease-out"
+            on:click={() => (currentCategory = category)}
+          >
+            {category}
           </div>
+        {/each}
+      </div>
+      <div id="flex flex-col">
+        {#each Object.keys(emojis) as category}
+          {#if currentCategory == category}
+            <div class="emojis flex flex-wrap pb-16">
+              {#each emojis[category] as [emoji, name]}
+                {#if name.includes(filter)}
+                  <div on:click={() => pickEmoji(emoji)} title={name}>
+                    {emoji}
+                  </div>
+                {/if}
+              {/each}
+            </div>
+          {/if}
         {/each}
       </div>
     </aside>
@@ -320,12 +307,8 @@
 {/if}
 
 <style>
-  /* TAILWINDED */
-  #emoji-container * {
-    font-size: 1.25rem;
-  }
-
   .emojis > div {
+    font-size: 1.25rem;
     transition: 75ms ease-out;
   }
 
