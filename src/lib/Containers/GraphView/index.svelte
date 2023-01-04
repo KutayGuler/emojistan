@@ -99,7 +99,6 @@
   }
 
   function handleKeydown(e: KeyboardEvent) {
-    console.log(e.code);
     if (e.code == "Tab") {
       e.preventDefault();
       changeZ();
@@ -107,13 +106,10 @@
   }
 
   function clickedOnNodes() {
-    console.log("clickedOnNodes");
     nodesStore.removeSpawner();
   }
 
-  function clickedOnEdges() {
-    console.log("clickedOnEdges");
-  }
+  function clickedOnEdges() {}
 
   onDestroy(() => {
     linker.reset();

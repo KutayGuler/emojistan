@@ -20,7 +20,7 @@
   let sequence: Array<SequenceItem> = [];
   let loop: Loop = {
     start: 0,
-    end: 16,
+    end: SIZE,
     iterationNumber: 1,
     iterationType: "increment",
     timeGap: 50,
@@ -34,7 +34,7 @@
     indexes[i] = i;
   }
 
-  for (let i = 0; i < 16; i++) {
+  for (let i = 0; i < SIZE; i++) {
     iterations[i] = i + 1;
   }
 
@@ -60,9 +60,9 @@
     if (loop.start == loop.end) {
       if (loop.iterationType == "increment") {
         loop.start = 0;
-        loop.end = 16;
+        loop.end = SIZE;
       } else {
-        loop.start = 16;
+        loop.start = SIZE;
         loop.end = 0;
       }
       notifications.warning(
@@ -76,7 +76,7 @@
           "starting index cannot be bigger than ending index on increment"
         );
         loop.start = 0;
-        loop.end = 16;
+        loop.end = SIZE;
       }
 
       if (loop.iterationNumber > loop.end) {
@@ -87,7 +87,7 @@
         notifications.warning(
           "ending index cannot be bigger than starting index on decrement"
         );
-        loop.start = 16;
+        loop.start = SIZE;
         loop.end = 0;
       }
 
@@ -136,18 +136,20 @@
   }
 
   onDestroy(() => {
-    let newsequence = sequence.filter((item) => {
-      let vals = Object.values(item);
-      return !(vals.includes("") || vals.includes(undefined));
-    });
+    // let newsequence = sequence.filter((item) => {
+    //   let vals = Object.values(item);
+    //   return !(vals.includes("") || vals.includes(undefined));
+    // });
 
     if (sequence.length == 0) {
       loopEvents.remove(id);
       nodesStore.remove(id);
       edgesStore.filter(id);
-    } else if (newsequence.length < sequence.length) {
-      loopEvents.update(id, { loop, sequence: newsequence });
     }
+
+    // else if (newsequence.length < sequence.length) {
+    //   loopEvents.update(id, { loop, sequence: newsequence });
+    // }
   });
 </script>
 

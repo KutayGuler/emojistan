@@ -21,8 +21,6 @@
     }
 
     for (let [_id, _slots] of $merges.entries()) {
-      console.log(id, _id);
-
       if (id == _id) continue;
       let _firstTwo = [_slots[0], _slots[1]];
       let firstTwo = [slots[0], slots[1]];

@@ -34,13 +34,10 @@
     let conditionID = $edgesStore[i].source;
     let condition = $conditions.get(conditionID);
     if (condition) {
-      // @ts-expect-error
-      condition.eventID = undefined;
+      condition.eventID = 0;
       conditions.update(conditionID, condition);
     }
     edgesStore.remove(id);
-    console.log($edgesStore);
-    console.log($conditions);
   }}
   d={path}
   fill="transparent"

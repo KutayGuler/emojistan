@@ -4,9 +4,7 @@
   import "../app.css";
   import supabase from "../supabase";
 
-  supabase.auth.onAuthStateChange((event, session) => {
-    console.log(event, session);
-  });
+  supabase.auth.onAuthStateChange((event, session) => {});
 </script>
 
 {#if $navigating?.from.pathname == "/" && $navigating?.to.pathname == "/editor"}

@@ -55,7 +55,7 @@ function createNodes() {
     useStorage: (id: string) => {
       // @ts-expect-error
       const val = JSON.parse(localStorage.getItem(id + "_nodes"));
-      console.log(val);
+
       set(val || []);
       subscribe((state) => {
         localStorage.setItem(id + "_nodes", JSON.stringify(Array.from(state)));
@@ -115,10 +115,9 @@ function createEdges() {
     useStorage: (id: string) => {
       // @ts-expect-error
       const val = JSON.parse(localStorage.getItem(id + "_edges"));
-      console.log(val);
+
       set(val || []);
       subscribe((state) => {
-        console.log(state);
         localStorage.setItem(id + "_edges", JSON.stringify(Array.from(state)));
       });
     },
@@ -533,14 +532,10 @@ function createLinker() {
       let linkSuccess = false;
 
       update((state) => {
-        console.log("prev: ", state.prev.id, "| current: ", state.current.id);
-
         state.prev.id = state.current.id;
         state.prev.component = state.current.component;
         state.current.id = id;
         state.current.component = component;
-
-        console.log("prev: ", state.prev.id, "| current: ", state.current.id);
 
         if (state.current.id != -1 && state.current.id == state.prev.id) {
           notifications.warning("Can't link components with themselves");
@@ -548,17 +543,8 @@ function createLinker() {
           return state;
         }
 
-        let type: "source" | "target" = "source";
-        let prevType: "source" | "target" = "source";
-        if (component == "event" || component == "loopEvent") type = "target";
-        if (
-          state.prev.component == "event" ||
-          state.prev.component == "loopEvent"
-        )
-          prevType = "target";
-
         if (state.current.id != -1 && state.prev.id != -1) {
-          let [sourceComp, targetComp] = [
+          let [currentComp, prevComp] = [
             state.current.component,
             state.prev.component,
           ];
@@ -566,13 +552,13 @@ function createLinker() {
           // UNLINKABLE COMPONENT RELATIONS
           if (
             // condition <-> condition
-            (sourceComp == "condition" && targetComp == sourceComp) ||
+            (currentComp == "condition" && prevComp == currentComp) ||
             // event || loopEvent <-> event || loopEvent
-            ((sourceComp == "event" || sourceComp == "loopEvent") &&
-              (targetComp == "event" || targetComp == "loopEvent"))
+            ((currentComp == "event" || currentComp == "loopEvent") &&
+              (prevComp == "event" || prevComp == "loopEvent"))
           ) {
             notifications.warning(
-              `Cannot link ${sourceComp}s with ${targetComp}s.`
+              `Cannot link ${currentComp}s with ${prevComp}s.`
             );
 
             state.reset();
@@ -580,63 +566,30 @@ function createLinker() {
             return state;
           }
 
-          if (
-            sourceComp == "condition" &&
-            (targetComp == "event" || targetComp == "loopEvent")
-          ) {
-            let condition = get(conditions).get(state.current.id);
-            if (!condition) return state;
-            if (condition.eventID) {
-              notifications.warning(
-                "Conditions can't trigger multiple events."
-              );
-              state.reset();
-              return state;
-            }
+          let conditionID = state.prev.id;
+          let eventID = state.current.id;
 
-            if (type == "source" && prevType == "target") {
-              edgesStore.add(state.current.id, state.prev.id);
-            } else if (type == "target" && prevType == "source") {
-              edgesStore.add(state.prev.id, state.current.id);
-            }
-            condition.eventID = state.current.id;
-            conditions.update(state.current.id, condition);
-            state.reset();
-
-            linkSuccess = true;
+          if (prevComp == "condition") {
+            conditionID = state.prev.id;
+            eventID = state.current.id;
           }
 
-          if (
-            targetComp == "condition" &&
-            (sourceComp == "event" || sourceComp == "loopEvent")
-          ) {
-            let condition = get(conditions).get(state.prev.id);
-            if (!condition) return state;
-            if (condition.eventID) {
-              notifications.warning(
-                "Conditions can't trigger multiple events."
-              );
-              state.reset();
-              return state;
-            }
-
-            if (type == "source" && prevType == "target") {
-              edgesStore.add(state.current.id, state.prev.id);
-            } else if (type == "target" && prevType == "source") {
-              edgesStore.add(state.prev.id, state.current.id);
-            }
-
-            condition.eventID = state.prev.id;
-            conditions.update(state.prev.id, condition);
+          let condition = get(conditions).get(conditionID);
+          if (!condition) return state;
+          if (condition.eventID) {
+            notifications.warning("Conditions can't trigger multiple events");
             state.reset();
-
-            linkSuccess = true;
+            return state;
           }
+
+          condition.eventID = eventID;
+          conditions.update(conditionID, condition);
+          edgesStore.add(conditionID, eventID);
+          state.reset();
+          linkSuccess = true;
         }
         return state;
       });
-
-      console.log(linkSuccess);
 
       return linkSuccess;
     },

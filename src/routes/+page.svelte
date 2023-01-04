@@ -66,7 +66,6 @@
         owner: owner.data.user.id,
       },
     ]);
-    console.log(data, error);
   }
 
   async function getIslands() {
@@ -75,7 +74,6 @@
       .from("islands")
       .select("data")
       .eq("owner", user.data.user?.id);
-    console.log(islands, error);
   }
 </script>
 

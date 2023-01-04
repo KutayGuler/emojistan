@@ -68,7 +68,7 @@
             sequence: [],
             loop: {
               start: 0,
-              end: 16,
+              end: SIZE,
               iterationNumber: 1,
               iterationType: "increment",
               timeGap: 50,

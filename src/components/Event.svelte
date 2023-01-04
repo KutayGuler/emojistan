@@ -57,8 +57,6 @@
     events.update(id, sequence);
     nodesStore.adjustHeight(id, sequence.length, EVENT_H);
 
-    console.log($events);
-
     [type, duration, index, background] = [types[0], 0, 0, ""];
   }
 
@@ -75,7 +73,6 @@
 
   function update() {
     events.update(id, sequence);
-    console.log($events);
   }
 
   function updateSlot(i: number) {
@@ -84,18 +81,22 @@
   }
 
   onDestroy(() => {
-    let newsequence = sequence.filter((item) => {
-      let vals = Object.values(item);
-      return !(vals.includes("") || vals.includes(undefined));
-    });
+    // let newsequence = sequence.filter((item) => {
+    //   let vals = Object.values(item);
+    //   return !(vals.includes("") || vals.includes(undefined));
+    // });
+
+    //
 
     if (sequence.length == 0) {
       events.remove(id);
       nodesStore.remove(id);
       edgesStore.filter(id);
-    } else if (newsequence.length < sequence.length) {
-      events.update(id, newsequence);
     }
+
+    // else if (newsequence.length < sequence.length) {
+    //   events.update(id, newsequence);
+    // }
   });
 </script>
 

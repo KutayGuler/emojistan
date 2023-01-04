@@ -23,6 +23,8 @@
     [$currentColor, $currentEmoji] = ["", ""];
   });
 
+  console.log($events, $conditions);
+
   function calcOperation(
     _code: string,
     index: number,
@@ -289,10 +291,10 @@
       case -1:
         code = "ArrowLeft";
         break;
-      case 16:
+      case SIZE:
         code = "ArrowDown";
         break;
-      case -16:
+      case -SIZE:
         code = "ArrowUp";
         break;
     }

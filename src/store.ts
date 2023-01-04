@@ -291,7 +291,7 @@ function createSetStore(name: string) {
       value != "" &&
       update((state) => {
         state.add(value);
-        console.log(state);
+
         return state;
       }),
     remove: (value: string) =>

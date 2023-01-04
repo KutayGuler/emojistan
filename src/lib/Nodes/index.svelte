@@ -77,7 +77,6 @@
       $nodeSelected = false;
     }}
     on:mousedown={(e) => {
-      console.log(e.button);
       e.preventDefault();
       moving = true;
       $nodeIdSelected = node.id;
@@ -110,6 +109,13 @@
           conditions.remove(node.id);
           break;
         case "event":
+          for (let [id, condition] of $conditions) {
+            if (condition.eventID == node.id) {
+              condition.eventID = 0;
+              conditions.update(id, condition);
+            }
+          }
+
           events.remove(node.id);
           break;
         case "loopEvent":

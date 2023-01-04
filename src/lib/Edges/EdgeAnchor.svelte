@@ -8,10 +8,8 @@
 
   function attemptLink() {
     if (linker.link(node.id, node.component, { x, y })) {
-      console.log("attempt succeeded");
       $nodesStore = $nodesStore;
     } else {
-      console.log("attempt failed");
     }
   }
 </script>

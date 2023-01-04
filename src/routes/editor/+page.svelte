@@ -68,7 +68,6 @@
 
   function pickEmoji(emoji: string) {
     $currentEmoji = emoji == $currentEmoji ? "" : emoji;
-    console.log($currentEmoji);
   }
 
   let innerWidth: number;
@@ -88,7 +87,6 @@
       $map.items.set(i, $currentEmoji);
     }
     $map = $map;
-    console.log($map);
   }
 
   function clearMap() {
@@ -304,7 +302,7 @@
   }
 
   .emojis > div:hover {
-    scale: 1.5;
+    transform: scale(1.5, 1.5);
   }
 
   aside {
