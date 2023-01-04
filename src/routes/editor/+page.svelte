@@ -236,15 +236,6 @@
         {/if}
         {#if test}
           <Play />
-          <div
-            in:scale
-            class="absolute -bottom-16 flex flex-row gap-2 bg-white"
-          >
-            {#each { length: 4 } as _}
-              <!--  TODO: Display items -->
-              <div class="cell" />
-            {/each}
-          </div>
         {:else if view == "editor"}
           <Editor {showIndex} />
         {:else if view == "rules"}

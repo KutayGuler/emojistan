@@ -1,6 +1,7 @@
 <script lang="ts">
   // import EdgeText from "$lib/Edges/EdgeText.svelte";
   import type { EdgeProps } from "$lib/types/types";
+  import { conditions } from "$src/store";
   import { edgesStore } from "../stores/store";
 
   export let baseEdgeProps: EdgeProps;
@@ -28,7 +29,19 @@
 </script>
 
 <path
-  on:click={() => edgesStore.remove(id)}
+  on:click={() => {
+    let i = $edgesStore.findIndex((e) => e.id == id);
+    let conditionID = $edgesStore[i].source;
+    let condition = $conditions.get(conditionID);
+    if (condition) {
+      // @ts-expect-error
+      condition.eventID = undefined;
+      conditions.update(conditionID, condition);
+    }
+    edgesStore.remove(id);
+    console.log($edgesStore);
+    console.log($conditions);
+  }}
   d={path}
   fill="transparent"
   stroke={edgeColor ? edgeColor : "gray"}

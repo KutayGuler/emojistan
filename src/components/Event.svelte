@@ -16,7 +16,7 @@
     type Mutations,
   } from "../store";
 
-  import { nodesStore } from "$lib/stores/store";
+  import { edgesStore, nodesStore } from "$lib/stores/store";
 
   let defaultBackground = $map.dbg;
 
@@ -92,6 +92,7 @@
     if (sequence.length == 0) {
       events.remove(id);
       nodesStore.remove(id);
+      edgesStore.filter(id);
     } else if (newsequence.length < sequence.length) {
       events.update(id, newsequence);
     }

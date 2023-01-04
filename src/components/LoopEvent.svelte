@@ -11,7 +11,7 @@
   import { notifications } from "$src/routes/notifications";
   import { onDestroy, onMount } from "svelte/internal";
   import { palette, loopEvents, currentEmoji, type TLoopEvent } from "../store";
-  import { nodesStore } from "$lib/stores/store";
+  import { edgesStore, nodesStore } from "$lib/stores/store";
 
   // TYPES
   import { SequenceItem, type Loop, type Mutations } from "../store";
@@ -135,18 +135,20 @@
     sequence[i].emoji = $currentEmoji;
   }
 
-  // onDestroy(() => {
-  //   let newsequence = sequence.filter((item) => {
-  //     let vals = Object.values(item);
-  //     return !(vals.includes("") || vals.includes(undefined));
-  //   });
+  onDestroy(() => {
+    let newsequence = sequence.filter((item) => {
+      let vals = Object.values(item);
+      return !(vals.includes("") || vals.includes(undefined));
+    });
 
-  //   if (sequence.length == 0) {
-  //     loopEvents.remove(id);
-  //   } else if (newsequence.length < sequence.length) {
-  //     loopEvents.update(id, { loop, sequence: newsequence });
-  //   }
-  // });
+    if (sequence.length == 0) {
+      loopEvents.remove(id);
+      nodesStore.remove(id);
+      edgesStore.filter(id);
+    } else if (newsequence.length < sequence.length) {
+      loopEvents.update(id, { loop, sequence: newsequence });
+    }
+  });
 </script>
 
 <label>

@@ -70,9 +70,7 @@ function createNodes() {
       let id;
 
       update((state) => {
-        state = state.filter(
-          (n) => n.component != "spawner"
-        );
+        state = state.filter((n) => n.component != "spawner");
         id = Math.max(...state.map((n) => n.id), 0) + 1;
         state.push(new Node(id, component, position, receiver));
         return state;
@@ -535,12 +533,16 @@ function createLinker() {
       let linkSuccess = false;
 
       update((state) => {
+        console.log("prev: ", state.prev.id, "| current: ", state.current.id);
+
         state.prev.id = state.current.id;
         state.prev.component = state.current.component;
         state.current.id = id;
         state.current.component = component;
 
-        if (state.current.id == state.prev.id) {
+        console.log("prev: ", state.prev.id, "| current: ", state.current.id);
+
+        if (state.current.id != -1 && state.current.id == state.prev.id) {
           notifications.warning("Can't link components with themselves");
           state.reset();
           return state;
@@ -561,9 +563,6 @@ function createLinker() {
             state.prev.component,
           ];
 
-          // TODO: Trigger only one event
-          // TODO: delete relation on edge remove
-
           // UNLINKABLE COMPONENT RELATIONS
           if (
             // condition <-> condition
@@ -581,27 +580,63 @@ function createLinker() {
             return state;
           }
 
-          if (type == "source" && prevType == "target") {
-            edgesStore.add(state.current.id, state.prev.id);
-          } else if (type == "target" && prevType == "source") {
-            edgesStore.add(state.prev.id, state.current.id);
-          }
-
           if (
             sourceComp == "condition" &&
             (targetComp == "event" || targetComp == "loopEvent")
           ) {
             let condition = get(conditions).get(state.current.id);
             if (!condition) return state;
-            condition.eventID = state.prev.id;
+            if (condition.eventID) {
+              notifications.warning(
+                "Conditions can't trigger multiple events."
+              );
+              state.reset();
+              return state;
+            }
+
+            if (type == "source" && prevType == "target") {
+              edgesStore.add(state.current.id, state.prev.id);
+            } else if (type == "target" && prevType == "source") {
+              edgesStore.add(state.prev.id, state.current.id);
+            }
+            condition.eventID = state.current.id;
             conditions.update(state.current.id, condition);
-            edgesStore.filter(state.prev.id);
             state.reset();
+
+            linkSuccess = true;
+          }
+
+          if (
+            targetComp == "condition" &&
+            (sourceComp == "event" || sourceComp == "loopEvent")
+          ) {
+            let condition = get(conditions).get(state.prev.id);
+            if (!condition) return state;
+            if (condition.eventID) {
+              notifications.warning(
+                "Conditions can't trigger multiple events."
+              );
+              state.reset();
+              return state;
+            }
+
+            if (type == "source" && prevType == "target") {
+              edgesStore.add(state.current.id, state.prev.id);
+            } else if (type == "target" && prevType == "source") {
+              edgesStore.add(state.prev.id, state.current.id);
+            }
+
+            condition.eventID = state.prev.id;
+            conditions.update(state.prev.id, condition);
+            state.reset();
+
             linkSuccess = true;
           }
         }
         return state;
       });
+
+      console.log(linkSuccess);
 
       return linkSuccess;
     },
