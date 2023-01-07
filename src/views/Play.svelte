@@ -124,29 +124,60 @@
     }
   }
 
+  let t = 0;
+
+  // TODO: there should also be checkCollision
+  // TODO: loop should cancel if there is a collision
+
+  function checkCollision(currentIndex: number, nextIndex: number) {}
+
   // MUTATIONS
   const m: Mutations = {
-    setBackgroundOf: (
-      { index, background }: { index: number; background: string },
-      _start?: number
-    ) => {
+    setBackgroundOf: ({ index, background }, _start?) => {
       backgrounds.set(_start || index, background);
       backgrounds = backgrounds;
+      if (ac == _start || ac == index) {
+        checkCondition();
+      }
     },
-    removeBackgroundOf: ({ index }: { index: number }) => {
+    removeBackgroundOf: ({ index }) => {
       backgrounds.delete(index);
     },
-    spawn: (
-      { index, emoji }: { index: number; emoji: string },
-      _start?: number
-    ) => {
+    trailBackground: ({ index, background, iterationNumber }, _start?) => {
+      let _t = Date.now();
+      // console.log(_t - t);
+      // console.trace();
+      // window.performance.now
+      if (t == 0) {
+        t = _t;
+      } else if (_t - t < 10) {
+        console.log(_t - t);
+
+        console.log("too fast");
+      }
+
+      t = _t;
+
+      if (_start) backgrounds.delete(_start + iterationNumber * -1);
+      backgrounds.set(_start || index, background);
+      backgrounds = backgrounds;
+      if (ac == _start || ac == index) {
+        checkCondition();
+      }
+    },
+    spawn: ({ index, emoji }, _start?) => {
       items.set(_start || index, emoji);
       items = items;
     },
-    destroy: ({ index }: { index: number }) => {
+    destroy: ({ index }) => {
       items.delete(index);
     },
-    wait: async (duration: number) => {
+    trail: ({ index, emoji, iterationNumber }, _start?) => {
+      if (_start) items.delete(_start + iterationNumber * -1);
+      items.set(_start || index, emoji);
+      items = items;
+    },
+    wait: async (duration) => {
       return new Promise((resolve) => {
         let timer = setTimeout(resolve, duration);
         timeouts.push(timer);
@@ -178,24 +209,32 @@
       this.condition = () => a() == b;
       this.event = async (_start?: number) => {
         for (let { type, ...args } of sequence) {
+          if (type.includes("trail")) {
+            // @ts-expect-error
+            args.iterationNumber = loop?.iterationNumber;
+          }
+
           if (type == "wait") {
-            await m["wait"](args.duration);
+            await m.wait(args.duration);
           } else {
+            // @ts-expect-error
             m[type](args, _start);
           }
         }
 
         if (loop) {
+          if (loop.timeGap != 0) {
+            await m["wait"](loop.timeGap);
+          }
+
           if (_start != undefined) {
-            if (_start >= loop.end) return;
-            if (loop.timeGap != 0) {
-              await m["wait"](loop.timeGap);
-            }
+            if (_start >= loop.end - 1) return;
             let sign = loop.iterationType == "increment" ? 1 : -1;
             this.event(_start + loop.iterationNumber * sign);
           } else {
             this.event(loop.start);
           }
+        } else {
         }
       };
     }
@@ -236,10 +275,6 @@
     }
   }
 
-  // Possible optimizations
-  // trigger once option (_conditions.delete(id) after event is fired);
-  // switch to canvas
-
   function getCollisionType(key1: string, key2: string): string {
     if (_collisions.has(key1)) {
       return _collisions.get(key1)?.get(key2) || "bump";
@@ -247,12 +282,8 @@
     return "bump";
   }
 
-  function moveActiveCell(operation: number, _delete?: boolean) {
-    if (_delete) {
-      items.delete(ac);
-    }
-    ac += operation;
-    adc = ac + dirs[dirKey].operation;
+  function checkCondition() {
+    // if prevAc == ac &&
     if (items.has(ac)) {
       for (let c of _conditions.values()) {
         if (c.condition()) c.event();
@@ -261,6 +292,15 @@
 
     // MAGIC UPDATE, NECESSARY FOR REACTIVITY
     items = items;
+  }
+
+  function moveActiveCell(operation: number, _delete?: boolean) {
+    if (_delete) {
+      items.delete(ac);
+    }
+    ac += operation;
+    adc = ac + dirs[dirKey].operation;
+    checkCondition();
   }
 
   function enactPushCollision(operation: number) {
@@ -474,7 +514,9 @@
           {dirs[dirKey].emoji}
         </div>
       {/if}
-      {items.get(i) || ""}
+      <span style="transform: rotate(45deg);">
+        {items.get(i) || ""}
+      </span>
     </div>
   {/each}
   {#if levelCompleted}

@@ -12,12 +12,10 @@
   function setDefaultBackground(color: string) {
     if (color == "") return;
     if (color == $map.dbg) {
-      // $dbg = DEFAULT_BG;
       map.updateDbg(DEFAULT_BG);
       return;
     }
 
-    // $dbg = color;
     map.updateDbg(color);
     map.filterBackgrounds();
   }
@@ -25,7 +23,6 @@
   function removeColor(color: string) {
     cp.remove(color);
     if (!$cp.has($map.dbg)) {
-      // $dbg = DEFAULT_BG;
       map.updateDbg(DEFAULT_BG);
     }
   }

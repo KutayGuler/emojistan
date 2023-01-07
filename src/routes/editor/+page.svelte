@@ -1,4 +1,10 @@
 <script lang="ts">
+  // DEMO FEATURES
+  // TODO: Switch to p5
+  // TODO: individual style transforms for emojis // rotation, scale, opacity
+  // TODO: inventory (events => addItem, consumeItem)
+  // TODO: Event trigger even if player does not move
+
   // VIEWS
   import Editor from "../../views/Editor.svelte";
 
@@ -56,7 +62,7 @@
     }
   });
 
-  let currentCategory = "😀";
+  let currentCategory = "💩";
   let filter = "";
 
   function handleKeydown(e: KeyboardEvent) {
@@ -243,9 +249,9 @@
     </div>
     <div
       style:background={$currentColor || $map.dbg}
-      class="absolute {test
+      class="{test
         ? '-right-24'
-        : 'right-64'} top-0 m-4 flex h-20 w-20 flex-col items-center justify-center self-end rounded-full p-10 text-4xl duration-200 ease-in-out"
+        : 'right-64'} absolute top-0 m-4 flex h-8 w-8 items-center justify-center bg-base-300 md:h-10 md:w-10 lg:h-12 lg:w-12"
       on:click={() => ($currentEmoji = "")}
     >
       {#key $currentEmoji}

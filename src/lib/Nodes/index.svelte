@@ -21,17 +21,6 @@
 
   export let node: Node;
 
-  // const {
-  //   onMouseMove,
-  //   onNodeClick,
-  //   onTouchMove,
-  //   nodesStore,
-  //   edgesStore,
-  //   nodeSelected,
-  //   nodeIdSelected,
-  //   movementStore,
-  // } = svelvetStore;
-
   $: shouldMove = moving && $movementStore;
 
   // $nodeSelected is a store boolean that lets GraphView component know if ANY node is selected

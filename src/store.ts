@@ -3,11 +3,48 @@ import { writable, get } from "svelte/store";
 import { DEFAULT_BG } from "./constants";
 
 export interface Mutations {
-  setBackgroundOf: Function;
-  removeBackgroundOf: Function;
-  spawn: Function;
-  destroy: Function;
-  wait: Function;
+  setBackgroundOf: (
+    { index, background }: { index: number; background: string },
+    _start?: number
+  ) => void;
+  removeBackgroundOf: ({ index }: { index: number }) => void;
+  trailBackground: (
+    {
+      index,
+      background,
+      iterationNumber,
+    }: {
+      index: number;
+      background: string;
+      iterationNumber: number;
+    },
+    _start?: number
+  ) => void;
+  spawn: (
+    { index, emoji }: { index: number; emoji: string },
+    _start?: number
+  ) => void;
+  destroy: ({ index }: { index: number }) => void;
+  trail: (
+    {
+      index,
+      emoji,
+      iterationNumber,
+    }: { index: number; emoji: string; iterationNumber: number },
+    _start?: number
+  ) => void;
+  wait: (duration: number) => Promise<any>;
+  // TODO: new stuff
+  freezePlayer: Function;
+  unfreezePlayer: Function;
+  transformPlayer: Function;
+  teleportPlayerTo: ({ index }: { index: number }) => void;
+  increasePlayerHealthBy: (num: number) => void;
+  decreasePlayerHealthBy: (num: number) => void;
+  increaseInteractedHealthBy: (num: number) => void;
+  decreaseInteractedHealthBy: (num: number) => void;
+  // ##### new stuff
+
   resetLevel: Function;
   completeLevel: Function;
 }
@@ -22,13 +59,13 @@ export interface SequenceItem {
 
 export class SequenceItem {
   constructor(
-    _type: keyof Mutations,
+    type: keyof Mutations,
     index: number,
     background: string,
     duration: number,
     emoji: string
   ) {
-    this.type = _type;
+    this.type = type;
     this.index = index;
     this.background = background;
     this.duration = duration;

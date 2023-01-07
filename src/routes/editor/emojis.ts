@@ -3,7 +3,7 @@ interface Emojis {
 }
 
 export const emojis: Emojis = {
-  "😀": [
+  "💩": [
     ["😀", "grinning face"],
     ["😃", "grinning face with big eyes"],
     ["😄", "grinning face with smiling eyes"],
@@ -446,7 +446,7 @@ export const emojis: Emojis = {
     ["🫂", "people hugging"],
     ["👣", "footprints"],
   ],
-  "🐸": [
+  "🐢": [
     ["🐵", "monkey face"],
     ["🐒", "monkey"],
     ["🦍", "gorilla"],
@@ -498,7 +498,6 @@ export const emojis: Emojis = {
     ["🦔", "hedgehog"],
     ["🦇", "bat"],
     ["🐻", "bear"],
-    ["🐻‍❄️", "polar bear"],
     ["🐨", "koala"],
     ["🐼", "panda"],
     ["🦥", "sloth"],

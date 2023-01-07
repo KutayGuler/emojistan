@@ -11,6 +11,7 @@
   } from "../store";
   import type { NodeComponent } from "$lib/types";
   import { nodesStore } from "$lib/stores/store";
+  import { SIZE } from "$src/constants";
 
   export let position: { x: number; y: number };
 

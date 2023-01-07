@@ -41,8 +41,10 @@
   const types: Array<keyof Mutations> = [
     "setBackgroundOf",
     "removeBackgroundOf",
+    "trailBackground",
     "spawn",
     "destroy",
+    "trail",
   ];
 
   let type = types[0];
@@ -135,6 +137,8 @@
     sequence[i].emoji = $currentEmoji;
   }
 
+  // TODO: Loop event palette gone after refreshing page
+
   onDestroy(() => {
     // let newsequence = sequence.filter((item) => {
     //   let vals = Object.values(item);
@@ -173,14 +177,14 @@
           <option value={t}>{t}</option>
         {/each}
       </select>
-      {#if q.type == "spawn"}
+      {#if q.type == "spawn" || q.type == "trail"}
         <div class="slot" on:click={() => updateSlot(i)}>{q.emoji || ""}</div>
         at<strong>i</strong>
       {:else if q.type == "destroy"}
         <p>destroy</p>
       {:else if q.type == "removeBackgroundOf"}
         <p>background</p>
-      {:else if q.type == "setBackgroundOf"}
+      {:else if q.type == "setBackgroundOf" || "trailBackground"}
         <strong>i</strong> to
         <select
           title="color"
