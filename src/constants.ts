@@ -9,7 +9,7 @@ export const MAX_ITERATION = SIZE;
 export const DURATIONS = [50, 100, 200, 500, 1000, 2000, 5000, 10000];
 
 export const DEFAULT_BG = "#cfcfcf";
-export const GRAPH_SIZE = 836;
+export const GRAPH_SIZE = 716;
 
 /* EVENT */
 export const EVENT_W = 250;

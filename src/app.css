@@ -23,15 +23,19 @@
   }
 
   .color {
-    @apply relative flex w-32 items-center justify-center rounded-xl  border-4 border-none py-8 text-2xl duration-200 ease-out;
+    @apply relative flex w-32 items-center justify-center rounded-xl border-4 border-none py-8 text-2xl duration-200 ease-out;
   }
 
   .map {
-    @apply grid w-auto grid-cols-12 grid-rows-12 gap-1 p-1 shadow-xl;
+    @apply grid w-auto grid-cols-12 grid-rows-12 gap-1;
   }
 
   .cell {
-    @apply relative flex h-8 w-8 items-center justify-center bg-base-300 md:h-10 md:w-10 lg:h-12 lg:w-12;
+    @apply relative flex h-14 w-14 items-center justify-center rounded bg-base-300;
+  }
+
+  .aside {
+    @apply z-10 h-[716px] w-80 overflow-y-auto rounded bg-base-200 p-8;
   }
 
   .cell > .direction {

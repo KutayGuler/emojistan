@@ -55,7 +55,7 @@
 
 <div class="if">
   <h4>if</h4>
-  <select bind:value={a} on:change={update}>
+  <select class="select" bind:value={a} on:change={update}>
     {#each props as _prop}
       <option value={_prop}>{_prop}</option>
     {/each}
@@ -75,7 +75,12 @@
 <div class="is">
   {#if a == "playerBackground"}
     <h4>is</h4>
-    <select bind:value={b} style:background={b} on:change={update}>
+    <select
+      class="select"
+      bind:value={b}
+      style:background={b}
+      on:change={update}
+    >
       {#each [...$palette].filter((color) => color != defaultBackground) as color}
         <option value={color} style:background={color} />
       {/each}

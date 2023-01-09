@@ -34,17 +34,20 @@ export interface Mutations {
     _start?: number
   ) => void;
   wait: (duration: number) => Promise<any>;
-  // TODO: new stuff
   freezePlayer: Function;
   unfreezePlayer: Function;
-  transformPlayer: Function;
+  changePlayerTo: ({ emoji }: { emoji: string }) => void;
+  changeInteractedTo: ({ emoji }: { emoji: string }) => void;
+  // TODO: new stuff
+  // transformPlayer: Function;
+  // rotatePlayer: ({ degree }: { degree: number}) => void;
   teleportPlayerTo: ({ index }: { index: number }) => void;
-  increasePlayerHealthBy: (num: number) => void;
-  decreasePlayerHealthBy: (num: number) => void;
-  increaseInteractedHealthBy: (num: number) => void;
-  decreaseInteractedHealthBy: (num: number) => void;
-  addItem: (item: string) => void;
-  consumeItem: (item: string) => void;
+  // increasePlayerPointsBy: (num: number) => void;
+  // decreasePlayerPointsBy: (num: number) => void;
+  // increaseInteractedPointsBy: (num: number) => void;
+  // decreaseInteractedPointsBy: (num: number) => void;
+  addItem: ({ emoji }: { emoji: string }) => void;
+  consumeItem: ({ emoji }: { emoji: string }) => void;
   // ##### new stuff
 
   resetLevel: Function;
@@ -89,16 +92,20 @@ export interface TLoopEvent {
   loop: Loop;
 }
 
-export type A = "playerBackground" | "playerInteractsWith";
+export type ConditionName =
+  | "playerBackground"
+  | "playerInteractsWith"
+  | "playerIsNearby"
+  | "playerConsumes";
 
 export interface Condition {
-  a: A;
+  a: ConditionName;
   b: string;
   eventID: number;
 }
 
 export class Condition {
-  constructor(a: A, b: string, eventID: number) {
+  constructor(a: ConditionName, b: string, eventID: number) {
     this.a = a;
     this.b = b;
     this.eventID = eventID;

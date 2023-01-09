@@ -82,10 +82,10 @@
   let dirs: {
     [key: string]: { style: string; emoji: string; operation: number };
   } = {
-    KeyW: { style: `top: -50%;`, emoji: "⬆️", operation: -SIZE },
-    KeyA: { style: `left: -50%;`, emoji: "⬅️", operation: -1 },
-    KeyS: { style: `bottom: -50%;`, emoji: "⬇️", operation: SIZE },
-    KeyD: { style: `right: -50%;`, emoji: "➡️", operation: 1 },
+    KeyW: { style: `top: -30%;`, emoji: "⬆️", operation: -SIZE },
+    KeyA: { style: `left: -30%;`, emoji: "⬅️", operation: -1 },
+    KeyS: { style: `bottom: -30%;`, emoji: "⬇️", operation: SIZE },
+    KeyD: { style: `right: -30%;`, emoji: "➡️", operation: 1 },
   };
   let dirKey = "KeyD";
 
@@ -97,6 +97,9 @@
   let _map = structuredClone($map);
   let items = new Map(_map.items);
   let backgrounds = new Map(_map.backgrounds);
+  // let inventories = new Map(_map.inventories);
+  // let healths = new Map(_map.healths);
+  // let stacks = new Map(_map.stacks);
   let _collisions = new Map<string, Map<string, string>>();
 
   let firstItemIndex = items.entries().next().value;
@@ -135,31 +138,17 @@
 
   // MUTATIONS
   const m: Mutations = {
-    setBackgroundOf: ({ index, background }, _start?) => {
+    setBackgroundOf({ index, background }, _start?) {
       backgrounds.set(_start || index, background);
       backgrounds = backgrounds;
       if (ac == _start || ac == index) {
         checkCondition();
       }
     },
-    removeBackgroundOf: ({ index }) => {
+    removeBackgroundOf({ index }) {
       backgrounds.delete(index);
     },
-    trailBackground: ({ index, background, iterationNumber }, _start?) => {
-      let _t = Date.now();
-      // console.log(_t - t);
-      // console.trace();
-      // window.performance.now
-      if (t == 0) {
-        t = _t;
-      } else if (_t - t < 10) {
-        console.log(_t - t);
-
-        console.log("too fast");
-      }
-
-      t = _t;
-
+    trailBackground({ index, background, iterationNumber }, _start?) {
       if (_start) backgrounds.delete(_start + iterationNumber * -1);
       backgrounds.set(_start || index, background);
       backgrounds = backgrounds;
@@ -167,14 +156,14 @@
         checkCondition();
       }
     },
-    spawn: ({ index, emoji }, _start?) => {
+    spawn({ index, emoji }, _start?) {
       items.set(_start || index, emoji);
       items = items;
     },
-    destroy: ({ index }) => {
+    destroy({ index }) {
       items.delete(index);
     },
-    trail: ({ index, emoji, iterationNumber }, _start?) => {
+    trail({ index, emoji, iterationNumber }, _start?) {
       if (_start) items.delete(_start + iterationNumber * -1);
       items.set(_start || index, emoji);
       items = items;
@@ -185,11 +174,26 @@
         timeouts.push(timer);
       });
     },
-    freezePlayer: () => {
-      playerFrozen = true;
+    changePlayerTo({ emoji }) {
+      items.set(ac, emoji);
     },
-    unfreezePlayer: () => {
-      playerFrozen = false;
+    teleportPlayerTo({ index }) {
+      let emoji = items.get(ac);
+      items.delete(ac);
+      // @ts-expect-error
+      items.set(index, emoji);
+      ac = index;
+      items = items;
+    },
+    freezePlayer: () => (playerFrozen = true),
+    unfreezePlayer: () => (playerFrozen = false),
+    addItem({ emoji }) {
+      // let playerInventory = inventories.get(ac)
+      // if (playerInventory?.length == 4) return;
+      // playerInventory.push(emoji);
+    },
+    consumeItem({ emoji }) {
+      // let playerInventory = inventories.get(ac)
     },
     resetLevel: () => {
       backgrounds = new Map(_map.backgrounds);
