@@ -43,6 +43,8 @@ export interface Mutations {
   decreasePlayerHealthBy: (num: number) => void;
   increaseInteractedHealthBy: (num: number) => void;
   decreaseInteractedHealthBy: (num: number) => void;
+  addItem: (item: string) => void;
+  consumeItem: (item: string) => void;
   // ##### new stuff
 
   resetLevel: Function;

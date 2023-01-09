@@ -1,6 +1,5 @@
 <script lang="ts">
   // DEMO FEATURES
-  // TODO: Switch to p5
   // TODO: individual style transforms for emojis // rotation, scale, opacity
   // TODO: inventory (events => addItem, consumeItem)
   // TODO: Event trigger even if player does not move

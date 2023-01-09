@@ -74,6 +74,8 @@
     }
   });
 
+  let playerHealth = 100;
+  let playerFrozen = false;
   let levelCompleted = false;
   let ac: number; // ACTIVE CELL
   let adc: number; // ADJACENT CELL
@@ -183,6 +185,12 @@
         timeouts.push(timer);
       });
     },
+    freezePlayer: () => {
+      playerFrozen = true;
+    },
+    unfreezePlayer: () => {
+      playerFrozen = false;
+    },
     resetLevel: () => {
       backgrounds = new Map(_map.backgrounds);
       items = new Map(_map.items);
@@ -224,7 +232,7 @@
 
         if (loop) {
           if (loop.timeGap != 0) {
-            await m["wait"](loop.timeGap);
+            await m.wait(loop.timeGap);
           }
 
           if (_start != undefined) {
@@ -385,6 +393,7 @@
   let playerInteracted = false;
 
   function handle(e: KeyboardEvent) {
+    if (playerFrozen || playerHealth <= 0) return;
     e.preventDefault();
     if (e.code.includes("Arrow")) {
       let operation = calcOperation(e.code, ac);
