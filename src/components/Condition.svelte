@@ -19,6 +19,8 @@
     "playerConsumes",
   ];
 
+  // TODO: Component overhaul
+
   export let id: number;
   let a: ConditionName;
   let b: string;

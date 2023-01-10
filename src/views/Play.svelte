@@ -67,7 +67,7 @@
   let playerFrozen = false;
   let levelCompleted = false;
   let ac: number; // ACTIVE CELL
-  let adc: number; // ADJACENT CELL
+  let ic: number; // INTERACTED CELL
   let dirs: {
     [key in Wasd]: { style: string; emoji: string; operation: number };
   } = {
@@ -93,7 +93,7 @@
 
   let firstItemIndex = items.entries().next().value;
   ac = firstItemIndex ? firstItemIndex[0] : -2;
-  adc = ac + 1;
+  ic = ac + 1;
 
   let controllables = [];
   for (let c of _map.items.values()) {
@@ -118,17 +118,13 @@
     }
   }
 
-  let t = 0;
-
-  function checkCollision(currentIndex: number, nextIndex: number) {}
-
   // MUTATIONS
   const m: Mutations = {
     setBackgroundOf({ index, background }, _start?) {
       backgrounds.set(_start || index, background);
       backgrounds = backgrounds;
       if (ac == _start || ac == index) {
-        checkCondition();
+        checkConditions();
       }
     },
     removeBackgroundOf({ index }) {
@@ -139,7 +135,7 @@
       backgrounds.set(_start || index, background);
       backgrounds = backgrounds;
       if (ac == _start || ac == index) {
-        checkCondition();
+        checkConditions();
       }
     },
     spawn({ index, emoji }, _start?) {
@@ -162,8 +158,8 @@
     },
     changeInteractedTo({ emoji }) {
       // adc might be updated by player until this event is triggered
-      if (items.has(adc)) {
-        items.set(adc, emoji);
+      if (items.has(ic)) {
+        items.set(ic, emoji);
       }
     },
     changePlayerTo({ emoji }) {
@@ -183,7 +179,7 @@
       backgrounds = new Map(_map.backgrounds);
       items = new Map(_map.items);
       ac = items.entries().next().value[0];
-      adc = ac + 1;
+      ic = ac + 1;
       dirKey = "KeyD";
       levelCompleted = false;
     },
@@ -258,7 +254,7 @@
       a = () => backgrounds.get(ac);
     } else if (condition.a == "playerInteractsWith") {
       a = () => {
-        return items.get(adc) || "";
+        return items.get(ic) || "";
       };
     }
 
@@ -276,16 +272,31 @@
     return "bump";
   }
 
-  function checkCondition() {
+  function checkConditions() {
     // if prevAc == ac &&
-    if (items.has(ac)) {
-      for (let c of _conditions.values()) {
-        if (c.condition()) c.event();
-      }
+    // if (items.has(ac)) {
+    for (let c of _conditions.values()) {
+      if (c.condition()) c.event();
     }
+    // }
 
     // MAGIC UPDATE, NECESSARY FOR REACTIVITY
     items = items;
+  }
+
+  function syncData(operation: number) {
+    let ids = [];
+    for (let id of items.keys()) {
+      ids.push(id);
+    }
+
+    ids = ids.filter((id) => !inventories.has(id));
+    console.log(ids);
+
+    // for (let id of ids) {
+    //   // TODO:
+    //   inventories.id();
+    // }
   }
 
   function moveActiveCell(operation: number, _delete?: boolean) {
@@ -293,8 +304,9 @@
       items.delete(ac);
     }
     ac += operation;
-    adc = ac + dirs[dirKey].operation;
-    checkCondition();
+    ic = ac + dirs[dirKey].operation;
+    syncData(operation);
+    checkConditions();
   }
 
   function enactPushCollision(operation: number) {
@@ -416,7 +428,7 @@
 
     if (wasd.includes(e.code)) {
       dirKey = e.code as Wasd;
-      adc = ac + dirs[dirKey].operation;
+      ic = ac + dirs[dirKey].operation;
       return;
     }
 
@@ -440,10 +452,10 @@
           if (id < smallest) smallest = id;
         }
         ac = smallest;
-        adc = ac + dirs[dirKey].operation;
+        ic = ac + dirs[dirKey].operation;
       } else {
         ac = closestID;
-        adc = ac + dirs[dirKey].operation;
+        ic = ac + dirs[dirKey].operation;
       }
       return;
     }
@@ -468,27 +480,43 @@
           if (id > biggest) biggest = id;
         }
         ac = biggest;
-        adc = ac + dirs[dirKey].operation;
+        ic = ac + dirs[dirKey].operation;
       } else {
         ac = closestID;
-        adc = ac + dirs[dirKey].operation;
+        ic = ac + dirs[dirKey].operation;
       }
       return;
     }
 
     if (e.code == "Space") {
-      if (calcOperation(translateOperation(dirKey), adc) * -1 == 0) {
+      console.log("pressed space");
+
+      if (calcOperation(translateOperation(dirKey), ic) * -1 == 0) {
         playerInteracted = false;
         return;
       }
 
+      console.log("skipped if");
+
       playerInteracted = true;
-      // add to player inventory and shit
-      if (items.has(ac)) {
-        for (let c of _conditions.values()) {
-          if (c.condition()) c.event();
+
+      let interactedItem = items.get(ic);
+      if (interactedItem && inventories.get(ac)?.length != 4) {
+        console.log("trigger");
+
+        if (!inventories.has(ac)) {
+          inventories.set(ac, []);
         }
+
+        inventories.get(ac)?.push(interactedItem);
+        items.delete(ic);
+        inventories = inventories;
+        items = items;
+        console.log(inventories);
       }
+
+      checkConditions();
+
       let timer = setTimeout(() => (playerInteracted = false), 100);
       timeouts.push(timer);
       return;
@@ -501,19 +529,13 @@
 <div class="map">
   {#each { length: SIZE * SIZE } as _, i}
     {@const active = ac == i}
-    <div
-      class="cell"
-      style:background={backgrounds.get(i) || $map.dbg}
-      class:active
-    >
-      {#if active && calcOperation(translateOperation(dirKey), i) != 0}
+    <div style:background={backgrounds.get(i) || $map.dbg} class:active>
+      {#if active}
         <div class="direction scale-75" style={dirs[dirKey].style}>
           {dirs[dirKey].emoji}
         </div>
       {/if}
-      <span style="transform: rotate(45deg);">
-        {items.get(i) || ""}
-      </span>
+      {items.get(i) || ""}
     </div>
   {/each}
   {#if levelCompleted}
@@ -524,3 +546,9 @@
     </dialog>
   {/if}
 </div>
+
+{#each [...inventories.entries()] as [key, inventory]}
+  <p class="absolute z-20">{key}: {inventory}</p>
+{:else}
+  <p class="z-20 absolute">nothing</p>
+{/each}

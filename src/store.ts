@@ -38,8 +38,6 @@ export interface Mutations {
   unfreezePlayer: Function;
   changePlayerTo: ({ emoji }: { emoji: string }) => void;
   changeInteractedTo: ({ emoji }: { emoji: string }) => void;
-  // TODO: new stuff
-  // rotatePlayer: ({ degree }: { degree: number}) => void;
   teleportPlayerTo: ({ index }: { index: number }) => void;
   increasePlayerPointsBy: ({ points }: { points: number }) => void;
   decreasePlayerPointsBy: ({ points }: { points: number }) => void;

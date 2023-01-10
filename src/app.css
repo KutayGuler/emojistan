@@ -30,15 +30,27 @@
     @apply grid w-auto grid-cols-12 grid-rows-12 gap-1;
   }
 
-  .cell {
+  /* .cell {
     @apply relative flex h-14 w-14 items-center justify-center rounded bg-base-300;
-  }
+  } */
 
   .aside {
     @apply z-10 h-[716px] w-80 overflow-y-auto rounded bg-base-200 p-8 pt-0;
   }
 
-  .cell > .direction {
+  .map > div {
+    position: relative;
+    display: flex;
+    height: 3.5rem;
+    width: 3.5rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.25rem;
+    --tw-bg-opacity: 1;
+    background-color: hsl(var(--b3, var(--b2)) / var(--tw-bg-opacity));
+  }
+
+  .direction {
     position: absolute;
     z-index: 2;
   }
@@ -59,7 +71,9 @@
 
   /* COLOR PALETTE */
 
-  --primary: #f6fafd;
+  /* TODO: Update colors */
+
+  --primary: #111827;
 
   background-color: var(--primary);
 }

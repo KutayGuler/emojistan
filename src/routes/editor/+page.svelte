@@ -1,13 +1,11 @@
 <script lang="ts">
   // DEMO FEATURES
-  // TODO: individual style transforms for emojis // rotation, scale, opacity
-  // TODO: inventory (events => addItem, consumeItem)
 
   // VIEWS
   import Editor from "../../views/Editor.svelte";
 
   import { flip } from "svelte/animate";
-  import { fly, scale, slide } from "svelte/transition";
+  import { fly, scale } from "svelte/transition";
 
   const flipParams = { duration: 300 };
 
@@ -200,31 +198,6 @@
             </div>
             <Palette />
             <h4 class="pt-8">Statics 🗿</h4>
-            <button
-              class="add btn w-full text-2xl"
-              on:click={() => statics.add($currentEmoji)}
-            >
-              [ {$currentEmoji == "" ? "____" : $currentEmoji} ]
-            </button>
-            <div class="h-1/3 overflow-y-auto">
-              <div
-                class="mt-2 grid w-full grid-flow-row grid-cols-2 justify-center gap-2 overflow-y-auto "
-              >
-                {#each [...$statics] as item (item)}
-                  <div
-                    transition:scale|local={flipParams}
-                    animate:flip={flipParams}
-                  >
-                    <button
-                      class="remove btn h-full w-full text-2xl"
-                      on:click={() => statics.remove(item)}>{item}</button
-                    >
-                  </div>
-                {/each}
-              </div>
-            </div>
-            <!-- TODO: Consumables -->
-            <h4 class="pt-8">Consumables 🧪</h4>
             <button
               class="add btn w-full text-2xl"
               on:click={() => statics.add($currentEmoji)}
