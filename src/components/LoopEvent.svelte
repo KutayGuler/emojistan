@@ -137,8 +137,6 @@
     sequence[i].emoji = $currentEmoji;
   }
 
-  // TODO: Loop event palette gone after refreshing page
-
   onDestroy(() => {
     // let newsequence = sequence.filter((item) => {
     //   let vals = Object.values(item);

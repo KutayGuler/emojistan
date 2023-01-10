@@ -35,7 +35,7 @@
   }
 
   .aside {
-    @apply z-10 h-[716px] w-80 overflow-y-auto rounded bg-base-200 p-8;
+    @apply z-10 h-[716px] w-80 overflow-y-auto rounded bg-base-200 p-8 pt-0;
   }
 
   .cell > .direction {

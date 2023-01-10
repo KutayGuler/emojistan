@@ -1,8 +1,4 @@
-interface Emojis {
-  [key: string]: Array<Array<string>>;
-}
-
-export const emojis: Emojis = {
+export const emojis = {
   "💩": [
     ["😀", "grinning face"],
     ["😃", "grinning face with big eyes"],

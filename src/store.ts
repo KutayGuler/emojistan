@@ -39,15 +39,12 @@ export interface Mutations {
   changePlayerTo: ({ emoji }: { emoji: string }) => void;
   changeInteractedTo: ({ emoji }: { emoji: string }) => void;
   // TODO: new stuff
-  // transformPlayer: Function;
   // rotatePlayer: ({ degree }: { degree: number}) => void;
   teleportPlayerTo: ({ index }: { index: number }) => void;
-  // increasePlayerPointsBy: (num: number) => void;
-  // decreasePlayerPointsBy: (num: number) => void;
-  // increaseInteractedPointsBy: (num: number) => void;
-  // decreaseInteractedPointsBy: (num: number) => void;
-  addItem: ({ emoji }: { emoji: string }) => void;
-  consumeItem: ({ emoji }: { emoji: string }) => void;
+  increasePlayerPointsBy: ({ points }: { points: number }) => void;
+  decreasePlayerPointsBy: ({ points }: { points: number }) => void;
+  increaseInteractedPointsBy: ({ points }: { points: number }) => void;
+  decreaseInteractedPointsBy: ({ points }: { points: number }) => void;
   // ##### new stuff
 
   resetLevel: Function;
@@ -228,6 +225,7 @@ function createEditableMap() {
   const { set, subscribe, update } = writable({
     items: new Map<number, string>(),
     backgrounds: new Map<number, string>(),
+    stacks: new Map<number, number>(),
     objective: "",
     dbg: DEFAULT_BG,
   });

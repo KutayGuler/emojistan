@@ -33,6 +33,11 @@
     "spawn",
     "destroy",
     "wait",
+    "freezePlayer",
+    "unfreezePlayer",
+    "teleportPlayerTo",
+    "changePlayerTo", // do
+    "changeInteractedTo", // do
     "resetLevel",
     "completeLevel",
   ];
@@ -102,7 +107,13 @@
 
 {#each sequence as s, i}
   <span>
-    <select title="event type" id="type" bind:value={s.type} on:change={update}>
+    <select
+      class="select"
+      title="event type"
+      id="type"
+      bind:value={s.type}
+      on:change={update}
+    >
       {#each types as t}
         <option value={t}>{t}</option>
       {/each}
@@ -110,19 +121,34 @@
     {#if s.type == "spawn"}
       <div class="slot" on:click={() => updateSlot(i)}>{s.emoji || ""}</div>
       at
-      <select title="index" id="index" bind:value={s.index} on:change={update}>
+      <select
+        class="select"
+        title="index"
+        id="index"
+        bind:value={s.index}
+        on:change={update}
+      >
         {#each indexes as j}
           <option value={j}>{j}</option>
         {/each}
       </select>
-    {:else if s.type == "destroy"}
-      <select title="index" id="index" bind:value={s.index} on:change={update}>
+    {:else if s.type == "changePlayerTo" || s.type == "changeInteractedTo"}
+      <div class="slot" on:click={() => updateSlot(i)}>{s.emoji || ""}</div>
+    {:else if s.type == "destroy" || s.type == "teleportPlayerTo" || s.type == "removeBackgroundOf"}
+      <select
+        class="select"
+        title="index"
+        id="index"
+        bind:value={s.index}
+        on:change={update}
+      >
         {#each indexes as j}
           <option value={j}>{j}</option>
         {/each}
       </select>
     {:else if s.type == "wait"}
       <select
+        class="select"
         title="duration"
         id="duration"
         bind:value={s.duration}
@@ -132,37 +158,42 @@
           <option value={d}>{d}</option>
         {/each}
       </select>
-    {:else if s.type == "setBackgroundOf" || s.type == "removeBackgroundOf"}
-      <select title="index" id="index" bind:value={s.index} on:change={update}>
+    {:else if s.type == "setBackgroundOf"}
+      <select
+        class="select"
+        title="index"
+        id="index"
+        bind:value={s.index}
+        on:change={update}
+      >
         {#each indexes as j}
           <option value={j}>{j}</option>
         {/each}
       </select>
-      {#if s.type == "setBackgroundOf"}
-        {#if $palette.size == 0 || ($palette.size == 1 && $palette.has(defaultBackground))}
-          <select title="color">
-            <option value="">No colors</option>
-          </select>
-        {:else}
-          to
-          <select
-            title="color"
-            bind:value={s.background}
-            style:background={s.background}
-            on:change={update}
-          >
-            {#each [...$palette].filter((color) => color != defaultBackground) as color}
-              <option value={color} style:background={color} />
-            {/each}
-          </select>
-        {/if}
+      {#if $palette.size == 0 || ($palette.size == 1 && $palette.has(defaultBackground))}
+        <select class="select" title="color">
+          <option value="">No colors</option>
+        </select>
+      {:else}
+        to
+        <select
+          class="select"
+          title="color"
+          bind:value={s.background}
+          style:background={s.background}
+          on:change={update}
+        >
+          {#each [...$palette].filter((color) => color != defaultBackground) as color}
+            <option value={color} style:background={color} />
+          {/each}
+        </select>
       {/if}
     {/if}
     <button id="remove" on:click={() => removeFromSequence(i)}>❌</button>
   </span>
 {/each}
 <label>
-  <select title="event type" bind:value={type}>
+  <select class="select" title="event type" bind:value={type}>
     {#each types as t}
       <option value={t}>{t}</option>
     {/each}

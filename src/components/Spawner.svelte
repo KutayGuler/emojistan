@@ -60,25 +60,25 @@
       name: "Event",
       onClick: () => spawn<Array<SequenceItem>>("event", [], true),
     },
-    {
-      name: "Loop Event",
-      onClick: () =>
-        spawn<TLoopEvent>(
-          "loopEvent",
-          {
-            sequence: [],
-            loop: {
-              start: 0,
-              end: SIZE,
-              iterationNumber: 1,
-              iterationType: "increment",
-              timeGap: 50,
-              reverse: false,
-            },
-          },
-          true
-        ),
-    },
+    // {
+    //   name: "Loop Event",
+    //   onClick: () =>
+    //     spawn<TLoopEvent>(
+    //       "loopEvent",
+    //       {
+    //         sequence: [],
+    //         loop: {
+    //           start: 0,
+    //           end: SIZE,
+    //           iterationNumber: 1,
+    //           iterationType: "increment",
+    //           timeGap: 50,
+    //           reverse: false,
+    //         },
+    //       },
+    //       true
+    //     ),
+    // },
   ];
 </script>
 

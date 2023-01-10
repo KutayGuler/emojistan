@@ -25,29 +25,18 @@
 
   console.log($events, $conditions);
 
-  function calcOperation(
-    _code: string,
-    index: number,
-    translate = false,
-    opposite = false
-  ) {
-    let code = _code;
-    if (translate) {
-      switch (code) {
-        case "KeyW":
-          code = opposite ? "ArrowDown" : "ArrowUp";
-          break;
-        case "KeyA":
-          code = opposite ? "ArrowRight" : "ArrowLeft";
-          break;
-        case "KeyS`":
-          code = opposite ? "ArrowUp" : "ArrowDown";
-          break;
-        case "KeyD":
-          code = opposite ? "ArrowLeft" : "ArrowRight";
-          break;
-      }
-    }
+  type Wasd = "KeyW" | "KeyA" | "KeyS" | "KeyD";
+  type ArrowKey = "ArrowLeft" | "ArrowUp" | "ArrowRight" | "ArrowDown";
+
+  // @ts-expect-error
+  function translateOperation(code: Wasd): ArrowKey {
+    if (code == "KeyW") return "ArrowUp";
+    if (code == "KeyA") return "ArrowLeft";
+    if (code == "KeyS") return "ArrowDown";
+    if (code == "KeyD") return "ArrowRight";
+  }
+
+  function calcOperation(code: ArrowKey, index: number) {
     if (code == "ArrowLeft" && index % SIZE == 0) return 0;
     if (code == "ArrowUp" && index < SIZE) return 0;
     if (code == "ArrowRight" && (index + 1) % SIZE == 0) return 0;
@@ -80,14 +69,14 @@
   let ac: number; // ACTIVE CELL
   let adc: number; // ADJACENT CELL
   let dirs: {
-    [key: string]: { style: string; emoji: string; operation: number };
+    [key in Wasd]: { style: string; emoji: string; operation: number };
   } = {
     KeyW: { style: `top: -30%;`, emoji: "⬆️", operation: -SIZE },
     KeyA: { style: `left: -30%;`, emoji: "⬅️", operation: -1 },
     KeyS: { style: `bottom: -30%;`, emoji: "⬇️", operation: SIZE },
     KeyD: { style: `right: -30%;`, emoji: "➡️", operation: 1 },
   };
-  let dirKey = "KeyD";
+  let dirKey: Wasd = "KeyD";
 
   /* ## DATA ## */
   let _events = new Map<number, Array<SequenceItem> | TLoopEvent>([
@@ -97,7 +86,7 @@
   let _map = structuredClone($map);
   let items = new Map(_map.items);
   let backgrounds = new Map(_map.backgrounds);
-  // let inventories = new Map(_map.inventories);
+  let inventories = new Map<number, Array<string>>();
   // let healths = new Map(_map.healths);
   // let stacks = new Map(_map.stacks);
   let _collisions = new Map<string, Map<string, string>>();
@@ -130,9 +119,6 @@
   }
 
   let t = 0;
-
-  // TODO: there should also be checkCollision
-  // TODO: loop should cancel if there is a collision
 
   function checkCollision(currentIndex: number, nextIndex: number) {}
 
@@ -174,6 +160,12 @@
         timeouts.push(timer);
       });
     },
+    changeInteractedTo({ emoji }) {
+      // adc might be updated by player until this event is triggered
+      if (items.has(adc)) {
+        items.set(adc, emoji);
+      }
+    },
     changePlayerTo({ emoji }) {
       items.set(ac, emoji);
     },
@@ -187,14 +179,6 @@
     },
     freezePlayer: () => (playerFrozen = true),
     unfreezePlayer: () => (playerFrozen = false),
-    addItem({ emoji }) {
-      // let playerInventory = inventories.get(ac)
-      // if (playerInventory?.length == 4) return;
-      // playerInventory.push(emoji);
-    },
-    consumeItem({ emoji }) {
-      // let playerInventory = inventories.get(ac)
-    },
     resetLevel: () => {
       backgrounds = new Map(_map.backgrounds);
       items = new Map(_map.items);
@@ -221,11 +205,10 @@
       this.condition = () => a() == b;
       this.event = async (_start?: number) => {
         for (let { type, ...args } of sequence) {
-          if (type.includes("trail")) {
-            // @ts-expect-error
-            args.iterationNumber = loop?.iterationNumber;
-          }
-
+          // if (type.includes("trail")) {
+          //   // @ts-expect-error
+          //   args.iterationNumber = loop?.iterationNumber;
+          // }
           if (type == "wait") {
             await m.wait(args.duration);
           } else {
@@ -234,20 +217,19 @@
           }
         }
 
-        if (loop) {
-          if (loop.timeGap != 0) {
-            await m.wait(loop.timeGap);
-          }
+        // if (loop) {
+        //   if (loop.timeGap != 0) {
+        //     await m.wait(loop.timeGap);
+        //   }
 
-          if (_start != undefined) {
-            if (_start >= loop.end - 1) return;
-            let sign = loop.iterationType == "increment" ? 1 : -1;
-            this.event(_start + loop.iterationNumber * sign);
-          } else {
-            this.event(loop.start);
-          }
-        } else {
-        }
+        //   if (_start != undefined) {
+        //     if (_start >= loop.end - 1) return;
+        //     let sign = loop.iterationType == "increment" ? 1 : -1;
+        //     this.event(_start + loop.iterationNumber * sign);
+        //   } else {
+        //     this.event(loop.start);
+        //   }
+        // }
       };
     }
   }
@@ -351,6 +333,7 @@
         break;
     }
 
+    // @ts-expect-error
     if (calcOperation(code, finalIndex) == 0) return;
 
     if (arr.every((str) => str == "push")) {
@@ -400,7 +383,7 @@
     if (playerFrozen || playerHealth <= 0) return;
     e.preventDefault();
     if (e.code.includes("Arrow")) {
-      let operation = calcOperation(e.code, ac);
+      let operation = calcOperation(e.code as ArrowKey, ac);
       if (!items.has(ac)) {
         moveActiveCell(operation);
         return;
@@ -432,7 +415,7 @@
     }
 
     if (wasd.includes(e.code)) {
-      dirKey = e.code;
+      dirKey = e.code as Wasd;
       adc = ac + dirs[dirKey].operation;
       return;
     }
@@ -494,12 +477,13 @@
     }
 
     if (e.code == "Space") {
-      if (calcOperation(dirKey, adc, true, true) == 0) {
+      if (calcOperation(translateOperation(dirKey), adc) * -1 == 0) {
         playerInteracted = false;
         return;
       }
 
       playerInteracted = true;
+      // add to player inventory and shit
       if (items.has(ac)) {
         for (let c of _conditions.values()) {
           if (c.condition()) c.event();
@@ -522,7 +506,7 @@
       style:background={backgrounds.get(i) || $map.dbg}
       class:active
     >
-      {#if active && calcOperation(dirKey, i, true) != 0}
+      {#if active && calcOperation(translateOperation(dirKey), i) != 0}
         <div class="direction scale-75" style={dirs[dirKey].style}>
           {dirs[dirKey].emoji}
         </div>

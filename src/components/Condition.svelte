@@ -8,15 +8,19 @@
     currentEmoji,
     Condition,
     map,
-    type A,
+    type ConditionName,
   } from "../store";
 
   let defaultBackground = $map.dbg;
 
-  const props: Array<A> = ["playerBackground", "playerInteractsWith"];
+  const props: Array<ConditionName> = [
+    "playerBackground",
+    "playerInteractsWith",
+    "playerConsumes",
+  ];
 
   export let id: number;
-  let a: A;
+  let a: ConditionName;
   let b: string;
   let eventID: number;
 
@@ -60,7 +64,7 @@
       <option value={_prop}>{_prop}</option>
     {/each}
   </select>
-  {#if a == "playerInteractsWith"}
+  {#if a == "playerInteractsWith" || a == "playerConsumes"}
     <div
       class="slot"
       on:click={() => {
