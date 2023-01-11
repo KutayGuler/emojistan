@@ -1,6 +1,6 @@
 import { page } from "$app/stores";
 import { writable, get } from "svelte/store";
-import { DEFAULT_BG } from "./constants";
+import { DEFAULT_BG, storeNames } from "./constants";
 
 export interface Mutations {
   setBackgroundOf: (
@@ -36,15 +36,11 @@ export interface Mutations {
   wait: (duration: number) => Promise<any>;
   freezePlayer: Function;
   unfreezePlayer: Function;
-  changePlayerTo: ({ emoji }: { emoji: string }) => void;
-  changeInteractedTo: ({ emoji }: { emoji: string }) => void;
+  addToInventory: Function;
   teleportPlayerTo: ({ index }: { index: number }) => void;
-  increasePlayerPointsBy: ({ points }: { points: number }) => void;
-  decreasePlayerPointsBy: ({ points }: { points: number }) => void;
-  increaseInteractedPointsBy: ({ points }: { points: number }) => void;
-  decreaseInteractedPointsBy: ({ points }: { points: number }) => void;
-  // ##### new stuff
-
+  changePlayerTo: (emoji: string) => void;
+  changeSelfTo: (emoji: string) => void;
+  changePlayerHealthBy: (points: number) => void;
   resetLevel: Function;
   completeLevel: Function;
 }
@@ -87,11 +83,7 @@ export interface TLoopEvent {
   loop: Loop;
 }
 
-export type ConditionName =
-  | "playerBackground"
-  | "playerInteractsWith"
-  | "playerIsNearby"
-  | "playerConsumes";
+export type ConditionName = "playerBackground";
 
 export interface Condition {
   a: ConditionName;
@@ -104,6 +96,30 @@ export class Condition {
     this.a = a;
     this.b = b;
     this.eventID = eventID;
+  }
+}
+
+export interface Interactable {
+  emoji: string;
+  mutation: keyof Mutations;
+  health: number;
+  points: number;
+  modifiers: Array<[string, number]>;
+}
+
+export class Interactable {
+  constructor(
+    emoji: string,
+    mutation: keyof Mutations,
+    health: number,
+    points: number,
+    modifiers: Array<[string, number]>
+  ) {
+    this.emoji = emoji;
+    this.mutation = mutation;
+    this.health = health;
+    this.points = points;
+    this.modifiers = modifiers;
   }
 }
 
@@ -195,21 +211,7 @@ function createSaves() {
       }),
     delete: (id: string) =>
       update((state) => {
-        for (let store of [
-          "pushes",
-          "merges",
-          "events",
-          "conditions",
-          "loopEvents",
-          "palette",
-          "statics",
-          "items",
-          "backgrounds",
-          "objective",
-          "nodes",
-          "edges",
-          "dbg",
-        ]) {
+        for (let store of storeNames) {
           localStorage.removeItem(id + "_" + store);
         }
         state.current = "";
@@ -364,3 +366,4 @@ export const merges = createMapStore<Array<string>>("merges");
 export const loopEvents = createMapStore<TLoopEvent>("loopEvents");
 export const events = createMapStore<Array<SequenceItem>>("events");
 export const conditions = createMapStore<Condition>("conditions");
+export const interactables = createMapStore<Interactable>("interactables");

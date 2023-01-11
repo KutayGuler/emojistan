@@ -36,8 +36,6 @@
     "freezePlayer",
     "unfreezePlayer",
     "teleportPlayerTo",
-    "changePlayerTo", // do
-    "changeInteractedTo", // do
     "resetLevel",
     "completeLevel",
   ];
@@ -132,8 +130,6 @@
           <option value={j}>{j}</option>
         {/each}
       </select>
-    {:else if s.type == "changePlayerTo" || s.type == "changeInteractedTo"}
-      <div class="slot" on:click={() => updateSlot(i)}>{s.emoji || ""}</div>
     {:else if s.type == "destroy" || s.type == "teleportPlayerTo" || s.type == "removeBackgroundOf"}
       <select
         class="select"

@@ -30,3 +30,22 @@ export const MERGER_W = 200;
 export const MERGER_H = 75;
 export const MERGER_BG = "#e9f3fb";
 export const MERGER_BORDER = "#3a96dd";
+
+// DATA
+// STORE NAMES
+export const storeNames = [
+  "pushes",
+  "merges",
+  "events",
+  "conditions",
+  "loopEvents",
+  "interactables",
+  "palette",
+  "statics",
+  "items",
+  "backgrounds",
+  "objective",
+  "nodes",
+  "edges",
+  "dbg",
+];

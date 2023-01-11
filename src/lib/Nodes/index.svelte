@@ -17,7 +17,15 @@
     movementStore,
   } from "$lib/stores/store";
   import type { Node } from "$lib/types/types";
-  import { conditions, events, loopEvents, merges, pushes } from "$src/store";
+  import {
+    conditions,
+    events,
+    interactables,
+    loopEvents,
+    merges,
+    pushes,
+  } from "$src/store";
+  import Interactable from "$components/Interactable.svelte";
 
   export let node: Node;
 
@@ -94,6 +102,9 @@
         case "merger":
           merges.remove(node.id);
           break;
+        case "interactable":
+          interactables.remove(node.id);
+          break;
         case "condition":
           conditions.remove(node.id);
           break;
@@ -137,6 +148,8 @@
   >
     {#if node.component == "spawner"}
       <Spawner position={node.position} />
+    {:else if node.component == "interactable"}
+      <Interactable id={node.id} />
     {:else if node.component == "condition"}
       <Condition id={node.id} />
     {:else if node.component == "pusher"}

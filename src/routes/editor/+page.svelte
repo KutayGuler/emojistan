@@ -22,6 +22,7 @@
     loopEvents,
     palette,
     statics,
+    interactables,
   } from "../../store";
   import { notifications } from "../notifications";
   import { emojis } from "./emojis";
@@ -42,11 +43,13 @@
         return;
       }
     }
+    // STORE NAMES
     for (let store of [
       map,
       pushes,
       merges,
       conditions,
+      interactables,
       events,
       loopEvents,
       palette,

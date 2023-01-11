@@ -17,6 +17,7 @@ import type { XYPosition, Position } from "./utils";
 export type NodeComponent =
   | "pusher"
   | "condition"
+  | "interactable"
   | "merger"
   | "event"
   | "loopEvent"
@@ -56,9 +57,10 @@ export class Node<T = any> {
       case "spawner":
         this.width = EVENT_W / 2;
         return;
+      case "interactable":
       case "pusher":
         this.width = PUSHER_W;
-        this.height = PUSHER_H;
+        this.height = PUSHER_H * 4;
         this.borderColor = MERGER_BORDER;
         this.bgColor = MERGER_BG;
         return;

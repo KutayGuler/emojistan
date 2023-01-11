@@ -8,6 +8,8 @@
     loopEvents,
     merges,
     pushes,
+    interactables,
+    Interactable,
   } from "../store";
   import type { NodeComponent } from "$lib/types";
   import { nodesStore } from "$lib/stores/store";
@@ -26,9 +28,12 @@
         break;
       case "spawner":
         break;
-      case "condition":
-        conditions.add(id, value);
+      case "interactable":
+        interactables.add(id, value);
         break;
+      // case "condition":
+      //   conditions.add(id, value);
+      //   break;
       case "event":
         events.add(id, value);
         break;
@@ -48,14 +53,22 @@
       onClick: () => spawn<Array<string>>("merger", ["", "", ""]),
     },
     {
-      name: "Condition",
+      name: "Interactable",
       onClick: () =>
-        spawn<ICondition>("condition", {
-          a: "playerBackground",
-          b: "",
-          eventID: 0,
-        }),
+        spawn<Interactable>(
+          "interactable",
+          new Interactable("", "addToInventory", 1, 1, [["nothing", 0]])
+        ),
     },
+    // {
+    //   name: "Condition",
+    //   onClick: () =>
+    //     spawn<ICondition>("condition", {
+    //       a: "playerBackground",
+    //       b: "",
+    //       eventID: 0,
+    //     }),
+    // },
     {
       name: "Event",
       onClick: () => spawn<Array<SequenceItem>>("event", [], true),

@@ -13,11 +13,7 @@
 
   let defaultBackground = $map.dbg;
 
-  const props: Array<ConditionName> = [
-    "playerBackground",
-    "playerInteractsWith",
-    "playerConsumes",
-  ];
+  const props: Array<ConditionName> = ["playerBackground"];
 
   // TODO: Component overhaul
 
@@ -66,17 +62,6 @@
       <option value={_prop}>{_prop}</option>
     {/each}
   </select>
-  {#if a == "playerInteractsWith" || a == "playerConsumes"}
-    <div
-      class="slot"
-      on:click={() => {
-        b = $currentEmoji;
-        update();
-      }}
-    >
-      {b}
-    </div>
-  {/if}
 </div>
 <div class="is">
   {#if a == "playerBackground"}
