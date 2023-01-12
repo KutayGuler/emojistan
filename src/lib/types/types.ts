@@ -57,7 +57,7 @@ export class Node<T = any> {
         return;
       case "interactable":
       case "pusher":
-        this.width = PUSHER_W;
+        this.width = PUSHER_W * 2;
         this.height = PUSHER_H * 4;
         this.borderColor = MERGER_BORDER;
         this.bgColor = MERGER_BG;

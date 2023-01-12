@@ -38,9 +38,6 @@ function createNodes() {
     },
     remove: (id: number) =>
       update((state) => {
-        // FIXME
-        // There is a bug in event components
-        // if first spawned is removed then second transforms
         state = state.filter((n) => n.id != id);
         return state;
       }),

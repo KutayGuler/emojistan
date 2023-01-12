@@ -130,7 +130,7 @@
       >
     {/if}
     <div
-      class="relative box-border flex h-3/4 flex-row items-center justify-center overflow-hidden"
+      class="relative box-border flex h-3/4 flex-row items-center justify-center"
     >
       {#if !test}
         <aside
@@ -225,8 +225,7 @@
           {/if}
         </aside>
       {/if}
-      <div class="px-8">
-        {#if view != "rules"}{/if}
+      <div class="flex flex-col justify-center px-8">
         {#if test}
           <Play />
         {:else if view == "editor"}

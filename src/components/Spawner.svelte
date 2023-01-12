@@ -52,7 +52,7 @@
       onClick: () =>
         spawn<Interactable>(
           "interactable",
-          new Interactable("", "addToInventory", "", 1, 1, [["nothing", 0]])
+          new Interactable("", "none", "", 1, 1, [["nothing", 0]])
         ),
     },
     {

@@ -38,7 +38,6 @@
   // onInteract: changePlayerTo {🤑}
   // health: 1
   // modifiers: anything: -1
-  // TODO:
 
   // example COOKING
 
@@ -122,7 +121,9 @@
     modifiers = modifiers;
   }
 
+  // TODO: change nothing to anything
   // TODO: Document component couplings step by step
+  // TODO: Integrate EventSequence into this component
 </script>
 
 <div class="form-control flex flex-col">
@@ -130,10 +131,7 @@
     {emoji}
   </div>
   <div class="form-control flex flex-row items-center justify-start gap-2">
-    <!-- <b>interaction: </b> -->
-    <label class="label">
-      <span class="label-text">action</span>
-    </label>
+    <b>action: </b>
     <select class="select" bind:value={action} on:change={update}>
       {#each actions as m}
         <option value={m}>{m}</option>
@@ -146,7 +144,7 @@
         <option value={item}>{item}</option>
       {/each}
     </select>
-  {:else}
+  {:else if action != "none"}
     <div class="slot" on:click={() => (actionEmoji = $currentEmoji)}>
       {actionEmoji}
     </div>

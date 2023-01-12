@@ -226,6 +226,7 @@
     ac += operation;
     ic = ac + dirs[dirKey].operation;
     syncData(operation);
+    items = items; // MAGIC UPDATE, NECESSARY FOR REACTIVITY
   }
 
   function enactPushCollision(operation: number) {
@@ -309,8 +310,11 @@
 
   let wasd = ["KeyW", "KeyA", "KeyS", "KeyD"];
 
-  let animating = false; // TODO:
+  let animating = false; // TODO: Prevent player from moving when there is an interaction animation
+
   function handle(e: KeyboardEvent) {
+    console.log(e);
+
     if (playerFrozen || playerHealth <= 0 || animating) return;
     e.preventDefault();
     if (e.code.includes("Arrow")) {
@@ -343,6 +347,13 @@
           items.set(ac, postOpItem);
           break;
       }
+    }
+
+    if (e.code.includes("Digit")) {
+      let digit = +e.code.replace("Digit", "");
+      currentInventoryIndex =
+        digit - 1 == currentInventoryIndex ? -1 : digit - 1;
+      return;
     }
 
     if (wasd.includes(e.code)) {
@@ -471,11 +482,31 @@
   {/if}
 </div>
 
-{#each [...inventories.entries()] as [key, inventory]}
-  {#if key == ac}
-    <p class="">{key}: {inventory}</p>
-    {#each inventory as item, i}
-      <div class={i == currentInventoryIndex ? "scale-150" : ""}>{item}</div>
-    {/each}
+<!-- TODO: Inventory styling -->
+{#key ac}
+  {#if inventories.get(ac)}
+    {@const playerInventory = inventories.get(ac)}
+    <div
+      class="absolute -bottom-8 flex w-full flex-row items-center justify-center gap-2"
+    >
+      {#each { length: 4 } as item, i}
+        {#if playerInventory[i]}
+          <div
+            class:selected={i == currentInventoryIndex}
+            class="slot bg-red-400"
+          >
+            {playerInventory[i]}
+          </div>
+        {:else}
+          <div class="slot bg-red-400">X</div>
+        {/if}
+      {/each}
+    </div>
   {/if}
-{/each}
+{/key}
+
+<style>
+  .selected {
+    scale: 150%;
+  }
+</style>

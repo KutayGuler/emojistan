@@ -2,6 +2,12 @@ import { page } from "$app/stores";
 import { writable, get } from "svelte/store";
 import { DEFAULT_BG, storeNames } from "./constants";
 
+export interface Actions {
+  addToInventory: (emoji: string) => void;
+  changePlayerTo: (emoji: string) => void;
+  changePlayerHealthBy: (points: number) => void;
+}
+
 export interface Mutations {
   setBackgroundOf: (
     { index, background }: { index: number; background: string },
