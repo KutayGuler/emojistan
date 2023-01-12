@@ -1,7 +1,6 @@
 <script lang="ts">
   // import EdgeText from "$lib/Edges/EdgeText.svelte";
   import type { EdgeProps } from "$lib/types/types";
-  import { conditions } from "$src/store";
   import { edgesStore } from "../stores/store";
 
   export let baseEdgeProps: EdgeProps;
@@ -30,13 +29,6 @@
 
 <path
   on:click={() => {
-    let i = $edgesStore.findIndex((e) => e.id == id);
-    let conditionID = $edgesStore[i].source;
-    let condition = $conditions.get(conditionID);
-    if (condition) {
-      condition.eventID = 0;
-      conditions.update(conditionID, condition);
-    }
     edgesStore.remove(id);
   }}
   d={path}

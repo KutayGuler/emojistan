@@ -5,7 +5,6 @@
     map,
     pushes,
     merges,
-    conditions,
     events,
     loopEvents,
     currentColor,
@@ -24,18 +23,8 @@
     [$currentColor, $currentEmoji] = ["", ""];
   });
 
-  console.log($events, $conditions);
-
   type Wasd = "KeyW" | "KeyA" | "KeyS" | "KeyD";
   type ArrowKey = "ArrowLeft" | "ArrowUp" | "ArrowRight" | "ArrowDown";
-
-  // @ts-expect-error
-  function translateOperation(code: Wasd): ArrowKey {
-    if (code == "KeyW") return "ArrowUp";
-    if (code == "KeyA") return "ArrowLeft";
-    if (code == "KeyS") return "ArrowDown";
-    if (code == "KeyD") return "ArrowRight";
-  }
 
   function calcOperation(code: ArrowKey, index: number) {
     if (code == "ArrowLeft" && index % SIZE == 0) return 0;
@@ -80,16 +69,11 @@
   let dirKey: Wasd = "KeyD";
 
   /* ## DATA ## */
-  let _events = new Map<number, Array<SequenceItem> | TLoopEvent>([
-    ...$events,
-    ...$loopEvents,
-  ]);
   let _map = structuredClone($map);
   let items = new Map(_map.items);
   let backgrounds = new Map(_map.backgrounds);
   // let _interactables = structuredClone($interactables);
   let inventories = new Map<number, Array<string>>();
-  let currentlyEquipped = "";
   let currentInventoryIndex = 0;
   // let healths = new Map(_map.healths);
   // let stacks = new Map(_map.stacks);
@@ -152,9 +136,6 @@
     setBackgroundOf({ index, background }, _start?) {
       backgrounds.set(_start || index, background);
       backgrounds = backgrounds;
-      if (ac == _start || ac == index) {
-        checkConditions();
-      }
     },
     removeBackgroundOf({ index }) {
       backgrounds.delete(index);
@@ -163,9 +144,6 @@
       if (_start) backgrounds.delete(_start + iterationNumber * -1);
       backgrounds.set(_start || index, background);
       backgrounds = backgrounds;
-      if (ac == _start || ac == index) {
-        checkConditions();
-      }
     },
     spawn({ index, emoji }, _start?) {
       items.set(_start || index, emoji);
@@ -227,102 +205,11 @@
     completeLevel: () => (levelCompleted = true),
   };
 
-  interface _Condition {
-    condition: Function;
-    event: Function;
-  }
-
-  class _Condition {
-    constructor(
-      a: Function,
-      b: string,
-      sequence: Array<SequenceItem>,
-      loop?: Loop
-    ) {
-      this.condition = () => a() == b;
-      this.event = async (_start?: number) => {
-        for (let { type, ...args } of sequence) {
-          // if (type.includes("trail")) {
-          //   // @ts-expect-error
-          //   args.iterationNumber = loop?.iterationNumber;
-          // }
-          if (type == "wait") {
-            await m.wait(args.duration);
-          } else {
-            // @ts-expect-error
-            m[type](args, _start);
-          }
-        }
-
-        // if (loop) {
-        //   if (loop.timeGap != 0) {
-        //     await m.wait(loop.timeGap);
-        //   }
-
-        //   if (_start != undefined) {
-        //     if (_start >= loop.end - 1) return;
-        //     let sign = loop.iterationType == "increment" ? 1 : -1;
-        //     this.event(_start + loop.iterationNumber * sign);
-        //   } else {
-        //     this.event(loop.start);
-        //   }
-        // }
-      };
-    }
-  }
-
-  let _conditions = new Map<number, _Condition>();
-
-  for (let [id, condition] of $conditions.entries()) {
-    let event = _events.get(condition.eventID);
-    if (event == undefined) continue;
-    if ($palette.size == 0) {
-      if (Array.isArray(event)) {
-        event = event.filter((s) => s.type != "setBackgroundOf");
-        if (event.length == 0) continue;
-      } else {
-        event.sequence = event.sequence.filter(
-          (s) => s.type != "setBackgroundOf"
-        );
-        if (event.sequence.length == 0) continue;
-      }
-    }
-
-    let a = () => {};
-    let b = condition.b;
-
-    if (condition.a == "playerBackground") {
-      a = () => backgrounds.get(ac);
-    } else if (condition.a == "playerInteractsWith") {
-      a = () => {
-        return items.get(ic) || "";
-      };
-    }
-
-    if (Array.isArray(event)) {
-      _conditions.set(id, new _Condition(a, b, event));
-    } else {
-      _conditions.set(id, new _Condition(a, b, event.sequence, event.loop));
-    }
-  }
-
   function getCollisionType(key1: string, key2: string): string {
     if (_collisions.has(key1)) {
       return _collisions.get(key1)?.get(key2) || "bump";
     }
     return "bump";
-  }
-
-  function checkConditions() {
-    // if prevAc == ac &&
-    // if (items.has(ac)) {
-    for (let c of _conditions.values()) {
-      if (c.condition()) c.event();
-    }
-    // }
-
-    // MAGIC UPDATE, NECESSARY FOR REACTIVITY
-    items = items;
   }
 
   function syncData(operation: number) {
@@ -339,7 +226,6 @@
     ac += operation;
     ic = ac + dirs[dirKey].operation;
     syncData(operation);
-    checkConditions();
   }
 
   function enactPushCollision(operation: number) {
@@ -556,17 +442,6 @@
 
       items = items;
       return;
-
-      // if (calcOperation(translateOperation(dirKey), ic) * -1 == 0) {
-      //   playerInteracted = false;
-      //   return;
-      // }
-
-      // checkConditions();
-
-      // let timer = setTimeout(() => (playerInteracted = false), 100);
-      // timeouts.push(timer);
-      // return;
     }
   }
 </script>

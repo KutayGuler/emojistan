@@ -1,5 +1,4 @@
 <script lang="ts">
-  import Condition from "$components/Condition.svelte";
   import LoopEvent from "$components/LoopEvent.svelte";
   import Spawner from "$components/Spawner.svelte";
   import Event from "$components/Event.svelte";
@@ -18,7 +17,6 @@
   } from "$lib/stores/store";
   import type { Node } from "$lib/types/types";
   import {
-    conditions,
     events,
     interactables,
     loopEvents,
@@ -105,17 +103,7 @@
         case "interactable":
           interactables.remove(node.id);
           break;
-        case "condition":
-          conditions.remove(node.id);
-          break;
         case "event":
-          for (let [id, condition] of $conditions) {
-            if (condition.eventID == node.id) {
-              condition.eventID = 0;
-              conditions.update(id, condition);
-            }
-          }
-
           events.remove(node.id);
           break;
         case "loopEvent":
@@ -150,8 +138,6 @@
       <Spawner position={node.position} />
     {:else if node.component == "interactable"}
       <Interactable id={node.id} />
-    {:else if node.component == "condition"}
-      <Condition id={node.id} />
     {:else if node.component == "pusher"}
       <Pusher id={node.id} />
     {:else if node.component == "merger"}

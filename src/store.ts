@@ -82,22 +82,6 @@ export interface TLoopEvent {
   loop: Loop;
 }
 
-export type ConditionName = "playerBackground";
-
-export interface Condition {
-  a: ConditionName;
-  b: string;
-  eventID: number;
-}
-
-export class Condition {
-  constructor(a: ConditionName, b: string, eventID: number) {
-    this.a = a;
-    this.b = b;
-    this.eventID = eventID;
-  }
-}
-
 export interface Interactable {
   emoji: string;
   action: keyof Mutations | "none";
@@ -367,5 +351,4 @@ export const pushes = createMapStore<Array<string>>("pushes");
 export const merges = createMapStore<Array<string>>("merges");
 export const loopEvents = createMapStore<TLoopEvent>("loopEvents");
 export const events = createMapStore<Array<SequenceItem>>("events");
-export const conditions = createMapStore<Condition>("conditions");
 export const interactables = createMapStore<Interactable>("interactables");

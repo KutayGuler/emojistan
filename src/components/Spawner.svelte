@@ -1,9 +1,7 @@
 <script lang="ts">
   import {
     type SequenceItem,
-    type Condition as ICondition,
     type TLoopEvent,
-    conditions,
     events,
     loopEvents,
     merges,
@@ -31,9 +29,6 @@
       case "interactable":
         interactables.add(id, value);
         break;
-      // case "condition":
-      //   conditions.add(id, value);
-      //   break;
       case "event":
         events.add(id, value);
         break;
@@ -60,15 +55,6 @@
           new Interactable("", "addToInventory", "", 1, 1, [["nothing", 0]])
         ),
     },
-    // {
-    //   name: "Condition",
-    //   onClick: () =>
-    //     spawn<ICondition>("condition", {
-    //       a: "playerBackground",
-    //       b: "",
-    //       eventID: 0,
-    //     }),
-    // },
     {
       name: "Event",
       onClick: () => spawn<Array<SequenceItem>>("event", [], true),

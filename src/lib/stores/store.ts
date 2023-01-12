@@ -1,7 +1,6 @@
 import { writable, derived, get } from "svelte/store";
 import { Node, type Edge, type NodeComponent } from "../types/types";
 import { GRAPH_SIZE } from "../../constants";
-import { conditions } from "$src/store";
 
 function createNodes() {
   const arr: Array<Node> = [];
@@ -321,8 +320,6 @@ function createLinker() {
 
           // UNLINKABLE COMPONENT RELATIONS
           if (
-            // condition <-> condition
-            (currentComp == "condition" && prevComp == currentComp) ||
             // event || loopEvent <-> event || loopEvent
             ((currentComp == "event" || currentComp == "loopEvent") &&
               (prevComp == "event" || prevComp == "loopEvent"))
@@ -336,25 +333,6 @@ function createLinker() {
             return state;
           }
 
-          let conditionID = state.prev.id;
-          let eventID = state.current.id;
-
-          if (prevComp == "condition") {
-            conditionID = state.prev.id;
-            eventID = state.current.id;
-          }
-
-          let condition = get(conditions).get(conditionID);
-          if (!condition) return state;
-          if (condition.eventID) {
-            notifications.warning("Conditions can't trigger multiple events");
-            state.reset();
-            return state;
-          }
-
-          condition.eventID = eventID;
-          conditions.update(conditionID, condition);
-          edgesStore.add(conditionID, eventID);
           state.reset();
           linkSuccess = true;
         }

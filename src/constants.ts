@@ -15,7 +15,6 @@ export const GRAPH_SIZE = 716;
 export const EVENT_W = 250;
 export const EVENT_H = 100;
 export const EVENT_BG = "#ffc83d";
-export const CONDITION_BG = "#644292";
 
 /* LOOP EVENT */
 export const LOOPEVENT_H = 200;
@@ -37,7 +36,6 @@ export const storeNames = [
   "pushes",
   "merges",
   "events",
-  "conditions",
   "loopEvents",
   "interactables",
   "palette",

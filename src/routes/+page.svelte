@@ -11,7 +11,6 @@
     merges,
     loopEvents,
     events,
-    conditions,
   } from "../store";
   import { navigating } from "$app/stores";
   import {  nodesStore, edgesStore  } from "$lib/stores/store";
@@ -61,7 +60,6 @@
           merges: Object.fromEntries($merges),
           loopEvents: Object.fromEntries($loopEvents),
           events: Object.fromEntries($events),
-          conditions: Object.fromEntries($conditions),
         },
         owner: owner.data.user.id,
       },

@@ -1,5 +1,4 @@
 import {
-  CONDITION_BG,
   EVENT_BG,
   EVENT_H,
   EVENT_W,
@@ -16,7 +15,6 @@ import type { XYPosition, Position } from "./utils";
 
 export type NodeComponent =
   | "pusher"
-  | "condition"
   | "interactable"
   | "merger"
   | "event"
@@ -70,12 +68,7 @@ export class Node<T = any> {
         this.borderColor = MERGER_BORDER;
         this.bgColor = MERGER_BG;
         return;
-      case "condition":
-        this.width = EVENT_W;
-        this.height = EVENT_H;
-        this.borderColor = "#cfc0e3";
-        this.bgColor = CONDITION_BG;
-        break;
+
       case "loopEvent":
         this.width = LOOPEVENT_W;
         this.height = LOOPEVENT_H;
