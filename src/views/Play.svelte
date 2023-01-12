@@ -16,6 +16,7 @@
     type SequenceItem,
     type TLoopEvent,
     type Loop,
+    interactables,
   } from "../store";
   import { SIZE } from "$src/constants";
 
@@ -86,7 +87,10 @@
   let _map = structuredClone($map);
   let items = new Map(_map.items);
   let backgrounds = new Map(_map.backgrounds);
+  // let _interactables = structuredClone($interactables);
   let inventories = new Map<number, Array<string>>();
+  let currentlyEquipped = "";
+  let currentInventoryIndex = 0;
   // let healths = new Map(_map.healths);
   // let stacks = new Map(_map.stacks);
   let _collisions = new Map<string, Map<string, string>>();
@@ -95,10 +99,35 @@
   ac = firstItemIndex ? firstItemIndex[0] : -2;
   ic = ac + 1;
 
-  let controllables = [];
-  for (let c of _map.items.values()) {
-    if (!$statics.has(c)) controllables.push(c);
+  interface _Interactable {
+    action: keyof Mutations | "none";
+    actionEmoji: string;
+    points: number;
+    health: number;
+    modifiers: Array<[string, number]>;
   }
+
+  interface _Interactables {
+    [key: string]: _Interactable;
+  }
+
+  let _interactables: _Interactables = {};
+
+  console.log($interactables);
+
+  for (let [id, interactable] of $interactables) {
+    const { emoji, ...args } = interactable;
+    // @ts-expect-error
+    _interactables[emoji] = {};
+    Object.assign(_interactables[emoji], args);
+  }
+
+  console.log(_interactables);
+
+  // let controllables = [];
+  // for (let c of _map.items.values()) {
+  //   if (!$statics.has(c)) controllables.push(c);
+  // }
 
   for (let [id, _slots] of [...$merges, ...$pushes]) {
     let [key1, key2, val] = _slots;
@@ -156,14 +185,26 @@
         timeouts.push(timer);
       });
     },
-    changeInteractedTo({ emoji }) {
-      // adc might be updated by player until this event is triggered
-      if (items.has(ic)) {
-        items.set(ic, emoji);
-      }
-    },
-    changePlayerTo({ emoji }) {
+    changePlayerTo(emoji) {
       items.set(ac, emoji);
+    },
+    addToInventory(interactedItem) {
+      // let interactedItem = items.get(ic);
+      if (interactedItem && inventories.get(ac)?.length != 4) {
+        console.log("trigger");
+
+        if (inventories.get(ac) == undefined) {
+          inventories.set(ac, [interactedItem]);
+        } else {
+          console.log(inventories.get(ac));
+          inventories.set(ac, [...inventories.get(ac), interactedItem]);
+        }
+
+        items.delete(ic);
+        inventories = inventories;
+        items = items;
+        console.log(inventories);
+      }
     },
     teleportPlayerTo({ index }) {
       let emoji = items.get(ac);
@@ -285,18 +326,10 @@
   }
 
   function syncData(operation: number) {
-    let ids = [];
-    for (let id of items.keys()) {
-      ids.push(id);
-    }
-
-    ids = ids.filter((id) => !inventories.has(id));
-    console.log(ids);
-
-    // for (let id of ids) {
-    //   // TODO:
-    //   inventories.id();
-    // }
+    if (inventories.size == 0) return;
+    inventories.set(ac, inventories.get(ac - operation));
+    inventories.delete(ac - operation);
+    inventories = inventories;
   }
 
   function moveActiveCell(operation: number, _delete?: boolean) {
@@ -389,10 +422,10 @@
   }
 
   let wasd = ["KeyW", "KeyA", "KeyS", "KeyD"];
-  let playerInteracted = false;
 
+  let animating = false; // TODO:
   function handle(e: KeyboardEvent) {
-    if (playerFrozen || playerHealth <= 0) return;
+    if (playerFrozen || playerHealth <= 0 || animating) return;
     e.preventDefault();
     if (e.code.includes("Arrow")) {
       let operation = calcOperation(e.code as ArrowKey, ac);
@@ -489,37 +522,51 @@
     }
 
     if (e.code == "Space") {
-      console.log("pressed space");
-
-      if (calcOperation(translateOperation(dirKey), ic) * -1 == 0) {
-        playerInteracted = false;
-        return;
-      }
-
-      console.log("skipped if");
-
-      playerInteracted = true;
-
       let interactedItem = items.get(ic);
-      if (interactedItem && inventories.get(ac)?.length != 4) {
-        console.log("trigger");
+      if (interactedItem == undefined) return;
+      let interactable: _Interactable = _interactables[interactedItem];
+      if (interactable == undefined) return;
+      let { action, actionEmoji, points, modifiers } = interactable;
 
-        if (!inventories.has(ac)) {
-          inventories.set(ac, []);
+      if (action != "none") {
+        if (action == "changePlayerHealthBy") {
+          m.changePlayerHealthBy(points);
+        } else {
+          m[action](actionEmoji);
         }
-
-        inventories.get(ac)?.push(interactedItem);
-        items.delete(ic);
-        inventories = inventories;
-        items = items;
-        console.log(inventories);
       }
 
-      checkConditions();
+      let ce = "nothing";
 
-      let timer = setTimeout(() => (playerInteracted = false), 100);
-      timeouts.push(timer);
+      if (inventories.get(ac) != undefined) {
+        ce = inventories.get(ac)[currentInventoryIndex];
+      }
+
+      let modifier = modifiers.find((m) => m[0] == ce);
+      if (modifier == undefined) {
+        modifier = modifiers[0];
+      }
+
+      _interactables[interactedItem].health += modifier[1];
+
+      if (_interactables[interactedItem].health <= 0) {
+        items.delete(ic);
+      }
+      console.log(_interactables);
+
+      items = items;
       return;
+
+      // if (calcOperation(translateOperation(dirKey), ic) * -1 == 0) {
+      //   playerInteracted = false;
+      //   return;
+      // }
+
+      // checkConditions();
+
+      // let timer = setTimeout(() => (playerInteracted = false), 100);
+      // timeouts.push(timer);
+      // return;
     }
   }
 </script>
@@ -532,7 +579,9 @@
     <div style:background={backgrounds.get(i) || $map.dbg} class:active>
       {#if active}
         <div class="direction scale-75" style={dirs[dirKey].style}>
-          {dirs[dirKey].emoji}
+          {(inventories.get(ac) &&
+            inventories.get(ac)[currentInventoryIndex]) ||
+            dirs[dirKey].emoji}
         </div>
       {/if}
       {items.get(i) || ""}
@@ -548,7 +597,10 @@
 </div>
 
 {#each [...inventories.entries()] as [key, inventory]}
-  <p class="absolute z-20">{key}: {inventory}</p>
-{:else}
-  <p class="z-20 absolute">nothing</p>
+  {#if key == ac}
+    <p class="">{key}: {inventory}</p>
+    {#each inventory as item, i}
+      <div class={i == currentInventoryIndex ? "scale-150" : ""}>{item}</div>
+    {/each}
+  {/if}
 {/each}

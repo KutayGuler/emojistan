@@ -73,7 +73,8 @@
 
   /* TODO: Update colors */
 
-  --primary: #111827;
+  /* --primary: #111827; */
+  --primary: white;
 
   background-color: var(--primary);
 }

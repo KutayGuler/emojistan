@@ -36,10 +36,9 @@ export interface Mutations {
   wait: (duration: number) => Promise<any>;
   freezePlayer: Function;
   unfreezePlayer: Function;
-  addToInventory: Function;
+  addToInventory: (emoji: string) => void;
   teleportPlayerTo: ({ index }: { index: number }) => void;
   changePlayerTo: (emoji: string) => void;
-  changeSelfTo: (emoji: string) => void;
   changePlayerHealthBy: (points: number) => void;
   resetLevel: Function;
   completeLevel: Function;
@@ -101,22 +100,25 @@ export class Condition {
 
 export interface Interactable {
   emoji: string;
-  mutation: keyof Mutations;
-  health: number;
+  action: keyof Mutations | "none";
+  actionEmoji: string;
   points: number;
+  health: number;
   modifiers: Array<[string, number]>;
 }
 
 export class Interactable {
   constructor(
     emoji: string,
-    mutation: keyof Mutations,
+    action: keyof Mutations | "none",
+    actionEmoji: string,
     health: number,
     points: number,
     modifiers: Array<[string, number]>
   ) {
     this.emoji = emoji;
-    this.mutation = mutation;
+    this.action = action;
+    this.actionEmoji = actionEmoji;
     this.health = health;
     this.points = points;
     this.modifiers = modifiers;
