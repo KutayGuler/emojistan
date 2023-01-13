@@ -62,7 +62,7 @@
 
 @font-face {
   font-family: regular;
-  src: url("/fonts/MouseMemoirs.ttf") format("truetype");
+  src: url("/fonts/Inter-Medium.ttf") format("truetype");
 }
 
 :root {

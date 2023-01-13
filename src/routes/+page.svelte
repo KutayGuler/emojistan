@@ -9,9 +9,10 @@
     palette,
     pushes,
     merges,
+    interactables,
   } from "../store";
   import { navigating } from "$app/stores";
-  import {  nodesStore, edgesStore  } from "$lib/stores/store";
+  import { nodesStore, edgesStore } from "$lib/stores/store";
 
   onMount(() => {
     if ($saves.current == "") saves.useStorage();
@@ -42,6 +43,8 @@
     if (!owner.data.user) {
       return;
     }
+
+    // CF #8
     const { data, error } = await supabase.from("islands").insert([
       {
         data: {
@@ -56,6 +59,7 @@
           edges: Array.from($edgesStore),
           pushes: Object.fromEntries($pushes),
           merges: Object.fromEntries($merges),
+          interactables: Object.fromEntries($interactables),
         },
         owner: owner.data.user.id,
       },

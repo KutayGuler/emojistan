@@ -1,17 +1,15 @@
 <script lang="ts">
-  import { onDestroy, onMount } from "svelte";
+  import { onMount } from "svelte";
   import { zoom, zoomTransform } from "d3-zoom";
   import { select, selectAll } from "d3-selection";
   import {
     nodesStore,
-    edgesStore,
     nodeSelected,
     backgroundStore,
     movementStore,
     widthStore,
     heightStore,
     d3Scale,
-    linker,
   } from "$lib/stores/store";
 
   import SimpleBezierEdge from "$lib/Edges/SimpleBezierEdge.svelte";
@@ -91,13 +89,6 @@
       .style("transform-origin", "0 0");
   }
 
-  let z1 = "z-index: 1;";
-  let svgStyle = "";
-
-  function changeZ() {
-    svgStyle = svgStyle == z1 ? "" : z1;
-  }
-
   function handleKeydown(e: KeyboardEvent) {
     if (e.code == "Tab") {
       e.preventDefault();
@@ -110,17 +101,9 @@
   }
 
   function clickedOnEdges() {}
-
-  onDestroy(() => {
-    linker.reset();
-  });
 </script>
 
 <svelte:window on:keydown={handleKeydown} />
-
-<button style="z-index: 2" class="absolute top-2" on:click={changeZ}
-  >{svgStyle == z1 ? "EDIT NODES" : "EDIT EDGES"}</button
->
 
 <!-- This is the container that holds GraphView and we have disabled right click functionality to prevent a sticking behavior -->
 <div class={`Nodes`} bind:this={nodesDiv} on:click={clickedOnNodes}>
@@ -134,7 +117,6 @@
 
 <!-- rendering dots on the background depending on the zoom level -->
 <svg
-  style={svgStyle}
   class={`Edges`}
   viewBox="0 0 {$widthStore} {$heightStore}"
   on:click={clickedOnEdges}

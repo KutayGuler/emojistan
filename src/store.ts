@@ -8,31 +8,11 @@ export interface Mutations {
     _start?: number
   ) => void;
   removeBackgroundOf: ({ index }: { index: number }) => void;
-  trailBackground: (
-    {
-      index,
-      background,
-      iterationNumber,
-    }: {
-      index: number;
-      background: string;
-      iterationNumber: number;
-    },
-    _start?: number
-  ) => void;
   spawn: (
     { index, emoji }: { index: number; emoji: string },
     _start?: number
   ) => void;
   destroy: ({ index }: { index: number }) => void;
-  trail: (
-    {
-      index,
-      emoji,
-      iterationNumber,
-    }: { index: number; emoji: string; iterationNumber: number },
-    _start?: number
-  ) => void;
   wait: (duration: number) => Promise<any>;
   freezePlayer: Function;
   unfreezePlayer: Function;

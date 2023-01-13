@@ -8,9 +8,9 @@
     currentColor,
     currentEmoji,
     statics,
+    interactables,
     type Mutations,
     type SequenceItem,
-    interactables,
   } from "../store";
   import { SIZE } from "$src/constants";
 
@@ -180,6 +180,9 @@
       levelCompleted = false;
     },
     completeLevel: () => (levelCompleted = true),
+    changePlayerHealthBy: ({ points }) => {
+      // TODO:
+    },
   };
 
   function getCollisionType(key1: string, key2: string): string {
@@ -424,14 +427,12 @@
       items = items;
 
       // TODO: Player shouldn't be able to pick up item if the inventory is full
-      // TODO: Isolated component editing
       // TODO: Change font family to Inter
 
       for (let { type, ...args } of sequence) {
         if (type == "wait") {
           await m.wait(args.duration);
         } else {
-          // @ts-expect-error
           m[type](args);
         }
       }
