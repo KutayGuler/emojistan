@@ -1,9 +1,5 @@
 <script lang="ts">
   import {
-    type SequenceItem,
-    type TLoopEvent,
-    events,
-    loopEvents,
     merges,
     pushes,
     interactables,
@@ -11,7 +7,6 @@
   } from "../store";
   import type { NodeComponent } from "$lib/types";
   import { nodesStore } from "$lib/stores/store";
-  import { SIZE } from "$src/constants";
 
   export let position: { x: number; y: number };
 
@@ -29,12 +24,6 @@
         break;
       case "interactable":
         interactables.add(id, value);
-        break;
-      case "event":
-        events.add(id, value);
-        break;
-      case "loopEvent":
-        loopEvents.add(id, value);
         break;
     }
   }
@@ -57,29 +46,6 @@
           new Interactable("", [], 1, 1, [["anything", 0]], { to: "", at: 1 })
         ),
     },
-    {
-      name: "Event",
-      onClick: () => spawn<Array<SequenceItem>>("event", [], true),
-    },
-    // {
-    //   name: "Loop Event",
-    //   onClick: () =>
-    //     spawn<TLoopEvent>(
-    //       "loopEvent",
-    //       {
-    //         sequence: [],
-    //         loop: {
-    //           start: 0,
-    //           end: SIZE,
-    //           iterationNumber: 1,
-    //           iterationType: "increment",
-    //           timeGap: 50,
-    //           reverse: false,
-    //         },
-    //       },
-    //       true
-    //     ),
-    // },
   ];
 </script>
 

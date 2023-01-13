@@ -1,15 +1,15 @@
 <script lang="ts">
-  // DEMO FEATURES
-
-  // VIEWS
-  import Editor from "../../views/Editor.svelte";
-
+  // SVELTEKIT
+  import { onMount } from "svelte";
   import { flip } from "svelte/animate";
+  import { goto } from "$app/navigation";
   import { fly, scale } from "svelte/transition";
 
-  const flipParams = { duration: 300 };
+  // VIEWS
+  import Play from "../../views/Play.svelte";
+  import Editor from "../../views/Editor.svelte";
 
-  // DATA
+  // STORES
   import {
     currentEmoji,
     currentColor,
@@ -17,21 +17,18 @@
     map,
     pushes,
     merges,
-    events,
-    loopEvents,
     palette,
     statics,
     interactables,
   } from "../../store";
-  import { notifications } from "../notifications";
+
   import { emojis } from "./emojis";
-  import { onMount } from "svelte";
-  import { goto } from "$app/navigation";
-  import Palette from "$components/Palette.svelte";
-  import Svelvet from "$lib";
-  import Play from "../../views/Play.svelte";
-  import { edgesStore, nodesStore } from "$lib/stores/store";
   import { SIZE } from "$src/constants";
+  import { notifications } from "../notifications";
+  import { edgesStore, nodesStore } from "$lib/stores/store";
+
+  import Svelvet from "$lib";
+  import Palette from "$components/Palette.svelte";
 
   onMount(() => {
     if ($saves.current == "") {
@@ -49,8 +46,6 @@
       pushes,
       merges,
       interactables,
-      events,
-      loopEvents,
       palette,
       statics,
       nodesStore,
@@ -60,6 +55,7 @@
     }
   });
 
+  const flipParams = { duration: 300 };
   let currentCategory = "💩";
   let filter = "";
 
@@ -281,6 +277,7 @@
         </aside>
       {/if}
     </div>
+    <!-- TODO: Add currentEmoji viewer -->
     <!-- <div
       style:background={$currentColor || $map.dbg}
       class="{test

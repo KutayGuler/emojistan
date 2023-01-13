@@ -1,10 +1,4 @@
 <script lang="ts">
-  import LoopEvent from "$components/LoopEvent.svelte";
-  import Spawner from "$components/Spawner.svelte";
-  import Event from "$components/Event.svelte";
-  import Pusher from "$components/Pusher.svelte";
-  import Merger from "$components/Merger.svelte";
-
   import {
     onMouseMove,
     onNodeClick,
@@ -15,15 +9,13 @@
     nodeIdSelected,
     movementStore,
   } from "$lib/stores/store";
+  import { interactables, merges, pushes } from "$src/store";
+
   import type { Node } from "$lib/types/types";
-  import {
-    events,
-    interactables,
-    loopEvents,
-    merges,
-    pushes,
-  } from "$src/store";
   import Interactable from "$components/Interactable.svelte";
+  import Spawner from "$components/Spawner.svelte";
+  import Pusher from "$components/Pusher.svelte";
+  import Merger from "$components/Merger.svelte";
 
   export let node: Node;
 
@@ -105,12 +97,6 @@
         case "interactable":
           interactables.remove(node.id);
           break;
-        case "event":
-          events.remove(node.id);
-          break;
-        case "loopEvent":
-          loopEvents.remove(node.id);
-          break;
         default:
           break;
       }
@@ -140,10 +126,6 @@
     <Pusher id={node.id} />
   {:else if node.component == "merger"}
     <Merger id={node.id} />
-    <!-- {:else if node.component == "event"}
-      <Event id={node.id} />
-    {:else if node.component == "loopEvent"}
-      <LoopEvent id={node.id} /> -->
   {/if}
 </div>
 

@@ -5,16 +5,11 @@
     map,
     pushes,
     merges,
-    events,
-    loopEvents,
     currentColor,
     currentEmoji,
     statics,
-    palette,
     type Mutations,
     type SequenceItem,
-    type TLoopEvent,
-    type Loop,
     interactables,
   } from "../store";
   import { SIZE } from "$src/constants";

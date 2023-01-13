@@ -1,7 +1,6 @@
 <script lang="ts">
   import {
     DURATIONS,
-    EVENT_H,
     INTERACTABLE_H,
     MIN_DURATION,
     MIN_INDEX,

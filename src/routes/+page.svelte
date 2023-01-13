@@ -9,8 +9,6 @@
     palette,
     pushes,
     merges,
-    loopEvents,
-    events,
   } from "../store";
   import { navigating } from "$app/stores";
   import {  nodesStore, edgesStore  } from "$lib/stores/store";
@@ -58,8 +56,6 @@
           edges: Array.from($edgesStore),
           pushes: Object.fromEntries($pushes),
           merges: Object.fromEntries($merges),
-          loopEvents: Object.fromEntries($loopEvents),
-          events: Object.fromEntries($events),
         },
         owner: owner.data.user.id,
       },

@@ -71,20 +71,6 @@ export class SequenceItem {
   }
 }
 
-export interface Loop {
-  start: number;
-  end: number;
-  iterationNumber: number;
-  iterationType: "increment" | "decrement";
-  timeGap: number;
-  reverse: boolean;
-}
-
-export interface TLoopEvent {
-  sequence: Array<SequenceItem>;
-  loop: Loop;
-}
-
 interface Evolve {
   to: string;
   at: number;
@@ -357,6 +343,4 @@ export const palette = createSetStore("palette");
 // MAPS
 export const pushes = createMapStore<Array<string>>("pushes");
 export const merges = createMapStore<Array<string>>("merges");
-export const loopEvents = createMapStore<TLoopEvent>("loopEvents");
-export const events = createMapStore<Array<SequenceItem>>("events");
 export const interactables = createMapStore<Interactable>("interactables");

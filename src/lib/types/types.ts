@@ -1,27 +1,17 @@
 import {
-  EVENT_BG,
-  EVENT_H,
-  EVENT_W,
   INTERACTABLE_H,
   INTERACTABLE_W,
-  LOOPEVENT_H,
-  LOOPEVENT_W,
   MERGER_BG,
   MERGER_BORDER,
   MERGER_H,
   MERGER_W,
   PUSHER_H,
   PUSHER_W,
+  SPAWNER_W,
 } from "$src/constants";
 import type { XYPosition, Position } from "./utils";
 
-export type NodeComponent =
-  | "pusher"
-  | "interactable"
-  | "merger"
-  | "event"
-  | "loopEvent"
-  | "spawner";
+export type NodeComponent = "pusher" | "interactable" | "merger" | "spawner";
 
 export interface Node<T = any> {
   id: number;
@@ -43,13 +33,11 @@ export interface Node<T = any> {
 }
 
 // #CF 1
-
 export class Node<T = any> {
   constructor(
     id: number,
     component: NodeComponent,
-    position: { x: number; y: number },
-    receiver: boolean
+    position: { x: number; y: number }
   ) {
     this.id = id;
     this.component = component;
@@ -57,7 +45,7 @@ export class Node<T = any> {
 
     switch (component) {
       case "spawner":
-        this.width = EVENT_W / 2;
+        this.width = SPAWNER_W / 2;
         return;
       case "interactable":
         this.width = INTERACTABLE_W;
@@ -77,25 +65,6 @@ export class Node<T = any> {
         this.borderColor = MERGER_BORDER;
         this.bgColor = MERGER_BG;
         return;
-
-      case "loopEvent":
-        this.width = LOOPEVENT_W;
-        this.height = LOOPEVENT_H;
-        this.borderColor = "#f6fafd";
-        this.bgColor = EVENT_BG;
-        break;
-      case "event":
-        this.width = EVENT_W;
-        this.height = EVENT_H;
-        this.borderColor = "#f6fafd";
-        this.bgColor = EVENT_BG;
-        break;
-    }
-
-    if (receiver) {
-      this.targetPosition = "left";
-    } else {
-      this.sourcePosition = "right";
     }
   }
 }
