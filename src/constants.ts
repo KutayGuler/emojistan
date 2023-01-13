@@ -32,7 +32,7 @@ export const MERGER_BORDER = "#3a96dd";
 
 /* INTERACTABLE */
 export const INTERACTABLE_W = 400;
-export const INTERACTABLE_H = 300;
+export const INTERACTABLE_H = 400;
 
 // DATA
 // STORE NAMES

@@ -40,7 +40,7 @@
   });
 </script>
 
-<div class="slots">
+<div class="flex flex-row items-center justify-center">
   <div class="slot" on:click={() => !disabled && updateSlot(0)}>
     {slots[0]}
   </div>

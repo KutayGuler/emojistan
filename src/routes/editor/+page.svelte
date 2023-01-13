@@ -106,7 +106,7 @@
   }
 
   let test = false;
-  let view: "editor" | "rules" = "editor";
+  let view: "editor" | "rules" = "rules";
 </script>
 
 <svelte:head>

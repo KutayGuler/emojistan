@@ -56,6 +56,7 @@
   id="svelvet-{node.id}"
 >
   <nav
+    style:display={node.component == "spawner" ? "none" : "block"}
     style:background-color={node.borderColor}
     on:touchmove={(e) => {
       if (shouldMove) {
@@ -89,7 +90,7 @@
   <!-- CF #3 -->
   <button
     style="border-color: {node.borderColor}"
-    class="absolute -top-1 right-1 cursor-pointer rounded border-2 bg-white"
+    class="absolute -top-1 right-1 z-10 cursor-pointer rounded border-2 bg-white"
     on:click={() => {
       nodesStore.remove(node.id);
       edgesStore.filter(node.id);
@@ -131,43 +132,36 @@
     </svg>
   </button>
   <!-- CF #2 -->
-  <div
-    class="flex flex-col {node.component == 'spawner'
-      ? 'w-full bg-white'
-      : 'pt-2'}"
-  >
-    {#if node.component == "spawner"}
-      <Spawner position={node.position} />
-    {:else if node.component == "interactable"}
-      <Interactable id={node.id} />
-    {:else if node.component == "pusher"}
-      <Pusher id={node.id} />
-    {:else if node.component == "merger"}
-      <Merger id={node.id} />
-    {:else if node.component == "event"}
+  {#if node.component == "spawner"}
+    <Spawner position={node.position} />
+  {:else if node.component == "interactable"}
+    <Interactable id={node.id} />
+  {:else if node.component == "pusher"}
+    <Pusher id={node.id} />
+  {:else if node.component == "merger"}
+    <Merger id={node.id} />
+    <!-- {:else if node.component == "event"}
       <Event id={node.id} />
     {:else if node.component == "loopEvent"}
-      <LoopEvent id={node.id} />
-    {/if}
-  </div>
+      <LoopEvent id={node.id} /> -->
+  {/if}
 </div>
 
 <style>
   nav {
-    position: absolute;
-    top: 0px;
     width: 100%;
     cursor: move;
     height: 10px;
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
+    margin-bottom: 0.5rem;
   }
 
   .Node {
     position: absolute;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: start;
     align-items: center;
     user-select: none;
     overscroll-behavior: auto;

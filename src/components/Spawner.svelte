@@ -83,7 +83,7 @@
   ];
 </script>
 
-<ul class="w-full">
+<ul class="w-full bg-white opacity-90">
   {#each menuItems as { name, onClick }}
     <li
       class="add box-border h-8 w-full pl-2 text-start hover:bg-base-200"

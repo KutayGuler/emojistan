@@ -72,11 +72,8 @@
   let _map = structuredClone($map);
   let items = new Map(_map.items);
   let backgrounds = new Map(_map.backgrounds);
-  // let _interactables = structuredClone($interactables);
   let inventories = new Map<number, Array<string>>();
   let currentInventoryIndex = 0;
-  // let healths = new Map(_map.healths);
-  // let stacks = new Map(_map.stacks);
   let _collisions = new Map<string, Map<string, string>>();
 
   let firstItemIndex = items.entries().next().value;
@@ -433,7 +430,6 @@
 
       // TODO: Player shouldn't be able to pick up item if the inventory is full
       // TODO: Isolated component editing
-      // TODO: Check out Histoire
       // TODO: Change font family to Inter
 
       for (let { type, ...args } of sequence) {
