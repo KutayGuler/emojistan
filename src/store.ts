@@ -2,12 +2,6 @@ import { page } from "$app/stores";
 import { writable, get } from "svelte/store";
 import { DEFAULT_BG, storeNames } from "./constants";
 
-export interface Actions {
-  addToInventory: (emoji: string) => void;
-  changePlayerTo: (emoji: string) => void;
-  changePlayerHealthBy: (points: number) => void;
-}
-
 export interface Mutations {
   setBackgroundOf: (
     { index, background }: { index: number; background: string },
@@ -42,10 +36,10 @@ export interface Mutations {
   wait: (duration: number) => Promise<any>;
   freezePlayer: Function;
   unfreezePlayer: Function;
-  addToInventory: (emoji: string) => void;
+  addToInventory: ({ emoji }: { emoji: string }) => void;
   teleportPlayerTo: ({ index }: { index: number }) => void;
-  changePlayerTo: (emoji: string) => void;
-  changePlayerHealthBy: (points: number) => void;
+  changePlayerTo: ({ emoji }: { emoji: string }) => void;
+  changePlayerHealthBy: ({ points }: { points: number }) => void;
   resetLevel: Function;
   completeLevel: Function;
 }
@@ -55,6 +49,7 @@ export interface SequenceItem {
   index: number;
   background: string;
   duration: number;
+  points: number;
   emoji: string;
 }
 
@@ -64,12 +59,14 @@ export class SequenceItem {
     index: number,
     background: string,
     duration: number,
+    points: number,
     emoji: string
   ) {
     this.type = type;
     this.index = index;
     this.background = background;
     this.duration = duration;
+    this.points = points;
     this.emoji = emoji;
   }
 }
@@ -88,30 +85,35 @@ export interface TLoopEvent {
   loop: Loop;
 }
 
+interface Evolve {
+  to: string;
+  at: number;
+}
+
 export interface Interactable {
   emoji: string;
-  action: keyof Mutations | "none";
-  actionEmoji: string;
+  sequence: Array<SequenceItem>;
   points: number;
   health: number;
   modifiers: Array<[string, number]>;
+  evolve: Evolve;
 }
 
 export class Interactable {
   constructor(
     emoji: string,
-    action: keyof Mutations | "none",
-    actionEmoji: string,
+    sequence: Array<SequenceItem>,
     health: number,
     points: number,
-    modifiers: Array<[string, number]>
+    modifiers: Array<[string, number]>,
+    evolve: Evolve
   ) {
     this.emoji = emoji;
-    this.action = action;
-    this.actionEmoji = actionEmoji;
+    this.sequence = sequence;
     this.health = health;
     this.points = points;
     this.modifiers = modifiers;
+    this.evolve = evolve;
   }
 }
 

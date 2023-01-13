@@ -84,8 +84,8 @@
   ic = ac + 1;
 
   interface _Interactable {
-    action: keyof Mutations | "none";
-    actionEmoji: string;
+    executing: boolean;
+    sequence: Array<SequenceItem>;
     points: number;
     health: number;
     modifiers: Array<[string, number]>;
@@ -108,11 +108,6 @@
 
   console.log(_interactables);
 
-  // let controllables = [];
-  // for (let c of _map.items.values()) {
-  //   if (!$statics.has(c)) controllables.push(c);
-  // }
-
   for (let [id, _slots] of [...$merges, ...$pushes]) {
     let [key1, key2, val] = _slots;
     if (!_collisions.has(key1)) {
@@ -133,29 +128,19 @@
 
   // MUTATIONS
   const m: Mutations = {
-    setBackgroundOf({ index, background }, _start?) {
-      backgrounds.set(_start || index, background);
+    setBackgroundOf({ index, background }) {
+      backgrounds.set(index, background);
       backgrounds = backgrounds;
     },
     removeBackgroundOf({ index }) {
       backgrounds.delete(index);
     },
-    trailBackground({ index, background, iterationNumber }, _start?) {
-      if (_start) backgrounds.delete(_start + iterationNumber * -1);
-      backgrounds.set(_start || index, background);
-      backgrounds = backgrounds;
-    },
-    spawn({ index, emoji }, _start?) {
-      items.set(_start || index, emoji);
+    spawn({ index, emoji }) {
+      items.set(index, emoji);
       items = items;
     },
     destroy({ index }) {
       items.delete(index);
-    },
-    trail({ index, emoji, iterationNumber }, _start?) {
-      if (_start) items.delete(_start + iterationNumber * -1);
-      items.set(_start || index, emoji);
-      items = items;
     },
     wait: async (duration) => {
       return new Promise((resolve) => {
@@ -163,25 +148,25 @@
         timeouts.push(timer);
       });
     },
-    changePlayerTo(emoji) {
+    changePlayerTo({ emoji }) {
       items.set(ac, emoji);
     },
-    addToInventory(interactedItem) {
-      // let interactedItem = items.get(ic);
-      if (interactedItem && inventories.get(ac)?.length != 4) {
+    addToInventory({ emoji }) {
+      console.log(inventories.get(ac)?.length);
+
+      if (emoji && inventories.get(ac)?.length != 4) {
         console.log("trigger");
 
         if (inventories.get(ac) == undefined) {
-          inventories.set(ac, [interactedItem]);
+          inventories.set(ac, [emoji]);
         } else {
           console.log(inventories.get(ac));
-          inventories.set(ac, [...inventories.get(ac), interactedItem]);
+          inventories.set(ac, [...inventories.get(ac), emoji]);
         }
 
         items.delete(ic);
         inventories = inventories;
         items = items;
-        console.log(inventories);
       }
     },
     teleportPlayerTo({ index }) {
@@ -312,9 +297,7 @@
 
   let animating = false; // TODO: Prevent player from moving when there is an interaction animation
 
-  function handle(e: KeyboardEvent) {
-    console.log(e);
-
+  async function handle(e: KeyboardEvent) {
     if (playerFrozen || playerHealth <= 0 || animating) return;
     e.preventDefault();
     if (e.code.includes("Arrow")) {
@@ -422,18 +405,13 @@
       let interactedItem = items.get(ic);
       if (interactedItem == undefined) return;
       let interactable: _Interactable = _interactables[interactedItem];
-      if (interactable == undefined) return;
-      let { action, actionEmoji, points, modifiers } = interactable;
+      if (interactable == undefined || interactable.executing) return;
+      let { sequence, points, modifiers } = interactable;
 
-      if (action != "none") {
-        if (action == "changePlayerHealthBy") {
-          m.changePlayerHealthBy(points);
-        } else {
-          m[action](actionEmoji);
-        }
-      }
+      _interactables[interactedItem].executing = true;
+      console.log("executing");
 
-      let ce = "nothing";
+      let ce = "anything";
 
       if (inventories.get(ac) != undefined) {
         ce = inventories.get(ac)[currentInventoryIndex];
@@ -452,7 +430,27 @@
       console.log(_interactables);
 
       items = items;
+
+      // TODO: Player shouldn't be able to pick up item if the inventory is full
+      // TODO: Isolated component editing
+      // TODO: Check out Histoire
+      // TODO: Change font family to Inter
+
+      for (let { type, ...args } of sequence) {
+        if (type == "wait") {
+          await m.wait(args.duration);
+        } else {
+          // @ts-expect-error
+          m[type](args);
+        }
+      }
+
+      _interactables[interactedItem].executing = false;
       return;
+    }
+
+    if (e.code == "KeyG") {
+      // TODO: Drop item
     }
   }
 </script>
@@ -482,24 +480,19 @@
   {/if}
 </div>
 
-<!-- TODO: Inventory styling -->
 {#key ac}
   {#if inventories.get(ac)}
     {@const playerInventory = inventories.get(ac)}
     <div
-      class="absolute -bottom-8 flex w-full flex-row items-center justify-center gap-2"
+      class="absolute -bottom-16 flex w-full flex-row items-center justify-center gap-2"
     >
-      {#each { length: 4 } as item, i}
-        {#if playerInventory[i]}
-          <div
-            class:selected={i == currentInventoryIndex}
-            class="slot bg-red-400"
-          >
-            {playerInventory[i]}
-          </div>
-        {:else}
-          <div class="slot bg-red-400">X</div>
-        {/if}
+      {#each { length: 4 } as _, i}
+        <div
+          class:selected={i == currentInventoryIndex}
+          class="flex h-12 w-12 flex-col items-center justify-center bg-base-300 p-2"
+        >
+          {playerInventory[i] || ""}
+        </div>
       {/each}
     </div>
   {/if}
@@ -507,6 +500,7 @@
 
 <style>
   .selected {
-    scale: 150%;
+    scale: 120%;
+    border: 2px solid black;
   }
 </style>

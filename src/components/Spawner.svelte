@@ -15,6 +15,7 @@
 
   export let position: { x: number; y: number };
 
+  // CF #4
   function spawn<T>(component: NodeComponent, value: T, receiver = false) {
     const id = nodesStore.spawn(component, position, receiver);
 
@@ -38,6 +39,7 @@
     }
   }
 
+  // CF #5
   let menuItems = [
     {
       name: "Pusher",
@@ -52,7 +54,7 @@
       onClick: () =>
         spawn<Interactable>(
           "interactable",
-          new Interactable("", "none", "", 1, 1, [["nothing", 0]])
+          new Interactable("", [], 1, 1, [["anything", 0]], { to: "", at: 1 })
         ),
     },
     {

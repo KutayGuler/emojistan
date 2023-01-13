@@ -86,6 +86,7 @@
       moved = false;
     }}
   />
+  <!-- CF #3 -->
   <button
     style="border-color: {node.borderColor}"
     class="absolute -top-1 right-1 cursor-pointer rounded border-2 bg-white"
@@ -129,6 +130,7 @@
       />
     </svg>
   </button>
+  <!-- CF #2 -->
   <div
     class="flex flex-col {node.component == 'spawner'
       ? 'w-full bg-white'

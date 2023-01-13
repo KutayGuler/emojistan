@@ -2,6 +2,8 @@ import {
   EVENT_BG,
   EVENT_H,
   EVENT_W,
+  INTERACTABLE_H,
+  INTERACTABLE_W,
   LOOPEVENT_H,
   LOOPEVENT_W,
   MERGER_BG,
@@ -40,6 +42,8 @@ export interface Node<T = any> {
   targetPosition?: "left" | "right" | "top" | "bottom";
 }
 
+// #CF 1
+
 export class Node<T = any> {
   constructor(
     id: number,
@@ -56,9 +60,14 @@ export class Node<T = any> {
         this.width = EVENT_W / 2;
         return;
       case "interactable":
+        this.width = INTERACTABLE_W;
+        this.height = INTERACTABLE_H;
+        this.borderColor = MERGER_BORDER;
+        this.bgColor = MERGER_BG;
+        return;
       case "pusher":
-        this.width = PUSHER_W * 2;
-        this.height = PUSHER_H * 4;
+        this.width = PUSHER_W;
+        this.height = PUSHER_H;
         this.borderColor = MERGER_BORDER;
         this.bgColor = MERGER_BG;
         return;

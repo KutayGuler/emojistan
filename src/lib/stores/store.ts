@@ -50,7 +50,7 @@ function createNodes() {
       update((state) => {
         for (let node of state) {
           if (node.id == id) {
-            node.height = defaultHeight + sequenceLength * 32;
+            node.height = defaultHeight + sequenceLength * 64;
             break;
           }
         }
@@ -318,8 +318,8 @@ function createLinker() {
           // UNLINKABLE COMPONENT RELATIONS
           if (
             // event || loopEvent <-> event || loopEvent
-            ((currentComp == "event" || currentComp == "loopEvent") &&
-              (prevComp == "event" || prevComp == "loopEvent"))
+            (currentComp == "event" || currentComp == "loopEvent") &&
+            (prevComp == "event" || prevComp == "loopEvent")
           ) {
             notifications.warning(
               `Cannot link ${currentComp}s with ${prevComp}s.`

@@ -30,8 +30,13 @@ export const MERGER_H = 75;
 export const MERGER_BG = "#e9f3fb";
 export const MERGER_BORDER = "#3a96dd";
 
+/* INTERACTABLE */
+export const INTERACTABLE_W = 400;
+export const INTERACTABLE_H = 300;
+
 // DATA
 // STORE NAMES
+// CF #6
 export const storeNames = [
   "pushes",
   "merges",

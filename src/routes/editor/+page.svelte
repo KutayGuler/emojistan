@@ -43,6 +43,7 @@
       }
     }
     // STORE NAMES
+    // CF #7
     for (let store of [
       map,
       pushes,
