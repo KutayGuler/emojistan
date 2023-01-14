@@ -439,7 +439,6 @@ export const emojis = {
     ["🗣️", "speaking head"],
     ["👤", "bust in silhouette"],
     ["👥", "busts in silhouette"],
-    ["🫂", "people hugging"],
     ["👣", "footprints"],
   ],
   "🐢": [

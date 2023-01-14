@@ -188,19 +188,23 @@
                     {/each}
                   </select>
                 </div>
+                <div class="flex flex-row" />
                 <button class="btn bg-accent" on:click={clearMap}>CLEAR</button>
-                <button class="btn" on:click={fillMap}
-                  >Fill With [{$currentEmoji || "____"}]</button
+                <button
+                  disabled={$currentEmoji == ""}
+                  class="btn"
+                  on:click={fillMap}>Fill With {$currentEmoji}</button
                 >
               </div>
             </div>
             <Palette />
             <h4 class="pt-8">Statics 🗿</h4>
             <button
+              disabled={$currentEmoji == ""}
               class="add btn w-full text-2xl"
               on:click={() => statics.add($currentEmoji)}
             >
-              [ {$currentEmoji == "" ? "____" : $currentEmoji} ]
+              [ {$currentEmoji == "" ? "___" : $currentEmoji} ]
             </button>
             <div class="h-1/3 overflow-y-auto">
               <div
@@ -240,6 +244,15 @@
           <div
             class="sticky top-0 flex w-full flex-col items-center justify-center gap-4 bg-base-300 p-4 pt-8"
           >
+            <div
+              style:background={$currentColor || $map.dbg}
+              class="flex h-16 w-16 items-center justify-center rounded-full border-2 border-black bg-base-300 text-3xl"
+              on:click={() => ($currentEmoji = "")}
+            >
+              {#key $currentEmoji}
+                <span in:scale>{$currentEmoji}</span>
+              {/key}
+            </div>
             <input
               class="input input-bordered w-full"
               type="text"
@@ -250,8 +263,8 @@
               {#each Object.keys(emojis) as category}
                 <div
                   class="{category == currentCategory
-                    ? 'scale-150 opacity-100'
-                    : 'hover:scale-150 hover:opacity-100'} cursor-pointer opacity-50 duration-75 ease-out"
+                    ? 'scale-125 opacity-100'
+                    : 'hover:scale-125 hover:opacity-100'} cursor-pointer opacity-50 duration-75 ease-out"
                   on:click={() => (currentCategory = category)}
                 >
                   {category}
@@ -277,18 +290,6 @@
         </aside>
       {/if}
     </div>
-    <!-- TODO: Add currentEmoji viewer -->
-    <!-- <div
-      style:background={$currentColor || $map.dbg}
-      class="{test
-        ? '-right-24'
-        : 'right-64'} absolute top-0 m-4 flex h-8 w-8 items-center justify-center bg-base-300 md:h-10 md:w-10 lg:h-12 lg:w-12"
-      on:click={() => ($currentEmoji = "")}
-    >
-      {#key $currentEmoji}
-        <span in:scale>{$currentEmoji}</span>
-      {/key}
-    </div> -->
   </main>
 {/if}
 

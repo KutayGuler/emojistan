@@ -16,10 +16,10 @@ export interface Mutations {
   wait: (duration: number) => Promise<any>;
   freezePlayer: Function;
   unfreezePlayer: Function;
-  addToInventory: ({ emoji }: { emoji: string }) => void;
+  addToPlayerInventory: ({ emoji }: { emoji: string }) => void;
   teleportPlayerTo: ({ index }: { index: number }) => void;
   changePlayerTo: ({ emoji }: { emoji: string }) => void;
-  changePlayerHealthBy: ({ points }: { points: number }) => void;
+  addToPlayerHP: ({ points }: { points: number }) => void;
   resetLevel: Function;
   completeLevel: Function;
 }
@@ -60,7 +60,7 @@ export interface Interactable {
   emoji: string;
   sequence: Array<SequenceItem>;
   points: number;
-  health: number;
+  hp: number;
   modifiers: Array<[string, number]>;
   evolve: Evolve;
 }
@@ -69,14 +69,14 @@ export class Interactable {
   constructor(
     emoji: string,
     sequence: Array<SequenceItem>,
-    health: number,
+    hp: number,
     points: number,
     modifiers: Array<[string, number]>,
     evolve: Evolve
   ) {
     this.emoji = emoji;
     this.sequence = sequence;
-    this.health = health;
+    this.hp = hp;
     this.points = points;
     this.modifiers = modifiers;
     this.evolve = evolve;

@@ -13,6 +13,7 @@
     type SequenceItem,
   } from "../store";
   import { SIZE } from "$src/constants";
+  import Merger from "$components/Merger.svelte";
 
   onMount(() => {
     [$currentColor, $currentEmoji] = ["", ""];
@@ -48,10 +49,10 @@
     }
   });
 
-  let playerHealth = 100;
+  let playerHP = 100;
   let playerFrozen = false;
   let levelCompleted = false;
-  let ac: number; // ACTIVE CELL
+  let ac = -2; // ACTIVE CELL
   let ic: number; // INTERACTED CELL
   let dirs: {
     [key in Wasd]: { style: string; emoji: string; operation: number };
@@ -68,18 +69,23 @@
   let items = new Map(_map.items);
   let backgrounds = new Map(_map.backgrounds);
   let inventories = new Map<number, Array<string>>();
+  let _collisions = new Map<string, Map<string, string>>(); // TODO: change this to object
   let currentInventoryIndex = 0;
-  let _collisions = new Map<string, Map<string, string>>();
+  let hps = new Map<number, number>();
 
-  let firstItemIndex = items.entries().next().value;
-  ac = firstItemIndex ? firstItemIndex[0] : -2;
-  ic = ac + 1;
+  for (let [index, emoji] of items) {
+    if (!$statics.has(emoji)) {
+      ac = index;
+      ic = ac + 1;
+      break;
+    }
+  }
 
   interface _Interactable {
     executing: boolean;
     sequence: Array<SequenceItem>;
     points: number;
-    health: number;
+    hp: number;
     modifiers: Array<[string, number]>;
   }
 
@@ -88,8 +94,6 @@
   }
 
   let _interactables: _Interactables = {};
-
-  console.log($interactables);
 
   for (let [id, interactable] of $interactables) {
     const { emoji, ...args } = interactable;
@@ -143,7 +147,7 @@
     changePlayerTo({ emoji }) {
       items.set(ac, emoji);
     },
-    addToInventory({ emoji }) {
+    addToPlayerInventory({ emoji }) {
       console.log(inventories.get(ac)?.length);
 
       if (emoji && inventories.get(ac)?.length != 4) {
@@ -180,7 +184,7 @@
       levelCompleted = false;
     },
     completeLevel: () => (levelCompleted = true),
-    changePlayerHealthBy: ({ points }) => {
+    addToPlayerHP: ({ points }) => {
       // TODO:
     },
   };
@@ -293,14 +297,12 @@
   let animating = false; // TODO: Prevent player from moving when there is an interaction animation
 
   async function handle(e: KeyboardEvent) {
-    if (playerFrozen || playerHealth <= 0 || animating) return;
     e.preventDefault();
+    if (!items.has(ac) || playerFrozen || playerHP <= 0 || animating) {
+      return;
+    }
     if (e.code.includes("Arrow")) {
       let operation = calcOperation(e.code as ArrowKey, ac);
-      if (!items.has(ac)) {
-        moveActiveCell(operation);
-        return;
-      }
       let item = items.get(ac);
       if (item == undefined || $statics.has(item)) return;
       let postOpItem = items.get(ac + operation);
@@ -417,17 +419,16 @@
         modifier = modifiers[0];
       }
 
-      _interactables[interactedItem].health += modifier[1];
+      _interactables[interactedItem].hp += modifier[1];
 
-      if (_interactables[interactedItem].health <= 0) {
+      if (_interactables[interactedItem].hp <= 0) {
         items.delete(ic);
       }
       console.log(_interactables);
 
       items = items;
 
-      // TODO: Player shouldn't be able to pick up item if the inventory is full
-      // TODO: Change font family to Inter
+      // TODO: Player shouldn't be able to pick up the item if the inventory is full
 
       for (let { type, ...args } of sequence) {
         if (type == "wait") {
@@ -442,7 +443,13 @@
     }
 
     if (e.code == "KeyG") {
-      // TODO: Drop item
+      let playerInventory = inventories.get(ac);
+      if (!playerInventory || items.has(ic)) return;
+      items.set(ic, playerInventory[currentInventoryIndex]);
+      playerInventory.splice(currentInventoryIndex, 1);
+      items = items;
+      inventories = inventories;
+      return;
     }
   }
 </script>
@@ -486,6 +493,13 @@
           {playerInventory[i] || ""}
         </div>
       {/each}
+    </div>
+  {/if}
+  {#if hps.get(ac)}
+    <div
+      class="absolute -bottom-16 flex w-full flex-row items-center justify-center gap-2"
+    >
+      <!-- TODO: Progress bar -->
     </div>
   {/if}
 {/key}

@@ -12,7 +12,7 @@ export const DEFAULT_BG = "#cfcfcf";
 export const GRAPH_SIZE = 716;
 
 /* SPAWNER */
-export const SPAWNER_W = 75;
+export const SPAWNER_W = 200;
 
 /* PUSHER */
 export const PUSHER_W = 150;

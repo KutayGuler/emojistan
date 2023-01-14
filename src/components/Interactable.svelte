@@ -12,45 +12,45 @@
 
   // example TREE
   // emoji: 🌲
-  // onInteract: addToInventory {🍁} x {5}
-  // health: 100
+  // onInteract: addToPlayerInventory {🍁} x {5}
+  // hp: 100
   // modifiers: anything: 0 | {🪓}: {-1}
 
   // example DOOR
   // emoji: 🚪
   // onInteract: ""
-  // health: 1
+  // hp: 1
   // modifiers: anything: 0 | {🔑}: {-1}
 
   // example KEY
   // emoji: 🔑
-  // onInteract: addToInventory {🔑} x {1}
-  // health: 1
+  // onInteract: addToPlayerInventory {🔑} x {1}
+  // hp: 1
   // modifiers: anything: -1
 
   // example FOOD
   // emoji: 🍔
-  // onInteract: changePlayerHealth {20}
-  // health: 1
+  // onInteract: addToPlayerHP {20}
+  // hp: 1
   // modifiers: anything: -1
 
   // example POISONOUS MUSHROOM
   // emoji: 🍄
-  // onInteract: changePlayerHealth {-20}
-  // health: 1
+  // onInteract: addToPlayerHP {-20}
+  // hp: 1
   // modifiers: anything: -1
 
   // example MONEY
   // emoji: 💵
   // onInteract: changePlayerTo {🤑}
-  // health: 1
+  // hp: 1
   // modifiers: anything: -1
 
   // example GROWING A PLANT
   // emoji: 🌱
-  // health: 1
+  // hp: 1
   // modifiers: anything: 0 | 💧: +1
-  // evolveAt: health 10 to {🌳}
+  // evolveAt: hp 10 to {🌳}
 
   import { edgesStore, nodesStore } from "$src/lib/stores/store";
   import { onDestroy, onMount } from "svelte";
@@ -67,19 +67,14 @@
 
   let defaultBackground = $map.dbg;
 
-  // emoji: the thing itself
-  // onInteract: addToInventory {emoji} | changePlayerHealth {points} | changePlayerTo {emoji} | changeSelfTo {emoji}
-  // health: 1
-  // modifiers: anything: 0 | {emoji}: {points}
-
   const types: Array<keyof Mutations> = [
     "setBackgroundOf",
     "removeBackgroundOf",
     "spawn",
     "destroy",
     "wait",
-    "addToInventory",
-    "changePlayerHealthBy",
+    "addToPlayerInventory",
+    "addToPlayerHP",
     "changePlayerTo",
     // "freezePlayer",
     // "unfreezePlayer",
@@ -89,17 +84,18 @@
   ];
 
   let indexes: Array<number> = [];
-  let healths: Array<number> = [];
+  let hps: Array<number> = [];
   let modifierPoints: Array<number> = [];
 
   for (let i = 0; i < 100; i++) {
-    healths[i] = i + 1;
+    hps[i] = i + 1;
     modifierPoints[i] = i + 1;
   }
 
   for (let i = 0; i >= -100; i--) {
     modifierPoints.unshift(i);
   }
+  console.log(modifierPoints);
 
   for (let i = 0; i < SIZE * SIZE; i++) {
     indexes[i] = i;
@@ -109,7 +105,7 @@
   export let id: number;
   let emoji = "";
   let sequence: Array<SequenceItem> = [];
-  let health = 1;
+  let hp = 1;
   let points = 0;
   let modifiers: Array<[string, number]> = [];
   let evolve = {
@@ -127,16 +123,14 @@
 
   onMount(() => {
     let obj = $interactables.get(id);
-    console.log(obj);
     if (!obj) return;
-    ({ emoji, sequence, health, points, modifiers, evolve } = obj);
-    console.log(evolve);
+    ({ emoji, sequence, hp, points, modifiers, evolve } = obj);
   });
 
   function updateStore() {
     interactables.update(
       id,
-      new Interactable(emoji, sequence, health, points, modifiers, evolve)
+      new Interactable(emoji, sequence, hp, points, modifiers, evolve)
     );
     nodesStore.adjustHeight(id, sequence.length, INTERACTABLE_H);
   }
@@ -149,14 +143,11 @@
       return;
     }
 
-    console.log(modifiers);
-
     modifiers = modifiers.filter((m) => m[0] != "");
     modifiers = modifiers.filter((m, i) => {
       if (i == 0) return true;
       return m[1] != 0;
     });
-    console.log(modifiers);
 
     updateStore();
   });
@@ -193,18 +184,18 @@
   }
 </script>
 
-<div class="slot absolute -top-6 z-10" on:click={() => (emoji = $currentEmoji)}>
+<div class="slot-lg absolute -top-12" on:click={() => (emoji = $currentEmoji)}>
   {emoji}
 </div>
-<div class="absolute top-4">
+<div class="absolute top-8 z-10">
   <select
     class="select select-bordered select-sm text-xl"
-    title="health"
-    bind:value={health}
+    title="HP"
+    bind:value={hp}
     on:change={updateStore}
   >
-    {#each healths as h}
-      <option value={h}>{h}</option>
+    {#each hps as _hp}
+      <option value={_hp}>{_hp}</option>
     {/each}
   </select>
 </div>
@@ -236,12 +227,12 @@
             <option value={j}>{j}</option>
           {/each}
         </select>
-      {:else if s.type == "addToInventory" || s.type == "changePlayerTo"}
+      {:else if s.type == "addToPlayerInventory" || s.type == "changePlayerTo"}
         <div class="slot" on:click={() => updateSlot(i)}>{s.emoji || ""}</div>
-      {:else if s.type == "changePlayerHealthBy"}
+      {:else if s.type == "addToPlayerHP"}
         <select class="select" bind:value={s.points} on:change={updateStore}>
-          {#each modifierPoints as point}
-            <option value={point}>{point}</option>
+          {#each modifierPoints.filter((val) => val != 0) as point}
+            <option value={point}>{point > 0 ? `+${point}` : point}</option>
           {/each}
         </select>
       {:else if s.type == "destroy" || s.type == "teleportPlayerTo" || s.type == "removeBackgroundOf"}
@@ -311,7 +302,7 @@
     <button on:click={addToSequence}>➕</button>
   </label>
   <div class="form-control flex flex-col">
-    <b>health modifiers</b>
+    <b>hp modifiers</b>
     {#each modifiers as [key, value], i}
       <div class="flex flex-row items-center justify-start gap-2">
         <div class="slot" on:click={() => updateModifierKey(i)}>
@@ -319,7 +310,7 @@
         </div>
         <select class="select" bind:value on:change={updateStore}>
           {#each modifierPoints as point}
-            <option value={point}>{point}</option>
+            <option value={point}>{point > 0 ? `+${point}` : point}</option>
           {/each}
         </select>
         {#if i != 0}
@@ -339,11 +330,11 @@
 
       <b>at</b>
       <select class="select" bind:value={evolve.at} on:change={updateStore}>
-        {#each healths as h}
+        {#each hps as h}
           <option value={h}>{h}</option>
         {/each}
       </select>
-      <b>Health</b>
+      <b>hp</b>
     </div> -->
   </div>
 </main>

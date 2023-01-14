@@ -34,12 +34,16 @@
     @apply flex h-12 w-12 flex-col items-center justify-center rounded-full border-2 bg-white text-lg;
   }
 
+  .slot-lg {
+    @apply flex h-24 w-24 flex-col items-center justify-center rounded-full border-2 bg-white text-4xl;
+  }
+
   /* .cell {
     @apply relative flex h-14 w-14 items-center justify-center rounded bg-base-300;
   } */
 
   .aside {
-    @apply z-10 h-[716px] w-80 overflow-y-auto rounded bg-base-200 p-8 pt-0;
+    @apply relative z-10 h-[716px] w-80 overflow-y-auto rounded bg-base-200 p-8 pt-0;
   }
 
   .map > div {
@@ -62,7 +66,7 @@
 
 @font-face {
   font-family: regular;
-  src: url("/fonts/Inter-Medium.ttf") format("truetype");
+  src: url("/fonts/Montserrat-ExtraBold.ttf") format("truetype");
 }
 
 :root {
