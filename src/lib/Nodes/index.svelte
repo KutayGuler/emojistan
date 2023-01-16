@@ -81,7 +81,7 @@
   <!-- CF #3 -->
   <button
     style="border-color: {node.borderColor}"
-    class="absolute -top-1 right-1 z-10 cursor-pointer rounded border-2 bg-white"
+    class="absolute -top-1 right-1 cursor-pointer rounded border-2 bg-white"
     on:click={() => {
       nodesStore.remove(node.id);
       edgesStore.filter(node.id);
@@ -133,9 +133,6 @@
     width: 100%;
     cursor: move;
     height: 24px;
-    border-top-left-radius: 4px;
-    border-top-right-radius: 4px;
-    margin-bottom: 0.5rem;
   }
 
   .Node {

@@ -13,9 +13,9 @@
     type SequenceItem,
   } from "../store";
   import { SIZE } from "$src/constants";
-  import Merger from "$components/Merger.svelte";
   import type { CollisionType } from "$src/types";
-  import { LOGONSERVER } from "$env/static/private";
+
+  // TODO: hps interface
 
   interface _Collisions {
     [key1: string]: {
@@ -202,6 +202,7 @@
     completeLevel: () => (levelCompleted = true),
     addToPlayerHP: ({ points }) => {
       // TODO:
+      hps.set(ac, hps.get(ac) + points);
     },
   };
 
@@ -236,25 +237,11 @@
     while (items.has(ac + operation * i)) {
       collisionChain.push(items.get(ac + operation * i) || "");
       i++;
-      if (collisionChain.length > SIZE + 1) {
-        console.warn("stuck in while loop");
-        break;
-      }
     }
-
-    console.log(collisionChain);
 
     let arr: Array<CollisionType> = [];
     for (let i = 0; i < collisionChain.length - 1; i++) {
       arr.push(getCollisionType(collisionChain[i], collisionChain[i + 1]));
-      console.log(arr);
-
-      // let current = collisionChain[i];
-      // let next = collisionChain[i + 1];
-      // if (current && next) {
-      //   arr.push(_collisions[current][next]);
-      //   // TODO:
-      // }
     }
 
     let finalIndex = ac + operation * (i - 1);
@@ -461,7 +448,7 @@
 
       let ce = "anything";
 
-      if (inventories.get(ac) != undefined) {
+      if (inventories.has(ac)) {
         ce = inventories.get(ac)[currentInventoryIndex];
       }
 
@@ -470,14 +457,25 @@
         modifier = modifiers[0];
       }
 
-      _interactables[interactedItem].hp += modifier[1];
+      let hp = _interactables[interactedItem].hp;
 
-      if (_interactables[interactedItem].hp <= 0) {
+      if (!hps.has(ic) && hp) {
+        hps.set(ic, hp);
+      }
+
+      // _interactables[interactedItem].hp += modifier[1];
+      hps.set(ic, hps.get(ic) + modifier[1]);
+
+      // if (_interactables[interactedItem].hp <= 0) {
+      //   items.delete(ic);
+      // }
+      if (hps.get(ic) <= 0) {
         items.delete(ic);
       }
       console.log(_interactables);
 
       items = items;
+      hps = hps;
 
       for (let { type, ...args } of sequence) {
         if (type == "wait") {

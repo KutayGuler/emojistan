@@ -16,11 +16,11 @@ export const SPAWNER_W = 200;
 
 /* PUSHER */
 export const PUSHER_W = 150;
-export const PUSHER_H = 75;
+export const PUSHER_H = 90;
 
 /* MERGER */
 export const MERGER_W = 200;
-export const MERGER_H = 75;
+export const MERGER_H = PUSHER_H;
 export const MERGER_BG = "#e9f3fb";
 export const MERGER_BORDER = "#3a96dd";
 
