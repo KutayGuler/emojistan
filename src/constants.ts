@@ -11,6 +11,9 @@ export const DURATIONS = [50, 100, 200, 500, 1000, 2000, 5000, 10000];
 export const DEFAULT_BG = "#cfcfcf";
 export const GRAPH_SIZE = 716;
 
+/* TODO: Update component colors */
+/* TODO: Component design */
+
 /* SPAWNER */
 export const SPAWNER_W = 200;
 
@@ -27,6 +30,8 @@ export const MERGER_BORDER = "#3a96dd";
 /* INTERACTABLE */
 export const INTERACTABLE_W = 400;
 export const INTERACTABLE_H = 400;
+export const INTERACTABLE_BG = "#dcfce7";
+export const INTERACTABLE_BORDER = "#059669";
 
 // DATA
 // STORE NAMES

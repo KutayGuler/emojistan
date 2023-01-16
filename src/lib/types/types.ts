@@ -1,4 +1,6 @@
 import {
+  INTERACTABLE_BG,
+  INTERACTABLE_BORDER,
   INTERACTABLE_H,
   INTERACTABLE_W,
   MERGER_BG,
@@ -50,8 +52,8 @@ export class Node<T = any> {
       case "interactable":
         this.width = INTERACTABLE_W;
         this.height = INTERACTABLE_H;
-        this.borderColor = MERGER_BORDER;
-        this.bgColor = MERGER_BG;
+        this.borderColor = INTERACTABLE_BORDER;
+        this.bgColor = INTERACTABLE_BG;
         return;
       case "pusher":
         this.width = PUSHER_W;

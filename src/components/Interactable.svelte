@@ -67,21 +67,34 @@
 
   let defaultBackground = $map.dbg;
 
-  const types: Array<keyof Mutations> = [
-    "setBackgroundOf",
-    "removeBackgroundOf",
-    "spawn",
-    "destroy",
-    "wait",
-    "addToPlayerInventory",
-    "addToPlayerHP",
-    "changePlayerTo",
-    // "freezePlayer",
-    // "unfreezePlayer",
-    "teleportPlayerTo",
-    "resetLevel",
-    "completeLevel",
-  ];
+  // TODO: Add icons
+  const _types = {
+    Player: [
+      "addToPlayerHP",
+      "addToPlayerInventory",
+      "changePlayerTo",
+      "teleportPlayerTo",
+    ],
+    Map: ["spawn", "destroy"],
+    Background: ["setBackgroundOf", "removeBackgroundOf"],
+    Level: ["resetLevel", "completeLevel"],
+  };
+
+  // const types: Array<keyof Mutations> = [
+  //   "setBackgroundOf",
+  //   "removeBackgroundOf",
+  //   "spawn",
+  //   "destroy",
+  //   "wait",
+  //   "addToPlayerInventory",
+  //   "addToPlayerHP",
+  //   "changePlayerTo",
+  //   // "freezePlayer",
+  //   // "unfreezePlayer",
+  //   "teleportPlayerTo",
+  //   "resetLevel",
+  //   "completeLevel",
+  // ];
 
   let indexes: Array<number> = [];
   let hps: Array<number> = [];
@@ -95,7 +108,6 @@
   for (let i = 0; i >= -100; i--) {
     modifierPoints.unshift(i);
   }
-  console.log(modifierPoints);
 
   for (let i = 0; i < SIZE * SIZE; i++) {
     indexes[i] = i;
@@ -116,7 +128,7 @@
   let enableEvolution;
 
   // SEQUENCE RELATED
-  let type = types[0];
+  let type = _types.Background[0];
   let duration = 0;
   let index = 0;
   let background = "";
@@ -169,7 +181,7 @@
     ];
     updateStore();
 
-    [type, duration, index, background] = [types[0], 0, 0, ""];
+    [type, duration, index, background] = [_types.background[0], 0, 0, ""];
   }
 
   function removeFromSequence(i: number) {
@@ -202,7 +214,7 @@
 <main class="pt-16">
   {#each sequence as s, i}
     <span>
-      <select
+      <!-- <select
         class="select"
         title="event type"
         id="type"
@@ -212,7 +224,7 @@
         {#each types as t}
           <option value={t}>{t}</option>
         {/each}
-      </select>
+      </select> -->
       {#if s.type == "spawn"}
         <div class="slot" on:click={() => updateSlot(i)}>{s.emoji || ""}</div>
         at
@@ -295,8 +307,12 @@
   {/each}
   <label>
     <select class="select" title="event type" bind:value={type}>
-      {#each types as t}
-        <option value={t}>{t}</option>
+      {#each Object.entries(_types) as [group, values]}
+        <optgroup label={group}>
+          {#each values as t}
+            <option value={t}>{t}</option>
+          {/each}
+        </optgroup>
       {/each}
     </select>
     <button on:click={addToSequence}>➕</button>

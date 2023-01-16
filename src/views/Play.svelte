@@ -1,5 +1,7 @@
 <script lang="ts">
   import { scale } from "svelte/transition";
+  import { tweened } from "svelte/motion";
+  import { cubicOut } from "svelte/easing";
   import { onDestroy, onMount } from "svelte/internal";
   import {
     map,
@@ -14,8 +16,6 @@
   } from "../store";
   import { SIZE } from "$src/constants";
   import type { CollisionType } from "$src/types";
-
-  // TODO: hps interface
 
   interface _Collisions {
     [key1: string]: {
@@ -76,7 +76,6 @@
     }
   });
 
-  let playerHP = 100;
   let playerFrozen = false;
   let levelCompleted = false;
   let ac = -2; // ACTIVE CELL
@@ -95,17 +94,9 @@
   let _map = structuredClone($map);
   let items = new Map(_map.items);
   let backgrounds = new Map(_map.backgrounds);
-  let hps = new Map<number, number>();
+  let hps = new Map<number, { max: number; current: number }>();
   let inventories = new Map<number, Array<string>>();
   let currentInventoryIndex = 0;
-
-  for (let [index, emoji] of items) {
-    if (!$statics.has(emoji)) {
-      ac = index;
-      ic = ac + 1;
-      break;
-    }
-  }
 
   let _interactables: _Interactables = {};
 
@@ -114,6 +105,33 @@
     // @ts-expect-error
     _interactables[emoji] = {};
     Object.assign(_interactables[emoji], args);
+  }
+
+  for (let [index, emoji] of items) {
+    if (ac != 2 && !$statics.has(emoji)) {
+      ac = index;
+      ic = ac + 1;
+    }
+
+    hps.set(index, {
+      max: _interactables[emoji]?.hp || 0,
+      current: _interactables[emoji]?.hp || 0,
+    });
+  }
+
+  let progress = tweened(1, {
+    duration: 400,
+    easing: cubicOut,
+  });
+
+  let numbers = new Map<number, number>();
+
+  for (let i = 0; i <= 100; i++) {
+    numbers.set(i, i / 100);
+  }
+
+  function getPercentage(max: number, current: number) {
+    return numbers.get(Math.floor((current * 100) / max)) || 0;
   }
 
   let _collisions: _Collisions = {};
@@ -201,8 +219,10 @@
     },
     completeLevel: () => (levelCompleted = true),
     addToPlayerHP: ({ points }) => {
-      // TODO:
-      hps.set(ac, hps.get(ac) + points);
+      let { current, max } = hps.get(ac);
+      current += points;
+      hps.set(ac, { current, max });
+      progress.set(getPercentage(max, current));
     },
   };
 
@@ -212,10 +232,15 @@
   }
 
   function syncData(operation: number) {
-    if (inventories.size == 0) return;
-    inventories.set(ac, inventories.get(ac - operation));
-    inventories.delete(ac - operation);
-    inventories = inventories;
+    if (inventories.size != 0) {
+      inventories.set(ac, inventories.get(ac - operation));
+      inventories.delete(ac - operation);
+      inventories = inventories;
+    }
+
+    hps.set(ac, hps.get(ac - operation));
+    hps.delete(ac - operation);
+    hps = hps;
   }
 
   function moveActiveCell(operation: number, _delete?: boolean) {
@@ -517,28 +542,23 @@
 </div>
 
 {#key ac}
-  {#if inventories.get(ac)}
-    {@const playerInventory = inventories.get(ac)}
-    <div
-      class="absolute -bottom-16 flex w-full flex-row items-center justify-center gap-2"
-    >
-      {#each { length: 4 } as _, i}
-        <div
-          class:selected={i == currentInventoryIndex}
-          class="flex h-12 w-12 flex-col items-center justify-center bg-base-300 p-2"
-        >
-          {playerInventory[i] || ""}
-        </div>
-      {/each}
-    </div>
-  {/if}
-  {#if hps.get(ac)}
-    <div
-      class="absolute -bottom-16 flex w-full flex-row items-center justify-center gap-2"
-    >
-      <!-- TODO: Progress bar -->
-    </div>
-  {/if}
+  <div
+    class="absolute -bottom-8 flex w-64 flex-row items-center justify-center gap-2"
+  >
+    <progress class="progress progress-success h-4" value={$progress} />
+  </div>
+  <div
+    class="absolute -bottom-24 flex w-full flex-row items-center justify-center gap-2"
+  >
+    {#each { length: 4 } as _, i}
+      <div
+        class:selected={i == currentInventoryIndex}
+        class="flex h-12 w-12 flex-col items-center justify-center bg-base-300 p-2"
+      >
+        {(inventories.get(ac) && inventories.get(ac)[i]) || ""}
+      </div>
+    {/each}
+  </div>
 {/key}
 
 <style>

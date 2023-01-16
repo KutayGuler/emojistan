@@ -126,9 +126,7 @@
         }}>{test ? "EDIT" : "TEST"}</button
       >
     {/if}
-    <div
-      class="relative box-border flex h-3/4 flex-row items-center justify-center"
-    >
+    <div class="relative box-border flex flex-row items-center justify-center">
       {#if !test}
         <aside
           transition:fly={{ x: -200 }}
@@ -226,15 +224,17 @@
           {/if}
         </aside>
       {/if}
-      <div class="flex flex-col justify-center px-8">
-        {#if test}
-          <Play />
-        {:else if view == "editor"}
+      {#if test}
+        <Play />
+      {:else if view == "editor"}
+        <div class="flex flex-col justify-center px-8">
           <Editor {showIndex} />
-        {:else if view == "rules"}
+        </div>
+      {:else if view == "rules"}
+        <div class="flex flex-col justify-center px-8">
           <Svelvet />
-        {/if}
-      </div>
+        </div>
+      {/if}
       {#if !test}
         <aside
           transition:fly={{ x: 200 }}
