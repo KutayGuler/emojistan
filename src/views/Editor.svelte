@@ -14,6 +14,8 @@
     }
   }
 
+  // TODO: Right click to copy
+
   function rightClickedCell(index: number) {
     if ($map.items.has(index)) {
       map.removeEmoji(index);

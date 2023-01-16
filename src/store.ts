@@ -1,6 +1,7 @@
 import { page } from "$app/stores";
 import { writable, get } from "svelte/store";
 import { DEFAULT_BG, storeNames } from "./constants";
+import type { CollisionType } from "./types";
 
 export interface Mutations {
   setBackgroundOf: (
@@ -321,6 +322,6 @@ export const statics = createSetStore("statics");
 export const palette = createSetStore("palette");
 
 // MAPS
-export const pushes = createMapStore<Array<string>>("pushes");
-export const merges = createMapStore<Array<string>>("merges");
+export const pushes = createMapStore<[string, string, CollisionType]>("pushes");
+export const merges = createMapStore<[string, string, CollisionType]>("merges");
 export const interactables = createMapStore<Interactable>("interactables");

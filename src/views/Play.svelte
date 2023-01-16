@@ -14,6 +14,26 @@
   } from "../store";
   import { SIZE } from "$src/constants";
   import Merger from "$components/Merger.svelte";
+  import type { CollisionType } from "$src/types";
+  import { LOGONSERVER } from "$env/static/private";
+
+  interface _Collisions {
+    [key1: string]: {
+      [key2: string]: CollisionType;
+    };
+  }
+
+  interface _Interactable {
+    executing: boolean;
+    sequence: Array<SequenceItem>;
+    points: number;
+    hp: number;
+    modifiers: Array<[string, number]>;
+  }
+
+  interface _Interactables {
+    [key: string]: _Interactable;
+  }
 
   onMount(() => {
     [$currentColor, $currentEmoji] = ["", ""];
@@ -21,6 +41,13 @@
 
   type Wasd = "KeyW" | "KeyA" | "KeyS" | "KeyD";
   type ArrowKey = "ArrowLeft" | "ArrowUp" | "ArrowRight" | "ArrowDown";
+
+  let wasdToArrow: { [key in Wasd]: ArrowKey } = {
+    KeyW: "ArrowUp",
+    KeyA: "ArrowLeft",
+    KeyD: "ArrowRight",
+    KeyS: "ArrowDown",
+  };
 
   function calcOperation(code: ArrowKey, index: number) {
     if (code == "ArrowLeft" && index % SIZE == 0) return 0;
@@ -68,10 +95,9 @@
   let _map = structuredClone($map);
   let items = new Map(_map.items);
   let backgrounds = new Map(_map.backgrounds);
-  let inventories = new Map<number, Array<string>>();
-  let _collisions = new Map<string, Map<string, string>>(); // TODO: change this to object
-  let currentInventoryIndex = 0;
   let hps = new Map<number, number>();
+  let inventories = new Map<number, Array<string>>();
+  let currentInventoryIndex = 0;
 
   for (let [index, emoji] of items) {
     if (!$statics.has(emoji)) {
@@ -79,18 +105,6 @@
       ic = ac + 1;
       break;
     }
-  }
-
-  interface _Interactable {
-    executing: boolean;
-    sequence: Array<SequenceItem>;
-    points: number;
-    hp: number;
-    modifiers: Array<[string, number]>;
-  }
-
-  interface _Interactables {
-    [key: string]: _Interactable;
   }
 
   let _interactables: _Interactables = {};
@@ -102,22 +116,24 @@
     Object.assign(_interactables[emoji], args);
   }
 
-  console.log(_interactables);
+  let _collisions: _Collisions = {};
 
   for (let [id, _slots] of [...$merges, ...$pushes]) {
     let [key1, key2, val] = _slots;
-    if (!_collisions.has(key1)) {
-      _collisions.set(key1, new Map());
+    if (!_collisions[key1]) {
+      _collisions[key1] = {};
     }
-    _collisions.get(key1)?.set(key2, val);
+
+    _collisions[key1][key2] = val;
 
     // making emoji merge both ways
     if (val != "push") {
       if (key1 != key2) {
-        if (!_collisions.has(key2)) {
-          _collisions.set(key2, new Map());
+        if (!_collisions[key2]) {
+          _collisions[key2] = {};
         }
-        _collisions.get(key2)?.set(key1, val);
+
+        _collisions[key2][key1] = val;
       }
     }
   }
@@ -189,11 +205,9 @@
     },
   };
 
-  function getCollisionType(key1: string, key2: string): string {
-    if (_collisions.has(key1)) {
-      return _collisions.get(key1)?.get(key2) || "bump";
-    }
-    return "bump";
+  function getCollisionType(key1: string, key2: string): CollisionType {
+    if (!_collisions[key1]) return "bump";
+    return _collisions[key1][key2] || "bump";
   }
 
   function syncData(operation: number) {
@@ -214,21 +228,33 @@
   }
 
   function enactPushCollision(operation: number) {
+    console.log(operation);
+
     let collisionChain = [];
     let i = 0;
 
-    while (items.get(ac + operation * i)) {
-      collisionChain.push(items.get(ac + operation * i));
+    while (items.has(ac + operation * i)) {
+      collisionChain.push(items.get(ac + operation * i) || "");
       i++;
+      if (collisionChain.length > SIZE + 1) {
+        console.warn("stuck in while loop");
+        break;
+      }
     }
 
-    let arr = [];
-    for (let i = 0; i < collisionChain.length; i++) {
-      let current = collisionChain[i];
-      let next = collisionChain[i + 1];
-      if (current && next) {
-        arr.push(_collisions.get(current)?.get(next));
-      }
+    console.log(collisionChain);
+
+    let arr: Array<CollisionType> = [];
+    for (let i = 0; i < collisionChain.length - 1; i++) {
+      arr.push(getCollisionType(collisionChain[i], collisionChain[i + 1]));
+      console.log(arr);
+
+      // let current = collisionChain[i];
+      // let next = collisionChain[i + 1];
+      // if (current && next) {
+      //   arr.push(_collisions[current][next]);
+      //   // TODO:
+      // }
     }
 
     let finalIndex = ac + operation * (i - 1);
@@ -273,12 +299,12 @@
       );
 
       for (let i = 0; i < arr.length + 1; i++) {
-        let cur = collisionChain[i];
+        let current = collisionChain[i];
         let next = collisionChain[i + 1];
 
-        if (!(next && cur)) continue;
+        if (!(next && current)) continue;
 
-        let emoji = _collisions.get(cur)?.get(next);
+        let emoji = _collisions[current][next];
         if (emoji && emoji != "push") {
           items.set(ac + operation * (i + 1), emoji);
           let item = items.get(ac);
@@ -298,13 +324,18 @@
 
   async function handle(e: KeyboardEvent) {
     e.preventDefault();
-    if (!items.has(ac) || playerFrozen || playerHP <= 0 || animating) {
+    if (
+      !items.has(ac) ||
+      playerFrozen ||
+      (hps.has(ac) && hps.get(ac) <= 0) ||
+      animating
+    ) {
       return;
     }
     if (e.code.includes("Arrow")) {
       let operation = calcOperation(e.code as ArrowKey, ac);
       let item = items.get(ac);
-      if (item == undefined || $statics.has(item)) return;
+      if (item == undefined || $statics.has(item) || operation == 0) return;
       let postOpItem = items.get(ac + operation);
 
       // if there are no items in front of the player after operation, moveActiveCell
@@ -339,6 +370,17 @@
     if (wasd.includes(e.code)) {
       dirKey = e.code as Wasd;
       ic = ac + dirs[dirKey].operation;
+      return;
+    }
+
+    if (e.code.includes("Control")) {
+      if (calcOperation(wasdToArrow[dirKey], ic) == 0) return;
+      let playerInventory = inventories.get(ac);
+      if (!playerInventory || items.has(ic)) return;
+      items.set(ic, playerInventory[currentInventoryIndex]);
+      playerInventory.splice(currentInventoryIndex, 1);
+      items = items;
+      inventories = inventories;
       return;
     }
 
@@ -399,11 +441,20 @@
     }
 
     if (e.code == "Space") {
+      if (calcOperation(wasdToArrow[dirKey], ic) == 0) return;
       let interactedItem = items.get(ic);
       if (interactedItem == undefined) return;
       let interactable: _Interactable = _interactables[interactedItem];
       if (interactable == undefined || interactable.executing) return;
-      let { sequence, points, modifiers } = interactable;
+      let { sequence, modifiers } = interactable;
+
+      for (let { type, ...args } of sequence) {
+        if (type == "addToPlayerInventory") {
+          if (inventories.get(ac)?.length == 4) {
+            return;
+          }
+        }
+      }
 
       _interactables[interactedItem].executing = true;
       console.log("executing");
@@ -428,8 +479,6 @@
 
       items = items;
 
-      // TODO: Player shouldn't be able to pick up the item if the inventory is full
-
       for (let { type, ...args } of sequence) {
         if (type == "wait") {
           await m.wait(args.duration);
@@ -439,16 +488,6 @@
       }
 
       _interactables[interactedItem].executing = false;
-      return;
-    }
-
-    if (e.code == "KeyG") {
-      let playerInventory = inventories.get(ac);
-      if (!playerInventory || items.has(ic)) return;
-      items.set(ic, playerInventory[currentInventoryIndex]);
-      playerInventory.splice(currentInventoryIndex, 1);
-      items = items;
-      inventories = inventories;
       return;
     }
   }
