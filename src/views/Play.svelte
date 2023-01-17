@@ -108,16 +108,20 @@
   }
 
   for (let [index, emoji] of items) {
-    if (ac != 2 && !$statics.has(emoji)) {
+    if (ac == -2 && !$statics.has(emoji)) {
       ac = index;
       ic = ac + 1;
     }
+
+    console.log(_interactables[emoji]);
 
     hps.set(index, {
       max: _interactables[emoji]?.hp || 0,
       current: _interactables[emoji]?.hp || 0,
     });
   }
+
+  console.log(hps);
 
   let progress = tweened(1, {
     duration: 400,
@@ -221,7 +225,7 @@
     addToPlayerHP: ({ points }) => {
       let { current, max } = hps.get(ac);
       current += points;
-      hps.set(ac, { current, max });
+      hps.set(ac, { current: current, max: max });
       progress.set(getPercentage(max, current));
     },
   };
@@ -421,6 +425,13 @@
         ac = closestID;
         ic = ac + dirs[dirKey].operation;
       }
+
+      let { current, max } = hps.get(ac);
+
+      progress = tweened(getPercentage(max, current), {
+        duration: 400,
+        easing: cubicOut,
+      });
       return;
     }
 
@@ -449,6 +460,13 @@
         ac = closestID;
         ic = ac + dirs[dirKey].operation;
       }
+
+      let { current, max } = hps.get(ac);
+
+      progress = tweened(getPercentage(max, current), {
+        duration: 400,
+        easing: cubicOut,
+      });
       return;
     }
 
@@ -482,22 +500,12 @@
         modifier = modifiers[0];
       }
 
-      let hp = _interactables[interactedItem].hp;
+      let { current, max } = hps.get(ic);
+      hps.set(ic, { current: current + modifier[1], max });
 
-      if (!hps.has(ic) && hp) {
-        hps.set(ic, hp);
-      }
-
-      // _interactables[interactedItem].hp += modifier[1];
-      hps.set(ic, hps.get(ic) + modifier[1]);
-
-      // if (_interactables[interactedItem].hp <= 0) {
-      //   items.delete(ic);
-      // }
-      if (hps.get(ic) <= 0) {
+      if (hps.get(ic)?.current <= 0) {
         items.delete(ic);
       }
-      console.log(_interactables);
 
       items = items;
       hps = hps;
