@@ -20,17 +20,17 @@ function createNodes() {
       });
     },
 
-    spawn: (
+    spawn(
       component: NodeComponent,
       position: { x: number; y: number },
       receiver: boolean = false
-    ) => {
-      let id;
+    ): number {
+      let id = 0;
 
       update((state) => {
         state = state.filter((n) => n.component != "spawner");
         id = Math.max(...state.map((n) => n.id), 0) + 1;
-        state.push(new Node(id, component, position, receiver));
+        state.push(new Node(id, component, position));
         return state;
       });
 
@@ -114,6 +114,7 @@ export const derivedEdges = derived(
       // any -> edge should follow type DerivedEdge, but we are assigning to any so the typing meshes together
 
       // These are dummy nodes to resolve a typescripting issue. They are overwritten in the following forEach loop
+      // @ts-expect-error
       let sourceNode: Node = {
         id: 0,
         position: { x: 25, y: 475 },
@@ -124,6 +125,7 @@ export const derivedEdges = derived(
         sourcePosition: "left",
       };
 
+      // @ts-expect-error
       let targetNode: Node = {
         id: 10,
         position: { x: 750, y: 475 },

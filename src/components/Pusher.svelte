@@ -22,6 +22,7 @@
       }
     }
 
+    // @ts-expect-error
     pushes.update(id, slots);
   }
 
@@ -40,7 +41,7 @@
   });
 </script>
 
-<div class="flex h-full flex-row items-center justify-center">
+<div class="flex h-full flex-row items-center justify-center gap-2">
   <div class="slot" on:click={() => !disabled && updateSlot(0)}>
     {slots[0]}
   </div>

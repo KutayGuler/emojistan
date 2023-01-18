@@ -1,17 +1,17 @@
 <script lang="ts">
-  import {
-    merges,
-    pushes,
-    interactables,
-    Interactable,
-  } from "../store";
+  import { merges, pushes, interactables, Interactable } from "../store";
   import type { NodeComponent } from "$lib/types";
   import { nodesStore } from "$lib/stores/store";
+  import Pusher from "./Pusher.svelte";
 
   export let position: { x: number; y: number };
+  // export let --pusherBG
+  // export let pusherBG;
+  // export let mergerBG;
+  // export let interactableBG;
 
   // CF #4
-  function spawn<T>(component: NodeComponent, value: T, receiver = false) {
+  function spawn(component: NodeComponent, value: any, receiver = false) {
     const id = nodesStore.spawn(component, position, receiver);
 
     switch (component) {
@@ -36,14 +36,14 @@
     },
     {
       name: "Merger",
-      onClick: () => spawn<Array<string>>("merger", ["", "", ""]),
+      onClick: () => spawn("merger", ["", "", ""]),
     },
     {
       name: "Interactable",
       onClick: () =>
-        spawn<Interactable>(
+        spawn(
           "interactable",
-          new Interactable("", [], 1, 1, [["anything", 0]], { to: "", at: 1 })
+          new Interactable("", [], 1, 1, [["any", 0]], { to: "", at: 1 })
         ),
     },
   ];
@@ -52,10 +52,22 @@
 <ul class="w-full bg-white opacity-90">
   {#each menuItems as { name, onClick }}
     <li
-      class="add box-border h-8 w-full pl-2 text-start hover:bg-base-200"
+      class="{name} box-border h-8 w-full pl-2 text-start hover:bg-base-200"
       on:click={onClick}
     >
       {name}
     </li>
   {/each}
 </ul>
+
+<style>
+  .Pusher:hover {
+    background-color: var(--pusher);
+  }
+  .Merger:hover {
+    background-color: var(--merger);
+  }
+  .Interactable:hover {
+    background-color: var(--interactable);
+  }
+</style>

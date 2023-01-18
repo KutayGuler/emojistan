@@ -113,17 +113,15 @@
       ic = ac + 1;
     }
 
-    console.log(_interactables[emoji]);
-
     hps.set(index, {
       max: _interactables[emoji]?.hp || 0,
       current: _interactables[emoji]?.hp || 0,
     });
   }
 
-  console.log(hps);
+  console.log(ac);
 
-  let progress = tweened(1, {
+  let progress = tweened(hps.get(ac)?.current || 0, {
     duration: 400,
     easing: cubicOut,
   });
@@ -195,7 +193,7 @@
           inventories.set(ac, [emoji]);
         } else {
           console.log(inventories.get(ac));
-          inventories.set(ac, [...inventories.get(ac), emoji]);
+          inventories.set(ac, [...(inventories.get(ac) || []), emoji]);
         }
 
         items.delete(ic);
@@ -223,7 +221,7 @@
     },
     completeLevel: () => (levelCompleted = true),
     addToPlayerHP: ({ points }) => {
-      let { current, max } = hps.get(ac);
+      let { current, max } = hps.get(ac) || { current: 0, max: 0 };
       current += points;
       hps.set(ac, { current: current, max: max });
       progress.set(getPercentage(max, current));
@@ -237,12 +235,12 @@
 
   function syncData(operation: number) {
     if (inventories.size != 0) {
-      inventories.set(ac, inventories.get(ac - operation));
+      inventories.set(ac, inventories.get(ac - operation) || []);
       inventories.delete(ac - operation);
       inventories = inventories;
     }
 
-    hps.set(ac, hps.get(ac - operation));
+    hps.set(ac, hps.get(ac - operation) || { current: 0, max: 0 });
     hps.delete(ac - operation);
     hps = hps;
   }
@@ -336,15 +334,13 @@
 
   let wasd = ["KeyW", "KeyA", "KeyS", "KeyD"];
 
-  let animating = false; // TODO: Prevent player from moving when there is an interaction animation
-
   async function handle(e: KeyboardEvent) {
     e.preventDefault();
     if (
       !items.has(ac) ||
       playerFrozen ||
-      (hps.has(ac) && hps.get(ac) <= 0) ||
-      animating
+      // @ts-expect-error
+      (hps.has(ac) && hps.get(ac) <= 0)
     ) {
       return;
     }
@@ -426,7 +422,7 @@
         ic = ac + dirs[dirKey].operation;
       }
 
-      let { current, max } = hps.get(ac);
+      let { current, max } = hps.get(ac) || { current: 0, max: 0 };
 
       progress = tweened(getPercentage(max, current), {
         duration: 400,
@@ -461,7 +457,7 @@
         ic = ac + dirs[dirKey].operation;
       }
 
-      let { current, max } = hps.get(ac);
+      let { current, max } = hps.get(ac) || { current: 0, max: 0 };
 
       progress = tweened(getPercentage(max, current), {
         duration: 400,
@@ -489,10 +485,10 @@
       _interactables[interactedItem].executing = true;
       console.log("executing");
 
-      let ce = "anything";
+      let ce = "any";
 
       if (inventories.has(ac)) {
-        ce = inventories.get(ac)[currentInventoryIndex];
+        ce = (inventories.get(ac) || [])[currentInventoryIndex];
       }
 
       let modifier = modifiers.find((m) => m[0] == ce);
@@ -500,9 +496,10 @@
         modifier = modifiers[0];
       }
 
-      let { current, max } = hps.get(ic);
+      let { current, max } = hps.get(ic) || { current: 0, max: 0 };
       hps.set(ic, { current: current + modifier[1], max });
 
+      // @ts-expect-error
       if (hps.get(ic)?.current <= 0) {
         items.delete(ic);
       }
@@ -532,8 +529,7 @@
     <div style:background={backgrounds.get(i) || $map.dbg} class:active>
       {#if active}
         <div class="direction scale-75" style={dirs[dirKey].style}>
-          {(inventories.get(ac) &&
-            inventories.get(ac)[currentInventoryIndex]) ||
+          {(inventories.get(ac) || [])[currentInventoryIndex] ||
             dirs[dirKey].emoji}
         </div>
       {/if}
@@ -563,7 +559,7 @@
         class:selected={i == currentInventoryIndex}
         class="flex h-12 w-12 flex-col items-center justify-center bg-base-300 p-2"
       >
-        {(inventories.get(ac) && inventories.get(ac)[i]) || ""}
+        {(inventories.get(ac) || [])[i] || ""}
       </div>
     {/each}
   </div>

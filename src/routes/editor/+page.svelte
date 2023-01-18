@@ -103,6 +103,8 @@
 
   let test = false;
   let view: "editor" | "rules" = "rules";
+
+  // TODO: bring back delete mode
 </script>
 
 <svelte:head>
@@ -142,7 +144,7 @@
                 : 'opacity-50'} cursor-pointer duration-200 ease-out hover:scale-150 hover:opacity-100"
               on:click={() => (view = "editor")}
             >
-              🏗️
+              🗺️
             </div>
             <div
               class="{view == 'rules'

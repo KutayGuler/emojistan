@@ -59,15 +59,15 @@
   });
 </script>
 
-<div class="flex h-full flex-row items-center justify-center">
+<div class="flex h-full flex-row items-center justify-center gap-2">
   <div class="slot" on:click={() => updateSlot(0)}>
     {slots[0]}
   </div>
-  <div>➕</div>
+  <div class="text-2xl">+</div>
   <div class="slot" on:click={() => updateSlot(1)}>
     {slots[1]}
   </div>
-  <div>➡️</div>
+  <div class="text-2xl">=</div>
   <div class="slot" on:click={() => updateSlot(2)}>
     {slots[2]}
   </div>

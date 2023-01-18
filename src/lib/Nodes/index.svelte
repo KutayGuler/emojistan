@@ -16,6 +16,14 @@
   import Spawner from "$components/Spawner.svelte";
   import Pusher from "$components/Pusher.svelte";
   import Merger from "$components/Merger.svelte";
+  import {
+    INTERACTABLE_BG,
+    INTERACTABLE_BORDER,
+    MERGER_BG,
+    MERGER_BORDER,
+    PUSHER_BG,
+    PUSHER_BORDER,
+  } from "$src/constants";
 
   export let node: Node;
 
@@ -47,6 +55,7 @@
   id="svelvet-{node.id}"
 >
   <nav
+    class="min-h-6 w-full cursor-move"
     style:display={node.component == "spawner" ? "none" : "block"}
     style:background-color={node.borderColor}
     on:touchmove={(e) => {
@@ -81,7 +90,7 @@
   <!-- CF #3 -->
   <button
     style="border-color: {node.borderColor}"
-    class="absolute -top-1 right-1 cursor-pointer rounded border-2 bg-white"
+    class="absolute top-0 right-0 flex h-6 w-6 cursor-pointer items-center justify-center rounded border-2 bg-white text-center text-xl"
     on:click={() => {
       nodesStore.remove(node.id);
       edgesStore.filter(node.id);
@@ -101,7 +110,8 @@
       }
     }}
   >
-    <svg
+    🞫
+    <!-- <svg
       class="w-3"
       xmlns="http://www.w3.org/2000/svg"
       fill="white"
@@ -114,11 +124,16 @@
         stroke-linejoin="round"
         d="M6 18L18 6M6 6l12 12"
       />
-    </svg>
+    </svg> -->
   </button>
   <!-- CF #2 -->
   {#if node.component == "spawner"}
-    <Spawner position={node.position} />
+    <Spawner
+      --pusher={PUSHER_BORDER}
+      --merger={MERGER_BORDER}
+      --interactable={INTERACTABLE_BORDER}
+      position={node.position}
+    />
   {:else if node.component == "interactable"}
     <Interactable id={node.id} />
   {:else if node.component == "pusher"}
@@ -129,12 +144,6 @@
 </div>
 
 <style>
-  nav {
-    width: 100%;
-    cursor: move;
-    height: 24px;
-  }
-
   .Node {
     transition: height 150ms ease-out;
     position: absolute;

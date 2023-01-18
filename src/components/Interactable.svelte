@@ -14,42 +14,42 @@
   // emoji: 🌲
   // onInteract: addToPlayerInventory {🍁} x {5}
   // hp: 100
-  // modifiers: anything: 0 | {🪓}: {-1}
+  // modifiers: any: 0 | {🪓}: {-1}
 
   // example DOOR
   // emoji: 🚪
   // onInteract: ""
   // hp: 1
-  // modifiers: anything: 0 | {🔑}: {-1}
+  // modifiers: any: 0 | {🔑}: {-1}
 
   // example KEY
   // emoji: 🔑
   // onInteract: addToPlayerInventory {🔑} x {1}
   // hp: 1
-  // modifiers: anything: -1
+  // modifiers: any: -1
 
   // example FOOD
   // emoji: 🍔
   // onInteract: addToPlayerHP {20}
   // hp: 1
-  // modifiers: anything: -1
+  // modifiers: any: -1
 
   // example POISONOUS MUSHROOM
   // emoji: 🍄
   // onInteract: addToPlayerHP {-20}
   // hp: 1
-  // modifiers: anything: -1
+  // modifiers: any: -1
 
   // example MONEY
   // emoji: 💵
   // onInteract: changePlayerTo {🤑}
   // hp: 1
-  // modifiers: anything: -1
+  // modifiers: any: -1
 
   // example GROWING A PLANT
   // emoji: 🌱
   // hp: 1
-  // modifiers: anything: 0 | 💧: +1
+  // modifiers: any: 0 | 💧: +1
   // evolveAt: hp 10 to {🌳}
 
   import { edgesStore, nodesStore } from "$src/lib/stores/store";
@@ -67,8 +67,9 @@
 
   let defaultBackground = $map.dbg;
 
-  // TODO: Add icons
-  const _types = {
+  const types: {
+    [key in "Player" | "Map" | "Background" | "Level"]: Array<keyof Mutations>;
+  } = {
     Player: [
       "addToPlayerHP",
       "addToPlayerInventory",
@@ -80,21 +81,12 @@
     Level: ["resetLevel", "completeLevel"],
   };
 
-  // const types: Array<keyof Mutations> = [
-  //   "setBackgroundOf",
-  //   "removeBackgroundOf",
-  //   "spawn",
-  //   "destroy",
-  //   "wait",
-  //   "addToPlayerInventory",
-  //   "addToPlayerHP",
-  //   "changePlayerTo",
-  //   // "freezePlayer",
-  //   // "unfreezePlayer",
-  //   "teleportPlayerTo",
-  //   "resetLevel",
-  //   "completeLevel",
-  // ];
+  const typeIcons = {
+    Player: "👾",
+    Map: "🗺️",
+    Background: "🖌️",
+    Level: "🎬",
+  };
 
   let indexes: Array<number> = [];
   let hps: Array<number> = [];
@@ -128,7 +120,7 @@
   let enableEvolution;
 
   // SEQUENCE RELATED
-  let type = _types.Background[0];
+  let type = types.Background[0];
   let duration = 0;
   let index = 0;
   let background = "";
@@ -181,7 +173,7 @@
     ];
     updateStore();
 
-    [type, duration, index, background] = [_types.background[0], 0, 0, ""];
+    [type, duration, index, background] = [types.Background[0], 0, 0, ""];
   }
 
   function removeFromSequence(i: number) {
@@ -194,12 +186,15 @@
     sequence[i].emoji = $currentEmoji;
     updateStore();
   }
+
+  // TODO: adjustHeight for modifiers
+  // TODO: evolve boolean and design
 </script>
 
 <div class="slot-lg absolute -top-12" on:click={() => (emoji = $currentEmoji)}>
   {emoji}
 </div>
-<div class="absolute top-8 z-10">
+<div class="absolute top-8">
   <select
     class="select select-bordered select-sm text-xl"
     title="HP"
@@ -214,17 +209,15 @@
 <main class="pt-16">
   {#each sequence as s, i}
     <span>
-      <!-- <select
-        class="select"
-        title="event type"
-        id="type"
-        bind:value={s.type}
-        on:change={updateStore}
-      >
-        {#each types as t}
-          <option value={t}>{t}</option>
+      <select class="select" title="event type" bind:value={s.type}>
+        {#each Object.entries(types) as [group, values]}
+          <optgroup label={`${group} ${typeIcons[group]}`}>
+            {#each values as t}
+              <option value={t}>{t}</option>
+            {/each}
+          </optgroup>
         {/each}
-      </select> -->
+      </select>
       {#if s.type == "spawn"}
         <div class="slot" on:click={() => updateSlot(i)}>{s.emoji || ""}</div>
         at
@@ -284,9 +277,12 @@
           {/each}
         </select>
         {#if $palette.size == 0 || ($palette.size == 1 && $palette.has(defaultBackground))}
-          <select class="select" title="color">
-            <option value="">No colors</option>
-          </select>
+          <div
+            class="tooltip"
+            data-tip="Please create a palette to use this event"
+          >
+            <select class="select" title="color" />
+          </div>
         {:else}
           to
           <select
@@ -302,20 +298,24 @@
           </select>
         {/if}
       {/if}
-      <button id="remove" on:click={() => removeFromSequence(i)}>❌</button>
+      <button
+        class="text-2xl"
+        id="remove"
+        on:click={() => removeFromSequence(i)}>🞫</button
+      >
     </span>
   {/each}
   <label>
     <select class="select" title="event type" bind:value={type}>
-      {#each Object.entries(_types) as [group, values]}
-        <optgroup label={group}>
+      {#each Object.entries(types) as [group, values]}
+        <optgroup label={`${group} ${typeIcons[group]}`}>
           {#each values as t}
             <option value={t}>{t}</option>
           {/each}
         </optgroup>
       {/each}
     </select>
-    <button on:click={addToSequence}>➕</button>
+    <button class="text-3xl" on:click={addToSequence}>+</button>
   </label>
   <div class="form-control flex flex-col">
     <b>hp modifiers</b>
@@ -330,7 +330,7 @@
           {/each}
         </select>
         {#if i != 0}
-          <button class="btn" on:click={() => deleteModifier(i)}>🞪</button>
+          <button class="text-2xl" on:click={() => deleteModifier(i)}>🞫</button>
         {/if}
       </div>
     {/each}

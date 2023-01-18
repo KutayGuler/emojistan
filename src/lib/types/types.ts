@@ -7,6 +7,8 @@ import {
   MERGER_BORDER,
   MERGER_H,
   MERGER_W,
+  PUSHER_BG,
+  PUSHER_BORDER,
   PUSHER_H,
   PUSHER_W,
   SPAWNER_W,
@@ -58,8 +60,8 @@ export class Node<T = any> {
       case "pusher":
         this.width = PUSHER_W;
         this.height = PUSHER_H;
-        this.borderColor = MERGER_BORDER;
-        this.bgColor = MERGER_BG;
+        this.borderColor = PUSHER_BORDER;
+        this.bgColor = PUSHER_BG;
         return;
       case "merger":
         this.width = MERGER_W;
