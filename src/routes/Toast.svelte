@@ -13,7 +13,7 @@
 </script>
 
 <div
-  class="pointer-events-none fixed bottom-4 right-4 z-10 flex w-80 flex-col items-center justify-start"
+  class="pointer-events-none fixed bottom-4 right-4 z-20 flex w-80 flex-col items-center justify-start"
 >
   {#each $notifications as notification (notification.id)}
     <div

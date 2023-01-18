@@ -13,6 +13,7 @@
     interactables,
     type Mutations,
     type SequenceItem,
+    type Evolve,
   } from "../store";
   import { SIZE } from "$src/constants";
   import type { CollisionType } from "$src/types";
@@ -29,6 +30,7 @@
     points: number;
     hp: number;
     modifiers: Array<[string, number]>;
+    evolve: Evolve;
   }
 
   interface _Interactables {
@@ -472,7 +474,7 @@
       if (interactedItem == undefined) return;
       let interactable: _Interactable = _interactables[interactedItem];
       if (interactable == undefined || interactable.executing) return;
-      let { sequence, modifiers } = interactable;
+      let { sequence, modifiers, evolve, devolve } = interactable;
 
       for (let { type, ...args } of sequence) {
         if (type == "addToPlayerInventory") {
@@ -485,27 +487,21 @@
       _interactables[interactedItem].executing = true;
       console.log("executing");
 
-      let ce = "any";
+      let modifierKey = "any";
 
       if (inventories.has(ac)) {
-        ce = (inventories.get(ac) || [])[currentInventoryIndex];
+        modifierKey = (inventories.get(ac) || [])[currentInventoryIndex];
       }
 
-      let modifier = modifiers.find((m) => m[0] == ce);
+      let modifier = modifiers.find((m) => m[0] == modifierKey);
       if (modifier == undefined) {
         modifier = modifiers[0];
       }
 
+      if (modifier[1] == 0) return;
+
       let { current, max } = hps.get(ic) || { current: 0, max: 0 };
       hps.set(ic, { current: current + modifier[1], max });
-
-      // @ts-expect-error
-      if (hps.get(ic)?.current <= 0) {
-        items.delete(ic);
-      }
-
-      items = items;
-      hps = hps;
 
       for (let { type, ...args } of sequence) {
         if (type == "wait") {
@@ -514,6 +510,26 @@
           m[type](args);
         }
       }
+
+      // @ts-expect-error
+      if (hps.get(ic)?.current <= 0) {
+        // TODO: add devolve
+        // TODO: sync hps and inventories
+        if (devolve.to != "") {
+          items.set(ic, devolve.to);
+        } else {
+          items.delete(ic);
+        }
+      } else if (evolve.at == hps.get(ic)) {
+        items.set(ic, evolve.to);
+        // @ts-expect-error
+        hps.set(ic, _interactables[items.get(ic)]);
+      }
+      // TODO: Add evolve
+      // TODO: sync hps and inventories
+
+      items = items;
+      hps = hps;
 
       _interactables[interactedItem].executing = false;
       return;

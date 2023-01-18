@@ -114,10 +114,11 @@
   let modifiers: Array<[string, number]> = [];
   let evolve = {
     to: "",
-    at: 1,
+    at: 2,
   };
-
-  let enableEvolution;
+  let devolve = {
+    to: "",
+  };
 
   // SEQUENCE RELATED
   let type = types.Background[0];
@@ -128,13 +129,18 @@
   onMount(() => {
     let obj = $interactables.get(id);
     if (!obj) return;
-    ({ emoji, sequence, hp, points, modifiers, evolve } = obj);
+    ({ emoji, sequence, hp, points, modifiers, evolve, devolve } = obj);
   });
+
+  // ONLY REQUIRED FOR VISUALITY
+  // TODO: determine values based on store data
+  let evolveEnabled = evolve.to != "";
+  let devolveEnabled = devolve.to != "";
 
   function updateStore() {
     interactables.update(
       id,
-      new Interactable(emoji, sequence, hp, points, modifiers, evolve)
+      new Interactable(emoji, sequence, hp, points, modifiers, evolve, devolve)
     );
     nodesStore.adjustHeight(id, sequence.length, INTERACTABLE_H);
   }
@@ -181,31 +187,167 @@
     updateStore();
   }
 
+  function updateEmoji() {
+    if (
+      $currentEmoji != "" &&
+      [evolve.to, devolve.to].includes($currentEmoji)
+    ) {
+      notifications.warning(
+        "An interactable cannot evolve or devolve to itself"
+      );
+      return;
+    }
+
+    for (let [_id, val] of $interactables.entries()) {
+      if (_id == id) continue;
+
+      if ($currentEmoji == val.emoji) {
+        notifications.warning("Cannot have two interactables with same emoji");
+        return;
+      }
+    }
+
+    emoji = $currentEmoji;
+    updateStore();
+  }
+
+  function updateEvolveEmoji() {
+    if (emoji == $currentEmoji) {
+      notifications.warning("An interactable cannot evolve to itself");
+      return;
+    }
+
+    evolve.to = $currentEmoji;
+    updateStore();
+  }
+
+  // this function deals with two-way binded variable
+  function updateHP() {
+    if (hp >= evolve.at) {
+      notifications.warning(
+        "Default HP cannot be bigger than or equal to evolve HP"
+      );
+      hp = evolve.at - 1;
+    }
+
+    updateStore();
+  }
+
+  // this function deals with two-way binded variable
+  function updateEvolveHP() {
+    if (evolve.at <= hp) {
+      notifications.warning(
+        "Evolve HP cannot be smaller than or equal to default HP"
+      );
+      evolve.at = hp + 1;
+    }
+
+    updateStore();
+  }
+
+  function updateDevolveEmoji() {
+    if (emoji == $currentEmoji) {
+      notifications.warning("An interactable cannot devolve to itself");
+      return;
+    }
+
+    devolve.to = $currentEmoji;
+    updateStore();
+  }
+
   function updateSlot(i: number) {
     sequence[i].emoji = $currentEmoji;
     updateStore();
   }
 
   // TODO: adjustHeight for modifiers
-  // TODO: evolve boolean and design
+
+  $: console.log(modifiers);
+  $: hasInteraction = modifiers
+    .filter((m) => m[0] != "")
+    .some((m) => m[1] != 0);
 </script>
 
-<div class="slot-lg absolute -top-12" on:click={() => (emoji = $currentEmoji)}>
-  {emoji}
-</div>
-<div class="absolute top-8">
-  <select
-    class="select select-bordered select-sm text-xl"
-    title="HP"
-    bind:value={hp}
-    on:change={updateStore}
-  >
-    {#each hps as _hp}
-      <option value={_hp}>{_hp}</option>
-    {/each}
-  </select>
+<div class="absolute -top-8 flex flex-row items-center justify-center gap-2">
+  {#if devolveEnabled}
+    <div
+      class="flex {evolveEnabled
+        ? 'scale-75'
+        : ''} flex-col items-center justify-center"
+    >
+      <div class="slot-lg" on:click={updateDevolveEmoji}>
+        {devolve.to}
+      </div>
+      <div class="absolute -bottom-2">
+        <select
+          disabled
+          class="select select-bordered select-sm text-xl"
+          title="HP"
+        >
+          <option value={0}>0</option>
+        </select>
+      </div>
+    </div>
+  {/if}
+  <div class="flex flex-col items-center justify-center">
+    <div class="slot-lg" on:click={updateEmoji}>
+      {emoji}
+    </div>
+    <div class="absolute -bottom-2">
+      <select
+        class="select select-bordered select-sm text-xl"
+        title="HP"
+        bind:value={hp}
+        on:change={updateHP}
+      >
+        {#each hps as _hp}
+          <option value={_hp}>{_hp}</option>
+        {/each}
+      </select>
+    </div>
+  </div>
+  <!-- TODO: Evolve hp and default hp can't be same -->
+  {#if evolveEnabled}
+    <div
+      class="flex {devolveEnabled
+        ? 'scale-75'
+        : ''}  flex-col  items-center justify-center"
+    >
+      <div class="slot-lg" on:click={updateEvolveEmoji}>
+        {evolve.to}
+      </div>
+      <div class="absolute -bottom-2">
+        <select
+          class="select select-bordered select-sm text-xl"
+          title="HP"
+          bind:value={evolve.at}
+          on:change={updateEvolveHP}
+        >
+          {#each hps as _hp}
+            <option value={_hp}>{_hp}</option>
+          {/each}
+        </select>
+      </div>
+    </div>
+  {/if}
 </div>
 <main class="pt-16">
+  <div class="form-control">
+    <label class="label cursor-pointer">
+      <span class="label-text">Evolve</span>
+      <input type="checkbox" class="checkbox" bind:checked={evolveEnabled} />
+    </label>
+    <label class="label cursor-pointer">
+      <span class="label-text">Devolve</span>
+      <input type="checkbox" class="checkbox" bind:checked={devolveEnabled} />
+    </label>
+  </div>
+  <!-- <div>
+    <input type="checkbox" bind:checked={evolveEnabled} />
+  </div>
+  <div>
+    <input type="checkbox" bind:checked={devolveEnabled} />
+  </div> -->
   {#each sequence as s, i}
     <span>
       <select class="select" title="event type" bind:value={s.type}>
@@ -317,7 +459,16 @@
     <button class="text-3xl" on:click={addToSequence}>+</button>
   </label>
   <div class="form-control flex flex-col">
-    <b>hp modifiers</b>
+    <p>
+      <b>hp modifiers</b>
+      {#if !hasInteraction}
+        <div
+          class="tooltip"
+          data-tip="An interactable needs at least one positive or negative modifier to fire events"
+        >
+          <button class="btn text-4xl text-warning">!</button>
+        </div>{/if}
+    </p>
     {#each modifiers as [key, value], i}
       <div class="flex flex-row items-center justify-start gap-2">
         <div class="slot" on:click={() => updateModifierKey(i)}>

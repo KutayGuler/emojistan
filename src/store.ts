@@ -52,9 +52,13 @@ export class SequenceItem {
   }
 }
 
-interface Evolve {
+export interface Evolve {
   to: string;
   at: number;
+}
+
+export interface Devolve {
+  to: string;
 }
 
 export interface Interactable {
@@ -64,6 +68,7 @@ export interface Interactable {
   hp: number;
   modifiers: Array<[string, number]>;
   evolve: Evolve;
+  devolve: Devolve;
 }
 
 export class Interactable {
@@ -73,7 +78,8 @@ export class Interactable {
     hp: number,
     points: number,
     modifiers: Array<[string, number]>,
-    evolve: Evolve
+    evolve: Evolve,
+    devolve: Devolve
   ) {
     this.emoji = emoji;
     this.sequence = sequence;
@@ -81,6 +87,7 @@ export class Interactable {
     this.points = points;
     this.modifiers = modifiers;
     this.evolve = evolve;
+    this.devolve = devolve;
   }
 }
 

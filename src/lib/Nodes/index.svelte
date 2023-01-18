@@ -85,6 +85,7 @@
   />
   <!-- CF #3 -->
   <button
+    style:display={node.component == "spawner" ? "none" : "flex"}
     style="border-color: {node.borderColor}"
     class="absolute top-0 right-0 flex h-6 w-6 cursor-pointer items-center justify-center rounded border-2 bg-white text-center text-xl"
     on:click={() => {

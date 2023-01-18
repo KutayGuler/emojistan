@@ -2,13 +2,8 @@
   import { merges, pushes, interactables, Interactable } from "../store";
   import type { NodeComponent } from "$lib/types";
   import { nodesStore } from "$lib/stores/store";
-  import Pusher from "./Pusher.svelte";
 
   export let position: { x: number; y: number };
-  // export let --pusherBG
-  // export let pusherBG;
-  // export let mergerBG;
-  // export let interactableBG;
 
   // CF #4
   function spawn(component: NodeComponent, value: any, receiver = false) {
@@ -43,13 +38,21 @@
       onClick: () =>
         spawn(
           "interactable",
-          new Interactable("", [], 1, 1, [["any", 0]], { to: "", at: 1 })
+          new Interactable(
+            "",
+            [],
+            1,
+            1,
+            [["any", 0]],
+            { to: "", at: 2 },
+            { to: "" }
+          )
         ),
     },
   ];
 </script>
 
-<ul class="w-full bg-white opacity-90">
+<ul class="w-full bg-white">
   {#each menuItems as { name, onClick }}
     <li
       class="{name} box-border h-8 w-full pl-2 text-start hover:bg-base-200"
