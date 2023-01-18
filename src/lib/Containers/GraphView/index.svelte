@@ -1,6 +1,8 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  // @ts-expect-error
   import { zoom, zoomTransform } from "d3-zoom";
+  // @ts-expect-error
   import { select, selectAll } from "d3-selection";
   import {
     nodesStore,
@@ -11,9 +13,6 @@
     heightStore,
     d3Scale,
   } from "$lib/stores/store";
-
-  import SimpleBezierEdge from "$lib/Edges/SimpleBezierEdge.svelte";
-  import EdgeAnchor from "$lib/Edges/EdgeAnchor.svelte";
   import Node from "$lib/Nodes/index.svelte";
 
   // leveraging d3 library to zoom/pan
@@ -32,16 +31,16 @@
   const gridSize = 15;
   const dotSize = 10;
 
-  let nodesDiv;
+  let nodesDiv: HTMLDivElement;
 
   onMount(() => {
     d3.select(`.Edges`).call(d3Zoom).on("dblclick.zoom", null);
     d3.select(`.Nodes`).call(d3Zoom).on("dblclick.zoom", null);
-    d3.select(`.Nodes`).on("contextmenu", function (e) {
+    d3.select(`.Nodes`).on("contextmenu", function (e: MouseEvent) {
       e.preventDefault();
       let { x, y, k } = d3.zoomTransform(nodesDiv);
-      y = (-y + e.layerY) / k;
-      x = (-x + e.layerX) / k;
+      y = (-y + e.layerY) / k; // e.layerX is experimental and not recommended
+      x = (-x + e.layerX) / k; // e.layerY is experimental and not recommended
       nodesStore.spawn("spawner", { x, y });
     });
   });
@@ -73,6 +72,7 @@
     // transform 'g' SVG elements (edge, edge text, edge anchor)
     d3.select(`.Edges g`).attr("transform", e.transform);
     // transform div elements (nodes)
+    // @ts-expect-error
     let transform = d3.zoomTransform(this);
     // selects and transforms all node divs from class 'Node' and performs transformation
     d3.select(`.Node`)
@@ -89,21 +89,12 @@
       .style("transform-origin", "0 0");
   }
 
-  function handleKeydown(e: KeyboardEvent) {
-    if (e.code == "Tab") {
-      e.preventDefault();
-      changeZ();
-    }
-  }
-
   function clickedOnNodes() {
     nodesStore.removeSpawner();
   }
 
   function clickedOnEdges() {}
 </script>
-
-<svelte:window on:keydown={handleKeydown} />
 
 <!-- This is the container that holds GraphView and we have disabled right click functionality to prevent a sticking behavior -->
 <div class={`Nodes`} bind:this={nodesDiv} on:click={clickedOnNodes}>
@@ -143,23 +134,6 @@
   {#if $backgroundStore}
     <rect width="100%" height="100%" style="fill: url(#background);" />
   {/if}
-
-  <!-- <g> tag defines which edge type to render depending on properties of edge object -->
-  <g>
-    {#each $derivedEdges as edge}
-      <SimpleBezierEdge {edge} />
-    {/each}
-    {#each $nodesStore as node}
-      {@const target = node.targetPosition != undefined}
-      {#if !["spawner", "pusher", "merger"].includes(node.component)}
-        <EdgeAnchor
-          {node}
-          x={node.position.x + (target ? 0 : node.width)}
-          y={node.position.y + node.height / 2}
-        />
-      {/if}
-    {/each}
-  </g>
 </svg>
 
 <style>
