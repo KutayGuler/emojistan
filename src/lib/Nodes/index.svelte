@@ -4,7 +4,6 @@
     onNodeClick,
     onTouchMove,
     nodesStore,
-    edgesStore,
     nodeSelected,
     nodeIdSelected,
     movementStore,
@@ -17,11 +16,8 @@
   import Pusher from "$components/Pusher.svelte";
   import Merger from "$components/Merger.svelte";
   import {
-    INTERACTABLE_BG,
     INTERACTABLE_BORDER,
-    MERGER_BG,
     MERGER_BORDER,
-    PUSHER_BG,
     PUSHER_BORDER,
   } from "$src/constants";
 
@@ -93,7 +89,6 @@
     class="absolute top-0 right-0 flex h-6 w-6 cursor-pointer items-center justify-center rounded border-2 bg-white text-center text-xl"
     on:click={() => {
       nodesStore.remove(node.id);
-      edgesStore.filter(node.id);
 
       switch (node.component) {
         case "pusher":
@@ -111,20 +106,6 @@
     }}
   >
     🞫
-    <!-- <svg
-      class="w-3"
-      xmlns="http://www.w3.org/2000/svg"
-      fill="white"
-      viewBox="0 0 24 24"
-      stroke="black"
-      stroke-width="2"
-    >
-      <path
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        d="M6 18L18 6M6 6l12 12"
-      />
-    </svg> -->
   </button>
   <!-- CF #2 -->
   {#if node.component == "spawner"}

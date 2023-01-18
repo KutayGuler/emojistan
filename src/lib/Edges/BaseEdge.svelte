@@ -1,7 +1,6 @@
 <script lang="ts">
   // import EdgeText from "$lib/Edges/EdgeText.svelte";
   import type { EdgeProps } from "$lib/types/types";
-  import { edgesStore } from "../stores/store";
 
   export let baseEdgeProps: EdgeProps;
 
@@ -28,9 +27,6 @@
 </script>
 
 <path
-  on:click={() => {
-    edgesStore.remove(id);
-  }}
   d={path}
   fill="transparent"
   stroke={edgeColor ? edgeColor : "gray"}

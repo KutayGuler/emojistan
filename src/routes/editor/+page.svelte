@@ -25,7 +25,7 @@
   import { emojis } from "./emojis";
   import { SIZE } from "$src/constants";
   import { notifications } from "../notifications";
-  import { edgesStore, nodesStore } from "$lib/stores/store";
+  import { nodesStore } from "$lib/stores/store";
 
   import Svelvet from "$lib";
   import Palette from "$components/Palette.svelte";
@@ -49,7 +49,6 @@
       palette,
       statics,
       nodesStore,
-      edgesStore,
     ]) {
       store.useStorage($saves.current);
     }

@@ -52,7 +52,7 @@
   // modifiers: any: 0 | 💧: +1
   // evolveAt: hp 10 to {🌳}
 
-  import { edgesStore, nodesStore } from "$src/lib/stores/store";
+  import { nodesStore } from "$src/lib/stores/store";
   import { onDestroy, onMount } from "svelte";
   import { notifications } from "../routes/notifications";
   import {
@@ -143,7 +143,6 @@
     if (emoji == "") {
       interactables.remove(id);
       nodesStore.remove(id);
-      edgesStore.filter(id);
       return;
     }
 

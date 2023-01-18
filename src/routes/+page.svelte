@@ -12,7 +12,7 @@
     interactables,
   } from "../store";
   import { navigating } from "$app/stores";
-  import { nodesStore, edgesStore } from "$lib/stores/store";
+  import { nodesStore } from "$lib/stores/store";
 
   onMount(() => {
     if ($saves.current == "") saves.useStorage();
@@ -56,7 +56,6 @@
           statics: Array.from($statics),
           palette: Array.from($palette),
           nodes: Array.from($nodesStore),
-          edges: Array.from($edgesStore),
           pushes: Object.fromEntries($pushes),
           merges: Object.fromEntries($merges),
           interactables: Object.fromEntries($interactables),
