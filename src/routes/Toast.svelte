@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
   import { flip } from "svelte/animate";
   import { fly } from "svelte/transition";
   import { notifications } from "./notifications";
 
+  // TODO: Change theme
   export let themes = {
     danger: "#E26D69",
     success: "#84C991",
@@ -18,12 +19,13 @@
   {#each $notifications as notification (notification.id)}
     <div
       animate:flip
+      style:background={themes[notification.type]}
       class:shake={notification.shake}
-      class="btn mt-2 h-fit"
-      style="background: {themes[notification.type]};"
+      class="mt-2 h-fit"
       transition:fly={{ y: -30 }}
     >
-      <div class="p-4 text-4xl">{notification.message}</div>
+      <!-- {getBackgroundAndText(notification.type)} -->
+      <div class="p-4 text-2xl">{notification.message}</div>
       {#if notification.icon}<i class={notification.icon} />{/if}
     </div>
   {/each}

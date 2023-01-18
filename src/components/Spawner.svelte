@@ -1,5 +1,12 @@
 <script lang="ts">
-  import { merges, pushes, interactables, Interactable } from "../store";
+  import {
+    merges,
+    pushes,
+    interactables,
+    Interactable,
+    Evolve,
+    Devolve,
+  } from "../store";
   import type { NodeComponent } from "$lib/types";
   import { nodesStore } from "$lib/stores/store";
 
@@ -44,8 +51,8 @@
             1,
             1,
             [["any", 0]],
-            { to: "", at: 2 },
-            { to: "" }
+            new Evolve(false, "", 2),
+            new Devolve(false, "")
           )
         ),
     },

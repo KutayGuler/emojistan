@@ -53,12 +53,29 @@ export class SequenceItem {
 }
 
 export interface Evolve {
+  enabled: boolean;
   to: string;
   at: number;
 }
 
+export class Evolve {
+  constructor(enabled: boolean, to: string, at: number) {
+    this.enabled = enabled;
+    this.to = to;
+    this.at = at;
+  }
+}
+
 export interface Devolve {
+  enabled: boolean;
   to: string;
+}
+
+export class Devolve {
+  constructor(enabled: boolean, to: string) {
+    this.enabled = enabled;
+    this.to = to;
+  }
 }
 
 export interface Interactable {
@@ -268,7 +285,7 @@ function createEditableMap() {
         state.items.delete(index);
         return state;
       }),
-    clearObjects: () =>
+    clearItems: () =>
       update((state) => {
         state.items.clear();
         return state;

@@ -513,19 +513,17 @@
 
       // @ts-expect-error
       if (hps.get(ic)?.current <= 0) {
-        // TODO: add devolve
         // TODO: sync hps and inventories
         if (devolve.to != "") {
           items.set(ic, devolve.to);
         } else {
           items.delete(ic);
         }
-      } else if (evolve.at == hps.get(ic)) {
+      } else if (evolve.at == hps.get(ic)?.current) {
         items.set(ic, evolve.to);
         // @ts-expect-error
         hps.set(ic, _interactables[items.get(ic)]);
       }
-      // TODO: Add evolve
       // TODO: sync hps and inventories
 
       items = items;

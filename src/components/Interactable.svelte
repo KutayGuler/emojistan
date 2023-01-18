@@ -56,12 +56,14 @@
   import { onDestroy, onMount } from "svelte";
   import { notifications } from "../routes/notifications";
   import {
-    currentEmoji,
-    Interactable,
-    interactables,
-    palette,
-    SequenceItem,
     map,
+    palette,
+    currentEmoji,
+    interactables,
+    Interactable,
+    SequenceItem,
+    Evolve,
+    Devolve,
     type Mutations,
   } from "../store";
 
@@ -109,33 +111,25 @@
   export let id: number;
   let emoji = "";
   let sequence: Array<SequenceItem> = [];
-  let hp = 1;
-  let points = 0;
+  let hp: number;
+  let points: number;
   let modifiers: Array<[string, number]> = [];
-  let evolve = {
-    to: "",
-    at: 2,
-  };
-  let devolve = {
-    to: "",
-  };
+  let evolve = new Evolve(false, "", 2);
+  let devolve = new Devolve(false, "");
 
   // SEQUENCE RELATED
-  let type = types.Background[0];
+  let type = types.Player[0];
   let duration = 0;
   let index = 0;
   let background = "";
 
   onMount(() => {
     let obj = $interactables.get(id);
+    console.log(obj);
+
     if (!obj) return;
     ({ emoji, sequence, hp, points, modifiers, evolve, devolve } = obj);
   });
-
-  // ONLY REQUIRED FOR VISUALITY
-  // TODO: determine values based on store data
-  let evolveEnabled = evolve.to != "";
-  let devolveEnabled = devolve.to != "";
 
   function updateStore() {
     interactables.update(
@@ -178,7 +172,7 @@
     ];
     updateStore();
 
-    [type, duration, index, background] = [types.Background[0], 0, 0, ""];
+    [type, duration, index, background] = [types.Player[0], 0, 0, ""];
   }
 
   function removeFromSequence(i: number) {
@@ -223,7 +217,7 @@
 
   // this function deals with two-way binded variable
   function updateHP() {
-    if (hp >= evolve.at) {
+    if (evolve.enabled && hp >= evolve.at) {
       notifications.warning(
         "Default HP cannot be bigger than or equal to evolve HP"
       );
@@ -260,6 +254,12 @@
     updateStore();
   }
 
+  function checkEvolve(e) {
+    if (evolve.at < hp) {
+      evolve.at = hp + 1;
+    }
+  }
+
   // TODO: adjustHeight for modifiers
 
   $: console.log(modifiers);
@@ -269,9 +269,9 @@
 </script>
 
 <div class="absolute -top-8 flex flex-row items-center justify-center gap-2">
-  {#if devolveEnabled}
+  {#if devolve.enabled}
     <div
-      class="flex {evolveEnabled
+      class="flex {evolve.enabled
         ? 'scale-75'
         : ''} flex-col items-center justify-center"
     >
@@ -306,10 +306,10 @@
       </select>
     </div>
   </div>
-  <!-- TODO: Evolve hp and default hp can't be same -->
-  {#if evolveEnabled}
+  {#if evolve.enabled}
     <div
-      class="flex {devolveEnabled
+      use:checkEvolve
+      class="flex {devolve.enabled
         ? 'scale-75'
         : ''}  flex-col  items-center justify-center"
     >
@@ -335,19 +335,13 @@
   <div class="form-control">
     <label class="label cursor-pointer">
       <span class="label-text">Evolve</span>
-      <input type="checkbox" class="checkbox" bind:checked={evolveEnabled} />
+      <input type="checkbox" class="checkbox" bind:checked={evolve.enabled} />
     </label>
     <label class="label cursor-pointer">
       <span class="label-text">Devolve</span>
-      <input type="checkbox" class="checkbox" bind:checked={devolveEnabled} />
+      <input type="checkbox" class="checkbox" bind:checked={devolve.enabled} />
     </label>
   </div>
-  <!-- <div>
-    <input type="checkbox" bind:checked={evolveEnabled} />
-  </div>
-  <div>
-    <input type="checkbox" bind:checked={devolveEnabled} />
-  </div> -->
   {#each sequence as s, i}
     <span>
       <select class="select" title="event type" bind:value={s.type}>

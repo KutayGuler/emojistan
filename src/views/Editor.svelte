@@ -3,8 +3,21 @@
   import { currentEmoji, currentColor, map } from "../store";
 
   export let showIndex = false;
+  export let deleteMode: "Item" | "Background" | "Both";
 
   function clickedCell(index: number) {
+    switch (deleteMode) {
+      case "Item":
+        if ($currentEmoji == "") map.removeEmoji(index);
+        break;
+      case "Background":
+        if ($currentColor == "") map.deleteBackground(index);
+        break;
+      case "Both":
+        if ($currentColor == "") map.deleteBackground(index);
+        if ($currentEmoji == "") map.removeEmoji(index);
+        break;
+    }
     if ($currentColor != "" && $currentColor != $map.dbg) {
       map.updateBackground(index, $currentColor);
     }
@@ -14,14 +27,8 @@
     }
   }
 
-  // TODO: Right click to copy
-
   function rightClickedCell(index: number) {
-    if ($map.items.has(index)) {
-      map.removeEmoji(index);
-    } else {
-      map.deleteBackground(index);
-    }
+    $currentEmoji = $map.items.get(index) || "";
   }
 </script>
 

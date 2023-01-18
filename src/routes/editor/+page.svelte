@@ -74,9 +74,15 @@
 
   let showIndex = false;
 
-  const clearModes = ["Items", "Backgrounds", "All"];
+  type DeleteMode = "Item" | "Background" | "Both";
+  const deleteModes: Array<DeleteMode> = ["Item", "Background", "Both"];
+  const deleteTexts: { [key in DeleteMode]: string } = {
+    Item: "ITEMS",
+    Background: "BGS",
+    Both: "ALL",
+  };
 
-  let clearMode = clearModes[2];
+  let deleteMode = deleteModes[2];
 
   function fillMap() {
     if ($currentEmoji == "") return;
@@ -87,14 +93,14 @@
   }
 
   function clearMap() {
-    switch (clearMode) {
-      case "Items":
-        map.clearObjects();
+    switch (deleteMode) {
+      case "Item":
+        map.clearItems();
         break;
-      case "Backgrounds":
+      case "Background":
         map.clearBackgrounds();
         break;
-      case "All":
+      case "Both":
         map.clearAll();
         break;
     }
@@ -102,8 +108,6 @@
 
   let test = false;
   let view: "editor" | "rules" = "rules";
-
-  // TODO: bring back delete mode
 </script>
 
 <svelte:head>
@@ -178,17 +182,22 @@
               </div>
               <div class="flex flex-col gap-2">
                 <div class="form-control w-full max-w-xs">
-                  <label for="clearMode" class="label">
-                    <span class="label-text">Clear Mode</span>
+                  <label for="deleteMode" class="label">
+                    <span class="label-text">Delete Mode</span>
                   </label>
-                  <select class="select select-bordered" bind:value={clearMode}>
-                    {#each clearModes as mode}
+                  <select
+                    class="select select-bordered"
+                    bind:value={deleteMode}
+                  >
+                    {#each deleteModes as mode}
                       <option value={mode}>{mode}</option>
                     {/each}
                   </select>
                 </div>
                 <div class="flex flex-row" />
-                <button class="btn bg-accent" on:click={clearMap}>CLEAR</button>
+                <button class="btn bg-accent" on:click={clearMap}
+                  >CLEAR {deleteTexts[deleteMode]}
+                </button>
                 <button
                   disabled={$currentEmoji == ""}
                   class="btn"
@@ -229,7 +238,7 @@
         <Play />
       {:else if view == "editor"}
         <div class="flex flex-col justify-center px-8">
-          <Editor {showIndex} />
+          <Editor {showIndex} {deleteMode} />
         </div>
       {:else if view == "rules"}
         <div class="flex flex-col justify-center px-8">
