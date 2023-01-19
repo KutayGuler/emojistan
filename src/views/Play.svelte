@@ -14,6 +14,7 @@
     type Mutations,
     type SequenceItem,
     type Evolve,
+    Devolve,
   } from "../store";
   import { SIZE } from "$src/constants";
   import type { CollisionType } from "$src/types";
@@ -31,6 +32,7 @@
     hp: number;
     modifiers: Array<[string, number]>;
     evolve: Evolve;
+    devolve: Devolve;
   }
 
   interface _Interactables {
@@ -135,6 +137,7 @@
   }
 
   function getPercentage(max: number, current: number) {
+    if (current > max) return 1;
     return numbers.get(Math.floor((current * 100) / max)) || 0;
   }
 
@@ -186,6 +189,8 @@
       items.set(ac, emoji);
     },
     addToPlayerInventory({ emoji }) {
+      console.log(emoji);
+
       console.log(inventories.get(ac)?.length);
 
       if (emoji && inventories.get(ac)?.length != 4) {
@@ -208,6 +213,7 @@
       items.delete(ac);
       // @ts-expect-error
       items.set(index, emoji);
+      // TODO: sync hps and inventories
       ac = index;
       items = items;
     },
@@ -225,7 +231,13 @@
     addToPlayerHP: ({ points }) => {
       let { current, max } = hps.get(ac) || { current: 0, max: 0 };
       current += points;
-      hps.set(ac, { current: current, max: max });
+      console.log(current, max);
+
+      if (current > max) {
+        hps.set(ac, { current, max: current });
+      } else {
+        hps.set(ac, { current, max });
+      }
       progress.set(getPercentage(max, current));
     },
   };
@@ -511,28 +523,53 @@
         }
       }
 
+      let playerEvolve = _interactables[items.get(ac)].evolve;
+      let playerDevolve = _interactables[items.get(ac)].devolve;
+
+      // EVOLVE & DEVOLVE PLAYER
+      // @ts-expect-error
+      if (hps.get(ac)?.current <= 0) {
+        if (playerDevolve?.enabled && playerDevolve.to != "") {
+          items.set(ac, playerDevolve.to);
+        } else {
+          items.delete(ac);
+          inventories.delete(ac);
+          hps.delete(ac);
+        }
+      } else if (
+        playerEvolve?.enabled &&
+        playerEvolve.at == hps.get(ac)?.current
+      ) {
+        items.set(ac, playerEvolve.to);
+      }
+
+      // EVOLVE & DEVOLVE INTERACTED ITEM
       // @ts-expect-error
       if (hps.get(ic)?.current <= 0) {
-        // TODO: sync hps and inventories
-        if (devolve.to != "") {
+        if (devolve?.enabled && devolve.to != "") {
           items.set(ic, devolve.to);
         } else {
           items.delete(ic);
         }
-      } else if (evolve.at == hps.get(ic)?.current) {
+      } else if (evolve?.enabled && evolve.at == hps.get(ic)?.current) {
         items.set(ic, evolve.to);
-        // @ts-expect-error
-        hps.set(ic, _interactables[items.get(ic)]);
       }
-      // TODO: sync hps and inventories
 
       items = items;
       hps = hps;
 
       _interactables[interactedItem].executing = false;
+      console.log("executed");
+
       return;
     }
   }
+
+  // TODO: Try object oriented approach
+  // hps and inventories can be put into an Item object
+  // which can be stored in items<string, Item>
+  // non-oop approach requires thinking of too many edge cases
+  // to synchronize data
 </script>
 
 <svelte:window on:keydown={handle} />

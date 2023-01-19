@@ -260,9 +260,9 @@
     }
   }
 
+  // TODO: modifier design like evolve, devolve
   // TODO: adjustHeight for modifiers
 
-  $: console.log(modifiers);
   $: hasInteraction = modifiers
     .filter((m) => m[0] != "")
     .some((m) => m[1] != 0);
