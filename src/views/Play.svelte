@@ -25,6 +25,51 @@
     };
   }
 
+  // TODO: JSDoc this function mutates ac if it is equal to "from" parameter
+  function transferItem(from: number, to: number) {
+    items.set(to, items.get(from));
+    items.delete(from);
+    items = items;
+    if (ac == from) {
+      ac = to;
+      ic = ac + dirs[dirKey].operation;
+    }
+  }
+
+  interface HP {
+    current: number;
+    max: number;
+    add(points: number): void;
+  }
+
+  class HP {
+    constructor(points: number) {
+      this.current = points;
+      this.max = points;
+    }
+
+    add(points: number) {
+      this.current += points;
+      if (this.current > this.max) {
+        this.max = this.current;
+      }
+    }
+  }
+
+  interface Item {
+    emoji: string;
+    inventory: [string, string, string, string] | [];
+    hp: HP;
+  }
+
+  class Item {
+    constructor(emoji: string) {
+      this.emoji = emoji;
+      this.inventory = [];
+      this.hp = new HP(0);
+    }
+  }
+
   interface _Interactable {
     executing: boolean;
     sequence: Array<SequenceItem>;
@@ -93,15 +138,12 @@
     KeyD: { style: `right: -30%;`, emoji: "➡️", operation: 1 },
   };
   let dirKey: Wasd = "KeyD";
+  let currentInventoryIndex = 0;
 
   /* ## DATA ## */
   let _map = structuredClone($map);
-  let items = new Map(_map.items);
+  let items = new Map<number, Item>();
   let backgrounds = new Map(_map.backgrounds);
-  let hps = new Map<number, { max: number; current: number }>();
-  let inventories = new Map<number, Array<string>>();
-  let currentInventoryIndex = 0;
-
   let _interactables: _Interactables = {};
 
   for (let [id, interactable] of $interactables) {
@@ -111,21 +153,28 @@
     Object.assign(_interactables[emoji], args);
   }
 
-  for (let [index, emoji] of items) {
-    if (ac == -2 && !$statics.has(emoji)) {
-      ac = index;
-      ic = ac + 1;
+  function initItems() {
+    for (let [id, item] of _map.items) {
+      items.set(id, new Item(item));
     }
 
-    hps.set(index, {
-      max: _interactables[emoji]?.hp || 0,
-      current: _interactables[emoji]?.hp || 0,
-    });
+    for (let [index, { emoji, hp }] of items) {
+      if (ac == -2 && !$statics.has(emoji)) {
+        ac = index;
+        ic = ac + 1;
+      }
+
+      hp.max = _interactables[emoji]?.hp || 0;
+      hp.current = _interactables[emoji]?.hp || 0;
+    }
   }
 
-  console.log(ac);
+  initItems();
+  console.log(items, ac);
+  $: player = items.get(ac);
+  console.log(player); // TODO: why is it undefined?
 
-  let progress = tweened(hps.get(ac)?.current || 0, {
+  let progress = tweened(player?.hp.current || 0, {
     duration: 400,
     easing: cubicOut,
   });
@@ -136,9 +185,11 @@
     numbers.set(i, i / 100);
   }
 
-  function getPercentage(max: number, current: number) {
-    if (current > max) return 1;
-    return numbers.get(Math.floor((current * 100) / max)) || 0;
+  function getHPpercentage(): number {
+    let { hp } = player;
+    if (!hp) return 0;
+    if (hp.current > hp.max) return 1;
+    return numbers.get(Math.floor((hp.current * 100) / hp.max)) || 0;
   }
 
   let _collisions: _Collisions = {};
@@ -173,7 +224,7 @@
       backgrounds.delete(index);
     },
     spawn({ index, emoji }) {
-      items.set(index, emoji);
+      items.set(index, new Item(emoji));
       items = items;
     },
     destroy({ index }) {
@@ -186,42 +237,24 @@
       });
     },
     changePlayerTo({ emoji }) {
-      items.set(ac, emoji);
+      // @ts-expect-error
+      player.emoji = emoji;
     },
     addToPlayerInventory({ emoji }) {
-      console.log(emoji);
-
-      console.log(inventories.get(ac)?.length);
-
-      if (emoji && inventories.get(ac)?.length != 4) {
-        console.log("trigger");
-
-        if (inventories.get(ac) == undefined) {
-          inventories.set(ac, [emoji]);
-        } else {
-          console.log(inventories.get(ac));
-          inventories.set(ac, [...(inventories.get(ac) || []), emoji]);
-        }
-
-        items.delete(ic);
-        inventories = inventories;
+      if (emoji && player?.inventory.length != 4) {
+        player?.inventory.push(emoji);
         items = items;
       }
     },
     teleportPlayerTo({ index }) {
-      let emoji = items.get(ac);
-      items.delete(ac);
-      // @ts-expect-error
-      items.set(index, emoji);
-      // TODO: sync hps and inventories
-      ac = index;
+      transferItem(ac, index);
       items = items;
     },
     freezePlayer: () => (playerFrozen = true),
     unfreezePlayer: () => (playerFrozen = false),
     resetLevel: () => {
       backgrounds = new Map(_map.backgrounds);
-      items = new Map(_map.items);
+      initItems();
       ac = items.entries().next().value[0];
       ic = ac + 1;
       dirKey = "KeyD";
@@ -229,16 +262,9 @@
     },
     completeLevel: () => (levelCompleted = true),
     addToPlayerHP: ({ points }) => {
-      let { current, max } = hps.get(ac) || { current: 0, max: 0 };
-      current += points;
-      console.log(current, max);
-
-      if (current > max) {
-        hps.set(ac, { current, max: current });
-      } else {
-        hps.set(ac, { current, max });
-      }
-      progress.set(getPercentage(max, current));
+      if (!player) return;
+      player.hp.add(points);
+      progress.set(getHPpercentage());
     },
   };
 
@@ -247,36 +273,15 @@
     return _collisions[key1][key2] || "bump";
   }
 
-  function syncData(operation: number) {
-    if (inventories.size != 0) {
-      inventories.set(ac, inventories.get(ac - operation) || []);
-      inventories.delete(ac - operation);
-      inventories = inventories;
-    }
-
-    hps.set(ac, hps.get(ac - operation) || { current: 0, max: 0 });
-    hps.delete(ac - operation);
-    hps = hps;
-  }
-
-  function moveActiveCell(operation: number, _delete?: boolean) {
-    if (_delete) {
-      items.delete(ac);
-    }
-    ac += operation;
-    ic = ac + dirs[dirKey].operation;
-    syncData(operation);
-    items = items; // MAGIC UPDATE, NECESSARY FOR REACTIVITY
-  }
+  // TODO: merge inventories
+  // TODO: set HP according to emoji's max (default) HP
 
   function enactPushCollision(operation: number) {
-    console.log(operation);
-
     let collisionChain = [];
     let i = 0;
 
     while (items.has(ac + operation * i)) {
-      collisionChain.push(items.get(ac + operation * i) || "");
+      collisionChain.push(items.get(ac + operation * i)?.emoji || "");
       i++;
     }
 
@@ -308,18 +313,14 @@
 
     if (arr.every((str) => str == "push")) {
       while (collisionChain.length != 0) {
-        let item = collisionChain.pop();
-        if (item) {
-          items.set(ac + operation * i--, item);
+        let emoji = collisionChain.pop();
+        if (emoji) {
+          items.set(ac + operation * i--, new Item(emoji));
           items = items;
         }
       }
 
-      let item = items.get(ac);
-      if (item) {
-        items.set(ac + operation, item);
-        moveActiveCell(operation, true);
-      }
+      transferItem(ac, ac + operation);
     } else if (arr.some((str) => [undefined, "push", "bump"].includes(str))) {
       arr = arr.slice(
         0,
@@ -334,12 +335,10 @@
 
         let emoji = _collisions[current][next];
         if (emoji && emoji != "push") {
-          items.set(ac + operation * (i + 1), emoji);
-          let item = items.get(ac);
-          if (item) {
-            items.set(ac + operation, item);
-          }
-          moveActiveCell(operation, true);
+          // TODO: check if it works properly
+          // TODO: implement changing the emoji
+          transferItem(ac + operation * i, ac + operation * (i + 1));
+          transferItem(ac, ac + operation);
           break;
         }
       }
@@ -350,28 +349,22 @@
 
   async function handle(e: KeyboardEvent) {
     e.preventDefault();
-    if (
-      !items.has(ac) ||
-      playerFrozen ||
-      // @ts-expect-error
-      (hps.has(ac) && hps.get(ac) <= 0)
-    ) {
+    if (!items.has(ac) || playerFrozen || (player?.hp || -1) <= 0) {
       return;
     }
     if (e.code.includes("Arrow")) {
       let operation = calcOperation(e.code as ArrowKey, ac);
-      let item = items.get(ac);
-      if (item == undefined || $statics.has(item) || operation == 0) return;
-      let postOpItem = items.get(ac + operation);
+      let item = player;
+      if (item == undefined || $statics.has(item.emoji) || operation == 0)
+        return;
+      let facingItem = items.get(ac + operation);
 
-      // if there are no items in front of the player after operation, moveActiveCell
-      if (!postOpItem) {
-        items.set(ac + operation, item);
-        moveActiveCell(operation, true);
+      if (!facingItem) {
+        transferItem(ac, ac + operation);
         return;
       }
 
-      switch (getCollisionType(item, postOpItem)) {
+      switch (getCollisionType(item.emoji, facingItem.emoji)) {
         case "push":
           enactPushCollision(operation);
           break;
@@ -379,9 +372,10 @@
           break;
         default:
           // MERGE
-          postOpItem = getCollisionType(item, postOpItem);
-          moveActiveCell(operation, true);
-          items.set(ac, postOpItem);
+          let mergeResult = getCollisionType(item.emoji, facingItem.emoji);
+          console.log(mergeResult);
+          transferItem(ac, ac + operation);
+          player.emoji = mergeResult;
           break;
       }
     }
@@ -400,17 +394,19 @@
     }
 
     if (e.code.includes("Control")) {
-      if (calcOperation(wasdToArrow[dirKey], ic) == 0) return;
-      let playerInventory = inventories.get(ac);
-      if (!playerInventory || items.has(ic)) return;
-      items.set(ic, playerInventory[currentInventoryIndex]);
-      playerInventory.splice(currentInventoryIndex, 1);
-      items = items;
-      inventories = inventories;
+      // if (calcOperation(wasdToArrow[dirKey], ic) == 0) return;
+      // let playerInventory = inventories.get(ac).inventories;
+      // if (!playerInventory || items.has(ic)) return;
+      // // TODO: Drop item
+      // items.set(ic, playerInventory[currentInventoryIndex]);
+      // playerInventory.splice(currentInventoryIndex, 1);
+      // items = items;
+      // inventories = inventories;
       return;
     }
 
     if (e.code == "KeyE") {
+      // TODO: why is this 300?
       let closestDistance = 300;
       let closestID = ac;
 
@@ -436,9 +432,7 @@
         ic = ac + dirs[dirKey].operation;
       }
 
-      let { current, max } = hps.get(ac) || { current: 0, max: 0 };
-
-      progress = tweened(getPercentage(max, current), {
+      progress = tweened(getHPpercentage(), {
         duration: 400,
         easing: cubicOut,
       });
@@ -449,7 +443,9 @@
       let closestDistance = 300;
       let closestID = ac;
 
-      let _items = Array.from(items).filter(([id, val]) => !$statics.has(val));
+      let _items = Array.from(items).filter(
+        ([id, { emoji }]) => !$statics.has(emoji)
+      );
 
       for (let [id, _] of _items) {
         if (id == ac) continue;
@@ -471,9 +467,7 @@
         ic = ac + dirs[dirKey].operation;
       }
 
-      let { current, max } = hps.get(ac) || { current: 0, max: 0 };
-
-      progress = tweened(getPercentage(max, current), {
+      progress = tweened(getHPpercentage(), {
         duration: 400,
         easing: cubicOut,
       });
@@ -484,36 +478,37 @@
       if (calcOperation(wasdToArrow[dirKey], ic) == 0) return;
       let interactedItem = items.get(ic);
       if (interactedItem == undefined) return;
-      let interactable: _Interactable = _interactables[interactedItem];
+      let interactable: _Interactable = _interactables[interactedItem.emoji];
       if (interactable == undefined || interactable.executing) return;
       let { sequence, modifiers, evolve, devolve } = interactable;
 
       for (let { type, ...args } of sequence) {
         if (type == "addToPlayerInventory") {
-          if (inventories.get(ac)?.length == 4) {
+          if (player?.inventory.length == 4) {
             return;
           }
         }
       }
 
-      _interactables[interactedItem].executing = true;
-      console.log("executing");
+      _interactables[interactedItem.emoji].executing = true;
+      let equippedItem = "any";
 
-      let modifierKey = "any";
+      // TODO:
+      // if (inventories.has(ac)) {
+      //   modifierKey = (inventories.get(ac) || [])[currentInventoryIndex];
+      // }
 
-      if (inventories.has(ac)) {
-        modifierKey = (inventories.get(ac) || [])[currentInventoryIndex];
-      }
-
-      let modifier = modifiers.find((m) => m[0] == modifierKey);
+      let modifier = modifiers.find((m) => m[0] == equippedItem);
       if (modifier == undefined) {
         modifier = modifiers[0];
       }
 
       if (modifier[1] == 0) return;
 
-      let { current, max } = hps.get(ic) || { current: 0, max: 0 };
-      hps.set(ic, { current: current + modifier[1], max });
+      let { current, max } = player?.hp || { current: 0, max: 0 };
+      // hps.set(ic, { current: current + modifier[1], max });
+      current += modifier[1];
+      // TODO: check if this updates hp
 
       for (let { type, ...args } of sequence) {
         if (type == "wait") {
@@ -523,53 +518,36 @@
         }
       }
 
-      let playerEvolve = _interactables[items.get(ac)].evolve;
-      let playerDevolve = _interactables[items.get(ac)].devolve;
+      let playerEvolve = _interactables[player?.emoji || ""].evolve;
+      let playerDevolve = _interactables[player?.emoji || ""].devolve;
 
       // EVOLVE & DEVOLVE PLAYER
-      // @ts-expect-error
-      if (hps.get(ac)?.current <= 0) {
+      if (current <= 0) {
         if (playerDevolve?.enabled && playerDevolve.to != "") {
-          items.set(ac, playerDevolve.to);
+          player.emoji = playerDevolve.to;
         } else {
           items.delete(ac);
-          inventories.delete(ac);
-          hps.delete(ac);
         }
-      } else if (
-        playerEvolve?.enabled &&
-        playerEvolve.at == hps.get(ac)?.current
-      ) {
-        items.set(ac, playerEvolve.to);
+      } else if (playerEvolve?.enabled && playerEvolve.at == current) {
+        player.emoji = playerEvolve.to;
       }
 
       // EVOLVE & DEVOLVE INTERACTED ITEM
-      // @ts-expect-error
-      if (hps.get(ic)?.current <= 0) {
+      if (interactedItem.hp.current <= 0) {
         if (devolve?.enabled && devolve.to != "") {
-          items.set(ic, devolve.to);
+          interactedItem.emoji = devolve.to;
         } else {
           items.delete(ic);
         }
-      } else if (evolve?.enabled && evolve.at == hps.get(ic)?.current) {
-        items.set(ic, evolve.to);
+      } else if (evolve?.enabled && evolve.at == interactedItem.hp.current) {
+        interactedItem.emoji = evolve.to;
       }
 
       items = items;
-      hps = hps;
-
-      _interactables[interactedItem].executing = false;
-      console.log("executed");
-
+      _interactables[interactedItem.emoji].executing = false;
       return;
     }
   }
-
-  // TODO: Try object oriented approach
-  // hps and inventories can be put into an Item object
-  // which can be stored in items<string, Item>
-  // non-oop approach requires thinking of too many edge cases
-  // to synchronize data
 </script>
 
 <svelte:window on:keydown={handle} />
@@ -580,11 +558,11 @@
     <div style:background={backgrounds.get(i) || $map.dbg} class:active>
       {#if active}
         <div class="direction scale-75" style={dirs[dirKey].style}>
-          {(inventories.get(ac) || [])[currentInventoryIndex] ||
+          {(player?.inventory || [])[currentInventoryIndex] ||
             dirs[dirKey].emoji}
         </div>
       {/if}
-      {items.get(i) || ""}
+      {items.get(i)?.emoji || ""}
     </div>
   {/each}
   {#if levelCompleted}
@@ -610,7 +588,7 @@
         class:selected={i == currentInventoryIndex}
         class="flex h-12 w-12 flex-col items-center justify-center bg-base-300 p-2"
       >
-        {(inventories.get(ac) || [])[i] || ""}
+        {(player?.inventory || [])[i] || ""}
       </div>
     {/each}
   </div>

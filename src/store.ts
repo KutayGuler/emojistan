@@ -4,23 +4,23 @@ import { DEFAULT_BG, storeNames } from "./constants";
 import type { CollisionType } from "./types";
 
 export interface Mutations {
-  setBackgroundOf: (
+  setBackgroundOf(
     { index, background }: { index: number; background: string },
     _start?: number
-  ) => void;
-  removeBackgroundOf: ({ index }: { index: number }) => void;
-  spawn: (
+  ): void;
+  removeBackgroundOf({ index }: { index: number }): void;
+  spawn(
     { index, emoji }: { index: number; emoji: string },
     _start?: number
-  ) => void;
-  destroy: ({ index }: { index: number }) => void;
-  wait: (duration: number) => Promise<any>;
+  ): void;
+  destroy({ index }: { index: number }): void;
+  wait(duration: number): Promise<any>;
   freezePlayer: Function;
   unfreezePlayer: Function;
-  addToPlayerInventory: ({ emoji }: { emoji: string }) => void;
-  teleportPlayerTo: ({ index }: { index: number }) => void;
-  changePlayerTo: ({ emoji }: { emoji: string }) => void;
-  addToPlayerHP: ({ points }: { points: number }) => void;
+  addToPlayerInventory({ emoji }: { emoji: string }): void;
+  teleportPlayerTo({ index }: { index: number }): void;
+  changePlayerTo({ emoji }: { emoji: string }): void;
+  addToPlayerHP({ points }: { points: number }): void;
   resetLevel: Function;
   completeLevel: Function;
 }
