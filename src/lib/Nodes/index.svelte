@@ -109,20 +109,22 @@
     🞫
   </button>
   <!-- CF #2 -->
-  {#if node.component == "spawner"}
-    <Spawner
-      --pusher={PUSHER_BORDER}
-      --merger={MERGER_BORDER}
-      --interactable={INTERACTABLE_BORDER}
-      position={node.position}
-    />
-  {:else if node.component == "interactable"}
-    <Interactable id={node.id} />
-  {:else if node.component == "pusher"}
-    <Pusher id={node.id} />
-  {:else if node.component == "merger"}
-    <Merger id={node.id} />
-  {/if}
+  <slot>
+    {#if node.component == "spawner"}
+      <Spawner
+        --pusher={PUSHER_BORDER}
+        --merger={MERGER_BORDER}
+        --interactable={INTERACTABLE_BORDER}
+        position={node.position}
+      />
+    {:else if node.component == "interactable"}
+      <Interactable id={node.id} />
+    {:else if node.component == "pusher"}
+      <Pusher id={node.id} />
+    {:else if node.component == "merger"}
+      <Merger id={node.id} />
+    {/if}
+  </slot>
 </div>
 
 <style>
