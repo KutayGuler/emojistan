@@ -7,26 +7,30 @@
   } from "$src/types";
   import Game from "$src/views/Game.svelte";
 
-  let map = new EditableMap();
-  let pushes = new Map<number, Pushes>();
-  pushes.set(0, ["X", "Y", "push"]);
-  let merges = new Map<number, Merges>();
-  merges.set(0, ["A", "B", "C"]);
+  const mapClass = "simulation";
+  const SIZE = 4;
 
-  let interactables = new Map<number, Interactable>();
-  // interactables.set(0, new Interactable())
+  let tutorials: Array<any> = [];
 
-  let statics = new Set(["Q"]);
+  tutorials.push({
+    content: `<p style="color: red;">test</p>`,
+    map: new EditableMap(
+      new Map<number, string>([
+        [1, "X"],
+        [2, "Y"],
+        [3, "Q"],
+      ])
+    ),
+    pushes: new Map<number, Pushes>([[0, ["X", "Y", "push"]]]),
+    merges: new Map<number, Merges>([[0, ["A", "B", "C"]]]),
+    interactables: new Map<number, Interactable>(),
+    statics: new Set(["Q"]),
+  });
 </script>
 
 <main class="flex h-full w-full flex-col items-center justify-center">
-  <Game
-    {map}
-    {pushes}
-    {merges}
-    {interactables}
-    {statics}
-    mapClass="simulation"
-    SIZE={4}
-  />
+  {#each tutorials as { content, ...tutorial }}
+    {@html content}
+    <Game {...tutorial} {mapClass} {SIZE} />
+  {/each}
 </main>

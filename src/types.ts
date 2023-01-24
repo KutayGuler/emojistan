@@ -92,8 +92,8 @@ export interface EditableMap {
 }
 
 export class EditableMap {
-  constructor() {
-    this.items = new Map<number, string>();
+  constructor(items = new Map<number, string>()) {
+    this.items = items;
     this.backgrounds = new Map<number, string>();
     this.objective = "";
     this.dbg = DEFAULT_BG;

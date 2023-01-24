@@ -34,8 +34,27 @@
   let levelCompleted = false;
   let ac = -2; // ACTIVE CELL
   let ic: number; // INTERACTED CELL
-  let dirKey: Wasd = "KeyD";
+  let directionKey: Wasd = "KeyD";
   let currentInventoryIndex = 0;
+  let items = new Map<number, Item>();
+  let backgrounds = new Map(map.backgrounds);
+  let _interactables: _Interactables = {};
+  let timeouts: Array<NodeJS.Timeout> = [];
+  let intervals: Array<NodeJS.Timer> = [];
+
+  onMount(() => {
+    [$currentColor, $currentEmoji] = ["", ""];
+  });
+
+  onDestroy(() => {
+    for (let timer of timeouts) {
+      clearTimeout(timer);
+    }
+
+    for (let interval of intervals) {
+      clearInterval(interval);
+    }
+  });
 
   const KEYS: {
     [key in Wasd]: { style: string; emoji: string; operation: number };
@@ -66,26 +85,6 @@
     );
   }
 
-  let items = new Map<number, Item>();
-  let backgrounds = new Map(map.backgrounds);
-  let _interactables: _Interactables = {};
-  let timeouts: Array<NodeJS.Timeout> = [];
-  let intervals: Array<NodeJS.Timer> = [];
-
-  onMount(() => {
-    [$currentColor, $currentEmoji] = ["", ""];
-  });
-
-  onDestroy(() => {
-    for (let timer of timeouts) {
-      clearTimeout(timer);
-    }
-
-    for (let interval of intervals) {
-      clearInterval(interval);
-    }
-  });
-
   /**
    * function mutates ac if it is equal to "from" parameter
    * Transfers an item from "from" to "to"
@@ -98,7 +97,7 @@
 
     if (ac == from) {
       ac = to;
-      ic = ac + KEYS[dirKey].operation;
+      ic = ac + KEYS[directionKey].operation;
     }
   }
 
@@ -114,7 +113,6 @@
     while (mergedInventory.length > 4) {
       mergedInventory.pop();
     }
-    console.log(items);
 
     items.set(
       to,
@@ -126,11 +124,10 @@
     );
     items.delete(from);
     items = items; // MAGIC UPDATE, NECESSARY FOR REACTIVITY
-    console.log(items);
 
     if (ac == from) {
       ac = to;
-      ic = ac + KEYS[dirKey].operation;
+      ic = ac + KEYS[directionKey].operation;
     }
   }
 
@@ -243,7 +240,7 @@
       initItems();
       ac = items.entries().next().value[0];
       ic = ac + 1;
-      dirKey = "KeyD";
+      directionKey = "KeyD";
       levelCompleted = false;
     },
     completeLevel: () => (levelCompleted = true),
@@ -371,13 +368,13 @@
     }
 
     if (WASD.includes(e.code)) {
-      dirKey = e.code as Wasd;
-      ic = ac + KEYS[dirKey].operation;
+      directionKey = e.code as Wasd;
+      ic = ac + KEYS[directionKey].operation;
       return;
     }
 
     if (e.code == "Space") {
-      if (calcOperation(wasdToArrow[dirKey], ic) == 0) return;
+      if (calcOperation(wasdToArrow[directionKey], ic) == 0) return;
       let interactedItem = items.get(ic);
       if (interactedItem == undefined) return;
       let interactable: _Interactable = _interactables[interactedItem.emoji];
@@ -445,7 +442,7 @@
 
     if (e.code.includes("Control")) {
       if (
-        calcOperation(wasdToArrow[dirKey], ic) == 0 ||
+        calcOperation(wasdToArrow[directionKey], ic) == 0 ||
         !player?.inventory ||
         items.has(ic)
       ) {
@@ -481,10 +478,10 @@
           if (id < smallest) smallest = id;
         }
         ac = smallest;
-        ic = ac + KEYS[dirKey].operation;
+        ic = ac + KEYS[directionKey].operation;
       } else {
         ac = closestID;
-        ic = ac + KEYS[dirKey].operation;
+        ic = ac + KEYS[directionKey].operation;
       }
 
       progress = tweened(calcPlayerHpPercentage(), {
@@ -509,10 +506,10 @@
           if (id > biggest) biggest = id;
         }
         ac = biggest;
-        ic = ac + KEYS[dirKey].operation;
+        ic = ac + KEYS[directionKey].operation;
       } else {
         ac = closestID;
-        ic = ac + KEYS[dirKey].operation;
+        ic = ac + KEYS[directionKey].operation;
       }
 
       progress = tweened(calcPlayerHpPercentage(), {
@@ -531,9 +528,9 @@
     {@const active = ac == i}
     <div style:background={backgrounds.get(i) || map.dbg} class:active>
       {#if active}
-        <div class="direction scale-75" style={KEYS[dirKey].style}>
+        <div class="direction scale-75" style={KEYS[directionKey].style}>
           {(player?.inventory || [])[currentInventoryIndex] ||
-            KEYS[dirKey].emoji}
+            KEYS[directionKey].emoji}
         </div>
       {/if}
       {items.get(i)?.emoji || ""}

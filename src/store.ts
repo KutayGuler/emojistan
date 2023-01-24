@@ -228,7 +228,6 @@ function createSetStore(name: string) {
 }
 
 // VANILLA
-export const currentItem = writable("");
 export const currentColor = writable("");
 export const currentEmoji = writable("");
 
