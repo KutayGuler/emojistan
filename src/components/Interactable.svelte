@@ -181,6 +181,12 @@
     updateStore();
   }
 
+  function removeFromModifiers(i: number) {
+    modifiers.splice(i, 1);
+    modifiers = modifiers;
+    updateStore();
+  }
+
   function updateEmoji() {
     if (
       $currentEmoji != "" &&
@@ -260,9 +266,6 @@
     }
   }
 
-  // TODO: modifier design like evolve, devolve
-  // TODO: adjustHeight for modifiers
-
   $: hasInteraction = modifiers
     .filter((m) => m[0] != "")
     .some((m) => m[1] != 0);
@@ -331,8 +334,8 @@
     </div>
   {/if}
 </div>
-<main class="pt-16">
-  <div class="form-control">
+<main class="flex flex-col items-center justify-center gap-12 pt-16">
+  <div class="form-control w-full">
     <label class="label cursor-pointer">
       <span class="label-text">Evolve</span>
       <input type="checkbox" class="checkbox" bind:checked={evolve.enabled} />
@@ -342,9 +345,153 @@
       <input type="checkbox" class="checkbox" bind:checked={devolve.enabled} />
     </label>
   </div>
-  {#each sequence as s, i}
-    <span>
-      <select class="select" title="event type" bind:value={s.type}>
+  <div class="form-control flex flex-col">
+    <p class="pb-6 text-4xl">
+      HP MODIFIERS
+      <button
+        class="btn text-4xl"
+        on:click={() => {
+          modifiers = [...modifiers, ["", 1]];
+        }}>+</button
+      >
+      {#if !hasInteraction}
+        <div
+          class="tooltip"
+          data-tip="An interactable needs at least one modifier with positive or negative value to fire events"
+        >
+          <button class="btn text-4xl text-warning">!</button>
+        </div>{/if}
+    </p>
+
+    <div
+      class="flex flex-wrap items-center justify-center gap-x-12 gap-y-6 pb-6"
+    >
+      {#each modifiers as [key, value], i}
+        <div class="relative flex flex-col items-center">
+          <!-- TODO: Add remove button for modifiers -->
+          {#if i != 0}
+            <button
+              class="absolute top-0 right-0 text-lg"
+              on:click={() => removeFromModifiers(i)}>🞫</button
+            >
+          {/if}
+          <div class="slot-lg scale-75" on:click={() => updateModifierKey(i)}>
+            {key}
+          </div>
+          <select
+            class="select select-bordered select-sm absolute -bottom-2"
+            bind:value
+            on:change={updateStore}
+          >
+            {#each modifierPoints as point}
+              <option value={point}>{point > 0 ? `+${point}` : point}</option>
+            {/each}
+          </select>
+        </div>
+      {/each}
+    </div>
+  </div>
+  <div class="flex flex-col gap-2">
+    {#each sequence as s, i}
+      <span class="flex w-full flex-row items-start justify-between gap-2">
+        <select class="select" title="event type" bind:value={s.type}>
+          {#each Object.entries(types) as [group, values]}
+            <optgroup label={`${group} ${typeIcons[group]}`}>
+              {#each values as t}
+                <option value={t}>{t}</option>
+              {/each}
+            </optgroup>
+          {/each}
+        </select>
+        {#if s.type == "spawn"}
+          <div class="slot" on:click={() => updateSlot(i)}>{s.emoji || ""}</div>
+          at
+          <select
+            class="select"
+            title="index"
+            id="index"
+            bind:value={s.index}
+            on:change={updateStore}
+          >
+            {#each indexes as j}
+              <option value={j}>{j}</option>
+            {/each}
+          </select>
+        {:else if s.type == "addToPlayerInventory" || s.type == "changePlayerTo"}
+          <div class="slot" on:click={() => updateSlot(i)}>{s.emoji || ""}</div>
+        {:else if s.type == "addToPlayerHP"}
+          <select class="select" bind:value={s.points} on:change={updateStore}>
+            {#each modifierPoints.filter((val) => val != 0) as point}
+              <option value={point}>{point > 0 ? `+${point}` : point}</option>
+            {/each}
+          </select>
+        {:else if s.type == "destroy" || s.type == "teleportPlayerTo" || s.type == "removeBackgroundOf"}
+          <select
+            class="select"
+            title="index"
+            id="index"
+            bind:value={s.index}
+            on:change={updateStore}
+          >
+            {#each indexes as j}
+              <option value={j}>{j}</option>
+            {/each}
+          </select>
+        {:else if s.type == "wait"}
+          <select
+            class="select"
+            title="duration"
+            id="duration"
+            bind:value={s.duration}
+            on:change={updateStore}
+          >
+            {#each DURATIONS as d}
+              <option value={d}>{d}</option>
+            {/each}
+          </select>
+        {:else if s.type == "setBackgroundOf"}
+          <select
+            class="select"
+            title="index"
+            id="index"
+            bind:value={s.index}
+            on:change={updateStore}
+          >
+            {#each indexes as j}
+              <option value={j}>{j}</option>
+            {/each}
+          </select>
+          {#if $palette.size == 0 || ($palette.size == 1 && $palette.has(defaultBackground))}
+            <div
+              class="tooltip"
+              data-tip="Please create a palette to use this event"
+            >
+              <select class="select" title="color" />
+            </div>
+          {:else}
+            to
+            <select
+              class="select"
+              title="color"
+              bind:value={s.background}
+              style:background={s.background}
+              on:change={updateStore}
+            >
+              {#each [...$palette].filter((color) => color != defaultBackground) as color}
+                <option value={color} style:background={color} />
+              {/each}
+            </select>
+          {/if}
+        {/if}
+        <button
+          class="text-2xl"
+          id="remove"
+          on:click={() => removeFromSequence(i)}>🞫</button
+        >
+      </span>
+    {/each}
+    <label>
+      <select class="select" title="event type" bind:value={type}>
         {#each Object.entries(types) as [group, values]}
           <optgroup label={`${group} ${typeIcons[group]}`}>
             {#each values as t}
@@ -353,149 +500,8 @@
           </optgroup>
         {/each}
       </select>
-      {#if s.type == "spawn"}
-        <div class="slot" on:click={() => updateSlot(i)}>{s.emoji || ""}</div>
-        at
-        <select
-          class="select"
-          title="index"
-          id="index"
-          bind:value={s.index}
-          on:change={updateStore}
-        >
-          {#each indexes as j}
-            <option value={j}>{j}</option>
-          {/each}
-        </select>
-      {:else if s.type == "addToPlayerInventory" || s.type == "changePlayerTo"}
-        <div class="slot" on:click={() => updateSlot(i)}>{s.emoji || ""}</div>
-      {:else if s.type == "addToPlayerHP"}
-        <select class="select" bind:value={s.points} on:change={updateStore}>
-          {#each modifierPoints.filter((val) => val != 0) as point}
-            <option value={point}>{point > 0 ? `+${point}` : point}</option>
-          {/each}
-        </select>
-      {:else if s.type == "destroy" || s.type == "teleportPlayerTo" || s.type == "removeBackgroundOf"}
-        <select
-          class="select"
-          title="index"
-          id="index"
-          bind:value={s.index}
-          on:change={updateStore}
-        >
-          {#each indexes as j}
-            <option value={j}>{j}</option>
-          {/each}
-        </select>
-      {:else if s.type == "wait"}
-        <select
-          class="select"
-          title="duration"
-          id="duration"
-          bind:value={s.duration}
-          on:change={updateStore}
-        >
-          {#each DURATIONS as d}
-            <option value={d}>{d}</option>
-          {/each}
-        </select>
-      {:else if s.type == "setBackgroundOf"}
-        <select
-          class="select"
-          title="index"
-          id="index"
-          bind:value={s.index}
-          on:change={updateStore}
-        >
-          {#each indexes as j}
-            <option value={j}>{j}</option>
-          {/each}
-        </select>
-        {#if $palette.size == 0 || ($palette.size == 1 && $palette.has(defaultBackground))}
-          <div
-            class="tooltip"
-            data-tip="Please create a palette to use this event"
-          >
-            <select class="select" title="color" />
-          </div>
-        {:else}
-          to
-          <select
-            class="select"
-            title="color"
-            bind:value={s.background}
-            style:background={s.background}
-            on:change={updateStore}
-          >
-            {#each [...$palette].filter((color) => color != defaultBackground) as color}
-              <option value={color} style:background={color} />
-            {/each}
-          </select>
-        {/if}
-      {/if}
-      <button
-        class="text-2xl"
-        id="remove"
-        on:click={() => removeFromSequence(i)}>🞫</button
-      >
-    </span>
-  {/each}
-  <label>
-    <select class="select" title="event type" bind:value={type}>
-      {#each Object.entries(types) as [group, values]}
-        <optgroup label={`${group} ${typeIcons[group]}`}>
-          {#each values as t}
-            <option value={t}>{t}</option>
-          {/each}
-        </optgroup>
-      {/each}
-    </select>
-    <button class="text-3xl" on:click={addToSequence}>+</button>
-  </label>
-  <div class="form-control flex flex-col">
-    <p>
-      <b>hp modifiers</b>
-      {#if !hasInteraction}
-        <div
-          class="tooltip"
-          data-tip="An interactable needs at least one positive or negative modifier to fire events"
-        >
-          <button class="btn text-4xl text-warning">!</button>
-        </div>{/if}
-    </p>
-    {#each modifiers as [key, value], i}
-      <div class="flex flex-row items-center justify-start gap-2">
-        <div class="slot" on:click={() => updateModifierKey(i)}>
-          {key}
-        </div>
-        <select class="select" bind:value on:change={updateStore}>
-          {#each modifierPoints as point}
-            <option value={point}>{point > 0 ? `+${point}` : point}</option>
-          {/each}
-        </select>
-        {#if i != 0}
-          <button class="text-2xl" on:click={() => deleteModifier(i)}>🞫</button>
-        {/if}
-      </div>
-    {/each}
-    <button
-      class="btn"
-      on:click={() => {
-        modifiers = [...modifiers, ["", 1]];
-      }}>Add modifier</button
-    >
-    <!-- <b>evolution modifier</b>
-    <div class="flex w-full flex-row items-center justify-center gap-2">
-      <b>Evolve to</b>
-
-      <b>at</b>
-      <select class="select" bind:value={evolve.at} on:change={updateStore}>
-        {#each hps as h}
-          <option value={h}>{h}</option>
-        {/each}
-      </select>
-      <b>hp</b>
-    </div> -->
+      <button class="text-3xl" on:click={addToSequence}>+</button>
+    </label>
   </div>
 </main>
 

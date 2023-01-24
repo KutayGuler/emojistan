@@ -25,10 +25,31 @@
     };
   }
 
-  // TODO: JSDoc this function mutates ac if it is equal to "from" parameter
+  /**
+   * function mutates ac if it is equal to "from" parameter
+   * Transfers an item from "from" to "to"
+   */
   function transferItem(from: number, to: number) {
+    console.log(items, from, to, items.get(from));
+
     items.set(to, items.get(from));
     items.delete(from);
+    console.log(items);
+
+    items = items;
+    if (ac == from) {
+      ac = to;
+      ic = ac + dirs[dirKey].operation;
+    }
+  }
+
+  function transferAndMerge(from: number, to: number, mergeResult: string) {
+    // TODO: merge inventories
+    items.set(to, items.get(from));
+    // @ts-expect-error
+    items.get(to).emoji = mergeResult;
+    items.delete(from);
+
     items = items;
     if (ac == from) {
       ac = to;
@@ -164,17 +185,16 @@
         ic = ac + 1;
       }
 
-      hp.max = _interactables[emoji]?.hp || 0;
-      hp.current = _interactables[emoji]?.hp || 0;
+      hp.max = _interactables[emoji]?.hp || 1;
+      hp.current = _interactables[emoji]?.hp || 1;
     }
   }
 
   initItems();
-  console.log(items, ac);
+  let player = items.get(ac);
   $: player = items.get(ac);
-  console.log(player); // TODO: why is it undefined?
 
-  let progress = tweened(player?.hp.current || 0, {
+  let progress = tweened(player?.hp.current || 1, {
     duration: 400,
     easing: cubicOut,
   });
@@ -185,7 +205,7 @@
     numbers.set(i, i / 100);
   }
 
-  function getHPpercentage(): number {
+  function getHpPercentage(): number {
     let { hp } = player;
     if (!hp) return 0;
     if (hp.current > hp.max) return 1;
@@ -196,6 +216,7 @@
 
   for (let [id, _slots] of [...$merges, ...$pushes]) {
     let [key1, key2, val] = _slots;
+    if (key1 == "") continue;
     if (!_collisions[key1]) {
       _collisions[key1] = {};
     }
@@ -264,7 +285,7 @@
     addToPlayerHP: ({ points }) => {
       if (!player) return;
       player.hp.add(points);
-      progress.set(getHPpercentage());
+      progress.set(getHpPercentage());
     },
   };
 
@@ -273,7 +294,6 @@
     return _collisions[key1][key2] || "bump";
   }
 
-  // TODO: merge inventories
   // TODO: set HP according to emoji's max (default) HP
 
   function enactPushCollision(operation: number) {
@@ -281,13 +301,18 @@
     let i = 0;
 
     while (items.has(ac + operation * i)) {
-      collisionChain.push(items.get(ac + operation * i)?.emoji || "");
+      console.log(ac + operation * i);
+      collisionChain.push(items.get(ac + operation * i)?.emoji);
       i++;
     }
 
-    let arr: Array<CollisionType> = [];
+    console.log(collisionChain);
+
+    let collisionTypeSequence: Array<CollisionType> = [];
     for (let i = 0; i < collisionChain.length - 1; i++) {
-      arr.push(getCollisionType(collisionChain[i], collisionChain[i + 1]));
+      collisionTypeSequence.push(
+        getCollisionType(collisionChain[i], collisionChain[i + 1])
+      );
     }
 
     let finalIndex = ac + operation * (i - 1);
@@ -311,35 +336,35 @@
     // @ts-expect-error
     if (calcOperation(code, finalIndex) == 0) return;
 
-    if (arr.every((str) => str == "push")) {
-      while (collisionChain.length != 0) {
-        let emoji = collisionChain.pop();
-        if (emoji) {
-          items.set(ac + operation * i--, new Item(emoji));
-          items = items;
-        }
-      }
+    if (collisionTypeSequence.every((str) => str == "push")) {
+      let length = collisionChain.length;
+      collisionChain.reverse();
 
-      transferItem(ac, ac + operation);
-    } else if (arr.some((str) => [undefined, "push", "bump"].includes(str))) {
-      arr = arr.slice(
+      for (let i = length - 1; i >= 0; i--) {
+        let from = ac + i * operation;
+        let to = ac + (i + 1) * operation;
+        transferItem(from, to);
+      }
+    } else {
+      collisionTypeSequence = collisionTypeSequence.slice(
         0,
-        arr.findIndex((str) => [undefined, "push", "bump"].includes(str)) + 1
+        collisionTypeSequence.findIndex((str) => str == "bump")
       );
 
-      for (let i = 0; i < arr.length + 1; i++) {
-        let current = collisionChain[i];
-        let next = collisionChain[i + 1];
+      if (
+        collisionTypeSequence.length == 0 ||
+        collisionTypeSequence.at(-1) == "push"
+      )
+        return;
 
-        if (!(next && current)) continue;
+      for (let i = collisionTypeSequence.length - 1; i >= 0; i--) {
+        let from = ac + i * operation;
+        let to = ac + (i + 1) * operation;
 
-        let emoji = _collisions[current][next];
-        if (emoji && emoji != "push") {
-          // TODO: check if it works properly
-          // TODO: implement changing the emoji
-          transferItem(ac + operation * i, ac + operation * (i + 1));
-          transferItem(ac, ac + operation);
-          break;
+        if (collisionTypeSequence[i] != "push") {
+          transferAndMerge(from, to, collisionTypeSequence[i]);
+        } else {
+          transferItem(from, to);
         }
       }
     }
@@ -349,13 +374,13 @@
 
   async function handle(e: KeyboardEvent) {
     e.preventDefault();
+
     if (!items.has(ac) || playerFrozen || (player?.hp || -1) <= 0) {
       return;
     }
     if (e.code.includes("Arrow")) {
       let operation = calcOperation(e.code as ArrowKey, ac);
-      let item = player;
-      if (item == undefined || $statics.has(item.emoji) || operation == 0)
+      if (player == undefined || $statics.has(player.emoji) || operation == 0)
         return;
       let facingItem = items.get(ac + operation);
 
@@ -364,7 +389,7 @@
         return;
       }
 
-      switch (getCollisionType(item.emoji, facingItem.emoji)) {
+      switch (getCollisionType(player.emoji, facingItem.emoji)) {
         case "push":
           enactPushCollision(operation);
           break;
@@ -372,12 +397,12 @@
           break;
         default:
           // MERGE
-          let mergeResult = getCollisionType(item.emoji, facingItem.emoji);
-          console.log(mergeResult);
+          let mergeResult = getCollisionType(player.emoji, facingItem.emoji);
           transferItem(ac, ac + operation);
           player.emoji = mergeResult;
           break;
       }
+      return;
     }
 
     if (e.code.includes("Digit")) {
@@ -390,87 +415,6 @@
     if (wasd.includes(e.code)) {
       dirKey = e.code as Wasd;
       ic = ac + dirs[dirKey].operation;
-      return;
-    }
-
-    if (e.code.includes("Control")) {
-      // if (calcOperation(wasdToArrow[dirKey], ic) == 0) return;
-      // let playerInventory = inventories.get(ac).inventories;
-      // if (!playerInventory || items.has(ic)) return;
-      // // TODO: Drop item
-      // items.set(ic, playerInventory[currentInventoryIndex]);
-      // playerInventory.splice(currentInventoryIndex, 1);
-      // items = items;
-      // inventories = inventories;
-      return;
-    }
-
-    if (e.code == "KeyE") {
-      // TODO: why is this 300?
-      let closestDistance = 300;
-      let closestID = ac;
-
-      let _items = Array.from(items).filter(([id, val]) => !$statics.has(val));
-
-      for (let [id, _] of _items) {
-        if (id == ac) continue;
-        if (id > ac && id - ac < closestDistance) {
-          closestDistance = id - ac;
-          closestID = id;
-        }
-      }
-
-      if (closestDistance == 300) {
-        let smallest = 300;
-        for (let [id, _] of _items) {
-          if (id < smallest) smallest = id;
-        }
-        ac = smallest;
-        ic = ac + dirs[dirKey].operation;
-      } else {
-        ac = closestID;
-        ic = ac + dirs[dirKey].operation;
-      }
-
-      progress = tweened(getHPpercentage(), {
-        duration: 400,
-        easing: cubicOut,
-      });
-      return;
-    }
-
-    if (e.code == "KeyQ") {
-      let closestDistance = 300;
-      let closestID = ac;
-
-      let _items = Array.from(items).filter(
-        ([id, { emoji }]) => !$statics.has(emoji)
-      );
-
-      for (let [id, _] of _items) {
-        if (id == ac) continue;
-        if (ac > id && ac - id < closestDistance) {
-          closestDistance = ac - id;
-          closestID = id;
-        }
-      }
-
-      if (closestDistance == 300) {
-        let biggest = 0;
-        for (let [id, _] of _items) {
-          if (id > biggest) biggest = id;
-        }
-        ac = biggest;
-        ic = ac + dirs[dirKey].operation;
-      } else {
-        ac = closestID;
-        ic = ac + dirs[dirKey].operation;
-      }
-
-      progress = tweened(getHPpercentage(), {
-        duration: 400,
-        easing: cubicOut,
-      });
       return;
     }
 
@@ -491,24 +435,14 @@
       }
 
       _interactables[interactedItem.emoji].executing = true;
-      let equippedItem = "any";
+      let equippedItem =
+        (player?.inventory || [])[currentInventoryIndex] || "any";
 
-      // TODO:
-      // if (inventories.has(ac)) {
-      //   modifierKey = (inventories.get(ac) || [])[currentInventoryIndex];
-      // }
-
-      let modifier = modifiers.find((m) => m[0] == equippedItem);
-      if (modifier == undefined) {
-        modifier = modifiers[0];
-      }
+      let modifier =
+        modifiers.find((m) => m[0] == equippedItem) || modifiers[0];
 
       if (modifier[1] == 0) return;
-
-      let { current, max } = player?.hp || { current: 0, max: 0 };
-      // hps.set(ic, { current: current + modifier[1], max });
-      current += modifier[1];
-      // TODO: check if this updates hp
+      interactedItem.hp.current += modifier[1];
 
       for (let { type, ...args } of sequence) {
         if (type == "wait") {
@@ -518,17 +452,20 @@
         }
       }
 
-      let playerEvolve = _interactables[player?.emoji || ""].evolve;
-      let playerDevolve = _interactables[player?.emoji || ""].devolve;
+      let playerEvolve = _interactables[player?.emoji || ""]?.evolve;
+      let playerDevolve = _interactables[player?.emoji || ""]?.devolve;
 
       // EVOLVE & DEVOLVE PLAYER
-      if (current <= 0) {
+      if (player?.hp.current <= 0) {
         if (playerDevolve?.enabled && playerDevolve.to != "") {
           player.emoji = playerDevolve.to;
         } else {
           items.delete(ac);
         }
-      } else if (playerEvolve?.enabled && playerEvolve.at == current) {
+      } else if (
+        playerEvolve?.enabled &&
+        playerEvolve.at == player?.hp.current
+      ) {
         player.emoji = playerEvolve.to;
       }
 
@@ -545,6 +482,85 @@
 
       items = items;
       _interactables[interactedItem.emoji].executing = false;
+      return;
+    }
+
+    if (e.code.includes("Control")) {
+      if (
+        calcOperation(wasdToArrow[dirKey], ic) == 0 ||
+        !player?.inventory ||
+        items.has(ic)
+      ) {
+        return;
+      }
+      items.set(ic, new Item(player?.inventory[currentInventoryIndex]));
+      player.inventory.splice(currentInventoryIndex, 1);
+      items = items;
+      console.log(items);
+
+      return;
+    }
+
+    let closestDistance = 300;
+    let closestID = ac;
+
+    let _items = Array.from(items).filter(
+      ([id, { emoji }]) => !$statics.has(emoji)
+    );
+
+    if (e.code == "KeyE") {
+      for (let [id, _] of _items) {
+        if (id == ac) continue;
+        if (id > ac && id - ac < closestDistance) {
+          closestDistance = id - ac;
+          closestID = id;
+        }
+      }
+
+      if (closestDistance == 300) {
+        let smallest = 300;
+        for (let [id, _] of _items) {
+          if (id < smallest) smallest = id;
+        }
+        ac = smallest;
+        ic = ac + dirs[dirKey].operation;
+      } else {
+        ac = closestID;
+        ic = ac + dirs[dirKey].operation;
+      }
+
+      progress = tweened(getHpPercentage(), {
+        duration: 400,
+        easing: cubicOut,
+      });
+      return;
+    }
+
+    if (e.code == "KeyQ") {
+      for (let [id, _] of _items) {
+        if (id == ac) continue;
+        if (ac > id && ac - id < closestDistance) {
+          closestDistance = ac - id;
+          closestID = id;
+        }
+      }
+
+      if (closestDistance == 300) {
+        let biggest = 0;
+        for (let [id, _] of _items) {
+          if (id > biggest) biggest = id;
+        }
+        ac = biggest;
+        ic = ac + dirs[dirKey].operation;
+      } else {
+        ac = closestID;
+        ic = ac + dirs[dirKey].operation;
+      }
+
+      progress = tweened(getHpPercentage(), {
+        duration: 400,
+        easing: cubicOut,
+      });
       return;
     }
   }
