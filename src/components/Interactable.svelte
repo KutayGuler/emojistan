@@ -4,7 +4,7 @@
     INTERACTABLE_H,
     MIN_DURATION,
     MIN_INDEX,
-    SIZE,
+    DEFAULT_SIDE_LENGTH,
   } from "$src/constants";
   // interactables = {
   // "emoji": {interactable}
@@ -53,19 +53,16 @@
   // evolveAt: hp 10 to {🌳}
 
   import { nodesStore } from "$src/lib/stores/store";
-  import { onDestroy, onMount } from "svelte";
-  import { notifications } from "../routes/notifications";
   import {
-    map,
-    palette,
-    currentEmoji,
-    interactables,
+    Devolve,
+    Evolve,
     Interactable,
     SequenceItem,
-    Evolve,
-    Devolve,
     type Mutations,
-  } from "../store";
+  } from "$src/types";
+  import { onDestroy, onMount } from "svelte";
+  import { notifications } from "../routes/notifications";
+  import { map, palette, currentEmoji, interactables } from "../store";
 
   let defaultBackground = $map.dbg;
 
@@ -103,7 +100,7 @@
     modifierPoints.unshift(i);
   }
 
-  for (let i = 0; i < SIZE * SIZE; i++) {
+  for (let i = 0; i < DEFAULT_SIDE_LENGTH * DEFAULT_SIDE_LENGTH; i++) {
     indexes[i] = i;
   }
 
@@ -123,6 +120,8 @@
   let index = 0;
   let background = "";
 
+  console.log($interactables);
+
   onMount(() => {
     let obj = $interactables.get(id);
     console.log(obj);
@@ -136,6 +135,7 @@
       id,
       new Interactable(emoji, sequence, hp, points, modifiers, evolve, devolve)
     );
+    // TODO: AdjustHeight for modifiers
     nodesStore.adjustHeight(id, sequence.length, INTERACTABLE_H);
   }
 
@@ -158,11 +158,6 @@
   function updateModifierKey(index: number) {
     if (index == 0) return;
     modifiers[index] = [$currentEmoji, points];
-  }
-
-  function deleteModifier(index: number) {
-    modifiers.splice(index, 1);
-    modifiers = modifiers;
   }
 
   function addToSequence() {
@@ -260,7 +255,7 @@
     updateStore();
   }
 
-  function checkEvolve(e) {
+  function checkEvolve(e: any) {
     if (evolve.at < hp) {
       evolve.at = hp + 1;
     }
@@ -368,7 +363,6 @@
     >
       {#each modifiers as [key, value], i}
         <div class="relative flex flex-col items-center">
-          <!-- TODO: Add remove button for modifiers -->
           {#if i != 0}
             <button
               class="absolute top-0 right-0 text-lg"

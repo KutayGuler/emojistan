@@ -22,8 +22,7 @@ function createNodes() {
 
     spawn(
       component: NodeComponent,
-      position: { x: number; y: number },
-      receiver: boolean = false
+      position: { x: number; y: number }
     ): number {
       let id = 0;
 
@@ -69,8 +68,6 @@ export const d3Scale = writable(1);
 export const nodesStore = createNodes();
 
 export const onMouseMove = (e: any, nodeID: number) => {
-  console.log(nodeID);
-
   nodesStore.update((n) => {
     n.forEach((node: Node) => {
       if (node.id === nodeID) {

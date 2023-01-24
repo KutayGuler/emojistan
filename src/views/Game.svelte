@@ -3,116 +3,52 @@
   import { tweened } from "svelte/motion";
   import { cubicOut } from "svelte/easing";
   import { onDestroy, onMount } from "svelte/internal";
+  import { currentColor, currentEmoji } from "../store";
+  import { DEFAULT_SIDE_LENGTH } from "$src/constants";
   import {
-    map,
-    pushes,
-    merges,
-    currentColor,
-    currentEmoji,
-    statics,
-    interactables,
+    Interactable,
+    Item,
+    type ArrowKey,
+    type CollisionType,
+    type EditableMap,
     type Mutations,
-    type SequenceItem,
-    type Evolve,
-    Devolve,
-  } from "../store";
-  import { SIZE } from "$src/constants";
-  import type { CollisionType } from "$src/types";
+    type Wasd,
+    type _Collisions,
+    type _Interactable,
+    type _Interactables,
+  } from "$src/types";
 
-  interface _Collisions {
-    [key1: string]: {
-      [key2: string]: CollisionType;
-    };
-  }
+  /* ## DATA ## */
+  export let map: EditableMap;
+  export let pushes: Map<number, [string, string, CollisionType]>;
+  export let merges: Map<number, [string, string, CollisionType]>;
+  export let interactables: Map<number, Interactable>;
+  export let statics: Set<string>;
+  export let mapClass = "map";
+  export let SIZE = DEFAULT_SIDE_LENGTH;
 
-  /**
-   * function mutates ac if it is equal to "from" parameter
-   * Transfers an item from "from" to "to"
-   */
-  function transferItem(from: number, to: number) {
-    console.log(items, from, to, items.get(from));
+  console.log(mapClass);
 
-    items.set(to, items.get(from));
-    items.delete(from);
-    console.log(items);
+  /* ## STATE ## */
+  let dialog: HTMLDialogElement;
+  let levelCompleted = false;
+  let ac = -2; // ACTIVE CELL
+  let ic: number; // INTERACTED CELL
+  let dirKey: Wasd = "KeyD";
+  let currentInventoryIndex = 0;
 
-    items = items;
-    if (ac == from) {
-      ac = to;
-      ic = ac + dirs[dirKey].operation;
-    }
-  }
+  const KEYS: {
+    [key in Wasd]: { style: string; emoji: string; operation: number };
+  } = {
+    KeyW: { style: `top: -30%;`, emoji: "⬆️", operation: -SIZE },
+    KeyA: { style: `left: -30%;`, emoji: "⬅️", operation: -1 },
+    KeyS: { style: `bottom: -30%;`, emoji: "⬇️", operation: SIZE },
+    KeyD: { style: `right: -30%;`, emoji: "➡️", operation: 1 },
+  };
 
-  function transferAndMerge(from: number, to: number, mergeResult: string) {
-    // TODO: merge inventories
-    items.set(to, items.get(from));
-    // @ts-expect-error
-    items.get(to).emoji = mergeResult;
-    items.delete(from);
+  const WASD = ["KeyW", "KeyA", "KeyS", "KeyD"];
 
-    items = items;
-    if (ac == from) {
-      ac = to;
-      ic = ac + dirs[dirKey].operation;
-    }
-  }
-
-  interface HP {
-    current: number;
-    max: number;
-    add(points: number): void;
-  }
-
-  class HP {
-    constructor(points: number) {
-      this.current = points;
-      this.max = points;
-    }
-
-    add(points: number) {
-      this.current += points;
-      if (this.current > this.max) {
-        this.max = this.current;
-      }
-    }
-  }
-
-  interface Item {
-    emoji: string;
-    inventory: [string, string, string, string] | [];
-    hp: HP;
-  }
-
-  class Item {
-    constructor(emoji: string) {
-      this.emoji = emoji;
-      this.inventory = [];
-      this.hp = new HP(0);
-    }
-  }
-
-  interface _Interactable {
-    executing: boolean;
-    sequence: Array<SequenceItem>;
-    points: number;
-    hp: number;
-    modifiers: Array<[string, number]>;
-    evolve: Evolve;
-    devolve: Devolve;
-  }
-
-  interface _Interactables {
-    [key: string]: _Interactable;
-  }
-
-  onMount(() => {
-    [$currentColor, $currentEmoji] = ["", ""];
-  });
-
-  type Wasd = "KeyW" | "KeyA" | "KeyS" | "KeyD";
-  type ArrowKey = "ArrowLeft" | "ArrowUp" | "ArrowRight" | "ArrowDown";
-
-  let wasdToArrow: { [key in Wasd]: ArrowKey } = {
+  const wasdToArrow: { [key in Wasd]: ArrowKey } = {
     KeyW: "ArrowUp",
     KeyA: "ArrowLeft",
     KeyD: "ArrowRight",
@@ -130,11 +66,15 @@
     );
   }
 
-  /* ## STATE ## */
-  let dialog: HTMLDialogElement;
-
+  let items = new Map<number, Item>();
+  let backgrounds = new Map(map.backgrounds);
+  let _interactables: _Interactables = {};
   let timeouts: Array<NodeJS.Timeout> = [];
   let intervals: Array<NodeJS.Timer> = [];
+
+  onMount(() => {
+    [$currentColor, $currentEmoji] = ["", ""];
+  });
 
   onDestroy(() => {
     for (let timer of timeouts) {
@@ -146,28 +86,55 @@
     }
   });
 
-  let playerFrozen = false;
-  let levelCompleted = false;
-  let ac = -2; // ACTIVE CELL
-  let ic: number; // INTERACTED CELL
-  let dirs: {
-    [key in Wasd]: { style: string; emoji: string; operation: number };
-  } = {
-    KeyW: { style: `top: -30%;`, emoji: "⬆️", operation: -SIZE },
-    KeyA: { style: `left: -30%;`, emoji: "⬅️", operation: -1 },
-    KeyS: { style: `bottom: -30%;`, emoji: "⬇️", operation: SIZE },
-    KeyD: { style: `right: -30%;`, emoji: "➡️", operation: 1 },
-  };
-  let dirKey: Wasd = "KeyD";
-  let currentInventoryIndex = 0;
+  /**
+   * function mutates ac if it is equal to "from" parameter
+   * Transfers an item from "from" to "to"
+   */
+  function transferItem(from: number, to: number) {
+    // @ts-expect-error
+    items.set(to, items.get(from));
+    items.delete(from);
+    items = items; // MAGIC UPDATE, NECESSARY FOR REACTIVITY
 
-  /* ## DATA ## */
-  let _map = structuredClone($map);
-  let items = new Map<number, Item>();
-  let backgrounds = new Map(_map.backgrounds);
-  let _interactables: _Interactables = {};
+    if (ac == from) {
+      ac = to;
+      ic = ac + KEYS[dirKey].operation;
+    }
+  }
 
-  for (let [id, interactable] of $interactables) {
+  /**
+   * function mutates ac if it is equal to "from" parameter
+   * Transfers an item from "from" to "to" and applies mergeResult
+   */
+  function transferAndMerge(from: number, to: number, mergeResult: string) {
+    let fromInventory = items.get(from)?.inventory || [];
+    let fromHP = items.get(from)?.hp.current || 1;
+    let toInventory = items.get(to)?.inventory || [];
+    let mergedInventory = [...fromInventory, ...toInventory];
+    while (mergedInventory.length > 4) {
+      mergedInventory.pop();
+    }
+    console.log(items);
+
+    items.set(
+      to,
+      new Item(
+        mergeResult,
+        mergedInventory,
+        _interactables[mergeResult]?.hp || fromHP
+      )
+    );
+    items.delete(from);
+    items = items; // MAGIC UPDATE, NECESSARY FOR REACTIVITY
+    console.log(items);
+
+    if (ac == from) {
+      ac = to;
+      ic = ac + KEYS[dirKey].operation;
+    }
+  }
+
+  for (let [id, interactable] of interactables) {
     const { emoji, ...args } = interactable;
     // @ts-expect-error
     _interactables[emoji] = {};
@@ -175,12 +142,12 @@
   }
 
   function initItems() {
-    for (let [id, item] of _map.items) {
+    for (let [id, item] of map.items) {
       items.set(id, new Item(item));
     }
 
     for (let [index, { emoji, hp }] of items) {
-      if (ac == -2 && !$statics.has(emoji)) {
+      if (ac == -2 && !statics.has(emoji)) {
         ac = index;
         ic = ac + 1;
       }
@@ -205,7 +172,8 @@
     numbers.set(i, i / 100);
   }
 
-  function getHpPercentage(): number {
+  function calcPlayerHpPercentage(): number {
+    // @ts-expect-error
     let { hp } = player;
     if (!hp) return 0;
     if (hp.current > hp.max) return 1;
@@ -214,7 +182,7 @@
 
   let _collisions: _Collisions = {};
 
-  for (let [id, _slots] of [...$merges, ...$pushes]) {
+  for (let [id, _slots] of [...merges, ...pushes]) {
     let [key1, key2, val] = _slots;
     if (key1 == "") continue;
     if (!_collisions[key1]) {
@@ -224,14 +192,12 @@
     _collisions[key1][key2] = val;
 
     // making emoji merge both ways
-    if (val != "push") {
-      if (key1 != key2) {
-        if (!_collisions[key2]) {
-          _collisions[key2] = {};
-        }
-
-        _collisions[key2][key1] = val;
+    if (val != "push" && key1 != key2) {
+      if (!_collisions[key2]) {
+        _collisions[key2] = {};
       }
+
+      _collisions[key2][key1] = val;
     }
   }
 
@@ -263,6 +229,7 @@
     },
     addToPlayerInventory({ emoji }) {
       if (emoji && player?.inventory.length != 4) {
+        // @ts-expect-error
         player?.inventory.push(emoji);
         items = items;
       }
@@ -271,10 +238,8 @@
       transferItem(ac, index);
       items = items;
     },
-    freezePlayer: () => (playerFrozen = true),
-    unfreezePlayer: () => (playerFrozen = false),
     resetLevel: () => {
-      backgrounds = new Map(_map.backgrounds);
+      backgrounds = new Map(map.backgrounds);
       initItems();
       ac = items.entries().next().value[0];
       ic = ac + 1;
@@ -285,7 +250,7 @@
     addToPlayerHP: ({ points }) => {
       if (!player) return;
       player.hp.add(points);
-      progress.set(getHpPercentage());
+      progress.set(calcPlayerHpPercentage());
     },
   };
 
@@ -293,8 +258,6 @@
     if (!_collisions[key1]) return "bump";
     return _collisions[key1][key2] || "bump";
   }
-
-  // TODO: set HP according to emoji's max (default) HP
 
   function enactPushCollision(operation: number) {
     let collisionChain = [];
@@ -311,6 +274,7 @@
     let collisionTypeSequence: Array<CollisionType> = [];
     for (let i = 0; i < collisionChain.length - 1; i++) {
       collisionTypeSequence.push(
+        // @ts-expect-error
         getCollisionType(collisionChain[i], collisionChain[i + 1])
       );
     }
@@ -370,18 +334,13 @@
     }
   }
 
-  let wasd = ["KeyW", "KeyA", "KeyS", "KeyD"];
-
   async function handle(e: KeyboardEvent) {
     e.preventDefault();
+    if (!items.has(ac) || (player?.hp || -1) <= 0) return;
 
-    if (!items.has(ac) || playerFrozen || (player?.hp || -1) <= 0) {
-      return;
-    }
     if (e.code.includes("Arrow")) {
       let operation = calcOperation(e.code as ArrowKey, ac);
-      if (player == undefined || $statics.has(player.emoji) || operation == 0)
-        return;
+      if (!player || statics.has(player.emoji) || operation == 0) return;
       let facingItem = items.get(ac + operation);
 
       if (!facingItem) {
@@ -389,17 +348,16 @@
         return;
       }
 
-      switch (getCollisionType(player.emoji, facingItem.emoji)) {
+      let collisionType = getCollisionType(player.emoji, facingItem.emoji);
+
+      switch (collisionType) {
         case "push":
           enactPushCollision(operation);
           break;
         case "bump":
           break;
         default:
-          // MERGE
-          let mergeResult = getCollisionType(player.emoji, facingItem.emoji);
-          transferItem(ac, ac + operation);
-          player.emoji = mergeResult;
+          transferAndMerge(ac, ac + operation, collisionType);
           break;
       }
       return;
@@ -412,9 +370,9 @@
       return;
     }
 
-    if (wasd.includes(e.code)) {
+    if (WASD.includes(e.code)) {
       dirKey = e.code as Wasd;
-      ic = ac + dirs[dirKey].operation;
+      ic = ac + KEYS[dirKey].operation;
       return;
     }
 
@@ -456,7 +414,7 @@
       let playerDevolve = _interactables[player?.emoji || ""]?.devolve;
 
       // EVOLVE & DEVOLVE PLAYER
-      if (player?.hp.current <= 0) {
+      if (player && player?.hp.current <= 0) {
         if (playerDevolve?.enabled && playerDevolve.to != "") {
           player.emoji = playerDevolve.to;
         } else {
@@ -505,7 +463,7 @@
     let closestID = ac;
 
     let _items = Array.from(items).filter(
-      ([id, { emoji }]) => !$statics.has(emoji)
+      ([id, { emoji }]) => !statics.has(emoji)
     );
 
     if (e.code == "KeyE") {
@@ -523,13 +481,13 @@
           if (id < smallest) smallest = id;
         }
         ac = smallest;
-        ic = ac + dirs[dirKey].operation;
+        ic = ac + KEYS[dirKey].operation;
       } else {
         ac = closestID;
-        ic = ac + dirs[dirKey].operation;
+        ic = ac + KEYS[dirKey].operation;
       }
 
-      progress = tweened(getHpPercentage(), {
+      progress = tweened(calcPlayerHpPercentage(), {
         duration: 400,
         easing: cubicOut,
       });
@@ -551,13 +509,13 @@
           if (id > biggest) biggest = id;
         }
         ac = biggest;
-        ic = ac + dirs[dirKey].operation;
+        ic = ac + KEYS[dirKey].operation;
       } else {
         ac = closestID;
-        ic = ac + dirs[dirKey].operation;
+        ic = ac + KEYS[dirKey].operation;
       }
 
-      progress = tweened(getHpPercentage(), {
+      progress = tweened(calcPlayerHpPercentage(), {
         duration: 400,
         easing: cubicOut,
       });
@@ -568,14 +526,14 @@
 
 <svelte:window on:keydown={handle} />
 
-<div class="map">
+<div class={mapClass}>
   {#each { length: SIZE * SIZE } as _, i}
     {@const active = ac == i}
-    <div style:background={backgrounds.get(i) || $map.dbg} class:active>
+    <div style:background={backgrounds.get(i) || map.dbg} class:active>
       {#if active}
-        <div class="direction scale-75" style={dirs[dirKey].style}>
+        <div class="direction scale-75" style={KEYS[dirKey].style}>
           {(player?.inventory || [])[currentInventoryIndex] ||
-            dirs[dirKey].emoji}
+            KEYS[dirKey].emoji}
         </div>
       {/if}
       {items.get(i)?.emoji || ""}

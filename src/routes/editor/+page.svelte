@@ -6,7 +6,7 @@
   import { fly, scale } from "svelte/transition";
 
   // VIEWS
-  import Play from "../../views/Play.svelte";
+  import Game from "../../views/Game.svelte";
   import Editor from "../../views/Editor.svelte";
 
   // STORES
@@ -23,7 +23,7 @@
   } from "../../store";
 
   import { emojis } from "./emojis";
-  import { SIZE } from "$src/constants";
+  import { DEFAULT_SIDE_LENGTH } from "$src/constants";
   import { notifications } from "../notifications";
   import { nodesStore } from "$lib/stores/store";
 
@@ -86,7 +86,7 @@
 
   function fillMap() {
     if ($currentEmoji == "") return;
-    for (let i = 0; i < SIZE * SIZE; i++) {
+    for (let i = 0; i < DEFAULT_SIDE_LENGTH * DEFAULT_SIDE_LENGTH; i++) {
       $map.items.set(i, $currentEmoji);
     }
     $map = $map;
@@ -235,7 +235,13 @@
         </aside>
       {/if}
       {#if test}
-        <Play />
+        <Game
+          map={structuredClone($map)}
+          pushes={$pushes}
+          merges={$merges}
+          interactables={$interactables}
+          statics={$statics}
+        />
       {:else if view == "editor"}
         <div class="flex flex-col justify-center px-8">
           <Editor {showIndex} {deleteMode} />

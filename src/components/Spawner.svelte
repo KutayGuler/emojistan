@@ -1,20 +1,14 @@
 <script lang="ts">
-  import {
-    merges,
-    pushes,
-    interactables,
-    Interactable,
-    Evolve,
-    Devolve,
-  } from "../store";
+  import { merges, pushes, interactables } from "../store";
   import type { NodeComponent } from "$lib/types";
   import { nodesStore } from "$lib/stores/store";
+  import { Devolve, Evolve, Interactable } from "$src/types";
 
   export let position: { x: number; y: number };
 
   // CF #4
-  function spawn(component: NodeComponent, value: any, receiver = false) {
-    const id = nodesStore.spawn(component, position, receiver);
+  function spawn(component: NodeComponent, value: any) {
+    const id = nodesStore.spawn(component, position);
 
     switch (component) {
       case "pusher":

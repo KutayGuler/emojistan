@@ -1,112 +1,13 @@
 import { page } from "$app/stores";
 import { writable, get } from "svelte/store";
 import { DEFAULT_BG, storeNames } from "./constants";
-import type { CollisionType } from "./types";
-
-export interface Mutations {
-  setBackgroundOf(
-    { index, background }: { index: number; background: string },
-    _start?: number
-  ): void;
-  removeBackgroundOf({ index }: { index: number }): void;
-  spawn(
-    { index, emoji }: { index: number; emoji: string },
-    _start?: number
-  ): void;
-  destroy({ index }: { index: number }): void;
-  wait(duration: number): Promise<any>;
-  freezePlayer: Function;
-  unfreezePlayer: Function;
-  addToPlayerInventory({ emoji }: { emoji: string }): void;
-  teleportPlayerTo({ index }: { index: number }): void;
-  changePlayerTo({ emoji }: { emoji: string }): void;
-  addToPlayerHP({ points }: { points: number }): void;
-  resetLevel: Function;
-  completeLevel: Function;
-}
-
-export interface SequenceItem {
-  type: keyof Mutations;
-  index: number;
-  background: string;
-  duration: number;
-  points: number;
-  emoji: string;
-}
-
-export class SequenceItem {
-  constructor(
-    type: keyof Mutations,
-    index: number,
-    background: string,
-    duration: number,
-    points: number,
-    emoji: string
-  ) {
-    this.type = type;
-    this.index = index;
-    this.background = background;
-    this.duration = duration;
-    this.points = points;
-    this.emoji = emoji;
-  }
-}
-
-export interface Evolve {
-  enabled: boolean;
-  to: string;
-  at: number;
-}
-
-export class Evolve {
-  constructor(enabled: boolean, to: string, at: number) {
-    this.enabled = enabled;
-    this.to = to;
-    this.at = at;
-  }
-}
-
-export interface Devolve {
-  enabled: boolean;
-  to: string;
-}
-
-export class Devolve {
-  constructor(enabled: boolean, to: string) {
-    this.enabled = enabled;
-    this.to = to;
-  }
-}
-
-export interface Interactable {
-  emoji: string;
-  sequence: Array<SequenceItem>;
-  points: number;
-  hp: number;
-  modifiers: Array<[string, number]>;
-  evolve: Evolve;
-  devolve: Devolve;
-}
-
-export class Interactable {
-  constructor(
-    emoji: string,
-    sequence: Array<SequenceItem>,
-    hp: number,
-    points: number,
-    modifiers: Array<[string, number]>,
-    evolve: Evolve,
-    devolve: Devolve
-  ) {
-    this.emoji = emoji;
-    this.sequence = sequence;
-    this.hp = hp;
-    this.points = points;
-    this.modifiers = modifiers;
-    this.evolve = evolve;
-    this.devolve = devolve;
-  }
-}
+import {
+  EditableMap,
+  type CollisionType,
+  type Interactable,
+  type Merges,
+  type Pushes,
+} from "./types";
 
 function createMapStore<T>(name: string) {
   const { set, subscribe, update } = writable(new Map<number, T>());
@@ -207,13 +108,7 @@ function createSaves() {
 }
 
 function createEditableMap() {
-  const { set, subscribe, update } = writable({
-    items: new Map<number, string>(),
-    backgrounds: new Map<number, string>(),
-    stacks: new Map<number, number>(),
-    objective: "",
-    dbg: DEFAULT_BG,
-  });
+  const { set, subscribe, update } = writable(new EditableMap());
 
   return {
     set,
@@ -346,6 +241,6 @@ export const statics = createSetStore("statics");
 export const palette = createSetStore("palette");
 
 // MAPS
-export const pushes = createMapStore<[string, string, CollisionType]>("pushes");
-export const merges = createMapStore<[string, string, CollisionType]>("merges");
+export const pushes = createMapStore<Pushes>("pushes");
+export const merges = createMapStore<Merges>("merges");
 export const interactables = createMapStore<Interactable>("interactables");

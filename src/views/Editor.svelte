@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { SIZE } from "$src/constants";
+  import { DEFAULT_SIDE_LENGTH } from "$src/constants";
   import { currentEmoji, currentColor, map } from "../store";
 
   export let showIndex = false;
@@ -33,7 +33,7 @@
 </script>
 
 <div class="map">
-  {#each { length: SIZE * SIZE } as _, i}
+  {#each { length: DEFAULT_SIDE_LENGTH * DEFAULT_SIDE_LENGTH } as _, i}
     <div
       class="cell"
       style:background={$map.backgrounds.get(i) || $map.dbg}
