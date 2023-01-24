@@ -59,45 +59,6 @@ function createNodes() {
   };
 }
 
-function createEdges() {
-  const arr: Array<Edge> = [];
-  const { set, subscribe, update } = writable(arr);
-
-  return {
-    set,
-    subscribe,
-    update,
-    useStorage: (id: string) => {
-      // @ts-expect-error
-      const val = JSON.parse(localStorage.getItem(id + "_edges"));
-
-      set(val || []);
-      subscribe((state) => {
-        localStorage.setItem(id + "_edges", JSON.stringify(Array.from(state)));
-      });
-    },
-    add: (sourceID: number, targetID: number) =>
-      update((state) => {
-        state.push({
-          id: `e${sourceID}-${targetID}`,
-          source: sourceID,
-          target: targetID,
-        });
-        return state;
-      }),
-    remove: (edgeID: string) =>
-      update((state) => {
-        state = state.filter((e) => e.id != edgeID);
-        return state;
-      }),
-    filter: (nodeID: number) =>
-      update((state) => {
-        state = state.filter((e) => !e.id.includes(nodeID.toString()));
-        return state;
-      }),
-  };
-}
-
 export const widthStore = writable(GRAPH_SIZE);
 export const heightStore = writable(GRAPH_SIZE);
 export const backgroundStore = writable(true);
@@ -108,6 +69,8 @@ export const d3Scale = writable(1);
 export const nodesStore = createNodes();
 
 export const onMouseMove = (e: any, nodeID: number) => {
+  console.log(nodeID);
+
   nodesStore.update((n) => {
     n.forEach((node: Node) => {
       if (node.id === nodeID) {
