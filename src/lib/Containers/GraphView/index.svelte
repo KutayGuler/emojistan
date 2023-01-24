@@ -23,10 +23,6 @@
     selectAll,
   };
 
-  //these are typscripted as any, however they have been transformed inside of store.ts
-  // export let nodesStore: any;
-  export let derivedEdges: any;
-
   // declaring the grid and dot size for d3's transformations and zoom
   const gridSize = 15;
   const dotSize = 10;
@@ -34,7 +30,6 @@
   let nodesDiv: HTMLDivElement;
 
   onMount(() => {
-    d3.select(`.Edges`).call(d3Zoom).on("dblclick.zoom", null);
     d3.select(`.Nodes`).call(d3Zoom).on("dblclick.zoom", null);
     d3.select(`.Nodes`).on("contextmenu", function (e: MouseEvent) {
       e.preventDefault();
@@ -92,8 +87,6 @@
   function clickedOnNodes() {
     nodesStore.removeSpawner();
   }
-
-  function clickedOnEdges() {}
 </script>
 
 <!-- This is the container that holds GraphView and we have disabled right click functionality to prevent a sticking behavior -->
@@ -107,11 +100,7 @@
 </div>
 
 <!-- rendering dots on the background depending on the zoom level -->
-<svg
-  class={`Edges`}
-  viewBox="0 0 {$widthStore} {$heightStore}"
-  on:click={clickedOnEdges}
->
+<svg class={`Edges`} viewBox="0 0 {$widthStore} {$heightStore}">
   <defs>
     <pattern
       id={`background`}
