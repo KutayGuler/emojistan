@@ -36,14 +36,20 @@
   }
 </script>
 
-<h4>Palette 🎨</h4>
-<div class="relative flex w-full flex-row">
-  <input class="h-12 w-full" type="color" bind:value={pickedColor} />
+<!-- TODO: Revise palette. It should be similar to statics every color having 3 different buttons is cluttering the ui -->
+<h4 class="pt-4">Palette 🎨</h4>
+<div class="relative flex h-12 w-full flex-row gap-2">
+  <input
+    style:background={$map.dbg}
+    class="h-full w-full flex-grow cursor-pointer rounded-md border-0"
+    type="color"
+    bind:value={pickedColor}
+  />
   <button class="add btn relative w-24  bg-white" on:click={addColor}
     >🎨
   </button>
 </div>
-<div class="flex h-1/3 w-full flex-row justify-end overflow-y-auto">
+<div class="flex w-full flex-row justify-end overflow-y-auto">
   <div class="h-full w-full">
     {#each [...$cp] as color (color)}
       <div

@@ -10,7 +10,9 @@
   style={`width: ${$widthStore}px; height: ${$heightStore}px`}
 >
   <GraphView />
-  <p class="absolute right-0 bottom-0">Right click to spawn a component</p>
+  <p class="absolute right-0 bottom-0 pr-1 text-sm">
+    Right click to spawn a Rulebox
+  </p>
 </div>
 
 <style>

@@ -545,25 +545,27 @@
   {/if}
 </div>
 
-{#key ac}
-  <div
-    class="absolute -bottom-8 flex w-64 flex-row items-center justify-center gap-2"
-  >
-    <progress class="progress progress-success h-4" value={$progress} />
-  </div>
-  <div
-    class="absolute -bottom-24 flex w-full flex-row items-center justify-center gap-2"
-  >
-    {#each { length: 4 } as _, i}
-      <div
-        class:selected={i == currentInventoryIndex}
-        class="flex h-12 w-12 flex-col items-center justify-center bg-base-300 p-2"
-      >
-        {(player?.inventory || [])[i] || ""}
-      </div>
-    {/each}
-  </div>
-{/key}
+{#if mapClass == "map"}
+  {#key ac}
+    <div
+      class="absolute -bottom-8 flex w-64 flex-row items-center justify-center gap-2"
+    >
+      <progress class="progress progress-success h-4" value={$progress} />
+    </div>
+    <div
+      class="absolute -bottom-24 flex w-full flex-row items-center justify-center gap-2"
+    >
+      {#each { length: 4 } as _, i}
+        <div
+          class:selected={i == currentInventoryIndex}
+          class="flex h-12 w-12 flex-col items-center justify-center bg-base-300 p-2"
+        >
+          {(player?.inventory || [])[i] || ""}
+        </div>
+      {/each}
+    </div>
+  {/key}
+{/if}
 
 <style>
   .selected {

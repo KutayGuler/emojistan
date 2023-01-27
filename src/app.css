@@ -47,7 +47,7 @@
   } */
 
   .aside {
-    @apply relative z-10 h-[716px] w-80 overflow-y-auto rounded bg-base-200 p-8 pt-0;
+    @apply relative z-10 h-[716px] w-80 overflow-y-auto rounded bg-base-200 p-8;
   }
 
   .simulation > div,

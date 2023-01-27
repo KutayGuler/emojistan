@@ -18,6 +18,7 @@
         if ($currentEmoji == "") map.removeEmoji(index);
         break;
     }
+
     if ($currentColor != "" && $currentColor != $map.dbg) {
       map.updateBackground(index, $currentColor);
     }

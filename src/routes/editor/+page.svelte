@@ -107,7 +107,14 @@
   }
 
   let test = false;
-  let view: "editor" | "rules" = "rules";
+  let view: "editor" | "rules" = "editor";
+
+  function toggleTest() {
+    test = !test;
+    if (!test) {
+      $currentEmoji = "";
+    }
+  }
 </script>
 
 <svelte:head>
@@ -117,19 +124,36 @@
 <svelte:window on:keydown={handleKeydown} bind:innerWidth bind:innerHeight />
 
 {#if $saves.current != ""}
+  {#if test}
+    <button on:click={toggleTest} class="absolute top-4 right-4 z-10 text-4xl"
+      >🞫</button
+    >
+  {/if}
   <main
-    class="noselect relative box-border flex h-screen flex-row items-center justify-center overflow-x-hidden text-2xl"
+    class="noselect relative box-border flex h-screen flex-col items-center justify-center gap-8 overflow-x-hidden text-2xl"
   >
-    {#if view != "rules"}
-      <button
-        class="btn absolute top-6 z-10 h-20 w-40 bg-primary text-5xl"
-        on:click={() => {
-          test = !test;
-          if (!test) {
-            $currentEmoji = "";
-          }
-        }}>{test ? "EDIT" : "TEST"}</button
+    {#if !test}
+      <div
+        transition:fly={{ y: -200 }}
+        class="absolute top-12 flex w-full flex-row items-center justify-center gap-8"
       >
+        <div
+          class="{view == 'editor'
+            ? 'scale-150 opacity-100'
+            : 'opacity-50'} cursor-pointer duration-200 ease-out hover:scale-150 hover:opacity-100"
+          on:click={() => (view = "editor")}
+        >
+          🗺️
+        </div>
+        <div
+          class="{view == 'rules'
+            ? 'scale-150 opacity-100'
+            : 'opacity-50'} cursor-pointer duration-200 hover:scale-150 hover:opacity-100"
+          on:click={() => (view = "rules")}
+        >
+          📜
+        </div>
+      </div>
     {/if}
     <div class="relative box-border flex flex-row items-center justify-center">
       {#if !test}
@@ -138,31 +162,13 @@
           style:background={$map.dbg}
           class="aside"
         >
-          <div
-            class="sticky top-0 flex w-full flex-row items-center justify-center gap-8 bg-base-300 p-4 py-8"
-          >
-            <div
-              class="{view == 'editor'
-                ? 'scale-150 opacity-100'
-                : 'opacity-50'} cursor-pointer duration-200 ease-out hover:scale-150 hover:opacity-100"
-              on:click={() => (view = "editor")}
-            >
-              🗺️
-            </div>
-            <div
-              class="{view == 'rules'
-                ? 'scale-150 opacity-100'
-                : 'opacity-50'} cursor-pointer duration-200 hover:scale-150 hover:opacity-100"
-              on:click={() => (view = "rules")}
-            >
-              📜
-            </div>
-          </div>
           {#if view == "editor"}
-            <div class="flex flex-col pb-8">
+            <div class="flex flex-col">
+              <button class="btn bg-primary" on:click={toggleTest}>TEST</button>
               <div class="form-control">
                 <label class="label cursor-pointer">
-                  <span class="label-text">Show Indexes</span>
+                  <!-- TODO: Consistent font size -->
+                  <span class="label-text text-xl">Show Indexes</span>
                   <input
                     type="checkbox"
                     class="checkbox checkbox-secondary"
@@ -170,34 +176,18 @@
                   />
                 </label>
               </div>
-              <div class="form-control">
-                <label class="label">
-                  <span class="label-text">Objective</span>
-                </label>
-                <textarea
-                  class="textarea textarea-bordered h-24"
-                  placeholder="Describe the goal"
-                  bind:value={$map.objective}
-                />
-              </div>
               <div class="flex flex-col gap-2">
-                <div class="form-control w-full max-w-xs">
-                  <label for="deleteMode" class="label">
-                    <span class="label-text">Delete Mode</span>
-                  </label>
-                  <select
-                    class="select select-bordered"
-                    bind:value={deleteMode}
-                  >
-                    {#each deleteModes as mode}
-                      <option value={mode}>{mode}</option>
-                    {/each}
-                  </select>
-                </div>
+                <p>Delete Mode</p>
+                <select class="select select-bordered" bind:value={deleteMode}>
+                  {#each deleteModes as mode}
+                    <option value={mode}>{mode}</option>
+                  {/each}
+                </select>
                 <div class="flex flex-row" />
                 <button class="btn bg-accent" on:click={clearMap}
                   >CLEAR {deleteTexts[deleteMode]}
                 </button>
+                <p>Filler</p>
                 <button
                   disabled={$currentEmoji == ""}
                   class="btn"
@@ -206,6 +196,17 @@
               </div>
             </div>
             <Palette />
+          {:else}
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text">Objective</span>
+              </label>
+              <textarea
+                class="textarea textarea-bordered h-24"
+                placeholder="Describe the goal"
+                bind:value={$map.objective}
+              />
+            </div>
             <h4 class="pt-8">Statics 🗿</h4>
             <button
               disabled={$currentEmoji == ""}
@@ -214,7 +215,7 @@
             >
               [ {$currentEmoji == "" ? "___" : $currentEmoji} ]
             </button>
-            <div class="h-1/3 overflow-y-auto">
+            <div class="overflow-y-auto">
               <div
                 class="mt-2 grid w-full grid-flow-row grid-cols-2 justify-center gap-2 overflow-y-auto "
               >
@@ -258,11 +259,12 @@
           class="aside"
         >
           <div
-            class="sticky top-0 flex w-full flex-col items-center justify-center gap-4 bg-base-300 p-4 pt-8"
+            style:background={$currentColor || $map.dbg}
+            class="sticky -top-8 flex w-full flex-col items-center justify-center gap-4 bg-transparent p-4"
           >
             <div
               style:background={$currentColor || $map.dbg}
-              class="flex h-16 w-16 items-center justify-center rounded-full border-2 border-black bg-base-300 text-3xl"
+              class="flex h-16 w-16 items-center justify-center rounded-full border-2 border-black text-3xl"
               on:click={() => ($currentEmoji = "")}
             >
               {#key $currentEmoji}
