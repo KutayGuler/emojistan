@@ -105,14 +105,15 @@
   }
 
   // COMPONENT RELATED
+  export let editable = true;
   export let id: number;
-  let emoji = "";
-  let sequence: Array<SequenceItem> = [];
-  let hp: number;
-  let points: number;
-  let modifiers: Array<[string, number]> = [];
-  let evolve = new Evolve(false, "", 2);
-  let devolve = new Devolve(false, "");
+  export let emoji = "";
+  export let sequence: Array<SequenceItem> = [];
+  export let hp: number;
+  export let points: number;
+  export let modifiers: Array<[string, number]> = [];
+  export let evolve = new Evolve(false, "", 2);
+  export let devolve = new Devolve(false, "");
 
   // SEQUENCE RELATED
   let type = types.Player[0];
@@ -120,14 +121,13 @@
   let index = 0;
   let background = "";
 
-  console.log($interactables);
-
   onMount(() => {
     let obj = $interactables.get(id);
     console.log(obj);
 
-    if (!obj) return;
-    ({ emoji, sequence, hp, points, modifiers, evolve, devolve } = obj);
+    if (obj) {
+      ({ emoji, sequence, hp, points, modifiers, evolve, devolve } = obj);
+    }
   });
 
   function updateStore() {

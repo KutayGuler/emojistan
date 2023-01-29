@@ -5,10 +5,10 @@
   import { nodesStore } from "$src/lib/stores/store";
 
   export let id: number;
-  let slots = ["", "", ""];
+  export let slots = ["", "", ""];
 
   onMount(() => {
-    slots = $merges.get(id) || ["", "", ""];
+    slots = $merges.get(id) || slots;
   });
 
   function checkCollision() {
@@ -36,6 +36,7 @@
       }
     }
 
+    // @ts-expect-error
     merges.update(id, slots);
   }
 

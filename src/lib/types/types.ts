@@ -17,13 +17,13 @@ import type { XYPosition, Position } from "./utils";
 
 export type NodeComponent = "pusher" | "interactable" | "merger" | "spawner";
 
-export interface Node<T = any> {
+export interface Node {
   id: number;
   component: NodeComponent;
   position: XYPosition;
-  data: T;
   width: number;
   height: number;
+  disabled: boolean;
   bgColor?: string;
   fontSize?: number;
   borderColor?: string;

@@ -1,4 +1,5 @@
 export const DEFAULT_SIDE_LENGTH = 12;
+export const DEFAULT_MAP_CLASS = "map";
 
 export const MIN_INDEX = 0;
 export const MAX_INDEX = DEFAULT_SIDE_LENGTH * DEFAULT_SIDE_LENGTH;

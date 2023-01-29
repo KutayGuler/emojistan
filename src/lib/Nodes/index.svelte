@@ -42,7 +42,7 @@
 />
 
 <div
-  class="Node"
+  class="Node {node.disabled ? 'pointer-events-none' : ''}"
   style="left: {node.position.x}px;
     top: {node.position.y}px;
     width: {node.width}px;

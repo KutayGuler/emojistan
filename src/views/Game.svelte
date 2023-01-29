@@ -4,7 +4,7 @@
   import { cubicOut } from "svelte/easing";
   import { onDestroy, onMount } from "svelte/internal";
   import { currentColor, currentEmoji } from "../store";
-  import { DEFAULT_SIDE_LENGTH } from "$src/constants";
+  import { DEFAULT_MAP_CLASS, DEFAULT_SIDE_LENGTH } from "$src/constants";
   import {
     Interactable,
     Item,
@@ -20,11 +20,11 @@
 
   /* ## DATA ## */
   export let map: EditableMap;
-  export let pushes: Map<number, [string, string, CollisionType]>;
-  export let merges: Map<number, [string, string, CollisionType]>;
-  export let interactables: Map<number, Interactable>;
-  export let statics: Set<string>;
-  export let mapClass = "map";
+  export let pushes = new Map<number, [string, string, CollisionType]>();
+  export let merges = new Map<number, [string, string, CollisionType]>();
+  export let interactables = new Map<number, Interactable>();
+  export let statics = new Set<string>();
+  export let mapClass = DEFAULT_MAP_CLASS;
   export let SIZE = DEFAULT_SIDE_LENGTH;
 
   console.log(mapClass);
@@ -545,15 +545,19 @@
   {/if}
 </div>
 
-{#if mapClass == "map"}
+{#if mapClass == DEFAULT_MAP_CLASS}
   {#key ac}
     <div
-      class="absolute -bottom-8 flex w-64 flex-row items-center justify-center gap-2"
+      class="absolute -top-16 flex w-64 flex-row items-center justify-center gap-2"
     >
-      <progress class="progress progress-success h-4" value={$progress} />
+      <p class="absolute -left-4 z-10 self-start">{player?.emoji}</p>
+      <progress class="progress progress-success h-8" value={$progress} />
+      <p class="absolute">{$progress.toFixed(2)}</p>
+
+      <!-- HP -->
     </div>
     <div
-      class="absolute -bottom-24 flex w-full flex-row items-center justify-center gap-2"
+      class="absolute -bottom-20 flex w-full flex-row items-center justify-center gap-2"
     >
       {#each { length: 4 } as _, i}
         <div

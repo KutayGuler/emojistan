@@ -121,6 +121,7 @@
   <title>Emojistan / Editor</title>
 </svelte:head>
 
+<!-- TODO: try mouse tracker again -->
 <svelte:window on:keydown={handleKeydown} bind:innerWidth bind:innerHeight />
 
 {#if $saves.current != ""}
@@ -130,12 +131,12 @@
     >
   {/if}
   <main
-    class="noselect relative box-border flex h-screen flex-col items-center justify-center gap-8 overflow-x-hidden text-2xl"
+    class="noselect relative box-border flex h-screen flex-col items-center justify-center gap-8 overflow-x-hidden"
   >
     {#if !test}
       <div
         transition:fly={{ y: -200 }}
-        class="absolute top-12 flex w-full flex-row items-center justify-center gap-8"
+        class="absolute top-12 flex w-full flex-row items-center justify-center gap-8 text-2xl"
       >
         <div
           class="{view == 'editor'
@@ -164,11 +165,13 @@
         >
           {#if view == "editor"}
             <div class="flex flex-col">
-              <button class="btn bg-primary" on:click={toggleTest}>TEST</button>
+              <button
+                class="btn bg-primary text-primary-content hover:bg-primary-focus"
+                on:click={toggleTest}>TEST</button
+              >
               <div class="form-control">
                 <label class="label cursor-pointer">
-                  <!-- TODO: Consistent font size -->
-                  <span class="label-text text-xl">Show Indexes</span>
+                  <span class="label-text">Show Indexes</span>
                   <input
                     type="checkbox"
                     class="checkbox checkbox-secondary"
@@ -177,17 +180,29 @@
                 </label>
               </div>
               <div class="flex flex-col gap-2">
-                <p>Delete Mode</p>
-                <select class="select select-bordered" bind:value={deleteMode}>
-                  {#each deleteModes as mode}
-                    <option value={mode}>{mode}</option>
-                  {/each}
-                </select>
+                <!-- TODO: Copy mode -->
+                <div class="form-control">
+                  <label class="label">
+                    <span class="label-text">Delete Mode</span>
+                  </label>
+                  <select
+                    class="select select-bordered"
+                    bind:value={deleteMode}
+                  >
+                    {#each deleteModes as mode}
+                      <option value={mode}>{mode}</option>
+                    {/each}
+                  </select>
+                </div>
+
                 <div class="flex flex-row" />
-                <button class="btn bg-accent" on:click={clearMap}
+                <button
+                  class="btn bg-accent text-accent-content hover:bg-accent-focus"
+                  on:click={clearMap}
                   >CLEAR {deleteTexts[deleteMode]}
                 </button>
-                <p>Filler</p>
+
+                <p class="label-text">Filler</p>
                 <button
                   disabled={$currentEmoji == ""}
                   class="btn"
@@ -207,10 +222,10 @@
                 bind:value={$map.objective}
               />
             </div>
-            <h4 class="pt-8">Statics 🗿</h4>
+            <p class="label-text pt-4">Statics 🗿</p>
             <button
               disabled={$currentEmoji == ""}
-              class="add btn w-full text-2xl"
+              class="add btn w-full "
               on:click={() => statics.add($currentEmoji)}
             >
               [ {$currentEmoji == "" ? "___" : $currentEmoji} ]
@@ -225,7 +240,7 @@
                     animate:flip={flipParams}
                   >
                     <button
-                      class="remove btn h-full w-full text-2xl"
+                      class="remove btn h-full w-full"
                       on:click={() => statics.remove(item)}>{item}</button
                     >
                   </div>

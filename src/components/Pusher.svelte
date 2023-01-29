@@ -6,7 +6,6 @@
 
   export let id: number;
   export let slots = ["", "", "push"];
-  export let editable = true;
 
   onMount(() => {
     slots = $pushes.get(id) || slots;
@@ -42,11 +41,11 @@
 </script>
 
 <div class="flex h-full flex-row items-center justify-center gap-2">
-  <div class="slot" on:click={() => editable && updateSlot(0)}>
+  <div class="slot" on:click={() => updateSlot(0)}>
     {slots[0]}
   </div>
   <div>💨</div>
-  <div class="slot" on:click={() => editable && updateSlot(1)}>
+  <div class="slot" on:click={() => updateSlot(1)}>
     {slots[1]}
   </div>
 </div>

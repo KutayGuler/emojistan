@@ -9,25 +9,29 @@
   let pickedColor = "#000000";
   const flipParams = { duration: 300 };
 
-  function setDefaultBackground(color: string) {
-    if (color == "") return;
-    if (color == $map.dbg) {
+  function setDefaultBackground() {
+    if ($currentColor == "") return;
+    if ($currentColor == $map.dbg) {
       map.updateDbg(DEFAULT_BG);
       return;
     }
 
-    map.updateDbg(color);
+    map.updateDbg($currentColor);
     map.filterBackgrounds();
   }
 
-  function removeColor(color: string) {
-    cp.remove(color);
+  function removeColor() {
+    console.log($cp);
+    cp.remove($currentColor);
     if (!$cp.has($map.dbg)) {
       map.updateDbg(DEFAULT_BG);
     }
+    console.log($cp);
   }
 
-  function addColor() {
+  function addColor(e) {
+    if (e.target.tagName == "INPUT") return;
+
     if ($cp.size == 8) {
       notifications.warning("Number of colors cannot exceed 8");
       return;
@@ -36,55 +40,55 @@
   }
 </script>
 
-<!-- TODO: Revise palette. It should be similar to statics every color having 3 different buttons is cluttering the ui -->
-<h4 class="pt-4">Palette 🎨</h4>
-<div class="relative flex h-12 w-full flex-row gap-2">
-  <input
-    style:background={$map.dbg}
-    class="h-full w-full flex-grow cursor-pointer rounded-md border-0"
-    type="color"
-    bind:value={pickedColor}
-  />
-  <button class="add btn relative w-24  bg-white" on:click={addColor}
-    >🎨
-  </button>
-</div>
-<div class="flex w-full flex-row justify-end overflow-y-auto">
-  <div class="h-full w-full">
+<p class="label-text pt-4">Palette 🎨</p>
+<div class="flex flex-col gap-2">
+  <div class="flex flex-row gap-2">
+    <!-- <button
+      on:click={setDefaultBackground}
+      title="Set as default background color"
+      class="btn flex-grow"
+      disabled={$currentColor == "" || !$cp.has($currentColor)}
+      ><span style:background={$currentColor} class="h-4 w-4" />&nbsp; 🌍</button
+    >
+    <button
+      on:click={removeColor}
+      title="Remove selected color"
+      class="btn flex-grow"
+      disabled={$currentColor == "" || !$cp.has($currentColor)}
+      ><span style:background={$currentColor} class="h-4 w-4" />&nbsp; ❌
+    </button> -->
+    <!-- disabled={$cp.has(pickedColor)} -->
+    <button
+      title="Add selected color"
+      class="btn h-16 flex-grow text-2xl"
+      on:click={addColor}
+    >
+      <input
+        style:background={$map.dbg}
+        class="h-12 w-12 cursor-pointer border-0"
+        type="color"
+        bind:value={pickedColor}
+      />&nbsp; +
+    </button>
+  </div>
+
+  <div class="inline-flex w-full items-center justify-center gap-2 pt-2">
     {#each [...$cp] as color (color)}
       <div
-        class="relative mt-2 flex flex-row justify-start gap-2"
+        class="{color == $currentColor
+          ? 'scale-125'
+          : ''} h-12 w-12 cursor-pointer rounded duration-150 ease-out hover:scale-125"
         transition:scale|local={flipParams}
         animate:flip={flipParams}
-      >
-        <div
-          style:background={color}
-          class="remove btn w-3/5"
-          on:click={() => removeColor(color)}
-        />
-        <button
-          class:default={$map.dbg == color}
-          class="w-1/3 opacity-50 hover:scale-125"
-          on:click={() => setDefaultBackground(color)}>🌍</button
-        >
-        {#if color != $map.dbg}
-          <button
-            class="w-1/3 opacity-50 hover:scale-125"
-            class:selected={$currentColor == color}
-            on:click={() => {
-              if ($currentColor == color) {
-                $currentColor = "";
-              } else {
-                $currentColor = color;
-              }
-            }}
-          >
-            🖌️
-          </button>
-        {:else}
-          <button class="w-1/3 cursor-default">&nbsp;</button>
-        {/if}
-      </div>
+        style:background={color}
+        on:click={() => {
+          if ($currentColor == color) {
+            $currentColor = "";
+          } else {
+            $currentColor = color;
+          }
+        }}
+      />
     {/each}
   </div>
 </div>
