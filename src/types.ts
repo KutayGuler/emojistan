@@ -159,6 +159,7 @@ export interface Interactable {
   points: number;
   hp: number;
   modifiers: Array<[string, number]>;
+  isStatic: boolean;
   evolve: Evolve;
   devolve: Devolve;
 }
@@ -170,6 +171,7 @@ export class Interactable {
     hp: number,
     points: number,
     modifiers: Array<[string, number]>,
+    isStatic: boolean,
     evolve: Evolve,
     devolve: Devolve
   ) {
@@ -178,6 +180,7 @@ export class Interactable {
     this.hp = hp;
     this.points = points;
     this.modifiers = modifiers;
+    this.isStatic = isStatic;
     this.evolve = evolve;
     this.devolve = devolve;
   }

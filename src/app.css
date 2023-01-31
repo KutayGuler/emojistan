@@ -3,31 +3,12 @@
 @tailwind utilities;
 
 @layer components {
-  .btn,
-  .input,
-  .select,
-  .label-text {
-    @apply text-lg;
-  }
-
   .btn {
     border: none;
   }
 
   .info {
     @apply cursor-help text-center text-lg duration-200 ease-out hover:scale-150;
-  }
-
-  .add {
-    @apply hover:after:content-['++'];
-  }
-
-  .remove {
-    @apply hover:after:content-['❌'];
-  }
-
-  .color {
-    @apply relative flex w-32 items-center justify-center rounded-xl border-4 border-none py-8 text-2xl duration-200 ease-out;
   }
 
   .map {
@@ -45,10 +26,6 @@
   .slot-lg {
     @apply flex h-24 w-24 flex-col items-center justify-center rounded-full border-2 bg-white text-4xl;
   }
-
-  /* .cell {
-    @apply relative flex h-14 w-14 items-center justify-center rounded bg-base-300;
-  } */
 
   .aside {
     @apply relative z-10 h-[716px] w-80 overflow-y-auto overflow-x-visible rounded bg-base-200 p-8;
@@ -102,6 +79,7 @@ html,
 body {
   margin: 0;
   padding: 0;
+  overflow: hidden;
 }
 
 ::-webkit-scrollbar-track {

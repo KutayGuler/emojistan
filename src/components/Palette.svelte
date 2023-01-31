@@ -9,24 +9,26 @@
   let pickedColor = "#000000";
   const flipParams = { duration: 300 };
 
-  function setDefaultBackground() {
-    if ($currentColor == "") return;
-    if ($currentColor == $map.dbg) {
+  function setDefaultBackground(color: string) {
+    console.log(color);
+
+    if (color == "") return;
+    if (color == $map.dbg) {
       map.updateDbg(DEFAULT_BG);
       return;
     }
 
-    map.updateDbg($currentColor);
+    map.updateDbg(color);
     map.filterBackgrounds();
   }
 
-  function removeColor() {
-    console.log($cp);
-    cp.remove($currentColor);
+  function removeColor(color: string) {
+    console.log(color);
+
+    cp.remove(color);
     if (!$cp.has($map.dbg)) {
       map.updateDbg(DEFAULT_BG);
     }
-    console.log($cp);
   }
 
   function addColor(e) {
@@ -43,32 +45,18 @@
 <p class="label-text pt-4">Palette 🎨</p>
 <div class="flex flex-col gap-2">
   <div class="flex flex-row gap-2">
-    <!-- <button
-      on:click={setDefaultBackground}
-      title="Set as default background color"
-      class="btn flex-grow"
-      disabled={$currentColor == "" || !$cp.has($currentColor)}
-      ><span style:background={$currentColor} class="h-4 w-4" />&nbsp; 🌍</button
-    >
+    <input
+      class="h-12 w-12 cursor-pointer"
+      type="color"
+      bind:value={pickedColor}
+    />
     <button
-      on:click={removeColor}
-      title="Remove selected color"
-      class="btn flex-grow"
-      disabled={$currentColor == "" || !$cp.has($currentColor)}
-      ><span style:background={$currentColor} class="h-4 w-4" />&nbsp; ❌
-    </button> -->
-    <!-- disabled={$cp.has(pickedColor)} -->
-    <button
+      disabled={$cp.has(pickedColor)}
       title="Add selected color"
-      class="btn h-16 flex-grow text-2xl"
+      class="btn flex-grow text-2xl"
       on:click={addColor}
     >
-      <input
-        style:background={$map.dbg}
-        class="h-12 w-12 cursor-pointer border-0"
-        type="color"
-        bind:value={pickedColor}
-      />&nbsp; +
+      +
     </button>
   </div>
 
@@ -77,18 +65,40 @@
       <div
         class="{color == $currentColor
           ? 'scale-125'
-          : ''} h-12 w-12 cursor-pointer rounded duration-150 ease-out hover:scale-125"
+          : ''} dropdown-hover dropdown h-12 w-12 cursor-pointer rounded duration-150 ease-out hover:scale-125"
         transition:scale|local={flipParams}
         animate:flip={flipParams}
         style:background={color}
-        on:click={() => {
+        on:click={(e) => {
+          // @ts-expect-error
+          if (e.target.tagName == "LI") return;
           if ($currentColor == color) {
             $currentColor = "";
           } else {
             $currentColor = color;
           }
         }}
-      />
+      >
+        <ul
+          tabindex="0"
+          class="dropdown-content menu rounded-box mt-12 bg-base-100 p-2 shadow"
+        >
+          <li
+            on:click={() => setDefaultBackground(color)}
+            title="Set as default background color"
+            class=""
+          >
+            🌍
+          </li>
+          <li
+            on:click={() => removeColor(color)}
+            title="Remove selected color"
+            class=" "
+          >
+            ❌
+          </li>
+        </ul>
+      </div>
     {/each}
   </div>
 </div>

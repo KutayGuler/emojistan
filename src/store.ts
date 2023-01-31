@@ -236,7 +236,6 @@ export const saves = createSaves();
 export const map = createEditableMap();
 
 // SETS
-export const statics = createSetStore("statics");
 export const palette = createSetStore("palette");
 
 // MAPS

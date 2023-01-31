@@ -5,7 +5,6 @@
   import {
     saves,
     map,
-    statics,
     palette,
     pushes,
     merges,
@@ -55,7 +54,6 @@
             backgrounds: Object.fromEntries($map.backgrounds),
             objective: $map.objective,
           },
-          statics: Array.from($statics),
           palette: Array.from($palette),
           nodes: Array.from($nodesStore),
           pushes: Object.fromEntries($pushes),

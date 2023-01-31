@@ -1,9 +1,8 @@
 <script lang="ts">
   // SVELTEKIT
   import { onMount } from "svelte";
-  import { flip } from "svelte/animate";
   import { goto } from "$app/navigation";
-  import { fly, scale } from "svelte/transition";
+  import { fly } from "svelte/transition";
 
   // VIEWS
   import Game from "../../views/Game.svelte";
@@ -18,7 +17,6 @@
     pushes,
     merges,
     palette,
-    statics,
     interactables,
   } from "../../store";
 
@@ -47,7 +45,6 @@
       merges,
       interactables,
       palette,
-      statics,
       nodesStore,
     ]) {
       store.useStorage($saves.current);
@@ -57,11 +54,19 @@
   const flipParams = { duration: 300 };
   let currentCategory = "💩";
   let filter = "";
+  let statics = new Set<string>();
+  $interactables.forEach(({ emoji, isStatic }) => {
+    isStatic && statics.add(emoji);
+  });
 
   function handleKeydown(e: KeyboardEvent) {
     if (e.code == "Escape") {
       $currentEmoji = "";
       $currentColor = "";
+
+      if (test) {
+        test = false;
+      }
     }
   }
 
@@ -72,6 +77,7 @@
   let innerWidth: number;
   let innerHeight: number;
 
+  // TODO: Add ligth/dark mode for this
   let showIndex = false;
 
   type DeleteMode = "Item" | "Background" | "Both";
@@ -115,14 +121,30 @@
       $currentEmoji = "";
     }
   }
+
+  let [x, y] = [0, 0];
 </script>
 
 <svelte:head>
-  <title>Emojistan / Editor</title>
+  <title>Emojistan | Editor</title>
 </svelte:head>
 
-<!-- TODO: try mouse tracker again -->
-<svelte:window on:keydown={handleKeydown} bind:innerWidth bind:innerHeight />
+<svelte:window
+  on:mousemove={(e) => {
+    x = e.clientX;
+    y = e.clientY;
+  }}
+  on:keydown={handleKeydown}
+  bind:innerWidth
+  bind:innerHeight
+/>
+<div
+  style:background={$currentColor || "none"}
+  class="absolute z-50 flex h-6 w-6 items-center justify-center rounded bg-red-500"
+  style="transform: translate({x + 12}px, {y - 12}px);"
+>
+  {$currentEmoji}
+</div>
 
 {#if $saves.current != ""}
   {#if test}
@@ -131,7 +153,7 @@
     >
   {/if}
   <main
-    class="noselect relative box-border flex h-screen flex-col items-center justify-center gap-8 overflow-x-hidden"
+    class="noselect relative box-border flex h-screen flex-col items-center justify-center gap-8 overflow-hidden overflow-x-hidden"
   >
     {#if !test}
       <div
@@ -158,11 +180,7 @@
     {/if}
     <div class="relative box-border flex flex-row items-center justify-center">
       {#if !test}
-        <aside
-          transition:fly={{ x: -200 }}
-          style:background={$map.dbg}
-          class="aside"
-        >
+        <aside transition:fly={{ x: -200 }} class="aside">
           {#if view == "editor"}
             <div class="flex flex-col">
               <button
@@ -222,15 +240,15 @@
                 bind:value={$map.objective}
               />
             </div>
-            <p class="label-text pt-4">Statics 🗿</p>
+            <!-- <p class="label-text pt-4">Statics 🗿</p>
             <button
               disabled={$currentEmoji == ""}
-              class="add btn w-full "
+              class="btn w-full "
               on:click={() => statics.add($currentEmoji)}
             >
-              [ {$currentEmoji == "" ? "___" : $currentEmoji} ]
-            </button>
-            <div class="overflow-y-auto">
+              {$currentEmoji} +
+            </button> -->
+            <!-- <div class="overflow-y-auto">
               <div
                 class="mt-2 grid w-full grid-flow-row grid-cols-2 justify-center gap-2 overflow-y-auto "
               >
@@ -246,7 +264,7 @@
                   </div>
                 {/each}
               </div>
-            </div>
+            </div> -->
           {/if}
         </aside>
       {/if}
@@ -256,7 +274,7 @@
           pushes={$pushes}
           merges={$merges}
           interactables={$interactables}
-          statics={$statics}
+          {statics}
         />
       {:else if view == "editor"}
         <div class="flex flex-col justify-center px-8">
@@ -268,24 +286,11 @@
         </div>
       {/if}
       {#if !test}
-        <aside
-          transition:fly={{ x: 200 }}
-          style:background={$map.dbg}
-          class="aside"
-        >
+        <aside transition:fly={{ x: 200 }} class="aside">
+          <!-- TODO: set defaault bg color -->
           <div
-            style:background={$currentColor || $map.dbg}
             class="sticky -top-8 flex w-full flex-col items-center justify-center gap-4 bg-transparent p-4"
           >
-            <div
-              style:background={$currentColor || $map.dbg}
-              class="flex h-16 w-16 items-center justify-center rounded-full border-2 border-black text-3xl"
-              on:click={() => ($currentEmoji = "")}
-            >
-              {#key $currentEmoji}
-                <span in:scale>{$currentEmoji}</span>
-              {/key}
-            </div>
             <input
               class="input input-bordered w-full"
               type="text"
@@ -296,8 +301,8 @@
               {#each Object.keys(emojis) as category}
                 <div
                   class="{category == currentCategory
-                    ? 'scale-125 opacity-100'
-                    : 'hover:scale-125 hover:opacity-100'} cursor-pointer opacity-50 duration-75 ease-out"
+                    ? 'scale-125'
+                    : 'opacity-50 hover:scale-125 hover:opacity-100'} cursor-pointer duration-75 ease-out"
                   on:click={() => (currentCategory = category)}
                 >
                   {category}

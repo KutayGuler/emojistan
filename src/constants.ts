@@ -41,7 +41,6 @@ export const storeNames = [
   "merges",
   "interactables",
   "palette",
-  "statics",
   "items",
   "backgrounds",
   "objective",

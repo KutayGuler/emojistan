@@ -105,13 +105,13 @@
   }
 
   // COMPONENT RELATED
-  export let editable = true;
   export let id: number;
   export let emoji = "";
   export let sequence: Array<SequenceItem> = [];
-  export let hp: number;
-  export let points: number;
+  export let hp = 1;
+  export let points = 1;
   export let modifiers: Array<[string, number]> = [];
+  export let isStatic = false;
   export let evolve = new Evolve(false, "", 2);
   export let devolve = new Devolve(false, "");
 
@@ -122,20 +122,33 @@
   let background = "";
 
   onMount(() => {
+    console.log(id);
+    console.log($interactables);
+
     let obj = $interactables.get(id);
     console.log(obj);
 
     if (obj) {
-      ({ emoji, sequence, hp, points, modifiers, evolve, devolve } = obj);
+      ({ emoji, sequence, hp, points, modifiers, isStatic, evolve, devolve } =
+        obj);
     }
   });
 
   function updateStore() {
     interactables.update(
       id,
-      new Interactable(emoji, sequence, hp, points, modifiers, evolve, devolve)
+      new Interactable(
+        emoji,
+        sequence,
+        hp,
+        points,
+        modifiers,
+        isStatic,
+        evolve,
+        devolve
+      )
     );
-    // TODO: AdjustHeight for modifiers
+
     nodesStore.adjustHeight(id, sequence.length, INTERACTABLE_H);
   }
 
@@ -157,7 +170,20 @@
 
   function updateModifierKey(index: number) {
     if (index == 0) return;
+    if (modifiers.some(([key, val]) => key == $currentEmoji)) {
+      notifications.warning("Cannot have multiple values of the same modifier");
+      return;
+    }
     modifiers[index] = [$currentEmoji, points];
+  }
+
+  function addToModifiers() {
+    if (modifiers.length == 3) {
+      notifications.warning("Cannot have more than 3 HP modifiers");
+      return;
+    }
+    modifiers = [...modifiers, ["", 1]];
+    updateStore();
   }
 
   function addToSequence() {
@@ -332,6 +358,10 @@
 <main class="flex flex-col items-center justify-center gap-12 pt-16">
   <div class="form-control w-full">
     <label class="label cursor-pointer">
+      <span class="label-text">Static</span>
+      <input type="checkbox" class="checkbox" bind:checked={isStatic} />
+    </label>
+    <label class="label cursor-pointer">
       <span class="label-text">Evolve</span>
       <input type="checkbox" class="checkbox" bind:checked={evolve.enabled} />
     </label>
@@ -341,22 +371,24 @@
     </label>
   </div>
   <div class="form-control flex flex-col">
-    <p class="pb-6 text-4xl">
-      HP MODIFIERS
+    <div
+      class="flex w-full flex-row items-center justify-center gap-2 pb-6 text-center text-2xl"
+    >
+      <p>HP MODIFIERS ({modifiers.length} / 3)</p>
       <button
-        class="btn text-4xl"
-        on:click={() => {
-          modifiers = [...modifiers, ["", 1]];
-        }}>+</button
+        class="btn text-2xl"
+        disabled={modifiers.length == 3 ||
+          modifiers.some(([key, val]) => key == "")}
+        on:click={addToModifiers}>+</button
       >
       {#if !hasInteraction}
         <div
           class="tooltip"
           data-tip="An interactable needs at least one modifier with positive or negative value to fire events"
         >
-          <button class="btn text-4xl text-warning">!</button>
+          <button class="btn text-2xl text-warning">!</button>
         </div>{/if}
-    </p>
+    </div>
 
     <div
       class="flex flex-wrap items-center justify-center gap-x-12 gap-y-6 pb-6"

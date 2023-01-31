@@ -159,7 +159,7 @@
   $: player = items.get(ac);
 
   let progress = tweened(player?.hp.current || 1, {
-    duration: 400,
+    duration: 200,
     easing: cubicOut,
   });
 
@@ -247,7 +247,30 @@
     addToPlayerHP: ({ points }) => {
       if (!player) return;
       player.hp.add(points);
-      progress.set(calcPlayerHpPercentage());
+      console.log(player.hp.current);
+
+      if (player.hp.current <= 0) {
+        items.delete(ac);
+        items = items;
+
+        for (let [id, { emoji, hp }] of items) {
+          if (hp.current > 0 && !statics.has(emoji)) {
+            player = items.get(id);
+            ac = id;
+            progress = tweened(calcPlayerHpPercentage(), {
+              duration: 200,
+              easing: cubicOut,
+            });
+
+            return "cancelLoop";
+          }
+        }
+
+        // TODO: Game over
+        // TODO: Consume item?
+      } else {
+        progress.set(calcPlayerHpPercentage());
+      }
     },
   };
 
@@ -374,10 +397,14 @@
     }
 
     if (e.code == "Space") {
+      console.log(items);
+
       if (calcOperation(wasdToArrow[directionKey], ic) == 0) return;
       let interactedItem = items.get(ic);
+
       if (interactedItem == undefined) return;
       let interactable: _Interactable = _interactables[interactedItem.emoji];
+      console.log(interactable);
       if (interactable == undefined || interactable.executing) return;
       let { sequence, modifiers, evolve, devolve } = interactable;
 
@@ -393,8 +420,13 @@
       let equippedItem =
         (player?.inventory || [])[currentInventoryIndex] || "any";
 
+      console.log(equippedItem);
+      console.log(modifiers);
+
       let modifier =
         modifiers.find((m) => m[0] == equippedItem) || modifiers[0];
+
+      console.log(modifier);
 
       if (modifier[1] == 0) return;
       interactedItem.hp.current += modifier[1];
@@ -403,7 +435,10 @@
         if (type == "wait") {
           await m.wait(args.duration);
         } else {
-          m[type](args);
+          let res = m[type](args);
+          if (res == "cancelLoop") {
+            break;
+          }
         }
       }
 
@@ -485,7 +520,7 @@
       }
 
       progress = tweened(calcPlayerHpPercentage(), {
-        duration: 400,
+        duration: 200,
         easing: cubicOut,
       });
       return;
@@ -513,7 +548,7 @@
       }
 
       progress = tweened(calcPlayerHpPercentage(), {
-        duration: 400,
+        duration: 200,
         easing: cubicOut,
       });
       return;
@@ -546,15 +581,18 @@
 </div>
 
 {#if mapClass == DEFAULT_MAP_CLASS}
+  {@const playerHP = $progress * (player?.hp.current || 1)}
   {#key ac}
     <div
       class="absolute -top-16 flex w-64 flex-row items-center justify-center gap-2"
     >
-      <p class="absolute -left-4 z-10 self-start">{player?.emoji}</p>
+      <p class="absolute -left-4 z-10 self-start text-2xl">
+        {player?.emoji || ""}
+      </p>
       <progress class="progress progress-success h-8" value={$progress} />
-      <p class="absolute">{$progress.toFixed(2)}</p>
-
-      <!-- HP -->
+      <p class="absolute">
+        {Number.isInteger(playerHP) ? playerHP : playerHP.toFixed(1)}
+      </p>
     </div>
     <div
       class="absolute -bottom-20 flex w-full flex-row items-center justify-center gap-2"
