@@ -70,10 +70,9 @@
     [key in "Player" | "Map" | "Background" | "Level"]: Array<keyof Mutations>;
   } = {
     Player: [
-      "addToPlayerHP",
-      "addToPlayerInventory",
-      "changePlayerTo",
-      "teleportPlayerTo",
+      "addToPlayerHP", // TODO: Migrate to consumable
+      "addToPlayerInventory", // TODO: Migrate to equippable and change it's name to dropItem
+      "changePlayerTo", // TODO: Migrate to consumable
     ],
     Map: ["spawn", "destroy"],
     Background: ["setBackgroundOf", "removeBackgroundOf"],
@@ -281,6 +280,8 @@
     updateStore();
   }
 
+  // TODO: Check evolve/devolve if they have emojis
+
   function checkEvolve(e: any) {
     if (evolve.at < hp) {
       evolve.at = hp + 1;
@@ -357,10 +358,15 @@
 </div>
 <main class="flex flex-col items-center justify-center gap-12 pt-16">
   <div class="form-control w-full">
-    <label class="label cursor-pointer">
-      <span class="label-text">Static</span>
-      <input type="checkbox" class="checkbox" bind:checked={isStatic} />
-    </label>
+    <div
+      class="tooltip tooltip-left"
+      data-tip="Static emojis cannot be controlled by player"
+    >
+      <label class="label cursor-pointer">
+        <span class="label-text">Static</span>
+        <input type="checkbox" class="checkbox" bind:checked={isStatic} />
+      </label>
+    </div>
     <label class="label cursor-pointer">
       <span class="label-text">Evolve</span>
       <input type="checkbox" class="checkbox" bind:checked={evolve.enabled} />
@@ -383,7 +389,7 @@
       >
       {#if !hasInteraction}
         <div
-          class="tooltip"
+          class="tooltip tooltip-right"
           data-tip="An interactable needs at least one modifier with positive or negative value to fire events"
         >
           <button class="btn text-2xl text-warning">!</button>
@@ -451,7 +457,7 @@
               <option value={point}>{point > 0 ? `+${point}` : point}</option>
             {/each}
           </select>
-        {:else if s.type == "destroy" || s.type == "teleportPlayerTo" || s.type == "removeBackgroundOf"}
+        {:else if s.type == "destroy" || s.type == "removeBackgroundOf"}
           <select
             class="select"
             title="index"

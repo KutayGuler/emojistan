@@ -240,6 +240,8 @@
                 bind:value={$map.objective}
               />
             </div>
+            <p class="label-text pt-4">Equippables 🗿</p>
+            <!-- TODO: Equippables -->
             <!-- <p class="label-text pt-4">Statics 🗿</p>
             <button
               disabled={$currentEmoji == ""}

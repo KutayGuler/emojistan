@@ -77,7 +77,6 @@ export interface Mutations {
   destroy({ index }: { index: number }): void;
   wait(duration: number): Promise<any>;
   addToPlayerInventory({ emoji }: { emoji: string }): void;
-  teleportPlayerTo({ index }: { index: number }): void;
   changePlayerTo({ emoji }: { emoji: string }): void;
   addToPlayerHP({ points }: { points: number }): void;
   resetLevel: Function;

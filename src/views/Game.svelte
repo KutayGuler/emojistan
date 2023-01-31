@@ -231,10 +231,6 @@
         items = items;
       }
     },
-    teleportPlayerTo({ index }) {
-      transferItem(ac, index);
-      items = items;
-    },
     resetLevel: () => {
       backgrounds = new Map(map.backgrounds);
       initItems();
