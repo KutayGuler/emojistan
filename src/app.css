@@ -68,7 +68,7 @@
   /* --primary: #111827; */
   --primary: white;
 
-  background-color: var(--primary);
+  background-color: hsl(var(--primary));
 }
 
 * {

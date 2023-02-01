@@ -2,11 +2,12 @@ import { page } from "$app/stores";
 import { writable, get } from "svelte/store";
 import { DEFAULT_BG, storeNames } from "./constants";
 import {
+  Consumable,
   EditableMap,
   type CollisionType,
   type Interactable,
-  type Merges,
-  type Pushes,
+  type Merger,
+  type Pusher,
 } from "./types";
 
 function createMapStore<T>(name: string) {
@@ -237,8 +238,10 @@ export const map = createEditableMap();
 
 // SETS
 export const palette = createSetStore("palette");
+export const equippables = createSetStore("equippables");
 
 // MAPS
-export const pushes = createMapStore<Pushes>("pushes");
-export const merges = createMapStore<Merges>("merges");
+export const pushes = createMapStore<Pusher>("pushes");
+export const merges = createMapStore<Merger>("merges");
+export const consumables = createMapStore<Consumable>("consumables");
 export const interactables = createMapStore<Interactable>("interactables");

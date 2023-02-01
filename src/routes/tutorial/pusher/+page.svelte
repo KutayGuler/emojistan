@@ -1,7 +1,7 @@
 <script lang="ts">
   import {
-    type Merges,
-    type Pushes,
+    type Merger,
+    type Pusher,
     Interactable,
     EditableMap,
   } from "$src/types";
@@ -35,7 +35,7 @@
           [6, "🔴"],
         ])
       ),
-      pushes: new Map<number, Pushes>([[0, ["🟢", "🔴", "push"]]]),
+      pushes: new Map<number, Pusher>([[0, ["🟢", "🔴", "push"]]]),
       mapClass: "simulation",
       SIZE: 4,
     },

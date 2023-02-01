@@ -11,11 +11,20 @@ import {
   PUSHER_BORDER,
   PUSHER_H,
   PUSHER_W,
-  SPAWNER_W,
+  CTX_MENU_W,
+  CONSUMABLE_BG,
+  CONSUMABLE_BORDER,
+  CONSUMABLE_H,
+  CONSUMABLE_W,
 } from "$src/constants";
 import type { XYPosition, Position } from "./utils";
 
-export type NodeComponent = "pusher" | "interactable" | "merger" | "spawner";
+export type NodeComponent =
+  | "pusher"
+  | "merger"
+  | "consumable"
+  | "interactable"
+  | "ctxMenu";
 
 export interface Node {
   id: number;
@@ -48,9 +57,15 @@ export class Node<T = any> {
     this.position = position;
 
     switch (component) {
-      case "spawner":
-        this.width = SPAWNER_W / 2;
+      case "ctxMenu":
+        this.width = CTX_MENU_W;
         return;
+      case "consumable":
+        this.width = CONSUMABLE_W;
+        this.height = CONSUMABLE_H;
+        this.borderColor = CONSUMABLE_BORDER;
+        this.bgColor = CONSUMABLE_BG;
+        break;
       case "interactable":
         this.width = INTERACTABLE_W;
         this.height = INTERACTABLE_H;

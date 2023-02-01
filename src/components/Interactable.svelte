@@ -12,7 +12,7 @@
 
   // example TREE
   // emoji: 🌲
-  // onInteract: addToPlayerInventory {🍁} x {5}
+  // onInteract: dropEquippable {🍁} x {5}
   // hp: 100
   // modifiers: any: 0 | {🪓}: {-1}
 
@@ -24,7 +24,7 @@
 
   // example KEY
   // emoji: 🔑
-  // onInteract: addToPlayerInventory {🔑} x {1}
+  // onInteract: dropEquippable {🔑} x {1}
   // hp: 1
   // modifiers: any: -1
 
@@ -62,18 +62,20 @@
   } from "$src/types";
   import { onDestroy, onMount } from "svelte";
   import { notifications } from "../routes/notifications";
-  import { map, palette, currentEmoji, interactables } from "../store";
+  import {
+    map,
+    palette,
+    currentEmoji,
+    interactables,
+    equippables,
+    consumables,
+  } from "../store";
 
   let defaultBackground = $map.dbg;
 
   const types: {
-    [key in "Player" | "Map" | "Background" | "Level"]: Array<keyof Mutations>;
+    [key in "Map" | "Background" | "Level"]: Array<keyof Mutations>;
   } = {
-    Player: [
-      "addToPlayerHP", // TODO: Migrate to consumable
-      "addToPlayerInventory", // TODO: Migrate to equippable and change it's name to dropItem
-      "changePlayerTo", // TODO: Migrate to consumable
-    ],
     Map: ["spawn", "destroy"],
     Background: ["setBackgroundOf", "removeBackgroundOf"],
     Level: ["resetLevel", "completeLevel"],
@@ -115,17 +117,13 @@
   export let devolve = new Devolve(false, "");
 
   // SEQUENCE RELATED
-  let type = types.Player[0];
+  let type = types.Map[0];
   let duration = 0;
   let index = 0;
   let background = "";
 
   onMount(() => {
-    console.log(id);
-    console.log($interactables);
-
     let obj = $interactables.get(id);
-    console.log(obj);
 
     if (obj) {
       ({ emoji, sequence, hp, points, modifiers, isStatic, evolve, devolve } =
@@ -158,6 +156,9 @@
       return;
     }
 
+    if (evolve.to == "") evolve.enabled = false;
+    if (devolve.to == "") devolve.enabled = false;
+
     modifiers = modifiers.filter((m) => m[0] != "");
     modifiers = modifiers.filter((m, i) => {
       if (i == 0) return true;
@@ -167,13 +168,13 @@
     updateStore();
   });
 
-  function updateModifierKey(index: number) {
+  function updateModifierKey(index: number, emoji: string) {
     if (index == 0) return;
-    if (modifiers.some(([key, val]) => key == $currentEmoji)) {
+    if (modifiers.some(([key, val]) => key == emoji)) {
       notifications.warning("Cannot have multiple values of the same modifier");
       return;
     }
-    modifiers[index] = [$currentEmoji, points];
+    modifiers[index] = [emoji, points];
   }
 
   function addToModifiers() {
@@ -192,7 +193,7 @@
     ];
     updateStore();
 
-    [type, duration, index, background] = [types.Player[0], 0, 0, ""];
+    [type, duration, index, background] = [types.Map[0], 0, 0, ""];
   }
 
   function removeFromSequence(i: number) {
@@ -223,6 +224,18 @@
 
       if ($currentEmoji == val.emoji) {
         notifications.warning("Cannot have two interactables with same emoji");
+        return;
+      }
+    }
+
+    for (let val of [...$consumables.values(), ...$equippables.values()]) {
+      if (
+        (typeof val == "string" && val != "" && $currentEmoji == val) ||
+        (typeof val == "object" && $currentEmoji == val.emoji)
+      ) {
+        notifications.warning(
+          "An emoji can only have one assigned type. Interactable, Consumable or Equippable"
+        );
         return;
       }
     }
@@ -280,8 +293,6 @@
     updateStore();
   }
 
-  // TODO: Check evolve/devolve if they have emojis
-
   function checkEvolve(e: any) {
     if (evolve.at < hp) {
       evolve.at = hp + 1;
@@ -295,11 +306,7 @@
 
 <div class="absolute -top-8 flex flex-row items-center justify-center gap-2">
   {#if devolve.enabled}
-    <div
-      class="flex {evolve.enabled
-        ? 'scale-75'
-        : ''} flex-col items-center justify-center"
-    >
+    <div class="flex scale-75 flex-col items-center justify-center">
       <div class="slot-lg" on:click={updateDevolveEmoji}>
         {devolve.to}
       </div>
@@ -334,9 +341,7 @@
   {#if evolve.enabled}
     <div
       use:checkEvolve
-      class="flex {devolve.enabled
-        ? 'scale-75'
-        : ''}  flex-col  items-center justify-center"
+      class="flex scale-75 flex-col  items-center justify-center"
     >
       <div class="slot-lg" on:click={updateEvolveEmoji}>
         {evolve.to}
@@ -381,6 +386,7 @@
       class="flex w-full flex-row items-center justify-center gap-2 pb-6 text-center text-2xl"
     >
       <p>HP MODIFIERS ({modifiers.length} / 3)</p>
+
       <button
         class="btn text-2xl"
         disabled={modifiers.length == 3 ||
@@ -407,8 +413,29 @@
               on:click={() => removeFromModifiers(i)}>🞫</button
             >
           {/if}
-          <div class="slot-lg scale-75" on:click={() => updateModifierKey(i)}>
-            {key}
+          <div
+            class={i != 0
+              ? "dropdown-hover dropdown dropdown-left scale-75"
+              : "scale-75"}
+          >
+            <div class="slot-lg">
+              {key}
+            </div>
+            {#if i != 0}
+              <div
+                tabindex="0"
+                class="dropdown-content menu absolute cursor-pointer rounded-lg bg-base-100 p-2 text-xl shadow"
+              >
+                {#each [...$equippables] as emoji}
+                  <div
+                    class="rounded-md p-1 hover:bg-base-200"
+                    on:click={() => updateModifierKey(i, emoji)}
+                  >
+                    {emoji}
+                  </div>
+                {/each}
+              </div>
+            {/if}
           </div>
           <select
             class="select select-bordered select-sm absolute -bottom-2"
@@ -449,14 +476,8 @@
               <option value={j}>{j}</option>
             {/each}
           </select>
-        {:else if s.type == "addToPlayerInventory" || s.type == "changePlayerTo"}
+        {:else if s.type == "dropEquippable"}
           <div class="slot" on:click={() => updateSlot(i)}>{s.emoji || ""}</div>
-        {:else if s.type == "addToPlayerHP"}
-          <select class="select" bind:value={s.points} on:change={updateStore}>
-            {#each modifierPoints.filter((val) => val != 0) as point}
-              <option value={point}>{point > 0 ? `+${point}` : point}</option>
-            {/each}
-          </select>
         {:else if s.type == "destroy" || s.type == "removeBackgroundOf"}
           <select
             class="select"

@@ -4,6 +4,7 @@
 
   export let showIndex = false;
   export let deleteMode: "Item" | "Background" | "Both";
+  export let copyMode: "Item" | "Background" | "Both";
 
   function clickedCell(index: number) {
     switch (deleteMode) {
@@ -29,7 +30,18 @@
   }
 
   function rightClickedCell(index: number) {
-    $currentEmoji = $map.items.get(index) || "";
+    switch (copyMode) {
+      case "Item":
+        $currentEmoji = $map.items.get(index) || "";
+        break;
+      case "Background":
+        $currentColor = $map.backgrounds.get(index) || "";
+        break;
+      case "Both":
+        $currentEmoji = $map.items.get(index) || "";
+        $currentColor = $map.backgrounds.get(index) || "";
+        break;
+    }
   }
 </script>
 

@@ -27,7 +27,7 @@ function createNodes() {
       let id = 0;
 
       update((state) => {
-        state = state.filter((n) => n.component != "spawner");
+        state = state.filter((n) => n.component != "ctxMenu");
         id = Math.max(...state.map((n) => n.id), 0) + 1;
         state.push(new Node(id, component, position));
         return state;
@@ -42,7 +42,7 @@ function createNodes() {
       }),
     removeSpawner: () =>
       update((state) => {
-        state = state.filter((n) => n.component != "spawner");
+        state = state.filter((n) => n.component != "ctxMenu");
         return state;
       }),
     adjustHeight: (id: number, sequenceLength: number, defaultHeight: number) =>

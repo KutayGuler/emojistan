@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { merges, pushes, interactables } from "../store";
+  import { merges, pushes, interactables, consumables } from "../store";
   import type { NodeComponent } from "$lib/types";
   import { nodesStore } from "$lib/stores/store";
-  import { Devolve, Evolve, Interactable } from "$src/types";
+  import { Devolve, Evolve, Interactable, Consumable } from "$src/types";
 
   export let position: { x: number; y: number };
 
@@ -16,10 +16,13 @@
       case "merger":
         merges.add(id, value);
         break;
-      case "spawner":
+      case "consumable":
+        consumables.add(id, value);
         break;
       case "interactable":
         interactables.add(id, value);
+        break;
+      case "ctxMenu":
         break;
     }
   }
@@ -33,6 +36,10 @@
     {
       name: "Merger",
       onClick: () => spawn("merger", ["", "", ""]),
+    },
+    {
+      name: "Consumable",
+      onClick: () => spawn("consumable", new Consumable("", 1)),
     },
     {
       name: "Interactable",
@@ -57,7 +64,7 @@
 <ul class="w-full bg-white">
   {#each menuItems as { name, onClick }}
     <li
-      class="{name} box-border h-8 w-full pl-2 text-start hover:bg-base-200"
+      class="{name} box-border h-8 w-full p-1 text-start hover:bg-base-200"
       on:click={onClick}
     >
       {name}
@@ -74,5 +81,8 @@
   }
   .Interactable:hover {
     background-color: var(--interactable);
+  }
+  .Consumable:hover {
+    background-color: var(--consumable);
   }
 </style>

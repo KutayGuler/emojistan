@@ -1,7 +1,7 @@
 import { DEFAULT_BG } from "./constants";
 
-export type Pushes = [string, string, CollisionType];
-export type Merges = [string, string, CollisionType];
+export type Pusher = [string, string, CollisionType];
+export type Merger = [string, string, CollisionType];
 
 export type CollisionType = "bump" | "push" | string;
 
@@ -25,23 +25,64 @@ export class HP {
   }
 }
 
+// TODO: Integrate equippables to push/merge
+// export interface Equippable {
+//   // emoji: string;
+//   // hp: HP;
+// }
+
 export interface Item {
   emoji: string;
-  inventory: [string, string, string, string] | [];
+  inventory: Array<Equippable>;
   hp: HP;
 }
 
 export class Item {
   constructor(
     emoji: string,
-    inventory: Array<string> | [] = [],
+    inventory: Array<Equippable> | [] = [],
     hpPoints: number = 1
   ) {
     this.emoji = emoji;
-    // @ts-expect-error
     this.inventory = inventory;
     this.hp = new HP(hpPoints);
   }
+}
+
+export interface Equippable {
+  emoji: string;
+  hp: number;
+}
+
+export class Equippable {
+  constructor(emoji: string, hp: number) {
+    this.emoji = emoji;
+    this.hp = hp;
+  }
+}
+
+export interface Consumable {
+  emoji: string;
+  hp: number;
+  mutateConsumerTo: string;
+}
+
+export class Consumable {
+  constructor(emoji: string, hp: number, mutateConsumerTo = "") {
+    this.emoji = emoji;
+    this.hp = hp;
+    this.mutateConsumerTo = mutateConsumerTo;
+  }
+}
+
+export interface _Consumable {
+  emoji: string;
+  hp: number;
+  mutateConsumerTo: string;
+}
+
+export interface _Consumables {
+  [key: string]: _Consumable;
 }
 
 export interface _Interactable {
@@ -76,9 +117,7 @@ export interface Mutations {
   ): void;
   destroy({ index }: { index: number }): void;
   wait(duration: number): Promise<any>;
-  addToPlayerInventory({ emoji }: { emoji: string }): void;
-  changePlayerTo({ emoji }: { emoji: string }): void;
-  addToPlayerHP({ points }: { points: number }): void;
+  dropEquippable({ emoji }: { emoji: string }): void;
   resetLevel: Function;
   completeLevel: Function;
 }

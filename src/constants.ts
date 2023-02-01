@@ -9,17 +9,17 @@ export const MIN_ITERATION = 1;
 export const MAX_ITERATION = DEFAULT_SIDE_LENGTH;
 export const DURATIONS = [50, 100, 200, 500, 1000, 2000, 5000, 10000];
 
-export const DEFAULT_BG = "#9ca3af";
+export const DEFAULT_BG = "#E6E6E6";
 export const GRAPH_SIZE = 716;
 
-/* SPAWNER */
-export const SPAWNER_W = 200;
+/* CONTEXT MENU */
+export const CTX_MENU_W = 110;
 
 /* PUSHER */
 export const PUSHER_W = 180;
 export const PUSHER_H = 90;
 export const PUSHER_BG = "#f9fafb";
-export const PUSHER_BORDER = "#9ca3af";
+export const PUSHER_BORDER = "#E6E6E6";
 
 /* MERGER */
 export const MERGER_W = 240;
@@ -29,9 +29,15 @@ export const MERGER_BORDER = "#f97316";
 
 /* INTERACTABLE */
 export const INTERACTABLE_W = 500;
-export const INTERACTABLE_H = 400;
+export const INTERACTABLE_H = 600;
 export const INTERACTABLE_BG = "#eef2ff";
 export const INTERACTABLE_BORDER = "#6366f1";
+
+/* CONSUMABLE */
+export const CONSUMABLE_W = 500;
+export const CONSUMABLE_H = 300;
+export const CONSUMABLE_BG = "#f0fdfa";
+export const CONSUMABLE_BORDER = "#14b8a6";
 
 // DATA
 // STORE NAMES
@@ -39,6 +45,8 @@ export const INTERACTABLE_BORDER = "#6366f1";
 export const storeNames = [
   "pushes",
   "merges",
+  "equippables",
+  "consumables",
   "interactables",
   "palette",
   "items",
@@ -47,3 +55,6 @@ export const storeNames = [
   "nodes",
   "dbg",
 ];
+
+/* INTERACTABLE */
+export const MAX_INVENTORY_SIZE = 4;

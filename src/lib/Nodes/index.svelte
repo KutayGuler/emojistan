@@ -11,15 +11,17 @@
   import { interactables, merges, pushes } from "$src/store";
 
   import type { Node } from "$lib/types/types";
+  import ContextMenu from "$components/ContextMenu.svelte";
   import Interactable from "$components/Interactable.svelte";
-  import Spawner from "$components/Spawner.svelte";
   import Pusher from "$components/Pusher.svelte";
   import Merger from "$components/Merger.svelte";
   import {
+    CONSUMABLE_BORDER,
     INTERACTABLE_BORDER,
     MERGER_BORDER,
     PUSHER_BORDER,
   } from "$src/constants";
+  import Consumable from "$components/Consumable.svelte";
 
   export let node: Node;
 
@@ -52,7 +54,7 @@
 >
   <nav
     class="min-h-6 w-full cursor-move"
-    style:display={node.component == "spawner" ? "none" : "block"}
+    style:display={node.component == "ctxMenu" ? "none" : "block"}
     style:background-color={node.borderColor}
     on:touchmove={(e) => {
       if (shouldMove) {
@@ -85,7 +87,7 @@
   />
   <!-- CF #3 -->
   <button
-    style:display={node.component == "spawner" ? "none" : "flex"}
+    style:display={node.component == "ctxMenu" ? "none" : "flex"}
     style="border-color: {node.borderColor}"
     class="absolute top-0 right-0 flex h-6 w-6 cursor-pointer items-center justify-center rounded border-2 bg-white text-center text-xl"
     on:click={() => {
@@ -110,15 +112,18 @@
   </button>
   <!-- CF #2 -->
   <slot>
-    {#if node.component == "spawner"}
-      <Spawner
+    {#if node.component == "ctxMenu"}
+      <ContextMenu
         --pusher={PUSHER_BORDER}
         --merger={MERGER_BORDER}
         --interactable={INTERACTABLE_BORDER}
+        --consumable={CONSUMABLE_BORDER}
         position={node.position}
       />
     {:else if node.component == "interactable"}
       <Interactable id={node.id} />
+    {:else if node.component == "consumable"}
+      <Consumable id={node.id} />
     {:else if node.component == "pusher"}
       <Pusher id={node.id} />
     {:else if node.component == "merger"}

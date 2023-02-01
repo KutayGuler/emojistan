@@ -4,8 +4,14 @@
   import { cubicOut } from "svelte/easing";
   import { onDestroy, onMount } from "svelte/internal";
   import { currentColor, currentEmoji } from "../store";
-  import { DEFAULT_MAP_CLASS, DEFAULT_SIDE_LENGTH } from "$src/constants";
   import {
+    DEFAULT_MAP_CLASS,
+    DEFAULT_SIDE_LENGTH,
+    MAX_INVENTORY_SIZE,
+  } from "$src/constants";
+  import {
+    Consumable,
+    Equippable,
     Interactable,
     Item,
     type ArrowKey,
@@ -16,18 +22,20 @@
     type _Collisions,
     type _Interactable,
     type _Interactables,
+    type _Consumable,
+    type _Consumables,
   } from "$src/types";
 
   /* ## DATA ## */
   export let map: EditableMap;
   export let pushes = new Map<number, [string, string, CollisionType]>();
   export let merges = new Map<number, [string, string, CollisionType]>();
+  export let equippables = new Set<string>();
   export let interactables = new Map<number, Interactable>();
+  export let consumables = new Map<number, Consumable>();
   export let statics = new Set<string>();
   export let mapClass = DEFAULT_MAP_CLASS;
   export let SIZE = DEFAULT_SIDE_LENGTH;
-
-  console.log(mapClass);
 
   /* ## STATE ## */
   let dialog: HTMLDialogElement;
@@ -36,9 +44,10 @@
   let ic: number; // INTERACTED CELL
   let directionKey: Wasd = "KeyD";
   let currentInventoryIndex = 0;
-  let items = new Map<number, Item>();
+  let items = new Map<number, Item | Equippable | Consumable>();
   let backgrounds = new Map(map.backgrounds);
   let _interactables: _Interactables = {};
+  let _consumables: _Consumables = {};
   let timeouts: Array<NodeJS.Timeout> = [];
   let intervals: Array<NodeJS.Timer> = [];
 
@@ -105,28 +114,30 @@
    * function mutates ac if it is equal to "from" parameter
    * Transfers an item from "from" to "to" and applies mergeResult
    */
-  function transferAndMerge(from: number, to: number, mergeResult: string) {
-    let fromInventory = items.get(from)?.inventory || [];
-    let fromHP = items.get(from)?.hp.current || 1;
-    let toInventory = items.get(to)?.inventory || [];
+  function transferAndMerge(fromID: number, toID: number, mergeResult: string) {
+    let from = items.get(fromID) as Item;
+    let fromInventory: Array<Equippable> = from?.inventory || [];
+    let fromHP = from?.hp.current || 1;
+    // @ts-expect-error
+    let toInventory: Array<Equippable> = items.get(toID)?.inventory || [];
     let mergedInventory = [...fromInventory, ...toInventory];
-    while (mergedInventory.length > 4) {
+    while (mergedInventory.length > MAX_INVENTORY_SIZE) {
       mergedInventory.pop();
     }
 
     items.set(
-      to,
+      toID,
       new Item(
         mergeResult,
         mergedInventory,
         _interactables[mergeResult]?.hp || fromHP
       )
     );
-    items.delete(from);
+    items.delete(fromID);
     items = items; // MAGIC UPDATE, NECESSARY FOR REACTIVITY
 
-    if (ac == from) {
-      ac = to;
+    if (ac == fromID) {
+      ac = toID;
       ic = ac + KEYS[directionKey].operation;
     }
   }
@@ -138,12 +149,33 @@
     Object.assign(_interactables[emoji], args);
   }
 
+  for (let [id, consumable] of consumables) {
+    const { emoji, ...args } = consumable;
+    // @ts-expect-error
+    _consumables[emoji] = {};
+    Object.assign(_consumables[emoji], args);
+  }
+
   function initItems() {
-    for (let [id, item] of map.items) {
-      items.set(id, new Item(item));
+    console.log(statics);
+    let consumableEmojis = Array.from(consumables.values());
+
+    for (let [id, _emoji] of map.items) {
+      if (equippables.has(_emoji)) {
+        // TODO: Equippables require hp
+        items.set(id, new Equippable(_emoji, 1));
+      } else if (_consumables[_emoji]) {
+        let { hp, mutateConsumerTo } = _consumables[_emoji];
+        items.set(id, new Consumable(_emoji, hp, mutateConsumerTo));
+      } else {
+        items.set(id, new Item(_emoji));
+      }
     }
 
+    console.log(items);
+
     for (let [index, { emoji, hp }] of items) {
+      if (typeof hp == "number") continue; // consumable and equippables' hp types are numbers
       if (ac == -2 && !statics.has(emoji)) {
         ac = index;
         ic = ac + 1;
@@ -155,8 +187,8 @@
   }
 
   initItems();
-  let player = items.get(ac);
-  $: player = items.get(ac);
+  let player = items.get(ac) as Item;
+  $: player = items.get(ac) as Item;
 
   let progress = tweened(player?.hp.current || 1, {
     duration: 200,
@@ -170,7 +202,6 @@
   }
 
   function calcPlayerHpPercentage(): number {
-    // @ts-expect-error
     let { hp } = player;
     if (!hp) return 0;
     if (hp.current > hp.max) return 1;
@@ -220,12 +251,8 @@
         timeouts.push(timer);
       });
     },
-    changePlayerTo({ emoji }) {
-      // @ts-expect-error
-      player.emoji = emoji;
-    },
-    addToPlayerInventory({ emoji }) {
-      if (emoji && player?.inventory.length != 4) {
+    dropEquippable({ emoji }) {
+      if (emoji && player?.inventory.length != MAX_INVENTORY_SIZE) {
         // @ts-expect-error
         player?.inventory.push(emoji);
         items = items;
@@ -240,34 +267,6 @@
       levelCompleted = false;
     },
     completeLevel: () => (levelCompleted = true),
-    addToPlayerHP: ({ points }) => {
-      if (!player) return;
-      player.hp.add(points);
-      console.log(player.hp.current);
-
-      if (player.hp.current <= 0) {
-        items.delete(ac);
-        items = items;
-
-        for (let [id, { emoji, hp }] of items) {
-          if (hp.current > 0 && !statics.has(emoji)) {
-            player = items.get(id);
-            ac = id;
-            progress = tweened(calcPlayerHpPercentage(), {
-              duration: 200,
-              easing: cubicOut,
-            });
-
-            return "cancelLoop";
-          }
-        }
-
-        // TODO: Game over
-        // TODO: Consume item?
-      } else {
-        progress.set(calcPlayerHpPercentage());
-      }
-    },
   };
 
   function getCollisionType(key1: string, key2: string): CollisionType {
@@ -352,7 +351,7 @@
 
   async function handle(e: KeyboardEvent) {
     e.preventDefault();
-    if (!items.has(ac) || (player?.hp || -1) <= 0) return;
+    if (!items.has(ac) || (player?.hp.current || -1) <= 0) return;
 
     if (e.code.includes("Arrow")) {
       let operation = calcOperation(e.code as ArrowKey, ac);
@@ -393,20 +392,68 @@
     }
 
     if (e.code == "Space") {
-      console.log(items);
-
       if (calcOperation(wasdToArrow[directionKey], ic) == 0) return;
       let interactedItem = items.get(ic);
+      console.log(interactedItem);
 
       if (interactedItem == undefined) return;
+      if (interactedItem instanceof Equippable) {
+        console.log(interactedItem);
+
+        if (player.inventory.length != MAX_INVENTORY_SIZE) {
+          player.inventory.push(interactedItem);
+          items.delete(ic);
+          items = items;
+        }
+        return;
+      } else if (interactedItem instanceof Consumable) {
+        console.log(interactedItem);
+        let { hp, mutateConsumerTo } = interactedItem;
+
+        if (!player) return;
+        player.hp.add(hp);
+        if (mutateConsumerTo != "") {
+          player.emoji = mutateConsumerTo;
+        }
+
+        items.delete(ic);
+
+        if (player.hp.current <= 0) {
+          items.delete(ac);
+          items = items;
+
+          for (let [id, { emoji, hp }] of items) {
+            if (typeof hp == "number") continue; // consumables and equippables' hp types are numbers
+            if (
+              hp.current > 0 &&
+              !statics.has(emoji) &&
+              !equippables.has(emoji)
+            ) {
+              player = items.get(id) as Item;
+              ac = id;
+              progress = tweened(calcPlayerHpPercentage(), {
+                duration: 200,
+                easing: cubicOut,
+              });
+
+              return;
+            }
+          }
+        } else {
+          progress.set(calcPlayerHpPercentage());
+        }
+
+        items = items;
+        return;
+      }
+
       let interactable: _Interactable = _interactables[interactedItem.emoji];
-      console.log(interactable);
       if (interactable == undefined || interactable.executing) return;
       let { sequence, modifiers, evolve, devolve } = interactable;
 
       for (let { type, ...args } of sequence) {
-        if (type == "addToPlayerInventory") {
-          if (player?.inventory.length == 4) {
+        if (type == "dropEquippable") {
+          if (player?.inventory.length == MAX_INVENTORY_SIZE) {
             return;
           }
         }
@@ -416,11 +463,8 @@
       let equippedItem =
         (player?.inventory || [])[currentInventoryIndex] || "any";
 
-      console.log(equippedItem);
-      console.log(modifiers);
-
       let modifier =
-        modifiers.find((m) => m[0] == equippedItem) || modifiers[0];
+        modifiers.find((m) => m[0] == equippedItem.emoji) || modifiers[0];
 
       console.log(modifier);
 
@@ -479,11 +523,9 @@
       ) {
         return;
       }
-      items.set(ic, new Item(player?.inventory[currentInventoryIndex]));
+      items.set(ic, player?.inventory[currentInventoryIndex]);
       player.inventory.splice(currentInventoryIndex, 1);
       items = items;
-      console.log(items);
-
       return;
     }
 
@@ -491,7 +533,7 @@
     let closestID = ac;
 
     let _items = Array.from(items).filter(
-      ([id, { emoji }]) => !statics.has(emoji)
+      ([id, { emoji }]) => !statics.has(emoji) && !equippables.has(emoji)
     );
 
     if (e.code == "KeyE") {
@@ -560,7 +602,7 @@
     <div style:background={backgrounds.get(i) || map.dbg} class:active>
       {#if active}
         <div class="direction scale-75" style={KEYS[directionKey].style}>
-          {(player?.inventory || [])[currentInventoryIndex] ||
+          {player.inventory[currentInventoryIndex]?.emoji ||
             KEYS[directionKey].emoji}
         </div>
       {/if}
@@ -583,7 +625,7 @@
       class="absolute -top-16 flex w-64 flex-row items-center justify-center gap-2"
     >
       <p class="absolute -left-4 z-10 self-start text-2xl">
-        {player?.emoji || ""}
+        {player.emoji || ""}
       </p>
       <progress class="progress progress-success h-8" value={$progress} />
       <p class="absolute">
@@ -593,12 +635,12 @@
     <div
       class="absolute -bottom-20 flex w-full flex-row items-center justify-center gap-2"
     >
-      {#each { length: 4 } as _, i}
+      {#each { length: MAX_INVENTORY_SIZE } as _, i}
         <div
           class:selected={i == currentInventoryIndex}
           class="flex h-12 w-12 flex-col items-center justify-center bg-base-300 p-2"
         >
-          {(player?.inventory || [])[i] || ""}
+          {player.inventory[i]?.emoji || ""}
         </div>
       {/each}
     </div>

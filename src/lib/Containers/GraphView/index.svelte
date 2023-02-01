@@ -36,7 +36,7 @@
       let { x, y, k } = d3.zoomTransform(nodesDiv);
       y = (-y + e.layerY) / k; // e.layerX is experimental and not recommended
       x = (-x + e.layerX) / k; // e.layerY is experimental and not recommended
-      nodesStore.spawn("spawner", { x, y });
+      nodesStore.spawn("ctxMenu", { x, y });
     });
   });
 

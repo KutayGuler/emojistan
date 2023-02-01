@@ -2,7 +2,8 @@
   // SVELTEKIT
   import { onMount } from "svelte";
   import { goto } from "$app/navigation";
-  import { fly } from "svelte/transition";
+  import { flip } from "svelte/animate";
+  import { fly, scale } from "svelte/transition";
 
   // VIEWS
   import Game from "../../views/Game.svelte";
@@ -18,6 +19,8 @@
     merges,
     palette,
     interactables,
+    equippables,
+    consumables,
   } from "../../store";
 
   import { emojis } from "./emojis";
@@ -43,6 +46,8 @@
       map,
       pushes,
       merges,
+      equippables,
+      consumables,
       interactables,
       palette,
       nodesStore,
@@ -58,6 +63,7 @@
   $interactables.forEach(({ emoji, isStatic }) => {
     isStatic && statics.add(emoji);
   });
+  $equippables.forEach((emoji) => statics.add(emoji));
 
   function handleKeydown(e: KeyboardEvent) {
     if (e.code == "Escape") {
@@ -77,10 +83,10 @@
   let innerWidth: number;
   let innerHeight: number;
 
-  // TODO: Add ligth/dark mode for this
   let showIndex = false;
 
   type DeleteMode = "Item" | "Background" | "Both";
+
   const deleteModes: Array<DeleteMode> = ["Item", "Background", "Both"];
   const deleteTexts: { [key in DeleteMode]: string } = {
     Item: "ITEMS",
@@ -89,6 +95,7 @@
   };
 
   let deleteMode = deleteModes[2];
+  let copyMode = deleteModes[2];
 
   function fillMap() {
     if ($currentEmoji == "") return;
@@ -198,7 +205,16 @@
                 </label>
               </div>
               <div class="flex flex-col gap-2">
-                <!-- TODO: Copy mode -->
+                <div class="form-control">
+                  <label class="label">
+                    <span class="label-text">Copy Mode</span>
+                  </label>
+                  <select class="select select-bordered" bind:value={copyMode}>
+                    {#each deleteModes as mode}
+                      <option value={mode}>{mode}</option>
+                    {/each}
+                  </select>
+                </div>
                 <div class="form-control">
                   <label class="label">
                     <span class="label-text">Delete Mode</span>
@@ -240,33 +256,45 @@
                 bind:value={$map.objective}
               />
             </div>
-            <p class="label-text pt-4">Equippables 🗿</p>
-            <!-- TODO: Equippables -->
-            <!-- <p class="label-text pt-4">Statics 🗿</p>
+            <p class="label-text pt-4">Equippables 🪕</p>
             <button
               disabled={$currentEmoji == ""}
               class="btn w-full "
-              on:click={() => statics.add($currentEmoji)}
+              on:click={() => {
+                for (let val of [
+                  ...$consumables.values(),
+                  ...$interactables.values(),
+                ]) {
+                  if ($currentEmoji == val.emoji) {
+                    notifications.warning(
+                      "An emoji can only have one assigned type. Interactable, Consumable or Equippable"
+                    );
+                    return;
+                  }
+                }
+
+                equippables.add($currentEmoji);
+              }}
             >
               {$currentEmoji} +
-            </button> -->
-            <!-- <div class="overflow-y-auto">
+            </button>
+            <div class="overflow-y-auto">
               <div
                 class="mt-2 grid w-full grid-flow-row grid-cols-2 justify-center gap-2 overflow-y-auto "
               >
-                {#each [...$statics] as item (item)}
+                {#each [...$equippables] as item (item)}
                   <div
                     transition:scale|local={flipParams}
                     animate:flip={flipParams}
                   >
                     <button
                       class="remove btn h-full w-full"
-                      on:click={() => statics.remove(item)}>{item}</button
+                      on:click={() => equippables.remove(item)}>{item}</button
                     >
                   </div>
                 {/each}
               </div>
-            </div> -->
+            </div>
           {/if}
         </aside>
       {/if}
@@ -276,11 +304,13 @@
           pushes={$pushes}
           merges={$merges}
           interactables={$interactables}
+          equippables={$equippables}
+          consumables={$consumables}
           {statics}
         />
       {:else if view == "editor"}
         <div class="flex flex-col justify-center px-8">
-          <Editor {showIndex} {deleteMode} />
+          <Editor {showIndex} {deleteMode} {copyMode} />
         </div>
       {:else if view == "rules"}
         <div class="flex flex-col justify-center px-8">
@@ -289,9 +319,8 @@
       {/if}
       {#if !test}
         <aside transition:fly={{ x: 200 }} class="aside">
-          <!-- TODO: set defaault bg color -->
           <div
-            class="sticky -top-8 flex w-full flex-col items-center justify-center gap-4 bg-transparent p-4"
+            class="sticky -top-8 flex w-full flex-col items-center justify-center gap-4 bg-base-200 bg-transparent p-4"
           >
             <input
               class="input input-bordered w-full"

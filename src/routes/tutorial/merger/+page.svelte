@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { type Merges, EditableMap } from "$src/types";
+  import { type Merger, EditableMap } from "$src/types";
   import { MERGER_BG, MERGER_BORDER, MERGER_H, MERGER_W } from "$src/constants";
   import Tutorial from "../Tutorial.svelte";
   import Merger from "$components/Merger.svelte";
@@ -31,7 +31,7 @@
           [6, "🔴"],
         ])
       ),
-      merges: new Map<number, Merges>([[0, ["🟢", "🔴", "🟡"]]]),
+      merges: new Map<number, Merger>([[0, ["🟢", "🔴", "🟡"]]]),
       mapClass: "simulation",
       SIZE: 4,
     },
