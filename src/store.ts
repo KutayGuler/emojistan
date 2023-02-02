@@ -4,6 +4,7 @@ import { DEFAULT_BG, storeNames } from "./constants";
 import {
   Consumable,
   EditableMap,
+  Equippable,
   type CollisionType,
   type Interactable,
   type Merger,
@@ -48,7 +49,8 @@ function createMapStore<T>(name: string) {
 function createSaves() {
   const { set, subscribe, update } = writable({
     saves: new Map<string, string>(),
-    current: "",
+    currentSaveID: "",
+    currentSaveName: "",
     loaded: false,
   });
 
@@ -59,18 +61,26 @@ function createSaves() {
     set,
     subscribe,
     useStorage: () => {
-      const current = localStorage.getItem("currentSave");
+      const currentSaveID = localStorage.getItem("currentSaveID");
       // @ts-expect-error
       const saves = JSON.parse(localStorage.getItem("saves"));
 
-      if (get(page).routeId == "editor" && (current == "" || current == null)) {
+      if (
+        get(page).routeId == "editor" &&
+        (currentSaveID == "" || currentSaveID == null)
+      ) {
         return false;
       }
 
+      let _saves = new Map<string, string>(saves) || new Map<string, string>();
+
       update((state) => {
-        state.saves = new Map(saves) || new Map();
-        state.current = current || "";
+        state.saves = _saves;
+        state.currentSaveID = currentSaveID || "";
+        state.currentSaveName = _saves.get(currentSaveID || "") || "";
         state.loaded = true;
+        console.log(state);
+
         return state;
       });
 
@@ -79,7 +89,7 @@ function createSaves() {
           "saves",
           JSON.stringify(Array.from(state.saves.entries()))
         );
-        localStorage.setItem("currentSave", state.current);
+        localStorage.setItem("currentSaveID", state.currentSaveID);
       });
 
       return true;
@@ -89,11 +99,12 @@ function createSaves() {
         state.saves.set(id, title);
         return state;
       }),
-    add: () =>
+    add: (name: string) =>
       update((state) => {
         let id = (Math.random() + 1).toString(36).substring(7);
-        state.current = id;
-        state.saves.set(id, "Island #" + id);
+        state.currentSaveID = id;
+        state.currentSaveName = name;
+        state.saves.set(id, name);
         return state;
       }),
     delete: (id: string) =>
@@ -101,7 +112,7 @@ function createSaves() {
         for (let store of storeNames) {
           localStorage.removeItem(id + "_" + store);
         }
-        state.current = "";
+        state.currentSaveID = "";
         state.saves.delete(id);
         return state;
       }),
@@ -238,10 +249,10 @@ export const map = createEditableMap();
 
 // SETS
 export const palette = createSetStore("palette");
-export const equippables = createSetStore("equippables");
 
 // MAPS
 export const pushes = createMapStore<Pusher>("pushes");
 export const merges = createMapStore<Merger>("merges");
 export const consumables = createMapStore<Consumable>("consumables");
+export const equippables = createMapStore<Equippable>("equippables");
 export const interactables = createMapStore<Interactable>("interactables");

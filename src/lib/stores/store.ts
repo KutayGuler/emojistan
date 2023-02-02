@@ -49,7 +49,7 @@ function createNodes() {
       update((state) => {
         for (let node of state) {
           if (node.id == id) {
-            node.height = defaultHeight + sequenceLength * 64;
+            node.height = defaultHeight + sequenceLength * 56;
             break;
           }
         }

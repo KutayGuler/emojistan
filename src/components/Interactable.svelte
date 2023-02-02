@@ -73,11 +73,12 @@
 
   let defaultBackground = $map.dbg;
 
+  // Add Inventory: ["drop"]
   const types: {
     [key in "Map" | "Background" | "Level"]: Array<keyof Mutations>;
   } = {
     Map: ["spawn", "destroy"],
-    Background: ["setBackgroundOf", "removeBackgroundOf"],
+    Background: ["paint", "erase"],
     Level: ["resetLevel", "completeLevel"],
   };
 
@@ -302,6 +303,10 @@
   $: hasInteraction = modifiers
     .filter((m) => m[0] != "")
     .some((m) => m[1] != 0);
+
+  //  TODO: Migrate HP Modifiers to Equippables
+  // track equippables' emojis and their corresponding values to see
+  // if they are non-zero
 </script>
 
 <div class="absolute -top-8 flex flex-row items-center justify-center gap-2">
@@ -362,7 +367,7 @@
   {/if}
 </div>
 <main class="flex flex-col items-center justify-center gap-12 pt-16">
-  <div class="form-control w-full">
+  <div class="form-control w-3/4">
     <div
       class="tooltip tooltip-left"
       data-tip="Static emojis cannot be controlled by player"
@@ -383,7 +388,7 @@
   </div>
   <div class="form-control flex flex-col">
     <div
-      class="flex w-full flex-row items-center justify-center gap-2 pb-6 text-center text-2xl"
+      class="flex w-full flex-row items-center justify-center gap-2 pb-6 text-xl"
     >
       <p>HP MODIFIERS ({modifiers.length} / 3)</p>
 
@@ -402,9 +407,7 @@
         </div>{/if}
     </div>
 
-    <div
-      class="flex flex-wrap items-center justify-center gap-x-12 gap-y-6 pb-6"
-    >
+    <div class="flex flex-wrap items-center justify-center gap-8 pb-6">
       {#each modifiers as [key, value], i}
         <div class="relative flex flex-col items-center">
           {#if i != 0}
@@ -415,7 +418,7 @@
           {/if}
           <div
             class={i != 0
-              ? "dropdown-hover dropdown dropdown-left scale-75"
+              ? "dropdown-hover dropdown-left dropdown scale-75"
               : "scale-75"}
           >
             <div class="slot-lg">
@@ -426,13 +429,15 @@
                 tabindex="0"
                 class="dropdown-content menu absolute cursor-pointer rounded-lg bg-base-100 p-2 text-xl shadow"
               >
-                {#each [...$equippables] as emoji}
+                {#each [...$equippables].filter(([id, e]) => e.emoji != "") as [id, { emoji }]}
                   <div
                     class="rounded-md p-1 hover:bg-base-200"
                     on:click={() => updateModifierKey(i, emoji)}
                   >
                     {emoji}
                   </div>
+                {:else}
+                  <div class="rounded-md p-1">No equippables defined.</div>
                 {/each}
               </div>
             {/if}
@@ -451,6 +456,7 @@
     </div>
   </div>
   <div class="flex flex-col gap-2">
+    <p class="text-xl">EVENT SEQUENCE</p>
     {#each sequence as s, i}
       <span class="flex w-full flex-row items-start justify-between gap-2">
         <select class="select" title="event type" bind:value={s.type}>
@@ -478,7 +484,7 @@
           </select>
         {:else if s.type == "dropEquippable"}
           <div class="slot" on:click={() => updateSlot(i)}>{s.emoji || ""}</div>
-        {:else if s.type == "destroy" || s.type == "removeBackgroundOf"}
+        {:else if s.type == "destroy" || s.type == "erase"}
           <select
             class="select"
             title="index"
@@ -502,7 +508,7 @@
               <option value={d}>{d}</option>
             {/each}
           </select>
-        {:else if s.type == "setBackgroundOf"}
+        {:else if s.type == "paint"}
           <select
             class="select"
             title="index"

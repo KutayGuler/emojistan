@@ -42,7 +42,9 @@
   }
 </script>
 
-<p class="label-text pt-4">Palette 🎨</p>
+<label class="label">
+  <span class="label-text">Palette</span>
+</label>
 <div class="flex flex-col gap-2">
   <div class="flex flex-row gap-2">
     <input
@@ -60,7 +62,7 @@
     </button>
   </div>
 
-  <div class="inline-flex w-full items-center justify-center gap-2 pt-2">
+  <div class="inline-flex w-full items-center justify-start gap-2 pt-2">
     {#each [...$cp] as color (color)}
       <div
         class="{color == $currentColor

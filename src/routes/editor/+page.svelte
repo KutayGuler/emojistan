@@ -32,7 +32,7 @@
   import Palette from "$components/Palette.svelte";
 
   onMount(() => {
-    if ($saves.current == "") {
+    if ($saves.currentSaveID == "") {
       let saveExists = saves.useStorage();
       if (!saveExists) {
         goto("/", { replaceState: true });
@@ -52,7 +52,7 @@
       palette,
       nodesStore,
     ]) {
-      store.useStorage($saves.current);
+      store.useStorage($saves.currentSaveID);
     }
   });
 
@@ -63,7 +63,7 @@
   $interactables.forEach(({ emoji, isStatic }) => {
     isStatic && statics.add(emoji);
   });
-  $equippables.forEach((emoji) => statics.add(emoji));
+  $equippables.forEach(({ emoji }) => statics.add(emoji));
 
   function handleKeydown(e: KeyboardEvent) {
     if (e.code == "Escape") {
@@ -236,7 +236,9 @@
                   >CLEAR {deleteTexts[deleteMode]}
                 </button>
 
-                <p class="label-text">Filler</p>
+                <label class="label">
+                  <span class="label-text">Filler</span>
+                </label>
                 <button
                   disabled={$currentEmoji == ""}
                   class="btn"
@@ -256,7 +258,7 @@
                 bind:value={$map.objective}
               />
             </div>
-            <p class="label-text pt-4">Equippables 🪕</p>
+            <!-- <p class="label-text pt-4">Equippables 🪕</p>
             <button
               disabled={$currentEmoji == ""}
               class="btn w-full "
@@ -294,7 +296,7 @@
                   </div>
                 {/each}
               </div>
-            </div>
+            </div> -->
           {/if}
         </aside>
       {/if}
@@ -307,6 +309,10 @@
           equippables={$equippables}
           consumables={$consumables}
           {statics}
+          on:noPlayer={() => {
+            test = false;
+            notifications.warning("No controllable player in the map");
+          }}
         />
       {:else if view == "editor"}
         <div class="flex flex-col justify-center px-8">
@@ -318,9 +324,9 @@
         </div>
       {/if}
       {#if !test}
-        <aside transition:fly={{ x: 200 }} class="aside">
+        <aside transition:fly={{ x: 200 }} class="aside pt-0">
           <div
-            class="sticky -top-8 flex w-full flex-col items-center justify-center gap-4 bg-base-200 bg-transparent p-4"
+            class="sticky top-0 flex w-full flex-col items-center justify-center gap-4 bg-base-200 p-4 pt-8"
           >
             <input
               class="input input-bordered w-full"

@@ -2,8 +2,8 @@
   import { scale } from "svelte/transition";
   import { tweened } from "svelte/motion";
   import { cubicOut } from "svelte/easing";
-  import { onDestroy, onMount } from "svelte/internal";
-  import { currentColor, currentEmoji } from "../store";
+  import { createEventDispatcher, onDestroy, onMount } from "svelte/internal";
+  import { currentColor, currentEmoji, saves } from "../store";
   import {
     DEFAULT_MAP_CLASS,
     DEFAULT_SIDE_LENGTH,
@@ -30,7 +30,7 @@
   export let map: EditableMap;
   export let pushes = new Map<number, [string, string, CollisionType]>();
   export let merges = new Map<number, [string, string, CollisionType]>();
-  export let equippables = new Set<string>();
+  export let equippables = new Map<number, Equippable>();
   export let interactables = new Map<number, Interactable>();
   export let consumables = new Map<number, Consumable>();
   export let statics = new Set<string>();
@@ -51,10 +51,6 @@
   let timeouts: Array<NodeJS.Timeout> = [];
   let intervals: Array<NodeJS.Timer> = [];
 
-  onMount(() => {
-    [$currentColor, $currentEmoji] = ["", ""];
-  });
-
   onDestroy(() => {
     for (let timer of timeouts) {
       clearTimeout(timer);
@@ -65,6 +61,7 @@
     }
   });
 
+  const dispatch = createEventDispatcher();
   const KEYS: {
     [key in Wasd]: { style: string; emoji: string; operation: number };
   } = {
@@ -186,7 +183,15 @@
     }
   }
 
-  initItems();
+  onMount(() => {
+    [$currentColor, $currentEmoji] = ["", ""];
+    initItems();
+
+    if (ac == -2) {
+      dispatch("noPlayer");
+    }
+  });
+
   let player = items.get(ac) as Item;
   $: player = items.get(ac) as Item;
 
@@ -231,11 +236,11 @@
 
   // MUTATIONS
   const m: Mutations = {
-    setBackgroundOf({ index, background }) {
+    paint({ index, background }) {
       backgrounds.set(index, background);
       backgrounds = backgrounds;
     },
-    removeBackgroundOf({ index }) {
+    erase({ index }) {
       backgrounds.delete(index);
     },
     spawn({ index, emoji }) {
@@ -592,6 +597,9 @@
       return;
     }
   }
+
+  // TODO: Consumables and equippables shouldn't be controllable
+  // they can be pushable or mergable tho
 </script>
 
 <svelte:window on:keydown={handle} />
@@ -618,21 +626,44 @@
   {/if}
 </div>
 
-{#if mapClass == DEFAULT_MAP_CLASS}
+{#if mapClass == DEFAULT_MAP_CLASS && ac != -2}
+  <!-- <div class=""></div> -->
+  <!-- The button to open modal -->
+  <label
+    title="Objective"
+    for="objective"
+    class="absolute -top-16 left-0 cursor-help text-2xl">🎯</label
+  >
+
+  <!-- Put this part before </body> tag -->
+  <input type="checkbox" id="objective" class="modal-toggle" />
+  <label for="objective" class="modal cursor-pointer">
+    <label class="modal-box relative" for="">
+      <h3 class="text-lg font-bold">{$saves.currentSaveName}</h3>
+      <p class="py-4">
+        {map.objective}
+      </p>
+    </label>
+  </label>
   {@const playerHP = $progress * (player?.hp.current || 1)}
   {#key ac}
     <div
       class="absolute -top-16 flex w-64 flex-row items-center justify-center gap-2"
     >
       <p class="absolute -left-4 z-10 self-start text-2xl">
-        {player.emoji || ""}
+        {player?.emoji || ""}
       </p>
-      <progress class="progress progress-success h-8" value={$progress} />
+      <progress
+        title="Health Bar"
+        class="progress progress-success h-8"
+        value={$progress}
+      />
       <p class="absolute">
         {Number.isInteger(playerHP) ? playerHP : playerHP.toFixed(1)}
       </p>
     </div>
     <div
+      title="Inventory"
       class="absolute -bottom-20 flex w-full flex-row items-center justify-center gap-2"
     >
       {#each { length: MAX_INVENTORY_SIZE } as _, i}
@@ -640,7 +671,7 @@
           class:selected={i == currentInventoryIndex}
           class="flex h-12 w-12 flex-col items-center justify-center bg-base-300 p-2"
         >
-          {player.inventory[i]?.emoji || ""}
+          {player?.inventory[i]?.emoji || ""}
         </div>
       {/each}
     </div>

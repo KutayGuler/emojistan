@@ -2,29 +2,26 @@
   import supabase from "../supabase";
   import { goto } from "$app/navigation";
   import { onMount } from "svelte";
-  import {
-    saves,
-    map,
-    palette,
-    pushes,
-    merges,
-    interactables,
-  } from "../store";
+  import { saves, map, palette, pushes, merges, interactables } from "../store";
   import { navigating } from "$app/stores";
   import { nodesStore } from "$lib/stores/store";
 
   // TODO: Figure out save file overriding problem
 
   onMount(() => {
-    if ($saves.current == "") saves.useStorage();
+    if ($saves.currentSaveID == "") saves.useStorage();
   });
 
-  function openSave(id?: string) {
-    if (id) {
-      $saves.current = id;
-    } else {
-      saves.add();
-    }
+  function newGame() {
+    // TODO: ask for game name
+    // input element at least 3 letters long
+
+    saves.add("game name");
+    goto("/editor");
+  }
+
+  function openSave(id: string) {
+    $saves.currentSaveID = id;
     goto("/editor");
   }
 
@@ -117,10 +114,10 @@
     <p class="py-8 text-9xl">Emojistan 🏝️</p>
     <div />
     {#if $saves.loaded}
-      <div class="flex w-1/3 flex-col gap-8 py-8">
-        <button
-          class="btn my-0 h-16 w-full  hover:bg-primary"
-          on:click={() => openSave()}>New Island</button
+      <div class="flex w-1/3 flex-col gap-8 py-8 ">
+        <a class="link" href="/tutorial">TUTORIAL</a>
+        <button class="btn h-16 w-full hover:bg-primary" on:click={newGame}
+          >New Game</button
         >
         {#each [...$saves.saves] as [id, title]}
           <div class="relative text-lg shadow-lg">

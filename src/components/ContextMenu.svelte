@@ -1,8 +1,20 @@
 <script lang="ts">
-  import { merges, pushes, interactables, consumables } from "../store";
+  import {
+    merges,
+    pushes,
+    interactables,
+    consumables,
+    equippables,
+  } from "../store";
   import type { NodeComponent } from "$lib/types";
   import { nodesStore } from "$lib/stores/store";
-  import { Devolve, Evolve, Interactable, Consumable } from "$src/types";
+  import {
+    Devolve,
+    Evolve,
+    Interactable,
+    Equippable,
+    Consumable,
+  } from "$src/types";
 
   export let position: { x: number; y: number };
 
@@ -18,6 +30,9 @@
         break;
       case "consumable":
         consumables.add(id, value);
+        break;
+      case "equippable":
+        equippables.add(id, value);
         break;
       case "interactable":
         interactables.add(id, value);
@@ -40,6 +55,10 @@
     {
       name: "Consumable",
       onClick: () => spawn("consumable", new Consumable("", 1)),
+    },
+    {
+      name: "Equippable",
+      onClick: () => spawn("equippable", new Equippable("", 1)),
     },
     {
       name: "Interactable",
@@ -81,6 +100,9 @@
   }
   .Interactable:hover {
     background-color: var(--interactable);
+  }
+  .Equippable:hover {
+    background-color: var(--equippable);
   }
   .Consumable:hover {
     background-color: var(--consumable);

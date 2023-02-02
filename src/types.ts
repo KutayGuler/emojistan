@@ -57,13 +57,13 @@ export interface Equippable {
 export class Equippable {
   constructor(emoji: string, hp: number) {
     this.emoji = emoji;
-    this.hp = hp;
+    this.hp = hp; // hp of item itself
   }
 }
 
 export interface Consumable {
   emoji: string;
-  hp: number;
+  hp: number; // add to consumer hp
   mutateConsumerTo: string;
 }
 
@@ -106,11 +106,11 @@ export interface _Collisions {
 }
 
 export interface Mutations {
-  setBackgroundOf(
+  paint(
     { index, background }: { index: number; background: string },
     _start?: number
   ): void;
-  removeBackgroundOf({ index }: { index: number }): void;
+  erase({ index }: { index: number }): void;
   spawn(
     { index, emoji }: { index: number; emoji: string },
     _start?: number

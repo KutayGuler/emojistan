@@ -8,7 +8,13 @@
     nodeIdSelected,
     movementStore,
   } from "$lib/stores/store";
-  import { interactables, merges, pushes } from "$src/store";
+  import {
+    consumables,
+    equippables,
+    interactables,
+    merges,
+    pushes,
+  } from "$src/store";
 
   import type { Node } from "$lib/types/types";
   import ContextMenu from "$components/ContextMenu.svelte";
@@ -17,11 +23,14 @@
   import Merger from "$components/Merger.svelte";
   import {
     CONSUMABLE_BORDER,
+    EQUIPPABLE_BG,
+    EQUIPPABLE_BORDER,
     INTERACTABLE_BORDER,
     MERGER_BORDER,
     PUSHER_BORDER,
   } from "$src/constants";
   import Consumable from "$components/Consumable.svelte";
+  import Equippable from "$components/Equippable.svelte";
 
   export let node: Node;
 
@@ -100,6 +109,12 @@
         case "merger":
           merges.remove(node.id);
           break;
+        case "consumable":
+          consumables.remove(node.id);
+          break;
+        case "equippable":
+          equippables.remove(node.id);
+          break;
         case "interactable":
           interactables.remove(node.id);
           break;
@@ -117,11 +132,14 @@
         --pusher={PUSHER_BORDER}
         --merger={MERGER_BORDER}
         --interactable={INTERACTABLE_BORDER}
+        --equippable={EQUIPPABLE_BORDER}
         --consumable={CONSUMABLE_BORDER}
         position={node.position}
       />
     {:else if node.component == "interactable"}
       <Interactable id={node.id} />
+    {:else if node.component == "equippable"}
+      <Equippable id={node.id} />
     {:else if node.component == "consumable"}
       <Consumable id={node.id} />
     {:else if node.component == "pusher"}

@@ -49,7 +49,6 @@
 
   function updateStore() {
     consumables.update(id, new Consumable(emoji, hp, mutateConsumerTo));
-    console.log($consumables);
   }
 
   function updateEmoji() {
@@ -85,9 +84,35 @@
   }
 </script>
 
+<div
+  title="Mutate consumer"
+  class:mutateConsumer
+  class="absolute top-0.5 left-1 opacity-50 hover:cursor-pointer"
+  on:click={() => (mutateConsumer = !mutateConsumer)}
+>
+  🧬
+</div>
 <div class="absolute -top-8 flex flex-row items-center justify-center gap-2">
-  <div class="slot-lg" on:click={updateEmoji}>
-    {emoji}
+  <div class="flex flex-col items-center justify-center">
+    <div class="slot-lg" on:click={updateEmoji}>
+      {emoji}
+    </div>
+    <div class="absolute -bottom-2">
+      <select
+        class="select select-bordered select-sm text-xl"
+        title="HP"
+        bind:value={hp}
+        on:change={updateStore}
+      >
+        {#each modifierPoints as point}
+          <option value={point}>{point}</option>
+        {/each}
+      </select>
+      <!-- <label class="label cursor-pointer">
+        <span class="label-text">Mutate Consumer</span>
+        <input type="checkbox" class="checkbox" bind:checked={mutateConsumer} />
+      </label> -->
+    </div>
   </div>
   {#if mutateConsumer}
     <!-- content here -->
@@ -98,26 +123,9 @@
     </div>
   {/if}
 </div>
-<main class="flex flex-col items-center justify-center gap-12 pt-16">
-  <div class="form-control">
-    <!-- <span class="label-text">Add to Consumer HP</span>
-      <div class="slot">{addToConsumerHP}</div> -->
-    <label class="label">
-      <span class="label-text">Add to consumer HP</span>
-    </label>
-    <select
-      class="select select-bordered select-sm text-xl"
-      title="HP"
-      bind:value={hp}
-      on:change={updateStore}
-    >
-      {#each modifierPoints as point}
-        <option value={point}>{point}</option>
-      {/each}
-    </select>
-    <label class="label cursor-pointer">
-      <span class="label-text">Mutate Consumer</span>
-      <input type="checkbox" class="checkbox" bind:checked={mutateConsumer} />
-    </label>
-  </div>
-</main>
+
+<style>
+  .mutateConsumer {
+    opacity: 1;
+  }
+</style>

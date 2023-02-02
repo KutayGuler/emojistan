@@ -16,6 +16,10 @@ import {
   CONSUMABLE_BORDER,
   CONSUMABLE_H,
   CONSUMABLE_W,
+  EQUIPPABLE_BG,
+  EQUIPPABLE_BORDER,
+  EQUIPPABLE_H,
+  EQUIPPABLE_W,
 } from "$src/constants";
 import type { XYPosition, Position } from "./utils";
 
@@ -23,6 +27,7 @@ export type NodeComponent =
   | "pusher"
   | "merger"
   | "consumable"
+  | "equippable"
   | "interactable"
   | "ctxMenu";
 
@@ -65,6 +70,12 @@ export class Node<T = any> {
         this.height = CONSUMABLE_H;
         this.borderColor = CONSUMABLE_BORDER;
         this.bgColor = CONSUMABLE_BG;
+        break;
+      case "equippable":
+        this.width = EQUIPPABLE_W;
+        this.height = EQUIPPABLE_H;
+        this.borderColor = EQUIPPABLE_BORDER;
+        this.bgColor = EQUIPPABLE_BG;
         break;
       case "interactable":
         this.width = INTERACTABLE_W;
