@@ -304,9 +304,9 @@
     .filter((m) => m[0] != "")
     .some((m) => m[1] != 0);
 
-  //  TODO: Migrate HP Modifiers to Equippables
-  // track equippables' emojis and their corresponding values to see
-  // if they are non-zero
+  // TODO: modifiers should be based on equippable id to be reactive
+  $: eqs = [...$equippables].filter(([id, e]) => e.emoji != "");
+  $: console.log($equippables);
 </script>
 
 <div class="absolute -top-8 flex flex-row items-center justify-center gap-2">
@@ -369,7 +369,7 @@
 <main class="flex flex-col items-center justify-center gap-12 pt-16">
   <div class="form-control w-3/4">
     <div
-      class="tooltip tooltip-left"
+      class="tooltip"
       data-tip="Static emojis cannot be controlled by player"
     >
       <label class="label cursor-pointer">
@@ -400,7 +400,7 @@
       >
       {#if !hasInteraction}
         <div
-          class="tooltip tooltip-right"
+          class="tooltip"
           data-tip="An interactable needs at least one modifier with positive or negative value to fire events"
         >
           <button class="btn text-2xl text-warning">!</button>
@@ -408,6 +408,14 @@
     </div>
 
     <div class="flex flex-wrap items-center justify-center gap-8 pb-6">
+      {#each eqs as [id, { emoji }]}
+        <!-- on:click={() => updateModifierKey(i, emoji)} -->
+        <div class="rounded-md p-1 hover:bg-base-200">
+          {emoji}
+        </div>
+      {:else}
+        <div class="rounded-md p-1">No equippables defined.</div>
+      {/each}
       {#each modifiers as [key, value], i}
         <div class="relative flex flex-col items-center">
           {#if i != 0}
@@ -429,7 +437,7 @@
                 tabindex="0"
                 class="dropdown-content menu absolute cursor-pointer rounded-lg bg-base-100 p-2 text-xl shadow"
               >
-                {#each [...$equippables].filter(([id, e]) => e.emoji != "") as [id, { emoji }]}
+                {#each eqs as [id, { emoji }]}
                   <div
                     class="rounded-md p-1 hover:bg-base-200"
                     on:click={() => updateModifierKey(i, emoji)}

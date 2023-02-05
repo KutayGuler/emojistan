@@ -40,7 +40,7 @@ function createNodes() {
         state = state.filter((n) => n.id != id);
         return state;
       }),
-    removeSpawner: () =>
+    removeCtxMenu: () =>
       update((state) => {
         state = state.filter((n) => n.component != "ctxMenu");
         return state;

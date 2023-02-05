@@ -35,7 +35,7 @@
           [6, "🔴"],
         ])
       ),
-      pushes: new Map<number, Pusher>([[0, ["🟢", "🔴", "push"]]]),
+      pushers: new Map<number, Pusher>([[0, ["🟢", "🔴", "push"]]]),
       mapClass: "simulation",
       SIZE: 4,
     },

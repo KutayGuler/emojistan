@@ -26,10 +26,6 @@ export class HP {
 }
 
 // TODO: Integrate equippables to push/merge
-// export interface Equippable {
-//   // emoji: string;
-//   // hp: HP;
-// }
 
 export interface Item {
   emoji: string;

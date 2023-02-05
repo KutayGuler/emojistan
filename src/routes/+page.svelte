@@ -2,33 +2,37 @@
   import supabase from "../supabase";
   import { goto } from "$app/navigation";
   import { onMount } from "svelte";
-  import { saves, map, palette, pushes, merges, interactables } from "../store";
+  import {
+    saves,
+    map,
+    palette,
+    pushers,
+    mergers,
+    interactables,
+  } from "../store";
   import { navigating } from "$app/stores";
   import { nodesStore } from "$lib/stores/store";
 
-  // TODO: Figure out save file overriding problem
+  // FIXME: Save file overriding problem
 
   onMount(() => {
     if ($saves.currentSaveID == "") saves.useStorage();
   });
 
-  function newGame() {
-    // TODO: ask for game name
-    // input element at least 3 letters long
+  let gameName = "";
+  let creating = false;
 
-    saves.add("game name");
+  function newGame() {
+    if (creating) return;
+    saves.add(gameName);
     goto("/editor");
+    creating = true;
   }
 
   function openSave(id: string) {
     $saves.currentSaveID = id;
     goto("/editor");
   }
-
-  // function renameSave() {
-  //   prevTitle = title;
-  //   saves.rename(id, title);
-  // }
 
   async function signInWithGoogle() {
     const { data, error } = await supabase.auth.signInWithOAuth({
@@ -53,8 +57,8 @@
           },
           palette: Array.from($palette),
           nodes: Array.from($nodesStore),
-          pushes: Object.fromEntries($pushes),
-          merges: Object.fromEntries($merges),
+          pushers: Object.fromEntries($pushers),
+          mergers: Object.fromEntries($mergers),
           interactables: Object.fromEntries($interactables),
         },
         owner: owner.data.user.id,
@@ -71,54 +75,35 @@
   }
 </script>
 
-<!-- {#await supabase.auth.getUser() then { data, error }}
-  <p>{JSON.stringify(data)}</p>
-{/await} -->
-
-<!-- The button to open modal -->
-<!-- <label for="my-modal-4" class="btn">open modal</label> -->
-
 <!-- Put this part before </body> tag -->
-<!-- <input type="checkbox" id="my-modal-4" class="modal-toggle" />
-<label for="my-modal-4" class="modal cursor-pointer">
+<input type="checkbox" id="new-game" class="modal-toggle" />
+<label for="new-game" class="modal cursor-pointer">
   <label class="modal-box relative" for="">
-    <label for="my-modal-4" class="btn btn-circle btn-sm absolute right-2 top-2"
-      >✕</label
-    >
-    <h3 class="text-lg font-bold">Congratulations random Internet user!</h3>
-    <p class="py-4">
-      You've been selected for a chance to get one year of subscription to use
-      Wikipedia for free!
-    </p>
+    <h3 class="text-lg font-bold">What's the name of the game?</h3>
+    <span class="inline">
+      <input
+        type="text"
+        class="input input-bordered my-4"
+        bind:value={gameName}
+      />
+      <button class="btn" disabled={gameName.length < 3} on:click={newGame}
+        >CREATE</button
+      >
+    </span>
   </label>
-</label> -->
+</label>
 
 {#if !$navigating}
   <main class="noselect">
-    <!-- <div class="dropdown-end dropdown-bottom dropdown absolute right-4 top-4">
-      <label tabindex="0">
-        <div class="avatar placeholder">
-          <div class="w-12 rounded-full bg-neutral-focus text-neutral-content">
-            <span class="text-3xl">K</span>
-          </div>
-        </div>
-      </label>
-      <ul
-        tabindex="0"
-        class="dropdown-content menu rounded-box mt-2 w-52 bg-base-100 p-2 shadow"
-      >
-        <li><a>Friends</a></li>
-        <li><a>Logout</a></li>
-      </ul>
-    </div> -->
     <p class="py-8 text-9xl">Emojistan 🏝️</p>
     <div />
     {#if $saves.loaded}
       <div class="flex w-1/3 flex-col gap-8 py-8 ">
         <a class="link" href="/tutorial">TUTORIAL</a>
-        <button class="btn h-16 w-full hover:bg-primary" on:click={newGame}
+        <!-- <button class="btn h-16 w-full hover:bg-primary" on:click={newGame}
           >New Game</button
-        >
+        > -->
+        <label for="new-game" class="btn">NEW GAME</label>
         {#each [...$saves.saves] as [id, title]}
           <div class="relative text-lg shadow-lg">
             <button

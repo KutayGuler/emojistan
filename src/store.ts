@@ -251,8 +251,8 @@ export const map = createEditableMap();
 export const palette = createSetStore("palette");
 
 // MAPS
-export const pushes = createMapStore<Pusher>("pushes");
-export const merges = createMapStore<Merger>("merges");
+export const pushers = createMapStore<Pusher>("pushers");
+export const mergers = createMapStore<Merger>("mergers");
 export const consumables = createMapStore<Consumable>("consumables");
 export const equippables = createMapStore<Equippable>("equippables");
 export const interactables = createMapStore<Interactable>("interactables");

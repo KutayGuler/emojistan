@@ -85,7 +85,7 @@
   }
 
   function clickedOnNodes() {
-    nodesStore.removeSpawner();
+    nodesStore.removeCtxMenu();
   }
 </script>
 

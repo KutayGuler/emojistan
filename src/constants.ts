@@ -49,8 +49,8 @@ export const EQUIPPABLE_BORDER = "#78716c";
 // STORE NAMES
 // CF #6
 export const storeNames = [
-  "pushes",
-  "merges",
+  "pushers",
+  "mergers",
   "equippables",
   "consumables",
   "interactables",

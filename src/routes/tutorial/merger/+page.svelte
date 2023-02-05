@@ -31,7 +31,7 @@
           [6, "🔴"],
         ])
       ),
-      merges: new Map<number, Merger>([[0, ["🟢", "🔴", "🟡"]]]),
+      mergers: new Map<number, Merger>([[0, ["🟢", "🔴", "🟡"]]]),
       mapClass: "simulation",
       SIZE: 4,
     },

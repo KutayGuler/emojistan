@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
-  import { pushes, currentEmoji } from "../store";
+  import { pushers, currentEmoji } from "../store";
   import { notifications } from "../routes/notifications";
   import { nodesStore } from "$src/lib/stores/store";
 
@@ -8,21 +8,21 @@
   export let slots = ["", "", "push"];
 
   onMount(() => {
-    slots = $pushes.get(id) || slots;
+    slots = $pushers.get(id) || slots;
   });
 
   function checkCollision() {
-    for (let [_id, _slots] of $pushes.entries()) {
+    for (let [_id, _slots] of $pushers.entries()) {
       if (id == _id) continue;
       if (_slots[0] == slots[0] && _slots[1] == slots[1]) {
         slots = ["", "", "push"];
-        notifications.warning("Can't have duplicate pushes.");
+        notifications.warning("Can't have duplicate pushers.");
         break;
       }
     }
 
     // @ts-expect-error
-    pushes.update(id, slots);
+    pushers.update(id, slots);
   }
 
   function updateSlot(i: number) {
@@ -34,7 +34,7 @@
 
   onDestroy(() => {
     if (slots.includes("")) {
-      pushes.remove(id);
+      pushers.remove(id);
       nodesStore.remove(id);
     }
   });

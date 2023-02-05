@@ -12,8 +12,8 @@
     consumables,
     equippables,
     interactables,
-    merges,
-    pushes,
+    mergers,
+    pushers,
   } from "$src/store";
 
   import type { Node } from "$lib/types/types";
@@ -104,10 +104,10 @@
 
       switch (node.component) {
         case "pusher":
-          pushes.remove(node.id);
+          pushers.remove(node.id);
           break;
         case "merger":
-          merges.remove(node.id);
+          mergers.remove(node.id);
           break;
         case "consumable":
           consumables.remove(node.id);

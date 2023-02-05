@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
-  import { merges, pushes, currentEmoji } from "../store";
+  import { mergers, pushers, currentEmoji } from "../store";
   import { notifications } from "../routes/notifications";
   import { nodesStore } from "$src/lib/stores/store";
 
@@ -8,11 +8,11 @@
   export let slots = ["", "", ""];
 
   onMount(() => {
-    slots = $merges.get(id) || slots;
+    slots = $mergers.get(id) || slots;
   });
 
   function checkCollision() {
-    for (let [_id, _slots] of $pushes.entries()) {
+    for (let [_id, _slots] of $pushers.entries()) {
       if (_slots[0] == slots[0] && _slots[1] == slots[1]) {
         slots = ["", "", ""];
         notifications.warning("Cannot have conflicting behaviours.");
@@ -20,7 +20,7 @@
       }
     }
 
-    for (let [_id, _slots] of $merges.entries()) {
+    for (let [_id, _slots] of $mergers.entries()) {
       if (id == _id) continue;
       let _firstTwo = [_slots[0], _slots[1]];
       let firstTwo = [slots[0], slots[1]];
@@ -30,14 +30,14 @@
       ) {
         slots = ["", "", ""];
         notifications.warning(
-          "Merges are bidirectional and can only have one outcome"
+          "mergers are bidirectional and can only have one outcome"
         );
         break;
       }
     }
 
     // @ts-expect-error
-    merges.update(id, slots);
+    mergers.update(id, slots);
   }
 
   function updateSlot(i: number) {
@@ -54,7 +54,7 @@
 
   onDestroy(() => {
     if (slots.includes("")) {
-      merges.remove(id);
+      mergers.remove(id);
       nodesStore.remove(id);
     }
   });

@@ -28,8 +28,8 @@
 
   /* ## DATA ## */
   export let map: EditableMap;
-  export let pushes = new Map<number, [string, string, CollisionType]>();
-  export let merges = new Map<number, [string, string, CollisionType]>();
+  export let pushers = new Map<number, [string, string, CollisionType]>();
+  export let mergers = new Map<number, [string, string, CollisionType]>();
   export let equippables = new Map<number, Equippable>();
   export let interactables = new Map<number, Interactable>();
   export let consumables = new Map<number, Consumable>();
@@ -50,6 +50,10 @@
   let _consumables: _Consumables = {};
   let timeouts: Array<NodeJS.Timeout> = [];
   let intervals: Array<NodeJS.Timer> = [];
+
+  onMount(() => {
+    [$currentColor, $currentEmoji] = ["", ""];
+  });
 
   onDestroy(() => {
     for (let timer of timeouts) {
@@ -154,7 +158,6 @@
   }
 
   function initItems() {
-    console.log(statics);
     let consumableEmojis = Array.from(consumables.values());
 
     for (let [id, _emoji] of map.items) {
@@ -169,13 +172,12 @@
       }
     }
 
-    console.log(items);
-
     for (let [index, { emoji, hp }] of items) {
       if (typeof hp == "number") continue; // consumable and equippables' hp types are numbers
       if (ac == -2 && !statics.has(emoji)) {
         ac = index;
         ic = ac + 1;
+        directionKey = "KeyD";
       }
 
       hp.max = _interactables[emoji]?.hp || 1;
@@ -183,14 +185,9 @@
     }
   }
 
-  onMount(() => {
-    [$currentColor, $currentEmoji] = ["", ""];
-    initItems();
+  initItems();
 
-    if (ac == -2) {
-      dispatch("noPlayer");
-    }
-  });
+  // TODO: Add statics again
 
   let player = items.get(ac) as Item;
   $: player = items.get(ac) as Item;
@@ -215,7 +212,7 @@
 
   let _collisions: _Collisions = {};
 
-  for (let [id, _slots] of [...merges, ...pushes]) {
+  for (let [id, _slots] of [...mergers, ...pushers]) {
     let [key1, key2, val] = _slots;
     if (key1 == "") continue;
     if (!_collisions[key1]) {
@@ -266,9 +263,6 @@
     resetLevel: () => {
       backgrounds = new Map(map.backgrounds);
       initItems();
-      ac = items.entries().next().value[0];
-      ic = ac + 1;
-      directionKey = "KeyD";
       levelCompleted = false;
     },
     completeLevel: () => (levelCompleted = true),
@@ -284,12 +278,9 @@
     let i = 0;
 
     while (items.has(ac + operation * i)) {
-      console.log(ac + operation * i);
       collisionChain.push(items.get(ac + operation * i)?.emoji);
       i++;
     }
-
-    console.log(collisionChain);
 
     let collisionTypeSequence: Array<CollisionType> = [];
     for (let i = 0; i < collisionChain.length - 1; i++) {
@@ -399,12 +390,9 @@
     if (e.code == "Space") {
       if (calcOperation(wasdToArrow[directionKey], ic) == 0) return;
       let interactedItem = items.get(ic);
-      console.log(interactedItem);
 
       if (interactedItem == undefined) return;
       if (interactedItem instanceof Equippable) {
-        console.log(interactedItem);
-
         if (player.inventory.length != MAX_INVENTORY_SIZE) {
           player.inventory.push(interactedItem);
           items.delete(ic);
@@ -412,7 +400,6 @@
         }
         return;
       } else if (interactedItem instanceof Consumable) {
-        console.log(interactedItem);
         let { hp, mutateConsumerTo } = interactedItem;
 
         if (!player) return;
@@ -470,8 +457,6 @@
 
       let modifier =
         modifiers.find((m) => m[0] == equippedItem.emoji) || modifiers[0];
-
-      console.log(modifier);
 
       if (modifier[1] == 0) return;
       interactedItem.hp.current += modifier[1];
@@ -600,11 +585,14 @@
 
   // TODO: Consumables and equippables shouldn't be controllable
   // they can be pushable or mergable tho
+  function noPlayer(node: any) {
+    if (ac == -2) dispatch("noPlayer");
+  }
 </script>
 
 <svelte:window on:keydown={handle} />
 
-<div class={mapClass}>
+<div class={mapClass} use:noPlayer>
   {#each { length: SIZE * SIZE } as _, i}
     {@const active = ac == i}
     <div style:background={backgrounds.get(i) || map.dbg} class:active>

@@ -70,13 +70,13 @@ export class Node<T = any> {
         this.height = CONSUMABLE_H;
         this.borderColor = CONSUMABLE_BORDER;
         this.bgColor = CONSUMABLE_BG;
-        break;
+        return;
       case "equippable":
         this.width = EQUIPPABLE_W;
         this.height = EQUIPPABLE_H;
         this.borderColor = EQUIPPABLE_BORDER;
         this.bgColor = EQUIPPABLE_BG;
-        break;
+        return;
       case "interactable":
         this.width = INTERACTABLE_W;
         this.height = INTERACTABLE_H;

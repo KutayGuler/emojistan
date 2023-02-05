@@ -1,7 +1,7 @@
 <script lang="ts">
   import {
-    merges,
-    pushes,
+    mergers,
+    pushers,
     interactables,
     consumables,
     equippables,
@@ -24,9 +24,10 @@
 
     switch (component) {
       case "pusher":
-        pushes.add(id, value);
+        pushers.add(id, value);
+        break;
       case "merger":
-        merges.add(id, value);
+        mergers.add(id, value);
         break;
       case "consumable":
         consumables.add(id, value);

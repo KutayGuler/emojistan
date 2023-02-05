@@ -15,8 +15,8 @@
     currentColor,
     saves,
     map,
-    pushes,
-    merges,
+    pushers,
+    mergers,
     palette,
     interactables,
     equippables,
@@ -44,8 +44,8 @@
     // CF #7
     for (let store of [
       map,
-      pushes,
-      merges,
+      pushers,
+      mergers,
       equippables,
       consumables,
       interactables,
@@ -303,8 +303,8 @@
       {#if test}
         <Game
           map={structuredClone($map)}
-          pushes={$pushes}
-          merges={$merges}
+          pushers={$pushers}
+          mergers={$mergers}
           interactables={$interactables}
           equippables={$equippables}
           consumables={$consumables}
