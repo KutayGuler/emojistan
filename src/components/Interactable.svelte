@@ -112,7 +112,7 @@
   export let sequence: Array<SequenceItem> = [];
   export let hp = 1;
   export let points = 1;
-  export let modifiers: Array<[string, number]> = [];
+  export let modifiers: Array<[number | "any", number]> = [];
   export let isStatic = false;
   export let evolve = new Evolve(false, "", 2);
   export let devolve = new Devolve(false, "");
@@ -160,7 +160,10 @@
     if (evolve.to == "") evolve.enabled = false;
     if (devolve.to == "") devolve.enabled = false;
 
-    modifiers = modifiers.filter((m) => m[0] != "");
+    modifiers = modifiers.filter((m) => {
+      if (m[0] == "any") return true;
+      return $equippables.get(m[0])?.emoji != "";
+    });
     modifiers = modifiers.filter((m, i) => {
       if (i == 0) return true;
       return m[1] != 0;
@@ -169,21 +172,13 @@
     updateStore();
   });
 
-  function updateModifierKey(index: number, emoji: string) {
-    if (index == 0) return;
-    if (modifiers.some(([key, val]) => key == emoji)) {
-      notifications.warning("Cannot have multiple values of the same modifier");
-      return;
-    }
-    modifiers[index] = [emoji, points];
-  }
-
-  function addToModifiers() {
+  function addToModifiers(equippableID: number) {
+    if (modifiers.some(([id, val]) => id == equippableID)) return;
     if (modifiers.length == 3) {
       notifications.warning("Cannot have more than 3 HP modifiers");
       return;
     }
-    modifiers = [...modifiers, ["", 1]];
+    modifiers = [...modifiers, [equippableID, 0]];
     updateStore();
   }
 
@@ -200,6 +195,12 @@
   function removeFromSequence(i: number) {
     sequence.splice(i, 1);
     sequence = sequence;
+    updateStore();
+  }
+
+  function removeEmptyModifier(node: any, i: number) {
+    modifiers.splice(i, 1);
+    modifiers = modifiers;
     updateStore();
   }
 
@@ -300,13 +301,8 @@
     }
   }
 
-  $: hasInteraction = modifiers
-    .filter((m) => m[0] != "")
-    .some((m) => m[1] != 0);
-
-  // TODO: modifiers should be based on equippable id to be reactive
+  $: hasInteraction = modifiers.some((m) => m[1] != 0);
   $: eqs = [...$equippables].filter(([id, e]) => e.emoji != "");
-  $: console.log($equippables);
 </script>
 
 <div class="absolute -top-8 flex flex-row items-center justify-center gap-2">
@@ -391,13 +387,24 @@
       class="flex w-full flex-row items-center justify-center gap-2 pb-6 text-xl"
     >
       <p>HP MODIFIERS ({modifiers.length} / 3)</p>
-
-      <button
-        class="btn text-2xl"
-        disabled={modifiers.length == 3 ||
-          modifiers.some(([key, val]) => key == "")}
-        on:click={addToModifiers}>+</button
-      >
+      <div class="dropdown-hover dropdown dropdown-right">
+        <label for="" tabindex="0" class="btn text-2xl">+</label>
+        <ul
+          tabindex="0"
+          class="dropdown-content menu rounded-box bg-base-100 p-2 shadow "
+        >
+          {#each eqs as [id, { emoji }]}
+            <div
+              class="rounded-md p-1 hover:bg-base-200"
+              on:click={() => addToModifiers(id)}
+            >
+              {emoji}
+            </div>
+          {:else}
+            <div class="rounded-md p-1">No equippables defined.</div>
+          {/each}
+        </ul>
+      </div>
       {#if !hasInteraction}
         <div
           class="tooltip"
@@ -408,57 +415,42 @@
     </div>
 
     <div class="flex flex-wrap items-center justify-center gap-8 pb-6">
-      {#each eqs as [id, { emoji }]}
-        <!-- on:click={() => updateModifierKey(i, emoji)} -->
-        <div class="rounded-md p-1 hover:bg-base-200">
-          {emoji}
-        </div>
-      {:else}
-        <div class="rounded-md p-1">No equippables defined.</div>
-      {/each}
-      {#each modifiers as [key, value], i}
+      {#each modifiers as [equippableID, value], i}
+        {@const modifierEmoji = $equippables.get(equippableID)?.emoji}
         <div class="relative flex flex-col items-center">
-          {#if i != 0}
+          {#if equippableID == "any"}
+            <div class="slot-lg scale-75">
+              {equippableID}
+            </div>
+            <select
+              class="select select-bordered select-sm absolute -bottom-2"
+              bind:value
+              on:change={updateStore}
+            >
+              {#each modifierPoints as point}
+                <option value={point}>{point > 0 ? `+${point}` : point}</option>
+              {/each}
+            </select>
+          {:else if modifierEmoji}
             <button
               class="absolute top-0 right-0 text-lg"
               on:click={() => removeFromModifiers(i)}>🞫</button
             >
-          {/if}
-          <div
-            class={i != 0
-              ? "dropdown-hover dropdown-left dropdown scale-75"
-              : "scale-75"}
-          >
-            <div class="slot-lg">
-              {key}
+            <div class="slot-lg scale-75">
+              {modifierEmoji}
             </div>
-            {#if i != 0}
-              <div
-                tabindex="0"
-                class="dropdown-content menu absolute cursor-pointer rounded-lg bg-base-100 p-2 text-xl shadow"
-              >
-                {#each eqs as [id, { emoji }]}
-                  <div
-                    class="rounded-md p-1 hover:bg-base-200"
-                    on:click={() => updateModifierKey(i, emoji)}
-                  >
-                    {emoji}
-                  </div>
-                {:else}
-                  <div class="rounded-md p-1">No equippables defined.</div>
-                {/each}
-              </div>
-            {/if}
-          </div>
-          <select
-            class="select select-bordered select-sm absolute -bottom-2"
-            bind:value
-            on:change={updateStore}
-          >
-            {#each modifierPoints as point}
-              <option value={point}>{point > 0 ? `+${point}` : point}</option>
-            {/each}
-          </select>
+            <select
+              class="select select-bordered select-sm absolute -bottom-2"
+              bind:value
+              on:change={updateStore}
+            >
+              {#each modifierPoints as point}
+                <option value={point}>{point > 0 ? `+${point}` : point}</option>
+              {/each}
+            </select>
+          {:else}
+            <div use:removeEmptyModifier={i} />
+          {/if}
         </div>
       {/each}
     </div>

@@ -22,8 +22,9 @@
     type _Collisions,
     type _Interactable,
     type _Interactables,
-    type _Consumable,
     type _Consumables,
+    type _Equippables,
+    HP,
   } from "$src/types";
 
   /* ## DATA ## */
@@ -39,6 +40,7 @@
 
   /* ## STATE ## */
   let dialog: HTMLDialogElement;
+  0;
   let levelCompleted = false;
   let ac = -2; // ACTIVE CELL
   let ic: number; // INTERACTED CELL
@@ -48,6 +50,7 @@
   let backgrounds = new Map(map.backgrounds);
   let _interactables: _Interactables = {};
   let _consumables: _Consumables = {};
+  let _equippables: _Equippables = {};
   let timeouts: Array<NodeJS.Timeout> = [];
   let intervals: Array<NodeJS.Timer> = [];
 
@@ -157,13 +160,17 @@
     Object.assign(_consumables[emoji], args);
   }
 
-  function initItems() {
-    let consumableEmojis = Array.from(consumables.values());
+  for (let [id, equippable] of equippables) {
+    const { emoji, ...args } = equippable;
+    // @ts-expect-error
+    _equippables[emoji] = {};
+    Object.assign(_equippables[emoji], args);
+  }
 
+  function initItems() {
     for (let [id, _emoji] of map.items) {
-      if (equippables.has(_emoji)) {
-        // TODO: Equippables require hp
-        items.set(id, new Equippable(_emoji, 1));
+      if (_equippables[_emoji]) {
+        items.set(id, new Equippable(_emoji, _equippables[_emoji].hp));
       } else if (_consumables[_emoji]) {
         let { hp, mutateConsumerTo } = _consumables[_emoji];
         items.set(id, new Consumable(_emoji, hp, mutateConsumerTo));
@@ -192,11 +199,6 @@
   let player = items.get(ac) as Item;
   $: player = items.get(ac) as Item;
 
-  let progress = tweened(player?.hp.current || 1, {
-    duration: 200,
-    easing: cubicOut,
-  });
-
   let numbers = new Map<number, number>();
 
   for (let i = 0; i <= 100; i++) {
@@ -209,6 +211,11 @@
     if (hp.current > hp.max) return 1;
     return numbers.get(Math.floor((hp.current * 100) / hp.max)) || 0;
   }
+
+  let progress = tweened(calcPlayerHpPercentage(), {
+    duration: 200,
+    easing: cubicOut,
+  });
 
   let _collisions: _Collisions = {};
 
@@ -390,6 +397,7 @@
     if (e.code == "Space") {
       if (calcOperation(wasdToArrow[directionKey], ic) == 0) return;
       let interactedItem = items.get(ic);
+      console.log(interactedItem);
 
       if (interactedItem == undefined) return;
       if (interactedItem instanceof Equippable) {
@@ -416,11 +424,7 @@
 
           for (let [id, { emoji, hp }] of items) {
             if (typeof hp == "number") continue; // consumables and equippables' hp types are numbers
-            if (
-              hp.current > 0 &&
-              !statics.has(emoji) &&
-              !equippables.has(emoji)
-            ) {
+            if (hp.current > 0 && !statics.has(emoji) && !_equippables[emoji]) {
               player = items.get(id) as Item;
               ac = id;
               progress = tweened(calcPlayerHpPercentage(), {
@@ -440,10 +444,12 @@
       }
 
       let interactable: _Interactable = _interactables[interactedItem.emoji];
+      console.log(interactable);
+
       if (interactable == undefined || interactable.executing) return;
       let { sequence, modifiers, evolve, devolve } = interactable;
 
-      for (let { type, ...args } of sequence) {
+      for (let { type } of sequence) {
         if (type == "dropEquippable") {
           if (player?.inventory.length == MAX_INVENTORY_SIZE) {
             return;
@@ -452,11 +458,25 @@
       }
 
       _interactables[interactedItem.emoji].executing = true;
-      let equippedItem =
-        (player?.inventory || [])[currentInventoryIndex] || "any";
+      let equippedItem = player?.inventory[currentInventoryIndex] || "any";
+
+      console.log(equippedItem);
+      // @ts-expect-error
+      if (equippedItem != "any") {
+        equippedItem.hp -= 1;
+      }
+
+      if (equippedItem.hp == 0) {
+        player.inventory.splice(currentInventoryIndex, 1);
+      }
+      console.log(modifiers);
 
       let modifier =
-        modifiers.find((m) => m[0] == equippedItem.emoji) || modifiers[0];
+        modifiers.find(
+          (m) => equippables.get(m[0])?.emoji == equippedItem.emoji
+        ) || modifiers[0];
+
+      console.log(modifier);
 
       if (modifier[1] == 0) return;
       interactedItem.hp.current += modifier[1];
@@ -523,7 +543,7 @@
     let closestID = ac;
 
     let _items = Array.from(items).filter(
-      ([id, { emoji }]) => !statics.has(emoji) && !equippables.has(emoji)
+      ([id, { emoji }]) => !statics.has(emoji) && !_equippables[emoji]
     );
 
     if (e.code == "KeyE") {
@@ -547,6 +567,7 @@
         ic = ac + KEYS[directionKey].operation;
       }
 
+      player = items.get(ac) as Item;
       progress = tweened(calcPlayerHpPercentage(), {
         duration: 200,
         easing: cubicOut,
@@ -575,6 +596,7 @@
         ic = ac + KEYS[directionKey].operation;
       }
 
+      player = items.get(ac) as Item;
       progress = tweened(calcPlayerHpPercentage(), {
         duration: 200,
         easing: cubicOut,
@@ -583,8 +605,6 @@
     }
   }
 
-  // TODO: Consumables and equippables shouldn't be controllable
-  // they can be pushable or mergable tho
   function noPlayer(node: any) {
     if (ac == -2) dispatch("noPlayer");
   }
@@ -595,10 +615,10 @@
 <div class={mapClass} use:noPlayer>
   {#each { length: SIZE * SIZE } as _, i}
     {@const active = ac == i}
-    <div style:background={backgrounds.get(i) || map.dbg} class:active>
+    <div style:background={backgrounds.get(i) || map.dbg}>
       {#if active}
         <div class="direction scale-75" style={KEYS[directionKey].style}>
-          {player.inventory[currentInventoryIndex]?.emoji ||
+          {player?.inventory[currentInventoryIndex]?.emoji ||
             KEYS[directionKey].emoji}
         </div>
       {/if}
@@ -615,15 +635,12 @@
 </div>
 
 {#if mapClass == DEFAULT_MAP_CLASS && ac != -2}
-  <!-- <div class=""></div> -->
-  <!-- The button to open modal -->
   <label
     title="Objective"
     for="objective"
     class="absolute -top-16 left-0 cursor-help text-2xl">🎯</label
   >
 
-  <!-- Put this part before </body> tag -->
   <input type="checkbox" id="objective" class="modal-toggle" />
   <label for="objective" class="modal cursor-pointer">
     <label class="modal-box relative" for="">
@@ -633,7 +650,7 @@
       </p>
     </label>
   </label>
-  {@const playerHP = $progress * (player?.hp.current || 1)}
+  {@const playerHP = $progress * (player?.hp.max || 1)}
   {#key ac}
     <div
       class="absolute -top-16 flex w-64 flex-row items-center justify-center gap-2"
@@ -655,11 +672,17 @@
       class="absolute -bottom-20 flex w-full flex-row items-center justify-center gap-2"
     >
       {#each { length: MAX_INVENTORY_SIZE } as _, i}
+        {@const item = player?.inventory[i]}
         <div
           class:selected={i == currentInventoryIndex}
           class="flex h-12 w-12 flex-col items-center justify-center bg-base-300 p-2"
         >
-          {player?.inventory[i]?.emoji || ""}
+          {#if item}
+            <div>{item.emoji || ""}</div>
+            <div class="absolute -top-1 right-0 text-sm">
+              {item.hp > 1 ? item.hp : ""}
+            </div>
+          {/if}
         </div>
       {/each}
     </div>

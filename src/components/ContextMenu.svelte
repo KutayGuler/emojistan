@@ -84,7 +84,7 @@
 <ul class="w-full bg-white">
   {#each menuItems as { name, onClick }}
     <li
-      class="{name} box-border h-8 w-full p-1 text-start hover:bg-base-200"
+      class="{name} box-border h-8 w-full cursor-pointer p-1 text-start hover:bg-base-200"
       on:click={onClick}
     >
       {name}

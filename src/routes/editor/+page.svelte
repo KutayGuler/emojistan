@@ -64,6 +64,8 @@
     isStatic && statics.add(emoji);
   });
   $equippables.forEach(({ emoji }) => statics.add(emoji));
+  $consumables.forEach(({ emoji }) => statics.add(emoji));
+  console.log(statics);
 
   function handleKeydown(e: KeyboardEvent) {
     if (e.code == "Escape") {
@@ -84,6 +86,7 @@
   let innerHeight: number;
 
   let showIndex = false;
+  let hintsEnabled = false;
 
   type DeleteMode = "Item" | "Background" | "Both";
 
@@ -195,6 +198,15 @@
                 on:click={toggleTest}>TEST</button
               >
               <div class="form-control">
+                <!-- TODO: Add info symbol from heroicons to aside components that require explanation. might use tooltip -->
+                <label class="label cursor-pointer">
+                  <span class="label-text">Enable Hints</span>
+                  <input
+                    type="checkbox"
+                    class="checkbox checkbox-secondary"
+                    bind:checked={hintsEnabled}
+                  />
+                </label>
                 <label class="label cursor-pointer">
                   <span class="label-text">Show Indexes</span>
                   <input

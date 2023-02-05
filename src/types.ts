@@ -25,8 +25,6 @@ export class HP {
   }
 }
 
-// TODO: Integrate equippables to push/merge
-
 export interface Item {
   emoji: string;
   inventory: Array<Equippable>;
@@ -57,6 +55,10 @@ export class Equippable {
   }
 }
 
+export interface _Equippables {
+  [key: string]: Equippable;
+}
+
 export interface Consumable {
   emoji: string;
   hp: number; // add to consumer hp
@@ -71,14 +73,8 @@ export class Consumable {
   }
 }
 
-export interface _Consumable {
-  emoji: string;
-  hp: number;
-  mutateConsumerTo: string;
-}
-
 export interface _Consumables {
-  [key: string]: _Consumable;
+  [key: string]: Consumable;
 }
 
 export interface _Interactable {
@@ -192,7 +188,7 @@ export interface Interactable {
   sequence: Array<SequenceItem>;
   points: number;
   hp: number;
-  modifiers: Array<[string, number]>;
+  modifiers: Array<[number | "any", number]>;
   isStatic: boolean;
   evolve: Evolve;
   devolve: Devolve;
@@ -204,7 +200,7 @@ export class Interactable {
     sequence: Array<SequenceItem>,
     hp: number,
     points: number,
-    modifiers: Array<[string, number]>,
+    modifiers: Array<[number | "any", number]>,
     isStatic: boolean,
     evolve: Evolve,
     devolve: Devolve
