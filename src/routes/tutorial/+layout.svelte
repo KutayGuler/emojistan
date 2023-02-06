@@ -1,5 +1,20 @@
-<script>
-  import Equippable from "$components/Equippable.svelte";
+<script lang="ts">
+  import {
+    PUSHER_BORDER,
+    MERGER_BORDER,
+    EQUIPPABLE_BORDER,
+    CONSUMABLE_BORDER,
+    INTERACTABLE_BORDER,
+  } from "../../constants";
+  import { page } from "$app/stores";
+
+  const colors: { [key: string]: string } = {
+    Pusher: PUSHER_BORDER,
+    Merger: MERGER_BORDER,
+    Equippable: EQUIPPABLE_BORDER,
+    Consumable: CONSUMABLE_BORDER,
+    Interactable: INTERACTABLE_BORDER,
+  };
 </script>
 
 <main class="flex flex-row">
@@ -10,9 +25,16 @@
     </div>
     <div class="drawer-side">
       <label for="my-drawer-2" class="drawer-overlay" />
-      <ul class="menu w-80 bg-base-100 p-4 text-base-content">
+      <ul class="menu m-4 w-80 rounded-md bg-base-200 text-base-content">
         {#each ["Pusher", "Merger", "Equippable", "Consumable", "Interactable"] as link}
-          <li><a href="../tutorial/{link.toLowerCase()}">{link}</a></li>
+          <li
+            class={link}
+            style={$page.url.pathname.includes(link.toLowerCase())
+              ? `background-color: ${colors[link]}; color: var(--primary);`
+              : ""}
+          >
+            <a href="../tutorial/{link.toLowerCase()}">{link}</a>
+          </li>
         {/each}
       </ul>
     </div>

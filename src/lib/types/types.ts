@@ -37,7 +37,6 @@ export interface Node {
   position: XYPosition;
   width: number;
   height: number;
-  disabled: boolean;
   bgColor?: string;
   fontSize?: number;
   borderColor?: string;

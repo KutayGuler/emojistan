@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { type Merger, EditableMap } from "$src/types";
+  import { type Merger as TMerger, EditableMap } from "$src/types";
   import { MERGER_BG, MERGER_BORDER, MERGER_H, MERGER_W } from "$src/constants";
   import Tutorial from "../Tutorial.svelte";
   import Merger from "$components/Merger.svelte";
@@ -11,7 +11,6 @@
     component: Merger,
     node: {
       id: 0,
-      disabled: true,
       component: "merger",
       position: { x: 0, y: 0 },
       width: MERGER_W,
@@ -22,7 +21,6 @@
     props: {
       id: -1,
       slots: ["🟢", "🔴", "🟡"],
-      editable: false,
     },
     gameProps: {
       map: new EditableMap(
@@ -31,11 +29,11 @@
           [6, "🔴"],
         ])
       ),
-      mergers: new Map<number, Merger>([[0, ["🟢", "🔴", "🟡"]]]),
+      mergers: new Map<number, TMerger>([[0, ["🟢", "🔴", "🟡"]]]),
       mapClass: "simulation",
       SIZE: 4,
     },
   };
 </script>
 
-<Tutorial {...tutorialProps} />
+<Tutorial {...tutorialProps} --header={MERGER_BORDER} />

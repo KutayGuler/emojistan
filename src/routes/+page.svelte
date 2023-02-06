@@ -75,6 +75,10 @@
   }
 </script>
 
+<svelte:head>
+  <title>Emojistan</title>
+</svelte:head>
+
 <!-- Put this part before </body> tag -->
 <input type="checkbox" id="new-game" class="modal-toggle" />
 <label for="new-game" class="modal cursor-pointer">

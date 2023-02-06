@@ -60,11 +60,19 @@
   let currentCategory = "💩";
   let filter = "";
   let statics = new Set<string>();
+
+  // FIXME: statics are not being updated for some reason
   $interactables.forEach(({ emoji, isStatic }) => {
     isStatic && statics.add(emoji);
   });
-  $equippables.forEach(({ emoji }) => statics.add(emoji));
-  $consumables.forEach(({ emoji }) => statics.add(emoji));
+  for (let [id, { emoji }] of [...$equippables, ...$consumables]) {
+    console.log(emoji);
+
+    statics.add(emoji);
+  }
+
+  // $equippables.forEach(({ emoji }) => statics.add(emoji));
+  // $consumables.forEach(({ emoji }) => statics.add(emoji));
   console.log(statics);
 
   function handleKeydown(e: KeyboardEvent) {
@@ -198,7 +206,7 @@
                 on:click={toggleTest}>TEST</button
               >
               <div class="form-control">
-                <!-- TODO: Add info symbol from heroicons to aside components that require explanation. might use tooltip -->
+                <!-- TODO: Add info symbol 🧙 from heroicons to aside components that require explanation. might use tooltip -->
                 <label class="label cursor-pointer">
                   <span class="label-text">Enable Hints</span>
                   <input

@@ -63,11 +63,15 @@
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
 
-  /* COLOR PALETTE */
+  /* RULEBOXES */
+  --pusher: #0ea5e9;
+  --merger: #f97316;
+  --interactable: #6366f1;
+  --consumable: #14b8a6;
+  --equippable: #78716c;
 
   /* --primary: #111827; */
   --primary: white;
-
   background-color: hsl(var(--primary));
 }
 
@@ -97,35 +101,28 @@ body {
   background-color: #e6e6e6;
 }
 
-/* CARDS */
+/* RULEBOXES */
 
-/* .slots {
-  position: relative;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-around;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-} */
+.Pusher:hover,
+.Merger:hover,
+.Interactable:hover,
+.Equippable:hover,
+.Consumable:hover {
+  color: var(--primary);
+}
 
-/* .slot {
-  width: 48px;
-  height: 24px;
-  background-color: var(--primary);
-  border: 2px solid black;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-} */
-
-/* UTILS */
-
-.noselect {
-  -webkit-touch-callout: none; /* iOS Safari */
-  -webkit-user-select: none; /* Safari */
-  -khtml-user-select: none; /* Konqueror HTML */
-  -moz-user-select: none; /* Old versions of Firefox */
-  -ms-user-select: none; /* Internet Explorer/Edge */
-  user-select: none;
+.Pusher:hover {
+  background-color: var(--pusher);
+}
+.Merger:hover {
+  background-color: var(--merger);
+}
+.Interactable:hover {
+  background-color: var(--interactable);
+}
+.Equippable:hover {
+  background-color: var(--equippable);
+}
+.Consumable:hover {
+  background-color: var(--consumable);
 }

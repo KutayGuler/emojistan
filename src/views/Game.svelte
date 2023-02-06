@@ -37,6 +37,7 @@
   export let statics = new Set<string>();
   export let mapClass = DEFAULT_MAP_CLASS;
   export let SIZE = DEFAULT_SIDE_LENGTH;
+  export let showUI = true;
 
   /* ## STATE ## */
   let dialog: HTMLDialogElement;
@@ -206,6 +207,7 @@
   }
 
   function calcPlayerHpPercentage(): number {
+    if (!player) return 0;
     let { hp } = player;
     if (!hp) return 0;
     if (hp.current > hp.max) return 1;
@@ -673,13 +675,14 @@
     >
       {#each { length: MAX_INVENTORY_SIZE } as _, i}
         {@const item = player?.inventory[i]}
+        {@const selected = i == currentInventoryIndex}
         <div
-          class:selected={i == currentInventoryIndex}
-          class="flex h-12 w-12 flex-col items-center justify-center bg-base-300 p-2"
+          class:selected
+          class="relative flex h-12 w-12 flex-col items-center justify-center bg-base-300 p-2"
         >
           {#if item}
             <div>{item.emoji || ""}</div>
-            <div class="absolute -top-1 right-0 text-sm">
+            <div class="absolute -top-0.5 right-0.5 text-sm">
               {item.hp > 1 ? item.hp : ""}
             </div>
           {/if}

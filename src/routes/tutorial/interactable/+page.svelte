@@ -16,7 +16,6 @@
     component: Interactable,
     node: {
       id: 0,
-      disabled: true,
       component: "interactable",
       position: { x: 0, y: 0 },
       width: INTERACTABLE_W,
@@ -31,7 +30,6 @@
         hp: 1,
         points: 1,
       },
-      editable: false,
     },
     gameProps: {
       map: new EditableMap(
@@ -60,4 +58,4 @@
   };
 </script>
 
-<Tutorial {...tutorialProps} />
+<Tutorial {...tutorialProps} --header={INTERACTABLE_BORDER} />

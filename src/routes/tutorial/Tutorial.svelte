@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { draggable } from "@neodrag/svelte";
   import type { Node as TNode } from "$lib/types/index";
   import Node from "$lib/Nodes/index.svelte";
   import Game from "$src/views/Game.svelte";
@@ -13,15 +12,14 @@
 </script>
 
 <div class="self-start p-4">
-  <h1 class=" text-4xl">{header}</h1>
+  <h1 class="text-4xl">{header}</h1>
   <p class="pt-2">
     {description}
   </p>
 </div>
 <div
-  use:draggable={{ bounds: "parent" }}
   style="height: {node.height}px; width: {node.width}px;"
-  class="z-10 mt-12"
+  class="pointer-events-none absolute z-10 mt-44"
 >
   <Node {node}>
     <svelte:component this={component} {...props} />
@@ -30,3 +28,9 @@
 <div class="absolute flex h-full items-center">
   <Game {...gameProps} />
 </div>
+
+<style>
+  h1 {
+    color: var(--header);
+  }
+</style>

@@ -21,14 +21,6 @@
   import Interactable from "$components/Interactable.svelte";
   import Pusher from "$components/Pusher.svelte";
   import Merger from "$components/Merger.svelte";
-  import {
-    CONSUMABLE_BORDER,
-    EQUIPPABLE_BG,
-    EQUIPPABLE_BORDER,
-    INTERACTABLE_BORDER,
-    MERGER_BORDER,
-    PUSHER_BORDER,
-  } from "$src/constants";
   import Consumable from "$components/Consumable.svelte";
   import Equippable from "$components/Equippable.svelte";
 
@@ -53,7 +45,7 @@
 />
 
 <div
-  class="Node {node.disabled ? 'pointer-events-none' : ''}"
+  class="Node"
   style="left: {node.position.x}px;
     top: {node.position.y}px;
     width: {node.width}px;
@@ -128,14 +120,7 @@
   <!-- CF #2 -->
   <slot>
     {#if node.component == "ctxMenu"}
-      <ContextMenu
-        --pusher={PUSHER_BORDER}
-        --merger={MERGER_BORDER}
-        --interactable={INTERACTABLE_BORDER}
-        --equippable={EQUIPPABLE_BORDER}
-        --consumable={CONSUMABLE_BORDER}
-        position={node.position}
-      />
+      <ContextMenu position={node.position} />
     {:else if node.component == "interactable"}
       <Interactable id={node.id} />
     {:else if node.component == "equippable"}

@@ -84,28 +84,10 @@
 <ul class="w-full bg-white">
   {#each menuItems as { name, onClick }}
     <li
-      class="{name} box-border h-8 w-full cursor-pointer p-1 text-start hover:bg-base-200"
+      class="{name} box-border h-8 w-full cursor-pointer p-1 text-start"
       on:click={onClick}
     >
       {name}
     </li>
   {/each}
 </ul>
-
-<style>
-  .Pusher:hover {
-    background-color: var(--pusher);
-  }
-  .Merger:hover {
-    background-color: var(--merger);
-  }
-  .Interactable:hover {
-    background-color: var(--interactable);
-  }
-  .Equippable:hover {
-    background-color: var(--equippable);
-  }
-  .Consumable:hover {
-    background-color: var(--consumable);
-  }
-</style>

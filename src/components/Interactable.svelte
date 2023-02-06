@@ -364,15 +364,10 @@
 </div>
 <main class="flex flex-col items-center justify-center gap-12 pt-16">
   <div class="form-control w-3/4">
-    <div
-      class="tooltip"
-      data-tip="Static emojis cannot be controlled by player"
-    >
-      <label class="label cursor-pointer">
-        <span class="label-text">Static</span>
-        <input type="checkbox" class="checkbox" bind:checked={isStatic} />
-      </label>
-    </div>
+    <label class="label cursor-pointer">
+      <span class="label-text">Static</span>
+      <input type="checkbox" class="checkbox" bind:checked={isStatic} />
+    </label>
     <label class="label cursor-pointer">
       <span class="label-text">Evolve</span>
       <input type="checkbox" class="checkbox" bind:checked={evolve.enabled} />
@@ -386,8 +381,8 @@
     <div
       class="flex w-full flex-row items-center justify-center gap-2 pb-6 text-xl"
     >
-      <p>HP MODIFIERS ({modifiers.length} / 3)</p>
-      <div class="dropdown-hover dropdown dropdown-right">
+      <p>Side Effects ({modifiers.length} / 3)</p>
+      <div class="dropdown-hover dropdown-right dropdown">
         <label for="" tabindex="0" class="btn text-2xl">+</label>
         <ul
           tabindex="0"
@@ -456,7 +451,7 @@
     </div>
   </div>
   <div class="flex flex-col gap-2">
-    <p class="text-xl">EVENT SEQUENCE</p>
+    <p class="text-xl">Event Sequence</p>
     {#each sequence as s, i}
       <span class="flex w-full flex-row items-start justify-between gap-2">
         <select class="select" title="event type" bind:value={s.type}>
