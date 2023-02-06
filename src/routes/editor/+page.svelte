@@ -31,7 +31,21 @@
   import Svelvet from "$lib";
   import Palette from "$components/Palette.svelte";
 
+  function getStatics() {
+    let statics = new Set<string>();
+    $interactables.forEach(({ emoji, isStatic }) => {
+      isStatic && statics.add(emoji);
+    });
+    for (let [id, { emoji }] of [...$equippables, ...$consumables]) {
+      statics.add(emoji);
+    }
+
+    return statics;
+  }
+
   onMount(() => {
+    console.log("onMount");
+
     if ($saves.currentSaveID == "") {
       let saveExists = saves.useStorage();
       if (!saveExists) {
@@ -59,21 +73,6 @@
   const flipParams = { duration: 300 };
   let currentCategory = "💩";
   let filter = "";
-  let statics = new Set<string>();
-
-  // FIXME: statics are not being updated for some reason
-  $interactables.forEach(({ emoji, isStatic }) => {
-    isStatic && statics.add(emoji);
-  });
-  for (let [id, { emoji }] of [...$equippables, ...$consumables]) {
-    console.log(emoji);
-
-    statics.add(emoji);
-  }
-
-  // $equippables.forEach(({ emoji }) => statics.add(emoji));
-  // $consumables.forEach(({ emoji }) => statics.add(emoji));
-  console.log(statics);
 
   function handleKeydown(e: KeyboardEvent) {
     if (e.code == "Escape") {
@@ -92,7 +91,6 @@
 
   let innerWidth: number;
   let innerHeight: number;
-
   let showIndex = false;
   let hintsEnabled = false;
 
@@ -140,6 +138,10 @@
     }
   }
 
+  function toggleView() {
+    view = view == "editor" ? "rules" : "editor";
+  }
+
   let [x, y] = [0, 0];
 </script>
 
@@ -164,14 +166,14 @@
   {$currentEmoji}
 </div>
 
-{#if $saves.current != ""}
+{#if $saves.currentSaveID != ""}
   {#if test}
     <button on:click={toggleTest} class="absolute top-4 right-4 z-10 text-4xl"
       >🞫</button
     >
   {/if}
   <main
-    class="noselect relative box-border flex h-screen flex-col items-center justify-center gap-8 overflow-hidden overflow-x-hidden"
+    class="relative box-border flex h-screen select-none flex-col items-center justify-center gap-8 overflow-hidden overflow-x-hidden"
   >
     {#if !test}
       <div
@@ -182,7 +184,7 @@
           class="{view == 'editor'
             ? 'scale-150 opacity-100'
             : 'opacity-50'} cursor-pointer duration-200 ease-out hover:scale-150 hover:opacity-100"
-          on:click={() => (view = "editor")}
+          on:click={toggleView}
         >
           🗺️
         </div>
@@ -190,9 +192,9 @@
           class="{view == 'rules'
             ? 'scale-150 opacity-100'
             : 'opacity-50'} cursor-pointer duration-200 hover:scale-150 hover:opacity-100"
-          on:click={() => (view = "rules")}
+          on:click={toggleView}
         >
-          📜
+          📚
         </div>
       </div>
     {/if}
@@ -202,19 +204,18 @@
           {#if view == "editor"}
             <div class="flex flex-col">
               <button
+                title="Enable/Disable Hints"
+                class:hintsEnabled
+                class="absolute top-0.5 left-1 opacity-50 hover:cursor-pointer"
+                on:click={() => (hintsEnabled = !hintsEnabled)}
+              >
+                🧙
+              </button>
+              <button
                 class="btn bg-primary text-primary-content hover:bg-primary-focus"
                 on:click={toggleTest}>TEST</button
               >
               <div class="form-control">
-                <!-- TODO: Add info symbol 🧙 from heroicons to aside components that require explanation. might use tooltip -->
-                <label class="label cursor-pointer">
-                  <span class="label-text">Enable Hints</span>
-                  <input
-                    type="checkbox"
-                    class="checkbox checkbox-secondary"
-                    bind:checked={hintsEnabled}
-                  />
-                </label>
                 <label class="label cursor-pointer">
                   <span class="label-text">Show Indexes</span>
                   <input
@@ -227,7 +228,14 @@
               <div class="flex flex-col gap-2">
                 <div class="form-control">
                   <label class="label">
-                    <span class="label-text">Copy Mode</span>
+                    <span class="label-text"
+                      >Copy Mode {#if hintsEnabled}<div
+                          class="tooltip tooltip-right"
+                          data-tip="Right click on any cell to copy the corresponding emoji or background."
+                        >
+                          <button>🧙</button>
+                        </div>{/if}
+                    </span>
                   </label>
                   <select class="select select-bordered" bind:value={copyMode}>
                     {#each deleteModes as mode}
@@ -237,7 +245,14 @@
                 </div>
                 <div class="form-control">
                   <label class="label">
-                    <span class="label-text">Delete Mode</span>
+                    <span class="label-text"
+                      >Delete Mode {#if hintsEnabled}<div
+                          class="tooltip tooltip-right"
+                          data-tip="Left click on any cell to delete the corresponding emoji or background."
+                        >
+                          <button>🧙</button>
+                        </div>{/if}</span
+                    >
                   </label>
                   <select
                     class="select select-bordered"
@@ -257,7 +272,14 @@
                 </button>
 
                 <label class="label">
-                  <span class="label-text">Filler</span>
+                  <span class="label-text"
+                    >Filler {#if hintsEnabled}<div
+                        class="tooltip tooltip-right"
+                        data-tip="Select an emoji from the emoji container and click on the button below to fill the entire map with that emoji"
+                      >
+                        <button>🧙</button>
+                      </div>{/if}</span
+                  >
                 </label>
                 <button
                   disabled={$currentEmoji == ""}
@@ -266,6 +288,16 @@
                 >
               </div>
             </div>
+            <label class="label">
+              <span class="label-text"
+                >Palette ({$palette.size} / 8) {#if hintsEnabled}<div
+                    class="tooltip tooltip-right"
+                    data-tip="Click on the box on the left to choose a color then click on [+] button to add that color to the palette"
+                  >
+                    <button>🧙</button>
+                  </div>{/if}</span
+              >
+            </label>
             <Palette />
           {:else}
             <div class="form-control">
@@ -278,6 +310,7 @@
                 bind:value={$map.objective}
               />
             </div>
+            <!-- TODO: Bring back statics -->
             <!-- <p class="label-text pt-4">Equippables 🪕</p>
             <button
               disabled={$currentEmoji == ""}
@@ -328,7 +361,7 @@
           interactables={$interactables}
           equippables={$equippables}
           consumables={$consumables}
-          {statics}
+          statics={getStatics()}
           on:noPlayer={() => {
             test = false;
             notifications.warning("No controllable player in the map");
@@ -344,7 +377,7 @@
         </div>
       {/if}
       {#if !test}
-        <aside transition:fly={{ x: 200 }} class="aside pt-0">
+        <aside transition:fly={{ x: 200 }} class="aside overflow-y-auto pt-0">
           <div
             class="sticky top-0 flex w-full flex-col items-center justify-center gap-4 bg-base-200 p-4 pt-8"
           >
@@ -397,5 +430,13 @@
 
   .emojis > div:hover {
     transform: scale(1.5, 1.5);
+  }
+
+  .hintsEnabled {
+    opacity: 1;
+  }
+
+  .tooltip:before {
+    z-index: 10;
   }
 </style>

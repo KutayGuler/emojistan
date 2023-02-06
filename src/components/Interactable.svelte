@@ -382,7 +382,7 @@
       class="flex w-full flex-row items-center justify-center gap-2 pb-6 text-xl"
     >
       <p>Side Effects ({modifiers.length} / 3)</p>
-      <div class="dropdown-hover dropdown-right dropdown">
+      <div class="dropdown-hover dropdown dropdown-right">
         <label for="" tabindex="0" class="btn text-2xl">+</label>
         <ul
           tabindex="0"
@@ -554,7 +554,7 @@
           </optgroup>
         {/each}
       </select>
-      <button class="text-3xl" on:click={addToSequence}>+</button>
+      <button class="btn ml-1 text-2xl" on:click={addToSequence}>+</button>
     </label>
   </div>
 </main>

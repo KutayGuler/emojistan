@@ -8,8 +8,7 @@
     SIZE: 4,
   };
 
-  // ARROW KEYS
-  // E, Q TO CHANGE PLAYER
+  // TODO: ARROW KEYS | E, Q TO CHANGE PLAYER
 </script>
 
 <!-- <Tutorial {...tutorialProps} --header={PUSHER_BORDER} /> -->

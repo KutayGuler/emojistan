@@ -42,9 +42,6 @@
   }
 </script>
 
-<label class="label">
-  <span class="label-text">Palette</span>
-</label>
 <div class="flex flex-col gap-2">
   <div class="flex flex-row gap-2">
     <input

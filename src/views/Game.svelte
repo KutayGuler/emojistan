@@ -195,7 +195,7 @@
 
   initItems();
 
-  // TODO: Add statics again
+  // FIXME: There is a problem with items that have maxxed and plussed out their hps when they are damaged
 
   let player = items.get(ac) as Item;
   $: player = items.get(ac) as Item;

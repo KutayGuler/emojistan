@@ -28,7 +28,7 @@
   }
 
   .aside {
-    @apply relative z-10 h-[716px] w-80 overflow-y-auto overflow-x-visible rounded bg-base-200 p-8;
+    @apply relative h-[716px] w-80 rounded bg-base-200 p-8;
   }
 
   .simulation > div,
