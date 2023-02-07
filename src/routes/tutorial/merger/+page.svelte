@@ -7,7 +7,7 @@
   const tutorialProps = {
     header: "Merger",
     description:
-      "Merger takes three emoji inputs. To put it simply, ☁️ + ❄️ = 🌨️",
+      "Merger takes three emoji inputs. To put it simply, ☁️ + ❄️ = 🌨️. Alternatively, ❄️ + ☁️ = 🌨️",
     component: Merger,
     node: {
       id: 0,

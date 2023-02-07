@@ -21,6 +21,7 @@
     interactables,
     equippables,
     consumables,
+    statics,
   } from "../../store";
 
   import { emojis } from "./emojis";
@@ -32,15 +33,15 @@
   import Palette from "$components/Palette.svelte";
 
   function getStatics() {
-    let statics = new Set<string>();
+    let _statics = new Set<string>($statics);
     $interactables.forEach(({ emoji, isStatic }) => {
-      isStatic && statics.add(emoji);
+      isStatic && _statics.add(emoji);
     });
     for (let [id, { emoji }] of [...$equippables, ...$consumables]) {
-      statics.add(emoji);
+      _statics.add(emoji);
     }
 
-    return statics;
+    return _statics;
   }
 
   onMount(() => {
@@ -310,25 +311,24 @@
                 bind:value={$map.objective}
               />
             </div>
-            <!-- TODO: Bring back statics -->
-            <!-- <p class="label-text pt-4">Equippables 🪕</p>
+            <p class="label-text pt-4">Statics 🗿</p>
             <button
               disabled={$currentEmoji == ""}
               class="btn w-full "
               on:click={() => {
-                for (let val of [
-                  ...$consumables.values(),
-                  ...$interactables.values(),
-                ]) {
-                  if ($currentEmoji == val.emoji) {
-                    notifications.warning(
-                      "An emoji can only have one assigned type. Interactable, Consumable or Equippable"
-                    );
-                    return;
-                  }
-                }
+                // for (let val of [
+                //   ...$consumables.values(),
+                //   ...$interactables.values(),
+                // ]) {
+                //   if ($currentEmoji == val.emoji) {
+                //     notifications.warning(
+                //       "An emoji can only have one assigned type. Interactable, Consumable or Equippable"
+                //     );
+                //     return;
+                //   }
+                // }
 
-                equippables.add($currentEmoji);
+                statics.add($currentEmoji);
               }}
             >
               {$currentEmoji} +
@@ -337,19 +337,19 @@
               <div
                 class="mt-2 grid w-full grid-flow-row grid-cols-2 justify-center gap-2 overflow-y-auto "
               >
-                {#each [...$equippables] as item (item)}
+                {#each [...$statics] as item (item)}
                   <div
                     transition:scale|local={flipParams}
                     animate:flip={flipParams}
                   >
                     <button
                       class="remove btn h-full w-full"
-                      on:click={() => equippables.remove(item)}>{item}</button
+                      on:click={() => statics.remove(item)}>{item}</button
                     >
                   </div>
                 {/each}
               </div>
-            </div> -->
+            </div>
           {/if}
         </aside>
       {/if}

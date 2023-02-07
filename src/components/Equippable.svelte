@@ -10,7 +10,7 @@
   import { Equippable } from "$src/types";
 
   export let id: number;
-  let emoji = "";
+  export let emoji = "";
   let hp = 1;
 
   let hps: Array<number> = [];

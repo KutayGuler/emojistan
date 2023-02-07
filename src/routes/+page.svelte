@@ -13,8 +13,6 @@
   import { navigating } from "$app/stores";
   import { nodesStore } from "$lib/stores/store";
 
-  // FIXME: Save file overriding problem
-
   onMount(() => {
     if ($saves.currentSaveID == "") saves.useStorage();
   });
@@ -103,7 +101,7 @@
     <div />
     {#if $saves.loaded}
       <div class="flex w-1/3 flex-col gap-8 py-8 ">
-        <a class="link" href="/tutorial">TUTORIAL</a>
+        <a class="link" href="/tutorial/controls">TUTORIAL</a>
         <!-- <button class="btn h-16 w-full hover:bg-primary" on:click={newGame}
           >New Game</button
         > -->

@@ -82,7 +82,7 @@ export interface _Interactable {
   sequence: Array<SequenceItem>;
   points: number;
   hp: number;
-  modifiers: Array<[string, number]>;
+  sideEffects: Array<[string, number]>;
   evolve: Evolve;
   devolve: Devolve;
 }
@@ -188,7 +188,7 @@ export interface Interactable {
   sequence: Array<SequenceItem>;
   points: number;
   hp: number;
-  modifiers: Array<[number | "any", number]>;
+  sideEffects: Array<[number | "any", number]>;
   isStatic: boolean;
   evolve: Evolve;
   devolve: Devolve;
@@ -200,7 +200,7 @@ export class Interactable {
     sequence: Array<SequenceItem>,
     hp: number,
     points: number,
-    modifiers: Array<[number | "any", number]>,
+    sideEffects: Array<[number | "any", number]>,
     isStatic: boolean,
     evolve: Evolve,
     devolve: Devolve
@@ -209,7 +209,7 @@ export class Interactable {
     this.sequence = sequence;
     this.hp = hp;
     this.points = points;
-    this.modifiers = modifiers;
+    this.sideEffects = sideEffects;
     this.isStatic = isStatic;
     this.evolve = evolve;
     this.devolve = devolve;

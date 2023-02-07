@@ -1,5 +1,11 @@
 <script lang="ts">
-  import { type Equippable as TEquippable, EditableMap } from "$src/types";
+  import {
+    Equippable as TEquippable,
+    EditableMap,
+    Interactable,
+    Devolve,
+    Evolve,
+  } from "$src/types";
   import {
     EQUIPPABLE_BG,
     EQUIPPABLE_BORDER,
@@ -11,12 +17,12 @@
 
   const tutorialProps = {
     header: "Equippable",
-    description:
-      "Equippable takes two emoji inputs and makes 🔴 pushable by 🟢",
+    // TODO: Description
+    description: "",
     component: Equippable,
     node: {
       id: 0,
-      component: "pusher",
+      component: "equippable",
       position: { x: 0, y: 0 },
       width: EQUIPPABLE_W,
       height: EQUIPPABLE_H,
@@ -24,16 +30,43 @@
       borderColor: EQUIPPABLE_BORDER,
     },
     props: {
-      id: -1,
+      id: -69,
+      emoji: "🗝️",
     },
     gameProps: {
       map: new EditableMap(
         new Map<number, string>([
-          [5, "🟢"],
-          [6, "🔴"],
+          [0, "🐒"],
+          [2, "🧱"],
+          [5, "🗝️"],
+          [6, "🧱"],
+          [8, "🚪"],
+          [9, "🧱"],
+          [10, "🧱"],
         ])
       ),
-      // equippables:  new Map<number, TEquippable>([[0, ]]),
+      equippables: new Map<number, TEquippable>([
+        [-69, new TEquippable("🗝️", 1)],
+      ]),
+      interactables: new Map<number, Interactable>([
+        [
+          -1,
+          new Interactable(
+            "🚪",
+            [],
+            1,
+            1,
+            [
+              ["any", 0],
+              [-69, -1],
+            ],
+            false,
+            new Evolve(false, "", 2),
+            new Devolve(false, "")
+          ),
+        ],
+      ]),
+
       mapClass: "simulation",
       SIZE: 4,
     },

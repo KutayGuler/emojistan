@@ -15,42 +15,42 @@
   // emoji: 🌲
   // onInteract: dropEquippable {🍁} x {5}
   // hp: 100
-  // modifiers: any: 0 | {🪓}: {-1}
+  // sideEffects: any: 0 | {🪓}: {-1}
 
   // example DOOR
   // emoji: 🚪
   // onInteract: ""
   // hp: 1
-  // modifiers: any: 0 | {🔑}: {-1}
+  // sideEffects: any: 0 | {🔑}: {-1}
 
   // example KEY
   // emoji: 🔑
   // onInteract: dropEquippable {🔑} x {1}
   // hp: 1
-  // modifiers: any: -1
+  // sideEffects: any: -1
 
   // example FOOD
   // emoji: 🍔
   // onInteract: addToPlayerHP {20}
   // hp: 1
-  // modifiers: any: -1
+  // sideEffects: any: -1
 
   // example POISONOUS MUSHROOM
   // emoji: 🍄
   // onInteract: addToPlayerHP {-20}
   // hp: 1
-  // modifiers: any: -1
+  // sideEffects: any: -1
 
   // example MONEY
   // emoji: 💵
   // onInteract: changePlayerTo {🤑}
   // hp: 1
-  // modifiers: any: -1
+  // sideEffects: any: -1
 
   // example GROWING A PLANT
   // emoji: 🌱
   // hp: 1
-  // modifiers: any: 0 | 💧: +1
+  // sideEffects: any: 0 | 💧: +1
   // evolveAt: hp 10 to {🌳}
 
   import { nodesStore } from "$src/lib/stores/store";
@@ -113,7 +113,7 @@
   export let sequence: Array<SequenceItem> = [];
   export let hp = 1;
   export let points = 1;
-  export let modifiers: Array<[number | "any", number]> = [];
+  export let sideEffects: Array<[number | "any", number]> = [];
   export let isStatic = false;
   export let evolve = new Evolve(false, "", 2);
   export let devolve = new Devolve(false, "");
@@ -128,7 +128,7 @@
     let obj = $interactables.get(id);
 
     if (obj) {
-      ({ emoji, sequence, hp, points, modifiers, isStatic, evolve, devolve } =
+      ({ emoji, sequence, hp, points, sideEffects, isStatic, evolve, devolve } =
         obj);
     }
   });
@@ -141,7 +141,7 @@
         sequence,
         hp,
         points,
-        modifiers,
+        sideEffects,
         isStatic,
         evolve,
         devolve
@@ -161,11 +161,11 @@
     if (evolve.to == "") evolve.enabled = false;
     if (devolve.to == "") devolve.enabled = false;
 
-    modifiers = modifiers.filter((m) => {
+    sideEffects = sideEffects.filter((m) => {
       if (m[0] == "any") return true;
       return $equippables.get(m[0])?.emoji != "";
     });
-    modifiers = modifiers.filter((m, i) => {
+    sideEffects = sideEffects.filter((m, i) => {
       if (i == 0) return true;
       return m[1] != 0;
     });
@@ -173,13 +173,13 @@
     updateStore();
   });
 
-  function addToModifiers(equippableID: number) {
-    if (modifiers.some(([id, val]) => id == equippableID)) return;
-    if (modifiers.length == 3) {
-      notifications.warning("Cannot have more than 3 HP modifiers");
+  function addTosideEffects(equippableID: number) {
+    if (sideEffects.some(([id, val]) => id == equippableID)) return;
+    if (sideEffects.length == 3) {
+      notifications.warning("Cannot have more than 3 side effects");
       return;
     }
-    modifiers = [...modifiers, [equippableID, 0]];
+    sideEffects = [...sideEffects, [equippableID, 0]];
     updateStore();
   }
 
@@ -200,14 +200,14 @@
   }
 
   function removeEmptyModifier(node: any, i: number) {
-    modifiers.splice(i, 1);
-    modifiers = modifiers;
+    sideEffects.splice(i, 1);
+    sideEffects = sideEffects;
     updateStore();
   }
 
-  function removeFromModifiers(i: number) {
-    modifiers.splice(i, 1);
-    modifiers = modifiers;
+  function removeFromSideEffects(i: number) {
+    sideEffects.splice(i, 1);
+    sideEffects = sideEffects;
     updateStore();
   }
 
@@ -302,7 +302,7 @@
     }
   }
 
-  $: hasInteraction = modifiers.some((m) => m[1] != 0);
+  $: hasInteraction = sideEffects.some((m) => m[1] != 0);
   $: eqs = [...$equippables].filter(([id, e]) => e.emoji != "");
 </script>
 
@@ -383,7 +383,7 @@
       class="flex w-full flex-row items-center justify-center gap-2 pb-6 text-xl"
     >
       <p style="color: {EQUIPPABLE_BORDER};">
-        Side Effects ({modifiers.length} / 3)
+        Side Effects ({sideEffects.length} / 3)
       </p>
       <div class="dropdown-hover dropdown-right dropdown">
         <label for="" tabindex="0" class="btn text-2xl">+</label>
@@ -394,7 +394,7 @@
           {#each eqs as [id, { emoji }]}
             <div
               class="rounded-md p-1 hover:bg-base-200"
-              on:click={() => addToModifiers(id)}
+              on:click={() => addTosideEffects(id)}
             >
               {emoji}
             </div>
@@ -406,14 +406,14 @@
       {#if !hasInteraction}
         <div
           class="tooltip"
-          data-tip="An interactable needs at least one modifier with positive or negative value to fire events"
+          data-tip="An interactable needs at least one side effect with positive or negative value to be interactable"
         >
           <button class="btn text-2xl text-warning">!</button>
         </div>{/if}
     </div>
 
     <div class="flex flex-wrap items-center justify-center gap-8 pb-6">
-      {#each modifiers as [equippableID, value], i}
+      {#each sideEffects as [equippableID, value], i}
         {@const modifierEmoji = $equippables.get(equippableID)?.emoji}
         <div class="relative flex flex-col items-center">
           {#if equippableID == "any"}
@@ -432,7 +432,7 @@
           {:else if modifierEmoji}
             <button
               class="absolute -top-2 -right-2 text-lg"
-              on:click={() => removeFromModifiers(i)}>🞫</button
+              on:click={() => removeFromSideEffects(i)}>🞫</button
             >
             <div class="slot-lg scale-75">
               {modifierEmoji}

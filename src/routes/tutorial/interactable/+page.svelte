@@ -46,7 +46,7 @@
             sequence: [],
             hp: 1,
             points: 1,
-            modifiers: ["any", -1],
+            sideEffects: ["any", -1],
             evolve: {},
             devolve: {},
           },

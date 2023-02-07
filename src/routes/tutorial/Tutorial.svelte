@@ -11,10 +11,14 @@
   export let gameProps: any;
 </script>
 
-<div class="relative flex w-full flex-row items-center justify-center gap-4">
+<div
+  class="relative flex h-full w-full flex-row items-start justify-center gap-4"
+>
   <div class="relative flex w-full flex-col items-center justify-center">
     <div class="self-start p-4">
-      <h1 class="text-4xl">{header}</h1>
+      {#if header}
+        <h1 class="text-4xl">{header}</h1>
+      {/if}
       <p class="h-24 pt-2">
         {description}
       </p>
@@ -28,7 +32,9 @@
       </Node>
     </div>
   </div>
-  <div class="relative flex w-full flex-col items-center justify-center">
+  <div
+    class="relative flex w-full flex-col items-center justify-center self-center"
+  >
     <Game {...gameProps} showObjective={false} />
   </div>
 </div>

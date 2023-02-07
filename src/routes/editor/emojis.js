@@ -728,7 +728,6 @@ export const emojis = {
     ["🍻", "clinking beer mugs"],
     ["🥂", "clinking glasses"],
     ["🥃", "tumbler glass"],
-    ["🫗", "pouring liquid"],
     ["🥤", "cup with straw"],
     ["🧃", "beverage box"],
     ["🧉", "mate"],

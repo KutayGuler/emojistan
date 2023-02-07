@@ -13,8 +13,7 @@
   export let emoji = "";
   export let hp = 1;
   export let mutateConsumerTo = "";
-
-  let mutateConsumer = false;
+  export let mutateConsumer = false;
 
   let modifierPoints: Array<number> = [];
 
@@ -106,7 +105,7 @@
           on:change={updateStore}
         >
           {#each modifierPoints as point}
-            <option value={point}>{point}</option>
+            <option value={point}>{point > 0 ? `+${point}` : point}</option>
           {/each}
         </select>
       </div>

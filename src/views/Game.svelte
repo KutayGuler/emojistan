@@ -151,13 +151,17 @@
 
   for (let [id, interactable] of interactables) {
     const { emoji, ...args } = interactable;
+    if (emoji == "") continue;
     // @ts-expect-error
     _interactables[emoji] = {};
     Object.assign(_interactables[emoji], args);
   }
 
+  console.log(_interactables);
+
   for (let [id, consumable] of consumables) {
     const { emoji, ...args } = consumable;
+    if (emoji == "") continue;
     // @ts-expect-error
     _consumables[emoji] = {};
     Object.assign(_consumables[emoji], args);
@@ -165,6 +169,7 @@
 
   for (let [id, equippable] of equippables) {
     const { emoji, ...args } = equippable;
+    if (emoji == "") continue;
     // @ts-expect-error
     _equippables[emoji] = {};
     Object.assign(_equippables[emoji], args);
@@ -401,13 +406,10 @@
     }
 
     if (e.code == "Space") {
-      console.log(directionKey, ic);
-
-      // FIXME: calcOperation not working as intended in simulation map
-      console.log(calcOperation(wasdToArrow[directionKey], ic));
-
       // required so that items are not overflowing from the map
-      if (calcOperation(wasdToArrow[directionKey], ic) == 0) return;
+      if (calcOperation(wasdToArrow[directionKey], ac) == 0) {
+        return;
+      }
       let interactedItem = items.get(ic);
       console.log(interactedItem);
 
@@ -463,7 +465,7 @@
       console.log(interactable);
 
       if (interactable == undefined || interactable.executing) return;
-      let { sequence, modifiers, evolve, devolve } = interactable;
+      let { sequence, sideEffects, evolve, devolve } = interactable;
 
       for (let { type } of sequence) {
         if (type == "dropEquippable") {
@@ -485,12 +487,12 @@
       if (equippedItem.hp == 0) {
         player.inventory.splice(currentInventoryIndex, 1);
       }
-      console.log(modifiers);
+      console.log(sideEffects);
 
       let modifier =
-        modifiers.find(
+        sideEffects.find(
           (m) => equippables.get(m[0])?.emoji == equippedItem.emoji
-        ) || modifiers[0];
+        ) || sideEffects[0];
 
       console.log(modifier);
 
@@ -543,7 +545,7 @@
 
     if (e.code.includes("Control")) {
       if (
-        calcOperation(wasdToArrow[directionKey], ic) == 0 ||
+        calcOperation(wasdToArrow[directionKey], ac) == 0 ||
         !player?.inventory ||
         items.has(ic)
       ) {
@@ -755,8 +757,12 @@
   }
 
   @keyframes consumable {
+    0% {
+      transform: scale(1);
+    }
+
     100% {
-      transform: rotate(360deg);
+      transform: scale(0.85);
     }
   }
 
@@ -765,6 +771,6 @@
   }
 
   .consumable {
-    animation: consumable 5000ms infinite linear;
+    animation: consumable 1000ms infinite linear alternate;
   }
 </style>
