@@ -59,11 +59,11 @@
   -webkit-text-size-adjust: 100%;
 
   /* RULEBOXES */
-  --pusher: #0ea5e9;
-  --merger: #f97316;
+  --pusher: #64748b;
+  --merger: #334155;
   --interactable: #6366f1;
-  --consumable: #14b8a6;
-  --equippable: #78716c;
+  --consumable: #22c55e;
+  --equippable: #f97316;
 
   /* --primary: #111827; */
   --primary: white;

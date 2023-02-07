@@ -12,7 +12,7 @@
   const tutorialProps = {
     header: "Consumable",
     description:
-      "Consumable takes two emoji inputs and makes 🔴 pushable by 🟢",
+      "Consumable takes an emoji and an HP input. Emoji is the consumable itself while HP determines how much the consumer will gain or lose.",
     component: Consumable,
     node: {
       id: 0,
@@ -24,17 +24,17 @@
       borderColor: CONSUMABLE_BORDER,
     },
     props: {
-      id: -1, 
+      id: -1,
     },
     gameProps: {
       map: new EditableMap(
         new Map<number, string>([
-          [5, "🟢"],
-          [6, "🔴"],
+          [5, "🐒"],
+          [6, "🍌"],
         ])
       ),
       consumables: new Map<number, TConsumable>([
-        [0, { emoji: "🟢", hp: 1, mutateConsumerTo: "" }],
+        [0, { emoji: "🍌", hp: 1, mutateConsumerTo: "" }],
       ]),
       mapClass: "simulation",
       SIZE: 4,

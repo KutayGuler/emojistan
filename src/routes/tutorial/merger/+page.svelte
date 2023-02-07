@@ -7,7 +7,7 @@
   const tutorialProps = {
     header: "Merger",
     description:
-      "Merger takes three emoji inputs. To put it simply, 🔴 + 🟢 = 🟡",
+      "Merger takes three emoji inputs. To put it simply, ☁️ + ❄️ = 🌨️",
     component: Merger,
     node: {
       id: 0,
@@ -20,16 +20,16 @@
     },
     props: {
       id: -1,
-      slots: ["🟢", "🔴", "🟡"],
+      slots: ["☁️", "❄️", "🌨️"],
     },
     gameProps: {
       map: new EditableMap(
         new Map<number, string>([
-          [5, "🟢"],
-          [6, "🔴"],
+          [5, "☁️"],
+          [6, "❄️"],
         ])
       ),
-      mergers: new Map<number, TMerger>([[0, ["🟢", "🔴", "🟡"]]]),
+      mergers: new Map<number, TMerger>([[0, ["☁️", "❄️", "🌨️"]]]),
       mapClass: "simulation",
       SIZE: 4,
     },

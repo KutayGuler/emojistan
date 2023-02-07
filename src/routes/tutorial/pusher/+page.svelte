@@ -6,7 +6,7 @@
 
   const tutorialProps = {
     header: "Pusher",
-    description: "Pusher takes two emoji inputs and makes 🔴 pushable by 🟢",
+    description: "Pusher takes two emoji inputs and makes 🍃 pushable by 🌬️",
     component: Pusher,
     node: {
       id: 0,
@@ -19,16 +19,16 @@
     },
     props: {
       id: -1,
-      slots: ["🟢", "🔴", "push"],
+      slots: ["🌬️", "🍃", "push"],
     },
     gameProps: {
       map: new EditableMap(
         new Map<number, string>([
-          [5, "🟢"],
-          [6, "🔴"],
+          [5, "🌬️"],
+          [6, "🍃"],
         ])
       ),
-      pushers: new Map<number, TPusher>([[0, ["🟢", "🔴", "push"]]]),
+      pushers: new Map<number, TPusher>([[0, ["🌬️", "🍃", "push"]]]),
       mapClass: "simulation",
       SIZE: 4,
     },

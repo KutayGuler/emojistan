@@ -11,8 +11,8 @@
   const ruleboxes = [
     "Pusher",
     "Merger",
-    "Equippable",
     "Consumable",
+    "Equippable",
     "Interactable",
   ];
 

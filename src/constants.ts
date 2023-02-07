@@ -18,14 +18,14 @@ export const CTX_MENU_W = 108;
 /* PUSHER */
 export const PUSHER_W = 180;
 export const PUSHER_H = 90;
-export const PUSHER_BG = "#f0f9ff";
-export const PUSHER_BORDER = "#0ea5e9";
+export const PUSHER_BG = "#f8fafc";
+export const PUSHER_BORDER = "#64748b";
 
 /* MERGER */
 export const MERGER_W = 240;
 export const MERGER_H = PUSHER_H;
-export const MERGER_BG = "#fff1f2";
-export const MERGER_BORDER = "#f43f5e";
+export const MERGER_BG = "#f8fafc";
+export const MERGER_BORDER = "#334155";
 
 /* INTERACTABLE */
 export const INTERACTABLE_W = 400;
@@ -36,8 +36,8 @@ export const INTERACTABLE_BORDER = "#6366f1";
 /* CONSUMABLE */
 export const CONSUMABLE_W = 240;
 export const CONSUMABLE_H = 90;
-export const CONSUMABLE_BG = "#f0fdfa";
-export const CONSUMABLE_BORDER = "#14b8a6";
+export const CONSUMABLE_BG = "#f0fdf4";
+export const CONSUMABLE_BORDER = "#22c55e";
 
 /* CONSUMABLE */
 export const EQUIPPABLE_W = 180;

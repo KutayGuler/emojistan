@@ -97,22 +97,20 @@
     <div class="slot-lg" on:click={updateEmoji}>
       {emoji}
     </div>
-    <div class="absolute -bottom-4">
-      <select
-        class="select select-bordered select-sm text-xl"
-        title="HP"
-        bind:value={hp}
-        on:change={updateStore}
-      >
-        {#each modifierPoints as point}
-          <option value={point}>{point}</option>
-        {/each}
-      </select>
-      <!-- <label class="label cursor-pointer">
-        <span class="label-text">Mutate Consumer</span>
-        <input type="checkbox" class="checkbox" bind:checked={mutateConsumer} />
-      </label> -->
-    </div>
+    {#if !mutateConsumer}
+      <div class="absolute -bottom-4">
+        <select
+          class="select select-bordered select-sm text-xl"
+          title="HP"
+          bind:value={hp}
+          on:change={updateStore}
+        >
+          {#each modifierPoints as point}
+            <option value={point}>{point}</option>
+          {/each}
+        </select>
+      </div>
+    {/if}
   </div>
   {#if mutateConsumer}
     <!-- content here -->

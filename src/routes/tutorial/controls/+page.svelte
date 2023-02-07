@@ -16,10 +16,10 @@
   };
 </script>
 
-<!-- <Tutorial {...tutorialProps} --header={PUSHER_BORDER} /> -->
-<div class="flex h-full flex-col items-center justify-center gap-16">
-  <Game {...gameProps} />
-  <div class="flex flex-row gap-12">
+<div
+  class="relative flex h-full w-full flex-row items-center justify-center gap-4"
+>
+  <div class="items-s flex w-full flex-col gap-12">
     <div class="flex flex-col items-center justify-center">
       <p>Movement</p>
       <div class="flex w-full justify-center">
@@ -57,5 +57,17 @@
       <p>Drop Item</p>
       <kbd class="kbd">Ctrl</kbd>
     </div>
+    <div class="flex flex-col items-center justify-center">
+      <p>Change Equipped Item</p>
+      <div class="flex w-full justify-center gap-2">
+        <kbd class="kbd">1</kbd>
+        <kbd class="kbd">2</kbd>
+        <kbd class="kbd">3</kbd>
+        <kbd class="kbd">4</kbd>
+      </div>
+    </div>
+  </div>
+  <div class="relative flex w-full flex-col items-center justify-center">
+    <Game {...gameProps} showObjective={false} />
   </div>
 </div>

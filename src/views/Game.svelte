@@ -37,7 +37,9 @@
   export let statics = new Set<string>();
   export let mapClass = DEFAULT_MAP_CLASS;
   export let SIZE = DEFAULT_SIDE_LENGTH;
-  export let showUI = true;
+  export let showHP = true;
+  export let showInventory = true;
+  export let showObjective = true;
 
   /* ## STATE ## */
   let dialog: HTMLDialogElement;
@@ -70,7 +72,7 @@
   });
 
   const dispatch = createEventDispatcher();
-  const KEYS: {
+  const keys: {
     [key in Wasd]: { emoji: string; operation: number };
   } = {
     KeyW: { emoji: "⬆️", operation: -SIZE },
@@ -79,7 +81,7 @@
     KeyD: { emoji: "➡️", operation: 1 },
   };
 
-  const WASD = ["KeyW", "KeyA", "KeyS", "KeyD"];
+  const wasd = ["KeyW", "KeyA", "KeyS", "KeyD"];
 
   const wasdToArrow: { [key in Wasd]: ArrowKey } = {
     KeyW: "ArrowUp",
@@ -111,7 +113,7 @@
 
     if (ac == from) {
       ac = to;
-      ic = ac + KEYS[directionKey].operation;
+      ic = ac + keys[directionKey].operation;
     }
   }
 
@@ -143,7 +145,7 @@
 
     if (ac == fromID) {
       ac = toID;
-      ic = ac + KEYS[directionKey].operation;
+      ic = ac + keys[directionKey].operation;
     }
   }
 
@@ -167,6 +169,8 @@
     _equippables[emoji] = {};
     Object.assign(_equippables[emoji], args);
   }
+
+  console.log(_equippables);
 
   function initItems() {
     for (let [id, _emoji] of map.items) {
@@ -390,13 +394,19 @@
       return;
     }
 
-    if (WASD.includes(e.code)) {
+    if (wasd.includes(e.code)) {
       directionKey = e.code as Wasd;
-      ic = ac + KEYS[directionKey].operation;
+      ic = ac + keys[directionKey].operation;
       return;
     }
 
     if (e.code == "Space") {
+      console.log(directionKey, ic);
+
+      // FIXME: calcOperation not working as intended in simulation map
+      console.log(calcOperation(wasdToArrow[directionKey], ic));
+
+      // required so that items are not overflowing from the map
       if (calcOperation(wasdToArrow[directionKey], ic) == 0) return;
       let interactedItem = items.get(ic);
       console.log(interactedItem);
@@ -413,34 +423,38 @@
         let { hp, mutateConsumerTo } = interactedItem;
 
         if (!player) return;
-        player.hp.add(hp);
+
         if (mutateConsumerTo != "") {
           player.emoji = mutateConsumerTo;
+        } else {
+          player.hp.add(hp);
+          if (player.hp.current <= 0) {
+            items.delete(ac);
+            items = items;
+
+            for (let [id, { emoji, hp }] of items) {
+              if (typeof hp == "number") continue; // consumables and equippables' hp types are numbers
+              if (
+                hp.current > 0 &&
+                !statics.has(emoji) &&
+                !_equippables[emoji]
+              ) {
+                player = items.get(id) as Item;
+                ac = id;
+                progress = tweened(calcPlayerHpPercentage(), {
+                  duration: 200,
+                  easing: cubicOut,
+                });
+
+                return;
+              }
+            }
+          } else {
+            progress.set(calcPlayerHpPercentage());
+          }
         }
 
         items.delete(ic);
-
-        if (player.hp.current <= 0) {
-          items.delete(ac);
-          items = items;
-
-          for (let [id, { emoji, hp }] of items) {
-            if (typeof hp == "number") continue; // consumables and equippables' hp types are numbers
-            if (hp.current > 0 && !statics.has(emoji) && !_equippables[emoji]) {
-              player = items.get(id) as Item;
-              ac = id;
-              progress = tweened(calcPlayerHpPercentage(), {
-                duration: 200,
-                easing: cubicOut,
-              });
-
-              return;
-            }
-          }
-        } else {
-          progress.set(calcPlayerHpPercentage());
-        }
-
         items = items;
         return;
       }
@@ -563,10 +577,10 @@
           if (id < smallest) smallest = id;
         }
         ac = smallest;
-        ic = ac + KEYS[directionKey].operation;
+        ic = ac + keys[directionKey].operation;
       } else {
         ac = closestID;
-        ic = ac + KEYS[directionKey].operation;
+        ic = ac + keys[directionKey].operation;
       }
 
       player = items.get(ac) as Item;
@@ -592,10 +606,10 @@
           if (id > biggest) biggest = id;
         }
         ac = biggest;
-        ic = ac + KEYS[directionKey].operation;
+        ic = ac + keys[directionKey].operation;
       } else {
         ac = closestID;
-        ic = ac + KEYS[directionKey].operation;
+        ic = ac + keys[directionKey].operation;
       }
 
       player = items.get(ac) as Item;
@@ -610,14 +624,11 @@
   function noPlayer(node: any) {
     if (ac == -2) dispatch("noPlayer");
   }
-
-  // TODO: Layout should be fitting to both views
 </script>
 
 <svelte:window on:keydown={handle} />
 
 <div class={mapClass} use:noPlayer>
-  <!-- TODO: might try pseudo elements for direction emoji -->
   {#each { length: SIZE * SIZE } as _, i}
     {@const active = ac == i}
     {@const item = items.get(i)}
@@ -627,7 +638,7 @@
       {#if active}
         <div class="absolute z-[2] text-base {directionKey}">
           {player?.inventory[currentInventoryIndex]?.emoji ||
-            KEYS[directionKey].emoji}
+            keys[directionKey].emoji}
         </div>
       {/if}
       <span class:equippable class:consumable>
@@ -645,58 +656,64 @@
 </div>
 
 {#if ac != -2}
-  <label
-    title="Objective"
-    for="objective"
-    class="absolute -top-16 left-0 cursor-help text-2xl">🎯</label
-  >
+  {#if showObjective}
+    <label
+      title="Objective"
+      for="objective"
+      class="absolute -top-16 left-0 cursor-help text-2xl">🎯</label
+    >
 
-  <input type="checkbox" id="objective" class="modal-toggle" />
-  <label for="objective" class="modal cursor-pointer">
-    <label class="modal-box relative" for="">
-      <h3 class="text-lg font-bold">{$saves.currentSaveName}</h3>
-      <p class="py-4">
-        {map.objective}
-      </p>
+    <input type="checkbox" id="objective" class="modal-toggle" />
+    <label for="objective" class="modal cursor-pointer">
+      <label class="modal-box relative" for="">
+        <h3 class="text-lg font-bold">{$saves.currentSaveName}</h3>
+        <p class="py-4">
+          {map.objective}
+        </p>
+      </label>
     </label>
-  </label>
-  {@const playerHP = $progress * (player?.hp.max || 1)}
+  {/if}
   {#key ac}
-    <div
-      class="absolute -top-16 flex w-64 flex-row items-center justify-center gap-2"
-    >
-      <p class="absolute -left-4 z-10 self-start text-2xl">
-        {player?.emoji || ""}
-      </p>
-      <progress
-        title="Health Bar"
-        class="progress progress-success h-8"
-        value={$progress}
-      />
-      <p class="absolute">
-        {Number.isInteger(playerHP) ? playerHP : playerHP.toFixed(1)}
-      </p>
-    </div>
-    <div
-      title="Inventory"
-      class="absolute -bottom-20 flex w-full flex-row items-center justify-center gap-2"
-    >
-      {#each { length: MAX_INVENTORY_SIZE } as _, i}
-        {@const item = player?.inventory[i]}
-        {@const selected = i == currentInventoryIndex}
-        <div
-          class:selected
-          class="relative flex h-12 w-12 flex-col items-center justify-center bg-base-300 p-2"
-        >
-          {#if item}
-            <div>{item.emoji || ""}</div>
-            <div class="absolute -top-0.5 right-0.5 text-sm">
-              {item.hp > 1 ? item.hp : ""}
-            </div>
-          {/if}
-        </div>
-      {/each}
-    </div>
+    {#if showHP}
+      {@const playerHP = $progress * (player?.hp.max || 1)}
+      <div
+        class="absolute -top-16 flex w-64 flex-row items-center justify-center gap-2"
+      >
+        <p class="absolute -left-4 z-10 self-start text-2xl">
+          {player?.emoji || ""}
+        </p>
+        <progress
+          title="Health Bar"
+          class="progress progress-success h-8"
+          value={$progress}
+        />
+        <p class="absolute">
+          {Number.isInteger(playerHP) ? playerHP : playerHP.toFixed(1)}
+        </p>
+      </div>
+    {/if}
+    {#if showInventory}
+      <div
+        title="Inventory"
+        class="absolute -bottom-20 flex w-full flex-row items-center justify-center gap-2"
+      >
+        {#each { length: MAX_INVENTORY_SIZE } as _, i}
+          {@const item = player?.inventory[i]}
+          {@const equipped = i == currentInventoryIndex}
+          <div
+            class:equipped
+            class="relative flex h-12 w-12 flex-col items-center justify-center bg-base-300 p-2"
+          >
+            {#if item}
+              <div>{item.emoji || ""}</div>
+              <div class="absolute -top-0.5 right-0.5 text-sm">
+                {item.hp > 1 ? item.hp : ""}
+              </div>
+            {/if}
+          </div>
+        {/each}
+      </div>
+    {/if}
   {/key}
 {/if}
 
@@ -722,7 +739,7 @@
     right: var(--off);
   }
 
-  .selected {
+  .equipped {
     scale: 120%;
     border: 2px solid black;
   }
@@ -749,17 +766,5 @@
 
   .consumable {
     animation: consumable 5000ms infinite linear;
-  }
-
-  /* TODO: lose | gain hp animation */
-  @keyframes lose {
-    100% {
-      filter: grayscale(1);
-      filter: hue-rotate(-60deg);
-    }
-  }
-
-  .lose {
-    animation: lose 500ms infinite linear;
   }
 </style>

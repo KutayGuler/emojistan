@@ -11,22 +11,26 @@
   export let gameProps: any;
 </script>
 
-<div class="self-start p-4">
-  <h1 class="text-4xl">{header}</h1>
-  <p class="pt-2">
-    {description}
-  </p>
-</div>
-<div
-  style="height: {node.height}px; width: {node.width}px;"
-  class="pointer-events-none absolute z-10 mt-44"
->
-  <Node {node}>
-    <svelte:component this={component} {...props} />
-  </Node>
-</div>
-<div class="absolute flex h-full items-center">
-  <Game {...gameProps} />
+<div class="relative flex w-full flex-row items-center justify-center gap-4">
+  <div class="relative flex w-full flex-col items-center justify-center">
+    <div class="self-start p-4">
+      <h1 class="text-4xl">{header}</h1>
+      <p class="h-24 pt-2">
+        {description}
+      </p>
+    </div>
+    <div
+      style="width: {node.width}px; height: {node.height}px;"
+      class="pointer-events-none relative mt-12 mb-24 flex flex-col justify-center"
+    >
+      <Node {node}>
+        <svelte:component this={component} {...props} />
+      </Node>
+    </div>
+  </div>
+  <div class="relative flex w-full flex-col items-center justify-center">
+    <Game {...gameProps} showObjective={false} />
+  </div>
 </div>
 
 <style>
