@@ -113,7 +113,7 @@
   export let sequence: Array<SequenceItem> = [];
   export let hp = 1;
   export let points = 1;
-  export let sideEffects: Array<[number | "any", number]> = [];
+  export let sideEffects: Array<[number | "any", number]> = [["any", 0]];
   export let isStatic = false;
   export let evolve = new Evolve(false, "", 2);
   export let devolve = new Devolve(false, "");
@@ -126,6 +126,7 @@
 
   onMount(() => {
     let obj = $interactables.get(id);
+    console.log(obj, isStatic);
 
     if (obj) {
       ({ emoji, sequence, hp, points, sideEffects, isStatic, evolve, devolve } =

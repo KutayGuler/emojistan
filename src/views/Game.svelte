@@ -42,8 +42,6 @@
   export let showObjective = true;
 
   /* ## STATE ## */
-  let dialog: HTMLDialogElement;
-  0;
   let levelCompleted = false;
   let ac = -2; // ACTIVE CELL
   let ic: number; // INTERACTED CELL
@@ -279,8 +277,11 @@
       }
     },
     resetLevel: () => {
+      items.clear();
       backgrounds = new Map(map.backgrounds);
+      ac = -2;
       initItems();
+      items = items;
       levelCompleted = false;
     },
     completeLevel: () => (levelCompleted = true),
@@ -649,10 +650,22 @@
     </div>
   {/each}
   {#if levelCompleted}
-    <dialog open bind:this={dialog} transition:scale>
-      LEVEL COMPLETED!
-      <button on:click={() => (levelCompleted = !levelCompleted)}>OK</button>
-      <button on:click={() => m.resetLevel()}>REPLAY</button>
+    <!--   -->
+    <dialog
+      open
+      style="background-color: rgba(0, 0, 0.5, 0.5);"
+      class="absolute z-20 flex h-full w-1/2 flex-col items-center justify-center self-center "
+      transition:scale
+    >
+      <p class="w-full text-white">LEVEL COMPLETED!</p>
+      <button
+        class="btn btn-success text-success-content"
+        on:click={() => m.resetLevel()}>REPLAY</button
+      >
+      <button
+        class="btn btn-error text-error-content"
+        on:click={() => (levelCompleted = !levelCompleted)}>QUIT</button
+      >
     </dialog>
   {/if}
 </div>

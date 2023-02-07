@@ -12,7 +12,7 @@
   const firstTutorialProps = {
     header: "Consumable",
     description:
-      "Consumable takes an emoji and an HP input. Emoji is the consumable itself while HP determines how much the consumer will gain or lose.",
+      "Consumable takes an emoji and a number input. Emoji is the consumable itself and the number below it is the HP side effect consumer will be subjected to.",
     component: Consumable,
     node: {
       id: 0,
@@ -44,7 +44,7 @@
 
   const secondTutorialProps = {
     description:
-      "You can also enable mutation by clicking the 🧬 icon on the top left corner. This option opens up another slot to determine what the consumer will mutate into.",
+      "On the top left corner, the 🧬 icon enables mutation and disables the HP side effect. If mutation is enabled, another slot opens up to determine what the consumer will mutate into.",
     component: Consumable,
     node: {
       id: 0,
@@ -79,3 +79,5 @@
 
 <Tutorial {...firstTutorialProps} --header={CONSUMABLE_BORDER} />
 <Tutorial {...secondTutorialProps} />
+
+<p class="self-start p-4">Consumables cannot be equipped.</p>

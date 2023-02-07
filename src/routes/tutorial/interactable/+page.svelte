@@ -1,5 +1,12 @@
 <script lang="ts">
-  import { type Interactable as TInteractable, EditableMap } from "$src/types";
+  import {
+    Interactable as TInteractable,
+    Equippable,
+    EditableMap,
+    Evolve,
+    Devolve,
+    SequenceItem,
+  } from "$src/types";
   import {
     INTERACTABLE_BG,
     INTERACTABLE_BORDER,
@@ -9,10 +16,9 @@
   import Tutorial from "../Tutorial.svelte";
   import Interactable from "$components/Interactable.svelte";
 
-  const tutorialProps = {
+  const firstTutorialProps = {
     header: "Interactable",
-    description:
-      "Interactable takes three emoji inputs. To put it simply, 🔴 + 🟢 = 🟡",
+    description: "", // TODO: Description
     component: Interactable,
     node: {
       id: 0,
@@ -25,37 +31,66 @@
     },
     props: {
       id: -1,
-      slots: {
-        emoji: "X",
-        hp: 1,
-        points: 1,
-      },
+      emoji: "🚪",
+      isStatic: true,
+      sideEffects: [
+        ["any", 0],
+        [-69, -1],
+      ],
     },
     gameProps: {
       map: new EditableMap(
         new Map<number, string>([
-          [5, "🟢"],
-          [6, "🔴"],
+          [0, "🐒"],
+          [2, "🧱"],
+          [3, "🍌"],
+          [5, "🗝️"],
+          [6, "🧱"],
+          [8, "🚪"],
+          [9, "🧱"],
+          [10, "🧱"],
         ])
       ),
-      interactables: new Map<number, Interactable>([
+      equippables: new Map<number, Equippable>([
+        [-69, new Equippable("🗝️", 1)],
+      ]),
+      interactables: new Map<number, TInteractable>([
         [
-          0,
-          {
-            emoji: "",
-            sequence: [],
-            hp: 1,
-            points: 1,
-            sideEffects: ["any", -1],
-            evolve: {},
-            devolve: {},
-          },
+          -2,
+          new TInteractable(
+            "🚪",
+            [],
+            1,
+            1,
+            [
+              ["any", 0],
+              [-69, -1],
+            ],
+            true,
+            new Evolve(false, "", 2),
+            new Devolve(false, "")
+          ),
+        ],
+        [
+          -3,
+          new TInteractable(
+            "🍌",
+            // @ts-expect-error
+            [new SequenceItem("completeLevel")],
+            1,
+            1,
+            [["any", -1]],
+            false,
+            new Evolve(false, "", 2),
+            new Devolve(false, "")
+          ),
         ],
       ]),
+
       mapClass: "simulation",
       SIZE: 4,
     },
   };
 </script>
 
-<Tutorial {...tutorialProps} --header={INTERACTABLE_BORDER} />
+<Tutorial {...firstTutorialProps} --header={INTERACTABLE_BORDER} />

@@ -5,6 +5,7 @@
     Interactable,
     Devolve,
     Evolve,
+    SequenceItem,
   } from "$src/types";
   import {
     EQUIPPABLE_BG,
@@ -17,8 +18,8 @@
 
   const tutorialProps = {
     header: "Equippable",
-    // TODO: Description
-    description: "",
+    description:
+      "Just like Consumables, Equippables also take an emoji and a number input. Emoji is the equippable itself and the number is the amount of times you can use it before it disappears.",
     component: Equippable,
     node: {
       id: 0,
@@ -38,6 +39,7 @@
         new Map<number, string>([
           [0, "🐒"],
           [2, "🧱"],
+          [3, "🍌"],
           [5, "🗝️"],
           [6, "🧱"],
           [8, "🚪"],
@@ -45,6 +47,7 @@
           [10, "🧱"],
         ])
       ),
+      statics: new Set<string>(["🧱", "🚪", "🍌"]),
       equippables: new Map<number, TEquippable>([
         [-69, new TEquippable("🗝️", 1)],
       ]),
@@ -60,7 +63,21 @@
               ["any", 0],
               [-69, -1],
             ],
-            false,
+            true,
+            new Evolve(false, "", 2),
+            new Devolve(false, "")
+          ),
+        ],
+        [
+          -2,
+          new Interactable(
+            "🍌",
+            // @ts-expect-error
+            [new SequenceItem("completeLevel")],
+            1,
+            1,
+            [["any", -1]],
+            true,
             new Evolve(false, "", 2),
             new Devolve(false, "")
           ),
@@ -74,3 +91,5 @@
 </script>
 
 <Tutorial {...tutorialProps} --header={EQUIPPABLE_BORDER} />
+
+<p class="self-start p-4">Equippables can only be used on Interactables.</p>
