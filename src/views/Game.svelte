@@ -71,12 +71,12 @@
 
   const dispatch = createEventDispatcher();
   const KEYS: {
-    [key in Wasd]: { style: string; emoji: string; operation: number };
+    [key in Wasd]: { emoji: string; operation: number };
   } = {
-    KeyW: { style: `top: -30%;`, emoji: "⬆️", operation: -SIZE },
-    KeyA: { style: `left: -30%;`, emoji: "⬅️", operation: -1 },
-    KeyS: { style: `bottom: -30%;`, emoji: "⬇️", operation: SIZE },
-    KeyD: { style: `right: -30%;`, emoji: "➡️", operation: 1 },
+    KeyW: { emoji: "⬆️", operation: -SIZE },
+    KeyA: { emoji: "⬅️", operation: -1 },
+    KeyS: { emoji: "⬇️", operation: SIZE },
+    KeyD: { emoji: "➡️", operation: 1 },
   };
 
   const WASD = ["KeyW", "KeyA", "KeyS", "KeyD"];
@@ -610,21 +610,29 @@
   function noPlayer(node: any) {
     if (ac == -2) dispatch("noPlayer");
   }
+
+  // TODO: Layout should be fitting to both views
 </script>
 
 <svelte:window on:keydown={handle} />
 
 <div class={mapClass} use:noPlayer>
+  <!-- TODO: might try pseudo elements for direction emoji -->
   {#each { length: SIZE * SIZE } as _, i}
     {@const active = ac == i}
+    {@const item = items.get(i)}
+    {@const equippable = item instanceof Equippable}
+    {@const consumable = item instanceof Consumable}
     <div style:background={backgrounds.get(i) || map.dbg}>
       {#if active}
-        <div class="direction scale-75" style={KEYS[directionKey].style}>
+        <div class="absolute z-[2] text-base {directionKey}">
           {player?.inventory[currentInventoryIndex]?.emoji ||
             KEYS[directionKey].emoji}
         </div>
       {/if}
-      {items.get(i)?.emoji || ""}
+      <span class:equippable class:consumable>
+        {item?.emoji || ""}
+      </span>
     </div>
   {/each}
   {#if levelCompleted}
@@ -636,7 +644,7 @@
   {/if}
 </div>
 
-{#if mapClass == DEFAULT_MAP_CLASS && ac != -2}
+{#if ac != -2}
   <label
     title="Objective"
     for="objective"
@@ -693,8 +701,65 @@
 {/if}
 
 <style>
+  /* DIRECTIONS */
+  :root {
+    --off: -25%;
+  }
+
+  .KeyW {
+    top: var(--off);
+  }
+
+  .KeyA {
+    left: var(--off);
+  }
+
+  .KeyS {
+    bottom: var(--off);
+  }
+
+  .KeyD {
+    right: var(--off);
+  }
+
   .selected {
     scale: 120%;
     border: 2px solid black;
+  }
+
+  @keyframes equippable {
+    0% {
+      transform: translateY(1px);
+    }
+
+    100% {
+      transform: translateY(-1px);
+    }
+  }
+
+  @keyframes consumable {
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  .equippable {
+    animation: equippable 500ms linear infinite alternate;
+  }
+
+  .consumable {
+    animation: consumable 5000ms infinite linear;
+  }
+
+  /* TODO: lose | gain hp animation */
+  @keyframes lose {
+    100% {
+      filter: grayscale(1);
+      filter: hue-rotate(-60deg);
+    }
+  }
+
+  .lose {
+    animation: lose 500ms infinite linear;
   }
 </style>

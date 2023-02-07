@@ -8,6 +8,14 @@
   } from "../../constants";
   import { page } from "$app/stores";
 
+  const ruleboxes = [
+    "Pusher",
+    "Merger",
+    "Equippable",
+    "Consumable",
+    "Interactable",
+  ];
+
   const colors: { [key: string]: string } = {
     Pusher: PUSHER_BORDER,
     Merger: MERGER_BORDER,
@@ -26,7 +34,12 @@
     <div class="drawer-side">
       <label for="my-drawer-2" class="drawer-overlay" />
       <ul class="menu m-4 w-80 rounded-md bg-base-200 text-base-content">
-        {#each ["Pusher", "Merger", "Equippable", "Consumable", "Interactable"] as link}
+        <li
+          class={$page.url.pathname.includes("controls") ? "bg-base-300" : ""}
+        >
+          <a href="../tutorial/controls">Controls</a>
+        </li>
+        {#each ruleboxes as link}
           <li
             class={link}
             style={$page.url.pathname.includes(link.toLowerCase())

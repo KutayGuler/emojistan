@@ -10,9 +10,9 @@
   import { onDestroy, onMount } from "svelte";
 
   export let id: number;
-  let emoji = "";
-  let hp = 1;
-  let mutateConsumerTo = "";
+  export let emoji = "";
+  export let hp = 1;
+  export let mutateConsumerTo = "";
 
   let mutateConsumer = false;
 
@@ -97,7 +97,7 @@
     <div class="slot-lg" on:click={updateEmoji}>
       {emoji}
     </div>
-    <div class="absolute -bottom-2">
+    <div class="absolute -bottom-4">
       <select
         class="select select-bordered select-sm text-xl"
         title="HP"

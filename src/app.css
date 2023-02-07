@@ -16,15 +16,15 @@
   }
 
   .simulation {
-    @apply grid w-auto grid-cols-4 grid-rows-4 gap-1;
+    @apply grid w-auto grid-cols-4 grid-rows-4 gap-1 text-2xl;
   }
 
   .slot {
-    @apply flex h-12 w-12 flex-col items-center justify-center rounded-full border-2 bg-white text-lg;
+    @apply flex h-12 w-12 flex-col items-center justify-center rounded border-2 bg-white text-lg;
   }
 
   .slot-lg {
-    @apply flex h-24 w-24 flex-col items-center justify-center rounded-full border-2 bg-white text-4xl;
+    @apply flex h-20 w-20 flex-col items-center justify-center rounded border-2 bg-white text-4xl;
   }
 
   .aside {
@@ -42,11 +42,6 @@
     border-radius: 0.25rem;
     --tw-bg-opacity: 1;
     background-color: hsl(var(--b3, var(--b2)) / var(--tw-bg-opacity));
-  }
-
-  .direction {
-    position: absolute;
-    z-index: 2;
   }
 }
 

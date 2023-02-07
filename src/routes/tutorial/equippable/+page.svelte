@@ -25,7 +25,6 @@
     },
     props: {
       id: -1,
-      slots: ["🟢", "🔴", "push"], // TODO: Add appropriate props
     },
     gameProps: {
       map: new EditableMap(

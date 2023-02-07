@@ -5,6 +5,7 @@
     MIN_DURATION,
     MIN_INDEX,
     DEFAULT_SIDE_LENGTH,
+    EQUIPPABLE_BORDER,
   } from "$src/constants";
   // interactables = {
   // "emoji": {interactable}
@@ -311,7 +312,7 @@
       <div class="slot-lg" on:click={updateDevolveEmoji}>
         {devolve.to}
       </div>
-      <div class="absolute -bottom-2">
+      <div class="absolute -bottom-4">
         <select
           disabled
           class="select select-bordered select-sm text-xl"
@@ -326,7 +327,7 @@
     <div class="slot-lg" on:click={updateEmoji}>
       {emoji}
     </div>
-    <div class="absolute -bottom-2">
+    <div class="absolute -bottom-4">
       <select
         class="select select-bordered select-sm text-xl"
         title="HP"
@@ -347,7 +348,7 @@
       <div class="slot-lg" on:click={updateEvolveEmoji}>
         {evolve.to}
       </div>
-      <div class="absolute -bottom-2">
+      <div class="absolute -bottom-4">
         <select
           class="select select-bordered select-sm text-xl"
           title="HP"
@@ -381,8 +382,10 @@
     <div
       class="flex w-full flex-row items-center justify-center gap-2 pb-6 text-xl"
     >
-      <p>Side Effects ({modifiers.length} / 3)</p>
-      <div class="dropdown-hover dropdown dropdown-right">
+      <p style="color: {EQUIPPABLE_BORDER};">
+        Side Effects ({modifiers.length} / 3)
+      </p>
+      <div class="dropdown-hover dropdown-right dropdown">
         <label for="" tabindex="0" class="btn text-2xl">+</label>
         <ul
           tabindex="0"
@@ -418,7 +421,7 @@
               {equippableID}
             </div>
             <select
-              class="select select-bordered select-sm absolute -bottom-2"
+              class="select select-bordered select-sm absolute -bottom-4"
               bind:value
               on:change={updateStore}
             >
@@ -428,14 +431,14 @@
             </select>
           {:else if modifierEmoji}
             <button
-              class="absolute top-0 right-0 text-lg"
+              class="absolute -top-2 -right-2 text-lg"
               on:click={() => removeFromModifiers(i)}>🞫</button
             >
             <div class="slot-lg scale-75">
               {modifierEmoji}
             </div>
             <select
-              class="select select-bordered select-sm absolute -bottom-2"
+              class="select select-bordered select-sm absolute -bottom-4"
               bind:value
               on:change={updateStore}
             >

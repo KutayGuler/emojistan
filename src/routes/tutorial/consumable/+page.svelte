@@ -24,8 +24,7 @@
       borderColor: CONSUMABLE_BORDER,
     },
     props: {
-      id: -1,
-      slots: ["🟢", "🔴", "push"], // TODO: Add appropriate props
+      id: -1, 
     },
     gameProps: {
       map: new EditableMap(

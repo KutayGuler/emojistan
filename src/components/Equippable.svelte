@@ -10,8 +10,8 @@
   import { Equippable } from "$src/types";
 
   export let id: number;
-  let emoji: string;
-  let hp: number;
+  let emoji = "";
+  let hp = 1;
 
   let hps: Array<number> = [];
 
@@ -64,7 +64,7 @@
     <div class="slot-lg" on:click={updateEmoji}>
       {emoji}
     </div>
-    <div class="absolute -bottom-2">
+    <div class="absolute -bottom-4">
       <select
         class="select select-bordered select-sm text-xl"
         title="HP"
