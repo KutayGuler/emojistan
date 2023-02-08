@@ -9,6 +9,8 @@
   export let node: TNode;
   export let props: any;
   export let gameProps: any;
+  export let incremental: Array<number> = [];
+  export let index = 0;
 </script>
 
 <div
@@ -30,6 +32,12 @@
       <Node {node}>
         <svelte:component this={component} {...props} />
       </Node>
+      {#if incremental.length}
+        <div
+          style:height={incremental[index] + "px"}
+          class="absolute bottom-0 z-20 w-full bg-indigo-50"
+        />
+      {/if}
     </div>
   </div>
   <div
