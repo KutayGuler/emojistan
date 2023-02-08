@@ -31,6 +31,8 @@
       pushers: new Map<number, TPusher>([[0, ["🌬️", "🍃", "push"]]]),
       mapClass: "simulation",
       SIZE: 4,
+      showHP: false,
+      showInventory: false,
     },
   };
 </script>

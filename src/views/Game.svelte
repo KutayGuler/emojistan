@@ -288,6 +288,7 @@
     },
     completeLevel: () => (levelCompleted = true),
   };
+  // TODO: Add "Game Over (no players left)"
 
   function getCollisionType(key1: string, key2: string): CollisionType {
     if (!_collisions[key1]) return "bump";
@@ -433,7 +434,21 @@
           player.emoji = mutateConsumerTo;
         } else {
           player.hp.add(hp);
+
           if (player.hp.current <= 0) {
+            let playerDevolve = _interactables[player?.emoji || ""]?.devolve;
+
+            if (playerDevolve.enabled) {
+              player.emoji = playerDevolve.to;
+              player.hp.max = _interactables[playerDevolve.to]?.hp || 1;
+              player.hp.current = player.hp.max;
+              progress.set(calcPlayerHpPercentage());
+              items.delete(ic);
+
+              items = items;
+              return;
+            }
+
             items.delete(ac);
             items = items;
 
@@ -454,9 +469,17 @@
                 return;
               }
             }
-          } else {
-            progress.set(calcPlayerHpPercentage());
           }
+
+          let playerEvolve = _interactables[player?.emoji || ""]?.evolve;
+
+          if (playerEvolve.enabled && player.hp.current == playerEvolve?.at) {
+            player.emoji = playerEvolve.to;
+            player.hp.max = _interactables[playerEvolve.to]?.hp || 1;
+            player.hp.current = player.hp.max;
+          }
+
+          progress.set(calcPlayerHpPercentage());
         }
 
         items.delete(ic);
@@ -492,15 +515,15 @@
       }
       console.log(sideEffects);
 
-      let modifier =
+      let sideEffect =
         sideEffects.find(
           (m) => equippables.get(m[0])?.emoji == equippedItem.emoji
         ) || sideEffects[0];
 
-      console.log(modifier);
+      console.log(sideEffect);
 
-      if (modifier[1] == 0) return;
-      interactedItem.hp.current += modifier[1];
+      if (sideEffect[1] == 0) return;
+      interactedItem.hp.current += sideEffect[1];
 
       for (let { type, ...args } of sequence) {
         if (type == "wait") {

@@ -9,6 +9,7 @@
   import { page } from "$app/stores";
 
   const ruleboxes = [
+    "Ruleboxes",
     "Pusher",
     "Merger",
     "Consumable",
@@ -26,7 +27,7 @@
 </script>
 
 <main class="flex flex-row">
-  <div class="drawer-mobile drawer">
+  <div class="drawer drawer-mobile">
     <input id="my-drawer-2" type="checkbox" class="drawer-toggle" />
     <div class="drawer-content flex flex-col items-center justify-start">
       <slot />

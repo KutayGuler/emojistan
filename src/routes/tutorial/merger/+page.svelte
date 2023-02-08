@@ -32,6 +32,8 @@
       mergers: new Map<number, TMerger>([[0, ["☁️", "❄️", "🌨️"]]]),
       mapClass: "simulation",
       SIZE: 4,
+      showHP: false,
+      showInventory: false,
     },
   };
 </script>
