@@ -19,7 +19,7 @@
 
   // TODO: Figure out how to display side effects other than "any"
   const incremental = [464, 440, 400, 164, 0];
-  let index = 4;
+  let index = 0;
 
   const tutorialProps = [
     {
@@ -299,13 +299,17 @@
       },
     },
   ];
+
+  $: props = tutorialProps[index];
+  // FIXME: Interactable not rerendering
 </script>
 
-{#each tutorialProps as props, i}
-  {#if i == index}
-    <Tutorial {...props} --header={INTERACTABLE_BORDER} {index} {incremental} />
-  {/if}
-{/each}
+{#key index}
+  <Tutorial {...props} --header={INTERACTABLE_BORDER} {index} {incremental} />
+{/key}
+
+<!-- {#each tutorialProps as props, i}
+{/each} -->
 
 <div class="flex">
   <button class="btn" on:click={() => index--}>PREV</button>
