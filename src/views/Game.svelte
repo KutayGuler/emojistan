@@ -202,7 +202,9 @@
 
   initItems();
 
-  // FIXME: There is a problem with items that have maxxed and plussed out their hps when they are damaged
+  // FIXME: There is a problem with items that have maxxed
+  // and plussed out their hps when they are damaged
+  // (percentage issue)
 
   let player = items.get(ac) as Item;
   $: player = items.get(ac) as Item;
@@ -697,11 +699,8 @@
         <p class="absolute -left-4 z-10 self-start text-2xl">
           {player?.emoji || ""}
         </p>
-        <progress
-          title="Health Bar"
-          class="progress progress-success h-8"
-          value={$progress}
-        />
+        <!-- progress-success -->
+        <progress title="Health Bar" class="progress h-8" value={$progress} />
         <p class="absolute">
           {Number.isInteger(playerHP) ? playerHP : playerHP.toFixed(1)}
         </p>
@@ -760,20 +759,12 @@
   }
 
   @keyframes equippable {
-    0% {
-      transform: translateY(1px);
-    }
-
     100% {
-      transform: translateY(-1px);
+      transform: translateY(-2px);
     }
   }
 
   @keyframes consumable {
-    0% {
-      transform: scale(1);
-    }
-
     100% {
       transform: scale(0.85);
     }
@@ -784,6 +775,10 @@
   }
 
   .consumable {
-    animation: consumable 1000ms infinite linear alternate;
+    animation: consumable 1000ms linear infinite alternate;
+  }
+
+  progress::-webkit-progress-value {
+    background: var(--consumable);
   }
 </style>

@@ -35,7 +35,7 @@
       {#if incremental.length}
         <div
           style:height={incremental[index] + "px"}
-          class="absolute bottom-0 z-20 w-full bg-indigo-50"
+          class="absolute bottom-0 z-10 w-full bg-indigo-50"
         />
       {/if}
     </div>
