@@ -15,267 +15,317 @@
     INTERACTABLE_W,
   } from "$src/constants";
   import Tutorial from "../Tutorial.svelte";
-  import Interactable from "$components/Interactable.svelte";
+  import { goto } from "$app/navigation";
 
   // TODO: Figure out how to display side effects other than "any"
   // TODO: multipage all that shit?
-  const veilHeights = [464, 440, 400, 164, 0];
-  const component = Interactable;
-  const node = {
-    id: 0,
-    component: "interactable",
-    position: { x: 0, y: 0 },
-    width: INTERACTABLE_W,
-    height: INTERACTABLE_H,
-    bgColor: INTERACTABLE_BG,
-    borderColor: INTERACTABLE_BORDER,
-  };
+  // const veilHeights = [464, 440, 400, 164, 0];
+  const veilHeight = 0;
   let index = 0;
+
+  // export let data;
+  // console.log(data);
 
   // TODO: Try resetting props based on previous props
 
-  const tutorialProps = [
-    {
-      header: "Interactable",
-      description:
-        "Interactables are the most complex ruleboxes. We will explain each feature with examples.",
-      props: {
-        id: -1,
-        emoji: "🌵",
-        isStatic: true,
-      },
-      gameProps: {
-        map: new EditableMap(
-          new Map<number, string>([
-            [5, "👶"],
-            [3, "🌵"],
-            [6, "🌵"],
-            [9, "🌵"],
-            [12, "🌵"],
-            [7, "👶"],
-          ])
-        ),
-        statics: new Set<string>(["🌵"]),
-        interactables: new Map<number, TInteractable>([
-          [
-            -1,
-            new TInteractable(
-              "🌵",
-              [],
-              1,
-              1,
-              [["any", 0]],
-              true,
-              new Evolve(false, "", 2),
-              new Devolve(false, "")
-            ),
-          ],
-        ]),
-        mapClass: "simulation",
-        SIZE: 4,
-      },
+  const tutorialProps = {
+    header: "Interactable",
+    description:
+      "Interactables are the most complex ruleboxes. We will explain each feature with examples.",
+    node: {
+      id: 0,
+      component: "interactable",
+      position: { x: 0, y: 0 },
+      width: INTERACTABLE_W,
+      height: INTERACTABLE_H,
+      bgColor: INTERACTABLE_BG,
+      borderColor: INTERACTABLE_BORDER,
     },
-    // EVOLUTION (monkey with banana, eats 4 bananas, evolves to human)
-    {
-      header: "Interactable",
-      description:
-        "Interactables are the most complex ruleboxes. We will explain each feature with examples.",
-      props: {
-        id: -1,
-        emoji: "👶",
-        evolve: new Evolve(true, "🚶", 5),
-      },
-      gameProps: {
-        map: new EditableMap(
-          new Map<number, string>([
-            [0, "👶"],
-            [10, "🍼"],
-            [11, "🍼"],
-            [14, "🍼"],
-            [15, "🍼"],
-          ])
-        ),
-        statics: new Set<string>(["🍼"]),
-        consumables: new Map<number, Consumable>([
-          [-2, { emoji: "🍼", hp: 1, mutateConsumerTo: "" }],
-        ]),
-        interactables: new Map<number, TInteractable>([
-          [
-            -3,
-            new TInteractable(
-              "👶",
-              [],
-              1,
-              1,
-              [],
-              true,
-              new Evolve(true, "🚶", 5),
-              new Devolve(false, "")
-            ),
-          ],
-        ]),
+    props: {
+      id: -1,
+      emoji: "🌵",
+      isStatic: true,
+      evolve: new Evolve(false, "", 2),
+      devolve: new Devolve(false, ""),
+      hp: 1,
+    },
+    gameProps: {
+      map: new EditableMap(
+        new Map<number, string>([
+          [5, "👶"],
+          [3, "🌵"],
+          [6, "🌵"],
+          [9, "🌵"],
+          [12, "🌵"],
+          [7, "👶"],
+        ])
+      ),
+      statics: new Set<string>(["🌵"]),
+      interactables: new Map<number, TInteractable>([
+        [
+          -1,
+          new TInteractable(
+            "🌵",
+            [],
+            1,
+            1,
+            [["any", 0]],
+            true,
+            new Evolve(false, "", 2),
+            new Devolve(false, "")
+          ),
+        ],
+      ]),
+      mapClass: "simulation",
+      SIZE: 4,
+    },
+  };
 
-        mapClass: "simulation",
-        SIZE: 4,
-      },
-    },
-    //  DEVOLUTION (human eats 4 🧪's devolves to 🧟)
-    {
-      header: "Interactable",
-      description:
-        "Interactables are the most complex ruleboxes. We will explain each feature with examples.",
-      props: {
-        id: -1,
-        emoji: "🚶",
-        devolve: new Devolve(true, "🧟"),
-        hp: 4,
-      },
-      gameProps: {
-        map: new EditableMap(
-          new Map<number, string>([
-            [0, "🚶"],
-            [10, "🧪"],
-            [11, "🧪"],
-            [14, "🧪"],
-            [15, "🧪"],
-          ])
-        ),
-        statics: new Set<string>(["🧪"]),
-        consumables: new Map<number, Consumable>([
-          [-2, { emoji: "🧪", hp: -1, mutateConsumerTo: "" }],
-        ]),
-        interactables: new Map<number, TInteractable>([
-          [
-            -3,
-            new TInteractable(
-              "🚶",
-              [],
-              4,
-              1,
-              [],
-              true,
-              new Evolve(false, "", 2),
-              new Devolve(true, "🧟")
-            ),
-          ],
-        ]),
+  // const tutorialProps = [
+  //   {
+  //     header: "Interactable",
+  //     description:
+  //       "Interactables are the most complex ruleboxes. We will explain each feature with examples.",
+  //     props: {
+  //       id: -1,
+  //       emoji: "🌵",
+  //       isStatic: true,
+  //       evolve: new Evolve(false, "", 2),
+  //       devolve: new Devolve(false, ""),
+  //       hp: 1,
+  //     },
+  //     gameProps: {
+  //       map: new EditableMap(
+  //         new Map<number, string>([
+  //           [5, "👶"],
+  //           [3, "🌵"],
+  //           [6, "🌵"],
+  //           [9, "🌵"],
+  //           [12, "🌵"],
+  //           [7, "👶"],
+  //         ])
+  //       ),
+  //       statics: new Set<string>(["🌵"]),
+  //       interactables: new Map<number, TInteractable>([
+  //         [
+  //           -1,
+  //           new TInteractable(
+  //             "🌵",
+  //             [],
+  //             1,
+  //             1,
+  //             [["any", 0]],
+  //             true,
+  //             new Evolve(false, "", 2),
+  //             new Devolve(false, "")
+  //           ),
+  //         ],
+  //       ]),
+  //       mapClass: "simulation",
+  //       SIZE: 4,
+  //     },
+  //   },
+  //   // EVOLUTION (monkey with banana, eats 4 bananas, evolves to human)
+  //   {
+  //     header: "Interactable",
+  //     description:
+  //       "Interactables are the most complex ruleboxes. We will explain each feature with examples.",
+  //     props: {
+  //       id: -1,
+  //       emoji: "👶",
+  //       isStatic: false,
+  //       evolve: new Evolve(true, "🚶", 5),
+  //       devolve: new Devolve(false, ""),
+  //       hp: 1,
+  //     },
+  //     gameProps: {
+  //       map: new EditableMap(
+  //         new Map<number, string>([
+  //           [0, "👶"],
+  //           [10, "🍼"],
+  //           [11, "🍼"],
+  //           [14, "🍼"],
+  //           [15, "🍼"],
+  //         ])
+  //       ),
+  //       statics: new Set<string>(["🍼"]),
+  //       consumables: new Map<number, Consumable>([
+  //         [-2, { emoji: "🍼", hp: 1, mutateConsumerTo: "" }],
+  //       ]),
+  //       interactables: new Map<number, TInteractable>([
+  //         [
+  //           -3,
+  //           new TInteractable(
+  //             "👶",
+  //             [],
+  //             1,
+  //             1,
+  //             [],
+  //             true,
+  //             new Evolve(true, "🚶", 5),
+  //             new Devolve(false, "")
+  //           ),
+  //         ],
+  //       ]),
 
-        mapClass: "simulation",
-        SIZE: 4,
-      },
-    },
-    //SIDE EFFECTS (door and monkey, interacting with "any" will be of no use, will have to use a key)
-    {
-      header: "Interactable",
-      description: "",
-      props: {
-        id: -1,
-        emoji: "🚪",
-        isStatic: true,
-      },
-      gameProps: {
-        map: new EditableMap(
-          new Map<number, string>([
-            [0, "🐒"],
-            [2, "🚪"],
-            [6, "🧱"],
-            [10, "🧱"],
-            [12, "🗝️"],
-            [14, "🧱"],
-            [15, "🍌"],
-          ])
-        ),
-        statics: new Set<string>(["🧱", "🚪", "🍌"]),
-        equippables: new Map<number, Equippable>([
-          [-69, new Equippable("🗝️", 1)],
-        ]),
-        interactables: new Map<number, TInteractable>([
-          [
-            -1,
-            new TInteractable(
-              "🚪",
-              [],
-              1,
-              1,
-              [
-                ["any", 0],
-                [-69, -1],
-              ],
-              true,
-              new Evolve(false, "", 2),
-              new Devolve(false, "")
-            ),
-          ],
-        ]),
-        mapClass: "simulation",
-        SIZE: 4,
-      },
-    },
-    // // EVENT SEQUENCE (the level from equippable)
-    {
-      header: "Interactable",
-      description: "",
-      props: {
-        id: -1,
-        emoji: "🚪",
-        isStatic: true,
-      },
-      gameProps: {
-        map: new EditableMap(
-          new Map<number, string>([
-            [0, "🐒"],
-            [2, "🚪"],
-            [6, "🧱"],
-            [10, "🧱"],
-            [12, "🗝️"],
-            [14, "🧱"],
-            [15, "🍌"],
-          ])
-        ),
-        statics: new Set<string>(["🧱", "🚪", "🍌"]),
-        equippables: new Map<number, Equippable>([
-          [-69, new Equippable("🗝️", 1)],
-        ]),
-        interactables: new Map<number, TInteractable>([
-          [
-            -1,
-            new TInteractable(
-              "🚪",
-              [],
-              1,
-              1,
-              [
-                ["any", 0],
-                [-69, -1],
-              ],
-              true,
-              new Evolve(false, "", 2),
-              new Devolve(false, "")
-            ),
-          ],
-        ]),
-        mapClass: "simulation",
-        SIZE: 4,
-      },
-    },
-  ];
+  //       mapClass: "simulation",
+  //       SIZE: 4,
+  //     },
+  //   },
+  //   //  DEVOLUTION (human eats 4 🧪's devolves to 🧟)
+  //   {
+  //     header: "Interactable",
+  //     description:
+  //       "Interactables are the most complex ruleboxes. We will explain each feature with examples.",
+  //     props: {
+  //       id: -1,
+  //       emoji: "🚶",
+  //       evolve: new Evolve(false, "", 2),
+  //       devolve: new Devolve(true, "🧟"),
+  //       hp: 4,
+  //     },
+  //     gameProps: {
+  //       map: new EditableMap(
+  //         new Map<number, string>([
+  //           [0, "🚶"],
+  //           [10, "🧪"],
+  //           [11, "🧪"],
+  //           [14, "🧪"],
+  //           [15, "🧪"],
+  //         ])
+  //       ),
+  //       statics: new Set<string>(["🧪"]),
+  //       consumables: new Map<number, Consumable>([
+  //         [-2, { emoji: "🧪", hp: -1, mutateConsumerTo: "" }],
+  //       ]),
+  //       interactables: new Map<number, TInteractable>([
+  //         [
+  //           -3,
+  //           new TInteractable(
+  //             "🚶",
+  //             [],
+  //             4,
+  //             1,
+  //             [],
+  //             true,
+  //             new Evolve(false, "", 2),
+  //             new Devolve(true, "🧟")
+  //           ),
+  //         ],
+  //       ]),
 
-  $: props = tutorialProps[index];
+  //       mapClass: "simulation",
+  //       SIZE: 4,
+  //     },
+  //   },
+  //   //SIDE EFFECTS (door and monkey, interacting with "any" will be of no use, will have to use a key)
+  //   {
+  //     header: "Interactable",
+  //     description: "",
+  //     props: {
+  //       id: -1,
+  //       emoji: "🚪",
+  //       isStatic: true,
+  //       evolve: new Evolve(false, "", 2),
+  //       devolve: new Devolve(false, ""),
+  //       hp: 1,
+  //     },
+  //     gameProps: {
+  //       map: new EditableMap(
+  //         new Map<number, string>([
+  //           [0, "🐒"],
+  //           [2, "🚪"],
+  //           [6, "🧱"],
+  //           [10, "🧱"],
+  //           [12, "🗝️"],
+  //           [14, "🧱"],
+  //           [15, "🍌"],
+  //         ])
+  //       ),
+  //       statics: new Set<string>(["🧱", "🚪", "🍌"]),
+  //       equippables: new Map<number, Equippable>([
+  //         [-69, new Equippable("🗝️", 1)],
+  //       ]),
+  //       interactables: new Map<number, TInteractable>([
+  //         [
+  //           -1,
+  //           new TInteractable(
+  //             "🚪",
+  //             [],
+  //             1,
+  //             1,
+  //             [
+  //               ["any", 0],
+  //               [-69, -1],
+  //             ],
+  //             true,
+  //             new Evolve(false, "", 2),
+  //             new Devolve(false, "")
+  //           ),
+  //         ],
+  //       ]),
+  //       mapClass: "simulation",
+  //       SIZE: 4,
+  //     },
+  //   },
+  //   // // EVENT SEQUENCE (the level from equippable)
+  //   {
+  //     header: "Interactable",
+  //     description: "",
+  //     props: {
+  //       id: -1,
+  //       emoji: "🚪",
+  //       isStatic: true,
+  //       evolve: new Evolve(false, "", 2),
+  //       devolve: new Devolve(false, ""),
+  //       hp: 1,
+  //     },
+  //     gameProps: {
+  //       map: new EditableMap(
+  //         new Map<number, string>([
+  //           [0, "🐒"],
+  //           [2, "🚪"],
+  //           [6, "🧱"],
+  //           [10, "🧱"],
+  //           [12, "🗝️"],
+  //           [14, "🧱"],
+  //           [15, "🍌"],
+  //         ])
+  //       ),
+  //       statics: new Set<string>(["🧱", "🚪", "🍌"]),
+  //       equippables: new Map<number, Equippable>([
+  //         [-69, new Equippable("🗝️", 1)],
+  //       ]),
+  //       interactables: new Map<number, TInteractable>([
+  //         [
+  //           -1,
+  //           new TInteractable(
+  //             "🚪",
+  //             [],
+  //             1,
+  //             1,
+  //             [
+  //               ["any", 0],
+  //               [-69, -1],
+  //             ],
+  //             true,
+  //             new Evolve(false, "", 2),
+  //             new Devolve(false, "")
+  //           ),
+  //         ],
+  //       ]),
+  //       mapClass: "simulation",
+  //       SIZE: 4,
+  //     },
+  //   },
+  // ];
   // FIXME: Interactable not rerendering
 </script>
 
-<Tutorial
-  {...props}
-  {component}
-  {node}
-  --header={INTERACTABLE_BORDER}
-  veilHeight={veilHeights[index]}
-/>
-
-<!-- {#each tutorialProps as props, i}
-{/each} -->
+<Tutorial {...tutorialProps} {veilHeight} --header={INTERACTABLE_BORDER} />
 
 <div class="flex">
-  <button class="btn" on:click={() => index--}>PREV</button>
-  <button class="btn" on:click={() => index++}>NEXT</button>
+  <button class="btn" on:click={() => goto("/tutorial/interactable/static")}
+    >NEXT</button
+  >
 </div>

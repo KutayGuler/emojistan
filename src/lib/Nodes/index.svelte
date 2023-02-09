@@ -119,7 +119,6 @@
     🞫
   </button>
   <!-- CF #2 -->
-  <!-- <slot> -->
   {#if node.component == "ctxMenu"}
     <ContextMenu position={node.position} {...props} />
   {:else if node.component == "interactable"}
@@ -133,7 +132,6 @@
   {:else if node.component == "merger"}
     <Merger id={node.id} {...props} />
   {/if}
-  <!-- </slot> -->
 </div>
 
 <style>
