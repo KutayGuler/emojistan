@@ -19,7 +19,7 @@
   const tutorialProps = {
     header: "Equippable",
     description:
-      "Just like Consumables, Equippables also take an emoji and a number input. Emoji is the equippable itself and the number is the amount of times you can use it before it disappears.",
+      "Just like Consumables, Equippables also take an emoji and a number input. Emoji is the equippable itself and the number is the amount of times it can be used before it disappears.",
     component: Equippable,
     node: {
       id: 0,

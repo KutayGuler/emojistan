@@ -2,6 +2,7 @@
   import type { Node as TNode } from "$lib/types/index";
   import Node from "$lib/Nodes/index.svelte";
   import Game from "$src/views/Game.svelte";
+  import { onMount } from "svelte";
 
   export let header: string;
   export let description: string;
@@ -9,8 +10,12 @@
   export let node: TNode;
   export let props: any;
   export let gameProps: any;
-  export let incremental: Array<number> = [];
-  export let index = 0;
+  export let veilHeight = 0;
+
+  onMount(() => {
+    console.log("tutorial rerender");
+    console.log(props);
+  });
 </script>
 
 <div
@@ -29,15 +34,11 @@
       style="width: {node.width}px; height: {node.height}px;"
       class="pointer-events-none relative mt-12 mb-24 flex flex-col justify-center"
     >
-      <Node {node}>
-        <svelte:component this={component} {...props} />
-      </Node>
-      {#if incremental.length}
-        <div
-          style:height={incremental[index] + "px"}
-          class="absolute bottom-0 z-10 w-full bg-indigo-50"
-        />
-      {/if}
+      <Node {node} {props} />
+      <div
+        style:height={veilHeight + "px"}
+        class="absolute bottom-0 z-10 w-full bg-indigo-50"
+      />
     </div>
   </div>
   <div

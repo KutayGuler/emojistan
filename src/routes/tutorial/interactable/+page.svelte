@@ -18,24 +18,27 @@
   import Interactable from "$components/Interactable.svelte";
 
   // TODO: Figure out how to display side effects other than "any"
-  const incremental = [464, 440, 400, 164, 0];
+  // TODO: multipage all that shit?
+  const veilHeights = [464, 440, 400, 164, 0];
+  const component = Interactable;
+  const node = {
+    id: 0,
+    component: "interactable",
+    position: { x: 0, y: 0 },
+    width: INTERACTABLE_W,
+    height: INTERACTABLE_H,
+    bgColor: INTERACTABLE_BG,
+    borderColor: INTERACTABLE_BORDER,
+  };
   let index = 0;
+
+  // TODO: Try resetting props based on previous props
 
   const tutorialProps = [
     {
       header: "Interactable",
       description:
         "Interactables are the most complex ruleboxes. We will explain each feature with examples.",
-      component: Interactable,
-      node: {
-        id: 0,
-        component: "interactable",
-        position: { x: 0, y: 0 },
-        width: INTERACTABLE_W,
-        height: INTERACTABLE_H,
-        bgColor: INTERACTABLE_BG,
-        borderColor: INTERACTABLE_BORDER,
-      },
       props: {
         id: -1,
         emoji: "🌵",
@@ -68,7 +71,6 @@
             ),
           ],
         ]),
-
         mapClass: "simulation",
         SIZE: 4,
       },
@@ -78,16 +80,6 @@
       header: "Interactable",
       description:
         "Interactables are the most complex ruleboxes. We will explain each feature with examples.",
-      component: Interactable,
-      node: {
-        id: 0,
-        component: "interactable",
-        position: { x: 0, y: 0 },
-        width: INTERACTABLE_W,
-        height: INTERACTABLE_H,
-        bgColor: INTERACTABLE_BG,
-        borderColor: INTERACTABLE_BORDER,
-      },
       props: {
         id: -1,
         emoji: "👶",
@@ -132,16 +124,6 @@
       header: "Interactable",
       description:
         "Interactables are the most complex ruleboxes. We will explain each feature with examples.",
-      component: Interactable,
-      node: {
-        id: 0,
-        component: "interactable",
-        position: { x: 0, y: 0 },
-        width: INTERACTABLE_W,
-        height: INTERACTABLE_H,
-        bgColor: INTERACTABLE_BG,
-        borderColor: INTERACTABLE_BORDER,
-      },
       props: {
         id: -1,
         emoji: "🚶",
@@ -182,21 +164,10 @@
         SIZE: 4,
       },
     },
-
     //SIDE EFFECTS (door and monkey, interacting with "any" will be of no use, will have to use a key)
     {
       header: "Interactable",
       description: "",
-      component: Interactable,
-      node: {
-        id: 0,
-        component: "interactable",
-        position: { x: 0, y: 0 },
-        width: INTERACTABLE_W,
-        height: INTERACTABLE_H,
-        bgColor: INTERACTABLE_BG,
-        borderColor: INTERACTABLE_BORDER,
-      },
       props: {
         id: -1,
         emoji: "🚪",
@@ -240,21 +211,10 @@
         SIZE: 4,
       },
     },
-
     // // EVENT SEQUENCE (the level from equippable)
     {
       header: "Interactable",
       description: "",
-      component: Interactable,
-      node: {
-        id: 0,
-        component: "interactable",
-        position: { x: 0, y: 0 },
-        width: INTERACTABLE_W,
-        height: INTERACTABLE_H,
-        bgColor: INTERACTABLE_BG,
-        borderColor: INTERACTABLE_BORDER,
-      },
       props: {
         id: -1,
         emoji: "🚪",
@@ -304,9 +264,13 @@
   // FIXME: Interactable not rerendering
 </script>
 
-{#key index}
-  <Tutorial {...props} --header={INTERACTABLE_BORDER} {index} {incremental} />
-{/key}
+<Tutorial
+  {...props}
+  {component}
+  {node}
+  --header={INTERACTABLE_BORDER}
+  veilHeight={veilHeights[index]}
+/>
 
 <!-- {#each tutorialProps as props, i}
 {/each} -->

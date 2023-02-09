@@ -25,6 +25,7 @@
   import Equippable from "$components/Equippable.svelte";
 
   export let node: Node;
+  export let props: any;
 
   $: shouldMove = moving && $movementStore;
 
@@ -118,21 +119,21 @@
     🞫
   </button>
   <!-- CF #2 -->
-  <slot>
-    {#if node.component == "ctxMenu"}
-      <ContextMenu position={node.position} />
-    {:else if node.component == "interactable"}
-      <Interactable id={node.id} />
-    {:else if node.component == "equippable"}
-      <Equippable id={node.id} />
-    {:else if node.component == "consumable"}
-      <Consumable id={node.id} />
-    {:else if node.component == "pusher"}
-      <Pusher id={node.id} />
-    {:else if node.component == "merger"}
-      <Merger id={node.id} />
-    {/if}
-  </slot>
+  <!-- <slot> -->
+  {#if node.component == "ctxMenu"}
+    <ContextMenu position={node.position} {...props} />
+  {:else if node.component == "interactable"}
+    <Interactable id={node.id} {...props} />
+  {:else if node.component == "equippable"}
+    <Equippable id={node.id} {...props} />
+  {:else if node.component == "consumable"}
+    <Consumable id={node.id} {...props} />
+  {:else if node.component == "pusher"}
+    <Pusher id={node.id} {...props} />
+  {:else if node.component == "merger"}
+    <Merger id={node.id} {...props} />
+  {/if}
+  <!-- </slot> -->
 </div>
 
 <style>

@@ -126,8 +126,6 @@
 
   onMount(() => {
     let obj = $interactables.get(id);
-    console.log(obj, isStatic);
-
     if (obj) {
       ({ emoji, sequence, hp, points, sideEffects, isStatic, evolve, devolve } =
         obj);
