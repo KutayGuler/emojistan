@@ -1,9 +1,9 @@
-import { writable, derived, get } from "svelte/store";
-import { Node, type Edge, type NodeComponent } from "../types/types";
+import { writable, get } from "svelte/store";
+import { Rulebox, type RuleboxType } from "../types/types";
 import { GRAPH_SIZE } from "../../constants";
 
-function createNodes() {
-  const arr: Array<Node> = [];
+function createRuleboxes() {
+  const arr: Array<Rulebox> = [];
   const { set, subscribe, update } = writable(arr);
 
   return {
@@ -12,24 +12,21 @@ function createNodes() {
     update,
     useStorage: (id: string) => {
       // @ts-expect-error
-      const val = JSON.parse(localStorage.getItem(id + "_nodes"));
+      const val = JSON.parse(localStorage.getItem(id + "_rbxs"));
 
       set(val || []);
       subscribe((state) => {
-        localStorage.setItem(id + "_nodes", JSON.stringify(Array.from(state)));
+        localStorage.setItem(id + "_rbxs", JSON.stringify(Array.from(state)));
       });
     },
 
-    spawn(
-      component: NodeComponent,
-      position: { x: number; y: number }
-    ): number {
+    spawn(component: RuleboxType, position: { x: number; y: number }): number {
       let id = 0;
 
       update((state) => {
-        state = state.filter((n) => n.component != "ctxMenu");
-        id = Math.max(...state.map((n) => n.id), 0) + 1;
-        state.push(new Node(id, component, position));
+        state = state.filter((rbx) => rbx.type != "ctxMenu");
+        id = Math.max(...state.map((rbx) => rbx.id), 0) + 1;
+        state.push(new Rulebox(id, component, position));
         return state;
       });
 
@@ -37,19 +34,19 @@ function createNodes() {
     },
     remove: (id: number) =>
       update((state) => {
-        state = state.filter((n) => n.id != id);
+        state = state.filter((rbx) => rbx.id != id);
         return state;
       }),
     removeCtxMenu: () =>
       update((state) => {
-        state = state.filter((n) => n.component != "ctxMenu");
+        state = state.filter((rbx) => rbx.type != "ctxMenu");
         return state;
       }),
     adjustHeight: (id: number, sequenceLength: number, defaultHeight: number) =>
       update((state) => {
-        for (let node of state) {
-          if (node.id == id) {
-            node.height = defaultHeight + sequenceLength * 56;
+        for (let rbx of state) {
+          if (rbx.id == id) {
+            rbx.height = defaultHeight + sequenceLength * 56;
             break;
           }
         }
@@ -62,50 +59,50 @@ export const widthStore = writable(GRAPH_SIZE);
 export const heightStore = writable(GRAPH_SIZE);
 export const backgroundStore = writable(true);
 export const movementStore = writable(true);
-export const nodeSelected = writable(false);
-export const nodeIdSelected = writable(-1);
+export const rbxSelected = writable(false);
+export const rbxIdSelected = writable(-1);
 export const d3Scale = writable(1);
-export const nodesStore = createNodes();
+export const rbxStore = createRuleboxes();
 
-export const onMouseMove = (e: any, nodeID: number) => {
-  nodesStore.update((n) => {
-    n.forEach((node: Node) => {
-      if (node.id === nodeID) {
+export const onMouseMove = (e: any, rbxID: number) => {
+  rbxStore.update((rbx) => {
+    rbx.forEach((rbx: Rulebox) => {
+      if (rbx.id === rbxID) {
         //retrieve d3Scale value from store
         const scale = get(d3Scale);
         // divide the movement value by scale to keep it proportional to d3Zoom transformations
-        node.position.x += e.movementX / scale;
-        node.position.y += e.movementY / scale;
+        rbx.position.x += e.movementX / scale;
+        rbx.position.y += e.movementY / scale;
       }
     });
-    return [...n];
+    return [...rbx];
   });
 };
 
-// This is the function handler for the touch event on mobile to select a node.
-export const onTouchMove = (e: any, nodeID: number) => {
-  nodesStore.update((n) => {
-    n.forEach((node: Node) => {
-      if (node.id === nodeID) {
-        //calculates the location of the selected node
+// This is the function handler for the touch event on mobile to select a rbx.
+export const onTouchMove = (e: any, rbxID: number) => {
+  rbxStore.update((rbx) => {
+    rbx.forEach((rbx: Rulebox) => {
+      if (rbx.id === rbxID) {
+        //calculates the location of the selected rbx
         const { x, y, width, height } = e.target.getBoundingClientRect();
         const offsetX =
           ((e.touches[0].clientX - x) / width) * e.target.offsetWidth;
         const offsetY =
           ((e.touches[0].clientY - y) / height) * e.target.offsetHeight;
-        // centers the node consistently under the user's touch
-        node.position.x += offsetX - node.width / 2;
-        node.position.y += offsetY - node.height / 2;
+        // centers the rbx consistently under the user's touch
+        rbx.position.x += offsetX - rbx.width / 2;
+        rbx.position.y += offsetY - rbx.height / 2;
       }
     });
-    return [...n];
+    return [...rbx];
   });
 };
-// if the user clicks a node without moving it, this function fires allowing a user to invoke the callback function
-export const onNodeClick = (e: any, nodeID: number) => {
-  get(nodesStore).forEach((node) => {
-    if (node.id === get(nodeIdSelected)) {
-      node.clickCallback?.(node);
+// if the user clicks a rbx without moving it, this function fires allowing a user to invoke the callback function
+export const onRuleboxClick = (e: any, rbxID: number) => {
+  get(rbxStore).forEach((rbx) => {
+    if (rbx.id === get(rbxIdSelected)) {
+      rbx.clickCallback?.(rbx);
     }
   });
 };

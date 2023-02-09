@@ -6,8 +6,8 @@
     consumables,
     equippables,
   } from "../store";
-  import type { NodeComponent } from "$lib/types";
-  import { nodesStore } from "$lib/stores/store";
+  import type { RuleboxType } from "$lib/types";
+  import { rbxStore } from "$lib/stores/store";
   import {
     Devolve,
     Evolve,
@@ -19,8 +19,8 @@
   export let position: { x: number; y: number };
 
   // CF #4
-  function spawn(component: NodeComponent, value: any) {
-    const id = nodesStore.spawn(component, position);
+  function spawn(component: RuleboxType, value: any) {
+    const id = rbxStore.spawn(component, position);
 
     switch (component) {
       case "pusher":

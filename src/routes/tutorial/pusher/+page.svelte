@@ -2,15 +2,15 @@
   import { type Pusher as TPusher, EditableMap } from "$src/types";
   import { PUSHER_BG, PUSHER_BORDER, PUSHER_H, PUSHER_W } from "$src/constants";
   import Tutorial from "../Tutorial.svelte";
-  import Pusher from "$components/Pusher.svelte";
+  import Pusher from "$rbx/Pusher.svelte";
 
   const tutorialProps = {
     header: "Pusher",
     description: "Pusher takes two emoji inputs and makes 🍃 pushable by 🌬️",
     component: Pusher,
-    node: {
+    rbx: {
       id: 0,
-      component: "pusher",
+      type: "pusher",
       position: { x: 0, y: 0 },
       width: PUSHER_W,
       height: PUSHER_H,

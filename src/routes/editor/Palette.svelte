@@ -1,10 +1,10 @@
 <script lang="ts">
   // DATA
-  import { palette as cp, currentColor, map } from "../store";
+  import { palette as cp, currentColor, map } from "$src/store";
   import { scale } from "svelte/transition";
   import { flip } from "svelte/animate";
-  import { notifications } from "../routes/notifications";
-  import { DEFAULT_BG } from "../constants";
+  import { notifications } from "$src/routes/notifications";
+  import { DEFAULT_BG } from "$src/constants";
 
   let pickedColor = "#000000";
   const flipParams = { duration: 300 };

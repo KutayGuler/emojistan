@@ -23,7 +23,7 @@ import {
 } from "$src/constants";
 import type { XYPosition, Position } from "./utils";
 
-export type NodeComponent =
+export type RuleboxType =
   | "pusher"
   | "merger"
   | "consumable"
@@ -31,9 +31,9 @@ export type NodeComponent =
   | "interactable"
   | "ctxMenu";
 
-export interface Node {
+export interface Rulebox {
   id: number;
-  component: NodeComponent;
+  type: RuleboxType;
   position: XYPosition;
   width: number;
   height: number;
@@ -50,17 +50,17 @@ export interface Node {
 }
 
 // #CF 1
-export class Node<T = any> {
+export class Rulebox<T = any> {
   constructor(
     id: number,
-    component: NodeComponent,
+    type: RuleboxType,
     position: { x: number; y: number }
   ) {
     this.id = id;
-    this.component = component;
+    this.type = type;
     this.position = position;
 
-    switch (component) {
+    switch (type) {
       case "ctxMenu":
         this.width = CTX_MENU_W;
         return;

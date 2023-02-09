@@ -12,7 +12,7 @@ const config = {
   kit: {
     adapter: adapter(),
     alias: {
-      $components: "src/components",
+      $rbx: "src/ruleboxes",
       $src: "src",
     },
   },

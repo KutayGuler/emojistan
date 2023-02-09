@@ -11,7 +11,7 @@
     interactables,
   } from "../store";
   import { navigating } from "$app/stores";
-  import { nodesStore } from "$lib/stores/store";
+  import { rbxStore } from "$lib/stores/store";
 
   onMount(() => {
     if ($saves.currentSaveID == "") saves.useStorage();
@@ -56,7 +56,7 @@
             objective: $map.objective,
           },
           palette: Array.from($palette),
-          nodes: Array.from($nodesStore),
+          rbxs: Array.from($rbxStore),
           pushers: Object.fromEntries($pushers),
           mergers: Object.fromEntries($mergers),
           interactables: Object.fromEntries($interactables),

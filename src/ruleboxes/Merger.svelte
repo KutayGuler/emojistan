@@ -2,7 +2,7 @@
   import { onDestroy, onMount } from "svelte";
   import { mergers, pushers, currentEmoji } from "../store";
   import { notifications } from "../routes/notifications";
-  import { nodesStore } from "$src/lib/stores/store";
+  import { rbxStore } from "$src/lib/stores/store";
 
   export let id: number;
   export let slots = ["", "", ""];
@@ -55,7 +55,7 @@
   onDestroy(() => {
     if (slots.includes("")) {
       mergers.remove(id);
-      nodesStore.remove(id);
+      rbxStore.remove(id);
     }
   });
 </script>

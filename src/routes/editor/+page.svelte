@@ -27,10 +27,10 @@
   import { emojis } from "./emojis";
   import { DEFAULT_SIDE_LENGTH } from "$src/constants";
   import { notifications } from "../notifications";
-  import { nodesStore } from "$lib/stores/store";
+  import { rbxStore } from "$lib/stores/store";
 
   import Svelvet from "$lib";
-  import Palette from "$components/Palette.svelte";
+  import Palette from "./Palette.svelte";
 
   function getStatics() {
     let _statics = new Set<string>($statics);
@@ -65,7 +65,7 @@
       consumables,
       interactables,
       palette,
-      nodesStore,
+      rbxStore,
     ]) {
       store.useStorage($saves.currentSaveID);
     }

@@ -53,7 +53,7 @@
   // sideEffects: any: 0 | 💧: +1
   // evolveAt: hp 10 to {🌳}
 
-  import { nodesStore } from "$src/lib/stores/store";
+  import { rbxStore } from "$src/lib/stores/store";
   import {
     Devolve,
     Evolve,
@@ -147,13 +147,13 @@
       )
     );
 
-    nodesStore.adjustHeight(id, sequence.length, INTERACTABLE_H);
+    rbxStore.adjustHeight(id, sequence.length, INTERACTABLE_H);
   }
 
   onDestroy(() => {
     if (emoji == "") {
       interactables.remove(id);
-      nodesStore.remove(id);
+      rbxStore.remove(id);
       return;
     }
 
@@ -198,7 +198,7 @@
     updateStore();
   }
 
-  function removeEmptyModifier(node: any, i: number) {
+  function removeEmptyModifier(rbx: any, i: number) {
     sideEffects.splice(i, 1);
     sideEffects = sideEffects;
     updateStore();

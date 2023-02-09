@@ -1,18 +1,18 @@
 <script lang="ts">
-  import type { Node as TNode } from "$lib/types/index";
-  import Node from "$lib/Nodes/index.svelte";
+  import type { Rulebox as TRulebox } from "$lib/types/index";
+  import Rulebox from "$lib/Rulebox.svelte";
   import Game from "$src/views/Game.svelte";
-  import { onMount } from "svelte";
 
   export let header: string;
   export let subheader = "";
   export let description: string;
-  export let node: TNode;
+  export let rbx: TRulebox;
   export let props: any;
   export let gameProps: any;
   export let veilHeight = 0;
 
   $: console.log(props);
+  $: console.log(gameProps);
 </script>
 
 <div
@@ -31,11 +31,11 @@
       </p>
     </div>
     <div
-      style="width: {node.width}px; height: {node.height}px;"
+      style="width: {rbx.width}px; height: {rbx.height}px;"
       class="pointer-events-none relative mt-12 mb-24 flex flex-col justify-center"
     >
       {#key props}
-        <Node {node} {props} />
+        <Rulebox {rbx} {props} />
       {/key}
       <div
         style:height={veilHeight + "px"}
@@ -46,7 +46,9 @@
   <div
     class="relative flex w-full flex-col items-center justify-center self-center"
   >
-    <Game {...gameProps} showObjective={false} />
+    {#key gameProps}
+      <Game {...gameProps} showObjective={false} />
+    {/key}
   </div>
 </div>
 

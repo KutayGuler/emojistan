@@ -14,16 +14,16 @@
     EQUIPPABLE_W,
   } from "$src/constants";
   import Tutorial from "../Tutorial.svelte";
-  import Equippable from "$components/Equippable.svelte";
+  import Equippable from "$rbx/Equippable.svelte";
 
   const tutorialProps = {
     header: "Equippable",
     description:
       "Just like Consumables, Equippables also take an emoji and a number input. Emoji is the equippable itself and the number is the amount of times it can be used before it disappears.",
     component: Equippable,
-    node: {
+    rbx: {
       id: 0,
-      component: "equippable",
+      type: "equippable",
       position: { x: 0, y: 0 },
       width: EQUIPPABLE_W,
       height: EQUIPPABLE_H,

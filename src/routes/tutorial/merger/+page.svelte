@@ -2,16 +2,16 @@
   import { type Merger as TMerger, EditableMap } from "$src/types";
   import { MERGER_BG, MERGER_BORDER, MERGER_H, MERGER_W } from "$src/constants";
   import Tutorial from "../Tutorial.svelte";
-  import Merger from "$components/Merger.svelte";
+  import Merger from "$rbx/Merger.svelte";
 
   const tutorialProps = {
     header: "Merger",
     description:
       "Merger takes three emoji inputs. To put it simply, ☁️ + ❄️ = 🌨️. Alternatively, ❄️ + ☁️ = 🌨️",
     component: Merger,
-    node: {
+    rbx: {
       id: 0,
-      component: "merger",
+      type: "merger",
       position: { x: 0, y: 0 },
       width: MERGER_W,
       height: MERGER_H,

@@ -7,16 +7,16 @@
     CONSUMABLE_W,
   } from "$src/constants";
   import Tutorial from "../Tutorial.svelte";
-  import Consumable from "$components/Consumable.svelte";
+  import Consumable from "$rbx/Consumable.svelte";
 
   const firstTutorialProps = {
     header: "Consumable",
     description:
       "Consumable takes an emoji and a number input. Emoji is the consumable itself and the number below it is the HP side effect consumer will be subjected to.",
     component: Consumable,
-    node: {
+    rbx: {
       id: 0,
-      component: "consumable",
+      type: "consumable",
       position: { x: 0, y: 0 },
       width: CONSUMABLE_W,
       height: CONSUMABLE_H,
@@ -46,9 +46,9 @@
     description:
       "On the top left corner, the 🧬 icon enables mutation and disables the HP side effect. If mutation is enabled, another slot opens up to determine what the consumer will mutate into.",
     component: Consumable,
-    node: {
+    rbx: {
       id: 0,
-      component: "consumable",
+      type: "consumable",
       position: { x: 0, y: 0 },
       width: CONSUMABLE_W,
       height: CONSUMABLE_H,

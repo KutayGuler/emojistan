@@ -649,7 +649,7 @@
     }
   }
 
-  function noPlayer(node: any) {
+  function noPlayer(rbx: any) {
     if (ac == -2) dispatch("noPlayer");
   }
 </script>

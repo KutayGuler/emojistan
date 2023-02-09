@@ -5,15 +5,15 @@
   // @ts-expect-error
   import { select, selectAll } from "d3-selection";
   import {
-    nodesStore,
-    nodeSelected,
+    rbxStore,
+    rbxSelected,
     backgroundStore,
     movementStore,
     widthStore,
     heightStore,
     d3Scale,
   } from "$lib/stores/store";
-  import Node from "$lib/Nodes/index.svelte";
+  import Rulebox from "$lib/Rulebox.svelte";
 
   // leveraging d3 library to zoom/pan
   let d3 = {
@@ -27,22 +27,24 @@
   const gridSize = 15;
   const dotSize = 10;
 
-  let nodesDiv: HTMLDivElement;
+  let ruleboxesDiv: HTMLDivElement;
 
   onMount(() => {
-    d3.select(`.Nodes`).call(d3Zoom).on("dblclick.zoom", null);
-    d3.select(`.Nodes`).on("contextmenu", function (e: MouseEvent) {
+    d3.select(`.Ruleboxes`).call(d3Zoom).on("dblclick.zoom", null);
+    d3.select(`.Ruleboxes`).on("contextmenu", function (e: MouseEvent) {
       e.preventDefault();
-      let { x, y, k } = d3.zoomTransform(nodesDiv);
+      let { x, y, k } = d3.zoomTransform(ruleboxesDiv);
+      // @ts-expect-error
       y = (-y + e.layerY) / k; // e.layerX is experimental and not recommended
+      // @ts-expect-error
       x = (-x + e.layerX) / k; // e.layerY is experimental and not recommended
-      nodesStore.spawn("ctxMenu", { x, y });
+      rbxStore.spawn("ctxMenu", { x, y });
     });
   });
 
   let d3Zoom: any = d3
     .zoom()
-    .filter(() => !$nodeSelected)
+    .filter(() => !$rbxSelected)
     .scaleExtent([0.4, 2])
     .on("zoom", handleZoom);
 
@@ -69,8 +71,8 @@
     // transform div elements (nodes)
     // @ts-expect-error
     let transform = d3.zoomTransform(this);
-    // selects and transforms all node divs from class 'Node' and performs transformation
-    d3.select(`.Node`)
+    // selects and transforms all rbx divs from class 'Rbx' and performs transformation
+    d3.select(`.Rbx`)
       .style(
         "transform",
         "translate(" +
@@ -84,17 +86,17 @@
       .style("transform-origin", "0 0");
   }
 
-  function clickedOnNodes() {
-    nodesStore.removeCtxMenu();
+  function clickedOnRuleboxes() {
+    rbxStore.removeCtxMenu();
   }
 </script>
 
 <!-- This is the container that holds GraphView and we have disabled right click functionality to prevent a sticking behavior -->
-<div class={`Nodes`} bind:this={nodesDiv} on:click={clickedOnNodes}>
+<div class={`Ruleboxes`} bind:this={ruleboxesDiv} on:click={clickedOnRuleboxes}>
   <!-- This container is transformed by d3zoom -->
-  <div class={`Node`}>
-    {#each $nodesStore as node}
-      <Node {node} />
+  <div class={`Rbx`}>
+    {#each $rbxStore as rbx}
+      <Rulebox {rbx} />
     {/each}
   </div>
 </div>
@@ -126,12 +128,12 @@
 </svg>
 
 <style>
-  .Nodes {
+  .Ruleboxes {
     position: absolute;
     width: 100%;
     height: 100%;
   }
-  .Node {
+  .Rbx {
     color: black; /* remove this once color is set to default via types */
     width: 100%;
     height: 100%;

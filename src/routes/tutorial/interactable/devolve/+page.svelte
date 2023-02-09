@@ -25,9 +25,9 @@
     description:
       "Interactables are the most complex ruleboxes. We will explain each feature with examples.",
 
-    node: {
+    rbx: {
       id: 0,
-      component: "interactable",
+      type: "interactable",
       position: { x: 0, y: 0 },
       width: INTERACTABLE_W,
       height: INTERACTABLE_H,
@@ -35,7 +35,7 @@
       borderColor: INTERACTABLE_BORDER,
     },
     props: {
-      id: -1,
+      id: -4,
       emoji: "🚶",
       evolve: new Evolve(false, "", 2),
       devolve: new Devolve(true, "🧟"),
@@ -57,7 +57,7 @@
       ]),
       interactables: new Map<number, TInteractable>([
         [
-          -3,
+          -4,
           new TInteractable(
             "🚶",
             [],

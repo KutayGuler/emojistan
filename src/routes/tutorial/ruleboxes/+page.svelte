@@ -1,11 +1,11 @@
 <script lang="ts">
-  import Consumable from "$components/Consumable.svelte";
-  import Equippable from "$components/Equippable.svelte";
-  import Interactable from "$components/Interactable.svelte";
-  import Merger from "$components/Merger.svelte";
-  import Pusher from "$components/Pusher.svelte";
+  import Consumable from "$rbx/Consumable.svelte";
+  import Equippable from "$rbx/Equippable.svelte";
+  import Interactable from "$rbx/Interactable.svelte";
+  import Merger from "$rbx/Merger.svelte";
+  import Pusher from "$rbx/Pusher.svelte";
 
-  import Node from "$lib/Nodes/index.svelte";
+  import Rulebox from "$lib/Rulebox.svelte";
   import {
     MERGER_BG,
     MERGER_H,
@@ -31,12 +31,12 @@
   import { onDestroy } from "svelte";
   import { fade, fly } from "svelte/transition";
 
-  const nodes = [
+  const ruleboxes = [
     {
       component: Pusher,
-      node: {
+      rbx: {
         id: 0,
-        component: "pusher",
+        type: "pusher",
         position: { x: 0, y: 0 },
         width: PUSHER_W,
         height: PUSHER_H,
@@ -46,9 +46,9 @@
     },
     {
       component: Merger,
-      node: {
+      rbx: {
         id: 0,
-        component: "merger",
+        type: "merger",
         position: { x: 0, y: 0 },
         width: MERGER_W,
         height: MERGER_H,
@@ -58,9 +58,9 @@
     },
     {
       component: Equippable,
-      node: {
+      rbx: {
         id: 0,
-        component: "equippable",
+        type: "equippable",
         position: { x: 0, y: 0 },
         width: EQUIPPABLE_W,
         height: EQUIPPABLE_H,
@@ -70,9 +70,9 @@
     },
     {
       component: Consumable,
-      node: {
+      rbx: {
         id: 0,
-        component: "consumable",
+        type: "consumable",
         position: { x: 0, y: 0 },
         width: CONSUMABLE_W,
         height: CONSUMABLE_H,
@@ -82,9 +82,9 @@
     },
     {
       component: Interactable,
-      node: {
+      rbx: {
         id: 0,
-        component: "interactable",
+        type: "interactable",
         position: { x: 0, y: 0 },
         width: INTERACTABLE_W,
         height: INTERACTABLE_H,
@@ -118,16 +118,16 @@
 <div
   class="relative flex h-full w-full flex-col items-center justify-center gap-8 p-1"
 >
-  {#each nodes as { node, component }, i}
+  {#each ruleboxes as { rbx, component }, i}
     {#if index == i}
       <div
         in:fade
-        style="width: {node.width}px; height: {node.height}px;"
+        style="width: {rbx.width}px; height: {rbx.height}px;"
         class="pointer-events-none relative flex flex-col justify-center"
       >
-        <Node {node}>
+        <Rulebox {rbx}>
           <svelte:component this={component} />
-        </Node>
+        </Rulebox>
       </div>
     {/if}
   {/each}
