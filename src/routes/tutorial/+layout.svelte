@@ -63,9 +63,15 @@
     </div>
     {#if rulebox?.next}
       <button
-        class="btn absolute bottom-2 right-2"
+        class="btn btn-lg absolute bottom-4 right-4"
         on:click={() => goto("/tutorial/" + rulebox.next)}
-        >{rulebox.next} ></button
+        >{rulebox.next} ⮞</button
+      >
+    {/if}
+    {#if $page.url.pathname.includes("controls")}
+      <button
+        class="btn btn-lg absolute bottom-4 right-4"
+        on:click={() => goto("/tutorial/ruleboxes")}>Ruleboxes ⮞</button
       >
     {/if}
     <div class="drawer-side">
@@ -90,3 +96,15 @@
     </div>
   </div>
 </main>
+
+<div class="modal" id="tutorial-complete">
+  <div class="modal-box">
+    <h3 class="text-lg font-bold">Congratulations!</h3>
+    <p class="py-4">
+      You have completed the tutorial! Now it's time to create your own games!
+    </p>
+    <div class="modal-action">
+      <a href="../../" class="btn">YAY!</a>
+    </div>
+  </div>
+</div>

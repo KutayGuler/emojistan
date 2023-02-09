@@ -79,7 +79,6 @@ function createSaves() {
         state.currentSaveID = currentSaveID || "";
         state.currentSaveName = _saves.get(currentSaveID || "") || "";
         state.loaded = true;
-        console.log(state);
 
         return state;
       });

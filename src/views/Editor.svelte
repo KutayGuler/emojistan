@@ -48,7 +48,6 @@
 <div class="map">
   {#each { length: DEFAULT_SIDE_LENGTH * DEFAULT_SIDE_LENGTH } as _, i}
     <div
-      class="cell"
       style:background={$map.backgrounds.get(i) || $map.dbg}
       on:click={() => clickedCell(i)}
       on:contextmenu|preventDefault={() => rightClickedCell(i)}

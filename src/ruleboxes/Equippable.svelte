@@ -31,8 +31,6 @@
   }
 
   function updateEmoji() {
-    console.log("update emoji");
-
     for (let [_id, val] of $equippables.entries()) {
       if (_id == id) continue;
 

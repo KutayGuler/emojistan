@@ -51,8 +51,6 @@
   }
 
   function updateEmoji() {
-    console.log("update emoji");
-
     for (let [_id, val] of $consumables.entries()) {
       if (_id == id) continue;
 

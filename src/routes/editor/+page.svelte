@@ -45,8 +45,6 @@
   }
 
   onMount(() => {
-    console.log("onMount");
-
     if ($saves.currentSaveID == "") {
       let saveExists = saves.useStorage();
       if (!saveExists) {
@@ -92,7 +90,7 @@
 
   let innerWidth: number;
   let innerHeight: number;
-  let showIndex = false;
+  let showIndex = false; // TODO: draw outline (parent class can be activated and then => .parent > div)
   let hintsEnabled = false;
 
   type DeleteMode = "Item" | "Background" | "Both";
@@ -351,6 +349,10 @@
               </div>
             </div>
           {/if}
+          <div class="flex flex-row items-center pt-8">
+            <kbd class="kbd mr-2">Esc</kbd>
+            <p>untoggle emoji / color</p>
+          </div>
         </aside>
       {/if}
       {#if test}
@@ -365,6 +367,9 @@
           on:noPlayer={() => {
             test = false;
             notifications.warning("No controllable player in the map");
+          }}
+          on:quit={() => {
+            test = false;
           }}
         />
       {:else if view == "editor"}
@@ -406,7 +411,11 @@
                 <div class="emojis flex flex-wrap justify-center">
                   {#each emojis[category] as [emoji, name]}
                     {#if name.includes(filter)}
-                      <div on:click={() => pickEmoji(emoji)} title={name}>
+                      <div
+                        class:selected={$currentEmoji == emoji}
+                        on:click={() => pickEmoji(emoji)}
+                        title={name}
+                      >
                         {emoji}
                       </div>
                     {/if}
@@ -426,10 +435,13 @@
     font-size: 1.25rem;
     width: 12%;
     transition: 75ms ease-out;
+    box-sizing: border-box;
+    cursor: pointer;
   }
 
+  .selected,
   .emojis > div:hover {
-    transform: scale(1.5, 1.5);
+    transform: scale(1.5);
   }
 
   .hintsEnabled {

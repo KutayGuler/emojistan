@@ -10,23 +10,20 @@
   export let props: any;
   export let gameProps: any;
   export let veilHeight = 0;
-
-  $: console.log(props);
-  $: console.log(gameProps);
 </script>
 
 <div
   class="relative flex h-full w-full flex-row items-start justify-center gap-4"
 >
   <div class="relative flex w-full flex-col items-center justify-center">
-    <div class="self-start p-4">
+    <div class="w-full self-start p-4">
       {#if header}
         <span class="flex-inline flex items-center">
           <h1 class="text-4xl">{header}</h1>
           <h3 class="pl-2 text-xl">{subheader}</h3>
         </span>
       {/if}
-      <p class="h-24 pt-2">
+      <p class="h-32 pt-2">
         {description}
       </p>
     </div>

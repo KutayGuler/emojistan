@@ -41,6 +41,9 @@
   export let showInventory = true;
   export let showObjective = true;
 
+  let completionMessage: "Level Completed!" | "Game Over. No players left." =
+    "Level Completed!";
+
   /* ## STATE ## */
   let levelCompleted = false;
   let ac = -2; // ACTIVE CELL
@@ -155,8 +158,6 @@
     Object.assign(_interactables[emoji], args);
   }
 
-  console.log(_interactables);
-
   for (let [id, consumable] of consumables) {
     const { emoji, ...args } = consumable;
     if (emoji == "") continue;
@@ -172,8 +173,6 @@
     _equippables[emoji] = {};
     Object.assign(_equippables[emoji], args);
   }
-
-  console.log(_equippables);
 
   function initItems() {
     for (let [id, _emoji] of map.items) {
@@ -288,7 +287,6 @@
     },
     completeLevel: () => (levelCompleted = true),
   };
-  // TODO: Add "Game Over (no players left)"
 
   function getCollisionType(key1: string, key2: string): CollisionType {
     if (!_collisions[key1]) return "bump";
@@ -415,7 +413,6 @@
         return;
       }
       let interactedItem = items.get(ic);
-      console.log(interactedItem);
 
       if (interactedItem == undefined) return;
       if (interactedItem instanceof Equippable) {
@@ -469,6 +466,10 @@
                 return;
               }
             }
+
+            completionMessage = "Game Over. No players left.";
+            levelCompleted = true;
+            return;
           }
 
           let playerEvolve = _interactables[player?.emoji || ""]?.evolve;
@@ -488,7 +489,6 @@
       }
 
       let interactable: _Interactable = _interactables[interactedItem.emoji];
-      console.log(interactable);
 
       if (interactable == undefined || interactable.executing) return;
       let { sequence, sideEffects, evolve, devolve } = interactable;
@@ -504,7 +504,14 @@
       _interactables[interactedItem.emoji].executing = true;
       let equippedItem = player?.inventory[currentInventoryIndex] || "any";
 
-      console.log(equippedItem);
+      let sideEffect =
+        sideEffects.find(
+          (m) => equippables.get(m[0])?.emoji == equippedItem.emoji
+        ) || sideEffects[0];
+
+      if (sideEffect[1] == 0) return;
+      interactedItem.hp.current += sideEffect[1];
+
       // @ts-expect-error
       if (equippedItem != "any") {
         equippedItem.hp -= 1;
@@ -513,17 +520,6 @@
       if (equippedItem.hp == 0) {
         player.inventory.splice(currentInventoryIndex, 1);
       }
-      console.log(sideEffects);
-
-      let sideEffect =
-        sideEffects.find(
-          (m) => equippables.get(m[0])?.emoji == equippedItem.emoji
-        ) || sideEffects[0];
-
-      console.log(sideEffect);
-
-      if (sideEffect[1] == 0) return;
-      interactedItem.hp.current += sideEffect[1];
 
       for (let { type, ...args } of sequence) {
         if (type == "wait") {
@@ -675,21 +671,22 @@
     </div>
   {/each}
   {#if levelCompleted}
-    <!--   -->
     <dialog
       open
       style="background-color: rgba(0, 0, 0.5, 0.5);"
-      class="absolute z-20 flex h-full w-1/2 flex-col items-center justify-center self-center "
-      transition:scale
+      class="absolute z-20 flex h-full w-full flex-col items-center justify-center gap-4 self-center "
+      transition:scale|local
     >
-      <p class="w-full text-white">LEVEL COMPLETED!</p>
+      <p class="absolute top-4 w-full text-center text-white">
+        {completionMessage}
+      </p>
       <button
-        class="btn btn-success text-success-content"
+        class="btn btn-success btn-lg w-1/4 text-success-content"
         on:click={() => m.resetLevel()}>REPLAY</button
       >
       <button
-        class="btn btn-error text-error-content"
-        on:click={() => (levelCompleted = !levelCompleted)}>QUIT</button
+        class="btn btn-error btn-lg w-1/4 text-error-content"
+        on:click={() => dispatch("quit")}>QUIT</button
       >
     </dialog>
   {/if}
@@ -722,7 +719,6 @@
         <p class="absolute -left-4 z-10 self-start text-2xl">
           {player?.emoji || ""}
         </p>
-        <!-- progress-success -->
         <progress title="Health Bar" class="progress h-8" value={$progress} />
         <p class="absolute">
           {Number.isInteger(playerHP) ? playerHP : playerHP.toFixed(1)}

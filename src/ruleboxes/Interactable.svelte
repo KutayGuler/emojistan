@@ -114,6 +114,7 @@
   export let hp = 1;
   export let points = 1;
   export let sideEffects: Array<[number | "any", number]> = [["any", 0]];
+  export let pseudoSideEffects: Array<[string, number]> = [];
   export let isStatic = false;
   export let evolve = new Evolve(false, "", 2);
   export let devolve = new Devolve(false, "");
@@ -198,7 +199,7 @@
     updateStore();
   }
 
-  function removeEmptyModifier(rbx: any, i: number) {
+  function removeEmptySideEffect(rbx: any, i: number) {
     sideEffects.splice(i, 1);
     sideEffects = sideEffects;
     updateStore();
@@ -446,8 +447,20 @@
               {/each}
             </select>
           {:else}
-            <div use:removeEmptyModifier={i} />
+            <div use:removeEmptySideEffect={i} />
           {/if}
+        </div>
+      {/each}
+      {#each pseudoSideEffects as [emoji, value]}
+        <div class="relative flex flex-col items-center">
+          <button class="absolute -top-2 -right-2 text-lg">🞫</button>
+          <div class="slot-lg scale-75">
+            {emoji}
+          </div>
+          <select class="select select-bordered select-sm absolute -bottom-4">
+            <option selected {value}>{value}</option>
+            <option value="+100">+100</option>
+          </select>
         </div>
       {/each}
     </div>

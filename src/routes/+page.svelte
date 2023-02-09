@@ -74,7 +74,7 @@
       .eq("owner", user.data.user?.id);
   }
 
-  $: console.log($navigating);
+  // TODO: Responsivity
 </script>
 
 <svelte:head>

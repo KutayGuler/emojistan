@@ -10,8 +10,6 @@
   const flipParams = { duration: 300 };
 
   function setDefaultBackground(color: string) {
-    console.log(color);
-
     if (color == "") return;
     if (color == $map.dbg) {
       map.updateDbg(DEFAULT_BG);
@@ -23,8 +21,6 @@
   }
 
   function removeColor(color: string) {
-    console.log(color);
-
     cp.remove(color);
     if (!$cp.has($map.dbg)) {
       map.updateDbg(DEFAULT_BG);
