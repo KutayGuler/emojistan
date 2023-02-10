@@ -1,13 +1,19 @@
-import { writable, derived } from "svelte/store";
+import { writable, derived, type Writable } from "svelte/store";
 
 const NOTIFICATION_TIMEOUT = 3000;
 
+interface Notification {
+  id: string;
+  type: string;
+  message: string;
+  shake: boolean;
+}
+
 const createNotificationStore = () => {
-  const _notifications = writable([]);
+  const _notifications: Writable<Array<Notification>> = writable([]);
 
   const send = (message: string, type = "default") => {
     _notifications.update((state) => {
-      console.log(state);
       if (state.length && message == state[state.length - 1].message) {
         if (state[state.length - 1].shake) {
           state[state.length - 1].shake = false;
@@ -16,12 +22,10 @@ const createNotificationStore = () => {
         }
         return state;
       } else {
-        return [...state, { id: id(), type, message }];
+        return [...state, { id: id(), type, message, shake: false }];
       }
     });
   };
-
-  let timers = [];
 
   const notifications = derived(_notifications, ($_notifications, set) => {
     set($_notifications);

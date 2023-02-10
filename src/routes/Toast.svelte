@@ -1,29 +1,21 @@
-<script>
+<script lang="ts">
+  // @ts-nocheck
   import { flip } from "svelte/animate";
   import { fly } from "svelte/transition";
   import { notifications } from "./notifications";
-
-  export let themes = {
-    danger: "#E26D69",
-    success: "#84C991",
-    warning: "#f0ad4e",
-    info: "#5bc0de",
-    default: "#aaaaaa",
-  };
 </script>
 
 <div
-  class="pointer-events-none fixed bottom-4 right-4 z-10 flex w-80 flex-col items-center justify-start"
+  class="pointer-events-none fixed bottom-4 right-4 z-20 flex w-80 flex-col items-center justify-start"
 >
   {#each $notifications as notification (notification.id)}
     <div
       animate:flip
       class:shake={notification.shake}
-      class="btn h-fit"
-      style="background: {themes[notification.type]};"
+      class="mt-2 h-fit bg-warning"
       transition:fly={{ y: -30 }}
     >
-      <div class="p-4 text-4xl">{notification.message}</div>
+      <div class="p-4 text-2xl">{notification.message}</div>
       {#if notification.icon}<i class={notification.icon} />{/if}
     </div>
   {/each}

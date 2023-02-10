@@ -1,29 +1,40 @@
 import {
-  CONDITION_BG,
-  CONTAINER_W,
-  EVENT_BG,
-  EVENT_H,
-  EVENT_W,
-  LOOPEVENT_H,
-  LOOPEVENT_W,
+  INTERACTABLE_BG,
+  INTERACTABLE_BORDER,
+  INTERACTABLE_H,
+  INTERACTABLE_W,
   MERGER_BG,
   MERGER_BORDER,
+  MERGER_H,
+  MERGER_W,
+  PUSHER_BG,
+  PUSHER_BORDER,
+  PUSHER_H,
+  PUSHER_W,
+  CTX_MENU_W,
+  CONSUMABLE_BG,
+  CONSUMABLE_BORDER,
+  CONSUMABLE_H,
+  CONSUMABLE_W,
+  EQUIPPABLE_BG,
+  EQUIPPABLE_BORDER,
+  EQUIPPABLE_H,
+  EQUIPPABLE_W,
 } from "$src/constants";
 import type { XYPosition, Position } from "./utils";
 
-export type NodeComponent =
-  | "container"
-  | "condition"
+export type RuleboxType =
+  | "pusher"
   | "merger"
-  | "event"
-  | "loopEvent"
-  | "spawner";
+  | "consumable"
+  | "equippable"
+  | "interactable"
+  | "ctxMenu";
 
-export interface Node<T = any> {
+export interface Rulebox {
   id: number;
-  component: NodeComponent;
+  type: RuleboxType;
   position: XYPosition;
-  data: T;
   width: number;
   height: number;
   bgColor?: string;
@@ -38,58 +49,51 @@ export interface Node<T = any> {
   targetPosition?: "left" | "right" | "top" | "bottom";
 }
 
-export class Node<T = any> {
+// #CF 1
+export class Rulebox<T = any> {
   constructor(
     id: number,
-    component: NodeComponent,
-    position: { x: number; y: number },
-    receiver: boolean
+    type: RuleboxType,
+    position: { x: number; y: number }
   ) {
     this.id = id;
-    this.component = component;
+    this.type = type;
     this.position = position;
 
-    switch (component) {
-      case "spawner":
-        this.width = EVENT_W / 2;
-        break;
+    switch (type) {
+      case "ctxMenu":
+        this.width = CTX_MENU_W;
+        return;
+      case "consumable":
+        this.width = CONSUMABLE_W;
+        this.height = CONSUMABLE_H;
+        this.borderColor = CONSUMABLE_BORDER;
+        this.bgColor = CONSUMABLE_BG;
+        return;
+      case "equippable":
+        this.width = EQUIPPABLE_W;
+        this.height = EQUIPPABLE_H;
+        this.borderColor = EQUIPPABLE_BORDER;
+        this.bgColor = EQUIPPABLE_BG;
+        return;
+      case "interactable":
+        this.width = INTERACTABLE_W;
+        this.height = INTERACTABLE_H;
+        this.borderColor = INTERACTABLE_BORDER;
+        this.bgColor = INTERACTABLE_BG;
+        return;
+      case "pusher":
+        this.width = PUSHER_W;
+        this.height = PUSHER_H;
+        this.borderColor = PUSHER_BORDER;
+        this.bgColor = PUSHER_BG;
+        return;
       case "merger":
-        this.width = EVENT_W / 2;
-        this.height = EVENT_H / 2;
+        this.width = MERGER_W;
+        this.height = MERGER_H;
         this.borderColor = MERGER_BORDER;
         this.bgColor = MERGER_BG;
-      case "condition":
-        this.width = EVENT_W;
-        this.height = EVENT_H;
-        this.borderColor = "#cfc0e3";
-        this.bgColor = CONDITION_BG;
-        break;
-      case "loopEvent":
-        this.width = LOOPEVENT_W;
-        this.height = LOOPEVENT_H;
-        this.borderColor = "#f6fafd";
-        this.bgColor = EVENT_BG;
-        break;
-      case "event":
-        this.width = EVENT_W;
-        this.height = EVENT_H;
-        this.borderColor = "#f6fafd";
-        this.bgColor = EVENT_BG;
-        break;
-      case "container":
-        this.width = CONTAINER_W;
-        this.height = CONTAINER_W;
-        this.borderColor = "#f6fafd";
-        this.bgColor = "#ffc83d";
-        break;
-    }
-
-    if (component == "spawner" || component == "merger") return;
-
-    if (receiver) {
-      this.targetPosition = "left";
-    } else {
-      this.sourcePosition = "right";
+        return;
     }
   }
 }

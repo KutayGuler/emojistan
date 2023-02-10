@@ -4,14 +4,12 @@
   import "../app.css";
   import supabase from "../supabase";
 
-  supabase.auth.onAuthStateChange((event, session) => {
-    console.log(event, session);
-  });
+  supabase.auth.onAuthStateChange((event, session) => {});
 </script>
 
 {#if $navigating?.from.pathname == "/" && $navigating?.to.pathname == "/editor"}
   <div
-    class="absolute z-10 flex h-full w-full items-center justify-center bg-white text-2xl"
+    class="absolute z-20 flex h-full w-full items-center justify-center bg-white text-2xl"
   >
     LOADING
     <span class="px-2" id="loading">👾</span>

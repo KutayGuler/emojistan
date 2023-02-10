@@ -1,26 +1,23 @@
 <script lang="ts">
+  import { DEFAULT_SIDE_LENGTH } from "$src/constants";
   import { currentEmoji, currentColor, map } from "../store";
-  const deleteModes = ["Item", "Background", "Both"];
-  let deleteMode = deleteModes[2];
 
   export let showIndex = false;
+  export let deleteMode: "Item" | "Background" | "Both";
+  export let copyMode: "Item" | "Background" | "Both";
 
   function clickedCell(index: number) {
-    if ($currentColor == "" && $currentEmoji == "") {
-      switch (deleteMode) {
-        case "Item":
-          map.removeEmoji(index);
-          break;
-        case "Background":
-          map.deleteBackground(index);
-          break;
-        default:
-        case "Both":
-          map.removeEmoji(index);
-          map.deleteBackground(index);
-          break;
-      }
-      return;
+    switch (deleteMode) {
+      case "Item":
+        if ($currentEmoji == "") map.removeEmoji(index);
+        break;
+      case "Background":
+        if ($currentColor == "") map.deleteBackground(index);
+        break;
+      case "Both":
+        if ($currentColor == "") map.deleteBackground(index);
+        if ($currentEmoji == "") map.removeEmoji(index);
+        break;
     }
 
     if ($currentColor != "" && $currentColor != $map.dbg) {
@@ -28,18 +25,32 @@
     }
 
     if ($currentEmoji != "") {
-      // db.saves.update();
       map.addEmoji(index, $currentEmoji);
+    }
+  }
+
+  function rightClickedCell(index: number) {
+    switch (copyMode) {
+      case "Item":
+        $currentEmoji = $map.items.get(index) || "";
+        break;
+      case "Background":
+        $currentColor = $map.backgrounds.get(index) || "";
+        break;
+      case "Both":
+        $currentEmoji = $map.items.get(index) || "";
+        $currentColor = $map.backgrounds.get(index) || "";
+        break;
     }
   }
 </script>
 
 <div class="map">
-  {#each { length: 256 } as _, i}
+  {#each { length: DEFAULT_SIDE_LENGTH * DEFAULT_SIDE_LENGTH } as _, i}
     <div
-      class="cell"
       style:background={$map.backgrounds.get(i) || $map.dbg}
       on:click={() => clickedCell(i)}
+      on:contextmenu|preventDefault={() => rightClickedCell(i)}
     >
       {$map?.items.get(i) || (showIndex ? i : "")}
     </div>

@@ -3,51 +3,84 @@
 @tailwind utilities;
 
 @layer components {
-  .btn,
-  .input,
-  .select,
-  .label-text {
-    @apply text-lg;
+  .btn {
+    border: none;
   }
 
   .info {
     @apply cursor-help text-center text-lg duration-200 ease-out hover:scale-150;
   }
 
-  .add {
-    @apply hover:after:content-['++'];
-  }
-
-  .remove {
-    @apply hover:after:content-['❌'];
-  }
-
-  .color {
-    @apply relative flex w-32 items-center justify-center rounded-xl  border-4 border-none py-8 text-2xl duration-200 ease-out;
-  }
-
   .map {
-    @apply grid w-auto grid-cols-16 grid-rows-16 gap-1 p-1 shadow-xl;
+    @apply grid w-auto grid-cols-12 grid-rows-12 gap-1 text-2xl;
   }
 
-  .cell {
-    @apply relative flex h-4 w-4 items-center justify-center bg-base-300 sm:h-6 sm:w-6 md:h-8 md:w-8 lg:h-10 lg:w-10 xl:h-12 xl:w-12;
+  .simulation {
+    @apply grid w-auto grid-cols-4 grid-rows-4 gap-1 text-2xl;
   }
 
-  .cell > .direction {
-    position: absolute;
-    z-index: 2;
+  .slot {
+    @apply flex h-12 w-12 flex-col items-center justify-center rounded border-2 bg-white text-lg;
+  }
+
+  .slot-lg {
+    @apply flex h-20 w-20 flex-col items-center justify-center rounded border-2 bg-white text-4xl;
+  }
+
+  .aside {
+    @apply relative h-[620px] w-72 rounded bg-base-200 p-8 2xl:h-[716px] 2xl:w-80;
+  }
+
+  .simulation > div,
+  .map > div {
+    position: relative;
+    display: flex;
+    width: 3rem;
+    height: 3rem;
+    font-size: 1.25rem; /* 20px */
+    line-height: 1.75rem; /* 28px */
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.25rem;
+    --tw-bg-opacity: 1;
+    background-color: hsl(var(--b3, var(--b2)) / var(--tw-bg-opacity));
+  }
+
+  .emojis > div {
+    width: 12%;
+    transition: 75ms ease-out;
+    box-sizing: border-box;
+    cursor: pointer;
+    font-size: 1rem; /* 16px */
+    line-height: 1.5rem; /* 24px */
+  }
+
+  .selected,
+  .emojis > div:hover {
+    transform: scale(1.5);
+  }
+
+  @media screen and (min-width: 1536px) {
+    .emojis > div {
+      font-size: 1.25rem;
+      line-height: 1.75rem; /* 28px */
+    }
+  }
+
+  @media screen and (min-width: 1536px) {
+    .simulation > div,
+    .map > div {
+      height: 3.5rem;
+      width: 3.5rem;
+      font-size: 1.5rem; /* 24px */
+      line-height: 2rem; /* 32px */
+    }
   }
 }
 
 @font-face {
   font-family: regular;
-  src: url("/fonts/MouseMemoirs.ttf") format("truetype");
-}
-
-@font-face {
-  font-family: emoji;
-  src: url("/fonts/TwemojiMozilla.ttf") format("truetype");
+  src: url("/fonts/Montserrat-ExtraBold.ttf") format("truetype");
 }
 
 :root {
@@ -58,11 +91,16 @@
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
 
-  /* COLOR PALETTE */
+  /* RULEBOXES */
+  --pusher: #64748b;
+  --merger: #334155;
+  --interactable: #6366f1;
+  --consumable: #22c55e;
+  --equippable: #f97316;
 
-  --primary: #f6fafd;
-
-  background-color: var(--primary);
+  /* --primary: #111827; */
+  --primary: white;
+  background-color: hsl(var(--primary));
 }
 
 * {
@@ -73,6 +111,7 @@ html,
 body {
   margin: 0;
   padding: 0;
+  overflow: hidden;
 }
 
 ::-webkit-scrollbar-track {
@@ -90,35 +129,28 @@ body {
   background-color: #e6e6e6;
 }
 
-/* CARDS */
+/* RULEBOXES */
 
-.slots {
-  position: relative;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-around;
-  align-items: center;
-  width: 100%;
-  height: 100%;
+.Pusher:hover,
+.Merger:hover,
+.Interactable:hover,
+.Equippable:hover,
+.Consumable:hover {
+  color: var(--primary);
 }
 
-.slot {
-  width: 48px;
-  height: 24px;
-  background-color: var(--primary);
-  border: 2px solid black;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.Pusher:hover {
+  background-color: var(--pusher);
 }
-
-/* UTILS */
-
-.noselect {
-  -webkit-touch-callout: none; /* iOS Safari */
-  -webkit-user-select: none; /* Safari */
-  -khtml-user-select: none; /* Konqueror HTML */
-  -moz-user-select: none; /* Old versions of Firefox */
-  -ms-user-select: none; /* Internet Explorer/Edge */
-  user-select: none;
+.Merger:hover {
+  background-color: var(--merger);
+}
+.Interactable:hover {
+  background-color: var(--interactable);
+}
+.Equippable:hover {
+  background-color: var(--equippable);
+}
+.Consumable:hover {
+  background-color: var(--consumable);
 }

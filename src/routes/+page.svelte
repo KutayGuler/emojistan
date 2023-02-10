@@ -5,35 +5,36 @@
   import {
     saves,
     map,
-    statics,
     palette,
-    pushes,
-    merges,
-    loopEvents,
-    events,
-    conditions,
+    pushers,
+    mergers,
+    interactables,
+    equippables,
+    consumables,
   } from "../store";
   import { navigating } from "$app/stores";
-  import { svelvetStore } from "$lib/stores/store";
-  const { nodesStore, edgesStore } = svelvetStore;
+  import { rbxStore } from "$lib/stores/store";
 
   onMount(() => {
-    if ($saves.current == "") saves.useStorage();
+    if ($saves.currentSaveID == "") saves.useStorage();
   });
 
-  function openSave(id?: string) {
-    if (id) {
-      $saves.current = id;
-    } else {
-      saves.add();
-    }
+  let gameName = "";
+  let deletedGameName = "";
+  let deletedGameID = "";
+  let creating = false;
+
+  function newGame() {
+    if (creating) return;
+    saves.add(gameName);
     goto("/editor");
+    creating = true;
   }
 
-  // function renameSave() {
-  //   prevTitle = title;
-  //   saves.rename(id, title);
-  // }
+  function openSave(id: string) {
+    $saves.currentSaveID = id;
+    goto("/editor");
+  }
 
   async function signInWithGoogle() {
     const { data, error } = await supabase.auth.signInWithOAuth({
@@ -46,6 +47,8 @@
     if (!owner.data.user) {
       return;
     }
+
+    // CF #8
     const { data, error } = await supabase.from("islands").insert([
       {
         data: {
@@ -54,20 +57,17 @@
             backgrounds: Object.fromEntries($map.backgrounds),
             objective: $map.objective,
           },
-          statics: Array.from($statics),
           palette: Array.from($palette),
-          nodes: Array.from($nodesStore),
-          edges: Array.from($edgesStore),
-          pushes: Object.fromEntries($pushes),
-          merges: Object.fromEntries($merges),
-          loopEvents: Object.fromEntries($loopEvents),
-          events: Object.fromEntries($events),
-          conditions: Object.fromEntries($conditions),
+          rbxs: Array.from($rbxStore),
+          pushers: Object.fromEntries($pushers),
+          mergers: Object.fromEntries($mergers),
+          equippables: Object.fromEntries($equippables),
+          consumables: Object.fromEntries($consumables),
+          interactables: Object.fromEntries($interactables),
         },
         owner: owner.data.user.id,
       },
     ]);
-    console.log(data, error);
   }
 
   async function getIslands() {
@@ -76,118 +76,123 @@
       .from("islands")
       .select("data")
       .eq("owner", user.data.user?.id);
-    console.log(islands, error);
   }
 </script>
 
-<!-- {#await supabase.auth.getUser() then { data, error }}
-  <p>{JSON.stringify(data)}</p>
-{/await} -->
-
-<!-- The button to open modal -->
-<!-- <label for="my-modal-4" class="btn">open modal</label> -->
+<svelte:head>
+  <title>Emojistan</title>
+</svelte:head>
 
 <!-- Put this part before </body> tag -->
-<!-- <input type="checkbox" id="my-modal-4" class="modal-toggle" />
-<label for="my-modal-4" class="modal cursor-pointer">
+<input type="checkbox" id="new-game" class="modal-toggle" />
+<label for="new-game" class="modal cursor-pointer">
   <label class="modal-box relative" for="">
-    <label for="my-modal-4" class="btn btn-circle btn-sm absolute right-2 top-2"
-      >✕</label
-    >
-    <h3 class="text-lg font-bold">Congratulations random Internet user!</h3>
-    <p class="py-4">
-      You've been selected for a chance to get one year of subscription to use
-      Wikipedia for free!
-    </p>
-  </label>
-</label> -->
-
-{#if !$navigating}
-  <main class="noselect">
-    <!-- <div class="dropdown-end dropdown-bottom dropdown absolute right-4 top-4">
-      <label tabindex="0">
-        <div class="avatar placeholder">
-          <div class="w-12 rounded-full bg-neutral-focus text-neutral-content">
-            <span class="text-3xl">K</span>
-          </div>
-        </div>
-      </label>
-      <ul
-        tabindex="0"
-        class="dropdown-content menu rounded-box mt-2 w-52 bg-base-100 p-2 shadow"
+    <h3 class="text-lg font-bold">What's the name of the game?</h3>
+    <span class="inline">
+      <input
+        type="text"
+        class="input input-bordered my-4"
+        bind:value={gameName}
+      />
+      <button class="btn" disabled={gameName.length < 3} on:click={newGame}
+        >CREATE</button
       >
-        <li><a>Friends</a></li>
-        <li><a>Logout</a></li>
-      </ul>
-    </div> -->
-    <p class="py-8 text-9xl">Emojistan 🏝️</p>
-    <p>test</p>
-    <div />
-    {#if $saves.loaded}
-      <div class="flex w-1/3 flex-col gap-8 py-8">
-        <button
-          class="btn my-0 h-16 w-full  hover:bg-primary"
-          on:click={() => openSave()}>New Island</button
-        >
-        {#each [...$saves.saves] as [id, title]}
-          <div class="relative text-lg shadow-lg">
-            <button
-              class="my-0 flex h-20 w-full flex-row items-center justify-start rounded-md border-r-2 p-4 duration-200 ease-out hover:bg-secondary hover:text-white"
-              on:click={() => openSave(id)}
-            >
-              <div>{title}</div>
-            </button>
+    </span>
+  </label>
+</label>
 
-            <!-- The button to open modal -->
-            <label
-              for="my-modal-4"
-              class="absolute top-2 right-2 cursor-pointer"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="h-6 w-6"
+<!-- Put this part before </body> tag -->
+<input type="checkbox" id="delete-save" class="modal-toggle" />
+<label for="delete-save" class="modal cursor-pointer">
+  <label class="modal-box relative" for="">
+    <p class="text-2xl font-bold">
+      Are you sure you want to delete {deletedGameName}?
+    </p>
+
+    <div class="modal-action">
+      <label for="delete-save" class="btn">Cancel</label>
+      <label
+        for="delete-save"
+        class="btn btn-error"
+        on:click={() => {
+          saves.delete(deletedGameID);
+          location.reload(); // REQUIRED FOR DELETING SAVES PROPERLY
+        }}>Delete</label
+      >
+    </div>
+  </label>
+</label>
+
+<div class="drawer-mobile drawer">
+  <input id="my-drawer-2" type="checkbox" class="drawer-toggle" />
+  <div class="drawer-content flex flex-col items-start justify-start">
+    <!-- Page content here -->
+    {#if !$navigating}
+      <h1 class="pt-4 text-2xl">Saves</h1>
+      {#if $saves.loaded}
+        <div class="flex w-1/3 flex-col gap-2 py-8 ">
+          {#each [...$saves.saves] as [id, title]}
+            <div class="relative text-lg shadow-lg">
+              <button
+                class="my-0 flex h-20 w-full flex-row items-center justify-start rounded-md border-r-2 p-4 duration-200 ease-out hover:bg-secondary hover:text-white"
+                on:click={() => openSave(id)}
               >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
-                />
-              </svg></label
-            >
+                <div>{title}</div>
+              </button>
 
-            <!-- Put this part before </body> tag -->
-            <input type="checkbox" id="my-modal-4" class="modal-toggle" />
-            <label for="my-modal-4" class="modal cursor-pointer">
-              <label class="modal-box relative" for="">
-                <p class="text-2xl font-bold">
-                  Are you sure you want to delete {title}?
-                </p>
-
-                <div class="modal-action">
-                  <label for="my-modal-4" class="btn">Cancel</label>
-                  <label
-                    for="my-modal-4"
-                    class="btn btn-error"
-                    on:click={() => {
-                      saves.delete(id);
-                      location.reload(); // REQUIRED FOR DELETING SAVES PROPERLY
-                    }}>Delete</label
-                  >
-                </div>
-              </label>
-            </label>
-          </div>
-        {/each}
-      </div>
-    {:else}
-      <p>Loading...</p>
+              <!-- The button to open modal -->
+              <label
+                on:click={() => {
+                  deletedGameID = id;
+                  deletedGameName = title;
+                }}
+                for="delete-save"
+                class="absolute top-2 right-2 cursor-pointer"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  class="h-6 w-6"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
+                  />
+                </svg></label
+              >
+            </div>
+          {:else}
+            <p>You do not have any saved games.</p>
+          {/each}
+        </div>
+      {:else}
+        <p>Loading...</p>
+      {/if}
     {/if}
-  </main>
-{/if}
+    <label for="my-drawer-2" class="btn btn-primary drawer-button lg:hidden"
+      >Open drawer</label
+    >
+  </div>
+  <div class="drawer-side">
+    <label for="my-drawer-2" class="drawer-overlay" />
+
+    <ul class="menu m-4 w-80 rounded bg-base-200 text-base-content">
+      <p class="select-none p-4 text-2xl">Emojistan 🏝️</p>
+      <div class="mx-4 mt-2 box-border ">
+        <button class="btn w-full" on:click={() => goto("/tutorial/controls")}
+          >TUTORIAL</button
+        >
+      </div>
+      <div class="mx-4 mt-2 box-border ">
+        <label for="new-game" class="btn w-full">NEW GAME</label>
+      </div>
+    </ul>
+  </div>
+</div>
 
 <style>
   svg:hover {

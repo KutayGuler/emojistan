@@ -1,12 +1,20 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  // @ts-expect-error
   import { zoom, zoomTransform } from "d3-zoom";
+  // @ts-expect-error
   import { select, selectAll } from "d3-selection";
-  import { svelvetStore, linker } from "$lib/stores/store";
+  import {
+    rbxStore,
+    rbxSelected,
+    backgroundStore,
+    movementStore,
+    d3Scale,
+  } from "$lib/stores/store";
+  import Rulebox from "$lib/Rulebox.svelte";
+  import { GRAPH_SIZE_2XL } from "$src/constants";
 
-  import SimpleBezierEdge from "$lib/Edges/SimpleBezierEdge.svelte";
-  import EdgeAnchor from "$lib/Edges/EdgeAnchor.svelte";
-  import Node from "$lib/Nodes/index.svelte";
+  export let graphSize: number = GRAPH_SIZE_2XL;
 
   // leveraging d3 library to zoom/pan
   let d3 = {
@@ -16,51 +24,28 @@
     selectAll,
   };
 
-  //these are typscripted as any, however they have been transformed inside of store.ts
-  // export let nodesStore: any;
-  export let derivedEdges: any;
-
-  // here we lookup the store using the unique key
-  const {
-    nodesStore,
-    edgesStore,
-    nodeSelected,
-    backgroundStore,
-    movementStore,
-    widthStore,
-    heightStore,
-    d3Scale,
-  } = svelvetStore;
-
-  function attemptLink(node: Node) {
-    // let type: "source" | "target" =
-    //   node.sourcePosition != undefined ? "source" : "target";
-    if (linker.link(node.id, node.component)) {
-      $nodesStore = $nodesStore;
-    }
-  }
-
   // declaring the grid and dot size for d3's transformations and zoom
   const gridSize = 15;
   const dotSize = 10;
 
-  let nodesDiv;
+  let ruleboxesDiv: HTMLDivElement;
 
   onMount(() => {
-    d3.select(`.Edges`).call(d3Zoom).on("dblclick.zoom", null);
-    d3.select(`.Nodes`).call(d3Zoom).on("dblclick.zoom", null);
-    d3.select(`.Nodes`).on("contextmenu", function (e) {
+    d3.select(`.Ruleboxes`).call(d3Zoom).on("dblclick.zoom", null);
+    d3.select(`.Ruleboxes`).on("contextmenu", function (e: MouseEvent) {
       e.preventDefault();
-      let { x, y, k } = d3.zoomTransform(nodesDiv);
-      y = (-y + e.layerY) / k;
-      x = (-x + e.layerX) / k;
-      nodesStore.spawn("spawner", { x, y });
+      let { x, y, k } = d3.zoomTransform(ruleboxesDiv);
+      // @ts-expect-error
+      y = (-y + e.layerY) / k; // e.layerX is experimental and not recommended
+      // @ts-expect-error
+      x = (-x + e.layerX) / k; // e.layerY is experimental and not recommended
+      rbxStore.spawn("ctxMenu", { x, y });
     });
   });
 
   let d3Zoom: any = d3
     .zoom()
-    .filter(() => !$nodeSelected)
+    .filter(() => !$rbxSelected)
     .scaleExtent([0.4, 2])
     .on("zoom", handleZoom);
 
@@ -85,9 +70,10 @@
     // transform 'g' SVG elements (edge, edge text, edge anchor)
     d3.select(`.Edges g`).attr("transform", e.transform);
     // transform div elements (nodes)
+    // @ts-expect-error
     let transform = d3.zoomTransform(this);
-    // selects and transforms all node divs from class 'Node' and performs transformation
-    d3.select(`.Node`)
+    // selects and transforms all rbx divs from class 'Rbx' and performs transformation
+    d3.select(`.Rbx`)
       .style(
         "transform",
         "translate(" +
@@ -101,46 +87,23 @@
       .style("transform-origin", "0 0");
   }
 
-  let z1 = "z-index: 1;";
-  let svgStyle = "";
-
-  function changeZ() {
-    svgStyle = svgStyle == z1 ? "" : z1;
-  }
-
-  function handleKeydown(e: KeyboardEvent) {
-    console.log(e.code);
-    if (e.code == "Tab") {
-      e.preventDefault();
-      changeZ();
-    }
+  function clickedOnRuleboxes() {
+    rbxStore.removeCtxMenu();
   }
 </script>
 
-<svelte:window on:keydown={handleKeydown} />
-
-<button style="z-index: 2" class="absolute top-2" on:click={changeZ}
-  >{svgStyle == z1 ? "EDIT NODES" : "EDIT EDGES"}</button
->
-
-<!-- TODO: Save camera position and zoom level -->
-
 <!-- This is the container that holds GraphView and we have disabled right click functionality to prevent a sticking behavior -->
-<div class={`Nodes`} bind:this={nodesDiv}>
+<div class={`Ruleboxes`} bind:this={ruleboxesDiv} on:click={clickedOnRuleboxes}>
   <!-- This container is transformed by d3zoom -->
-  <div class={`Node`}>
-    {#each $nodesStore as node}
-      <Node {node} />
+  <div class={`Rbx`}>
+    {#each $rbxStore as rbx}
+      <Rulebox {rbx} />
     {/each}
   </div>
 </div>
 
 <!-- rendering dots on the background depending on the zoom level -->
-<svg
-  style={svgStyle}
-  class={`Edges`}
-  viewBox="0 0 {$widthStore} {$heightStore}"
->
+<svg class={`Edges`} viewBox="0 0 {graphSize} {graphSize}">
   <defs>
     <pattern
       id={`background`}
@@ -163,32 +126,15 @@
   {#if $backgroundStore}
     <rect width="100%" height="100%" style="fill: url(#background);" />
   {/if}
-
-  <!-- <g> tag defines which edge type to render depending on properties of edge object -->
-  <g>
-    {#each $derivedEdges as edge}
-      <SimpleBezierEdge {edge} />
-    {/each}
-    {#each $nodesStore as node}
-      {@const target = node.targetPosition != undefined}
-      {#if node.component != "spawner"}
-        <EdgeAnchor
-          on:linkAttempt={() => attemptLink(node)}
-          x={node.position.x + (target ? 0 : node.width)}
-          y={node.position.y + node.height / 2}
-        />
-      {/if}
-    {/each}
-  </g>
 </svg>
 
 <style>
-  .Nodes {
+  .Ruleboxes {
     position: absolute;
     width: 100%;
     height: 100%;
   }
-  .Node {
+  .Rbx {
     color: black; /* remove this once color is set to default via types */
     width: 100%;
     height: 100%;

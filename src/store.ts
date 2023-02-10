@@ -1,70 +1,15 @@
 import { page } from "$app/stores";
 import { writable, get } from "svelte/store";
-import { DEFAULT_BG } from "./constants";
-
-export interface Mutations {
-  setBackgroundOf: Function;
-  removeBackgroundOf: Function;
-  spawn: Function;
-  destroy: Function;
-  wait: Function;
-  resetLevel: Function;
-  completeLevel: Function;
-}
-
-export interface SequenceItem {
-  type: keyof Mutations;
-  index: number;
-  background: string;
-  duration: number;
-  emoji: string;
-}
-
-export class SequenceItem {
-  constructor(
-    _type: keyof Mutations,
-    index: number,
-    background: string,
-    duration: number,
-    emoji: string
-  ) {
-    this.type = _type;
-    this.index = index;
-    this.background = background;
-    this.duration = duration;
-    this.emoji = emoji;
-  }
-}
-
-export interface Loop {
-  start: number;
-  end: number;
-  iterationNumber: number;
-  iterationType: "increment" | "decrement";
-  timeGap: number;
-  reverse: boolean;
-}
-
-export interface TLoopEvent {
-  sequence: Array<SequenceItem>;
-  loop: Loop;
-}
-
-export type A = "playerBackground" | "playerInteractsWith";
-
-export interface Condition {
-  a: A;
-  b: string;
-  eventID: number;
-}
-
-export class Condition {
-  constructor(a: A, b: string, eventID: number) {
-    this.a = a;
-    this.b = b;
-    this.eventID = eventID;
-  }
-}
+import { DEFAULT_BG, storeNames } from "./constants";
+import {
+  Consumable,
+  EditableMap,
+  Equippable,
+  type CollisionType,
+  type Interactable,
+  type Merger,
+  type Pusher,
+} from "./types";
 
 function createMapStore<T>(name: string) {
   const { set, subscribe, update } = writable(new Map<number, T>());
@@ -104,7 +49,8 @@ function createMapStore<T>(name: string) {
 function createSaves() {
   const { set, subscribe, update } = writable({
     saves: new Map<string, string>(),
-    current: "",
+    currentSaveID: "",
+    currentSaveName: "",
     loaded: false,
   });
 
@@ -115,18 +61,25 @@ function createSaves() {
     set,
     subscribe,
     useStorage: () => {
-      const current = localStorage.getItem("currentSave");
+      const currentSaveID = localStorage.getItem("currentSaveID");
       // @ts-expect-error
       const saves = JSON.parse(localStorage.getItem("saves"));
 
-      if (get(page).routeId == "editor" && (current == "" || current == null)) {
+      if (
+        get(page).routeId == "editor" &&
+        (currentSaveID == "" || currentSaveID == null)
+      ) {
         return false;
       }
 
+      let _saves = new Map<string, string>(saves) || new Map<string, string>();
+
       update((state) => {
-        state.saves = new Map(saves) || new Map();
-        state.current = current || "";
+        state.saves = _saves;
+        state.currentSaveID = currentSaveID || "";
+        state.currentSaveName = _saves.get(currentSaveID || "") || "";
         state.loaded = true;
+
         return state;
       });
 
@@ -135,7 +88,7 @@ function createSaves() {
           "saves",
           JSON.stringify(Array.from(state.saves.entries()))
         );
-        localStorage.setItem("currentSave", state.current);
+        localStorage.setItem("currentSaveID", state.currentSaveID);
       });
 
       return true;
@@ -145,33 +98,20 @@ function createSaves() {
         state.saves.set(id, title);
         return state;
       }),
-    add: () =>
+    add: (name: string) =>
       update((state) => {
         let id = (Math.random() + 1).toString(36).substring(7);
-        state.current = id;
-        state.saves.set(id, "Island #" + id);
+        state.currentSaveID = id;
+        state.currentSaveName = name;
+        state.saves.set(id, name);
         return state;
       }),
     delete: (id: string) =>
       update((state) => {
-        for (let store of [
-          "pushes",
-          "merges",
-          "events",
-          "conditions",
-          "loopEvents",
-          "palette",
-          "statics",
-          "items",
-          "backgrounds",
-          "objective",
-          "nodes",
-          "edges",
-          "dbg",
-        ]) {
+        for (let store of storeNames) {
           localStorage.removeItem(id + "_" + store);
         }
-        state.current = "";
+        state.currentSaveID = "";
         state.saves.delete(id);
         return state;
       }),
@@ -179,12 +119,7 @@ function createSaves() {
 }
 
 function createEditableMap() {
-  const { set, subscribe, update } = writable({
-    items: new Map<number, string>(),
-    backgrounds: new Map<number, string>(),
-    objective: "",
-    dbg: DEFAULT_BG,
-  });
+  const { set, subscribe, update } = writable(new EditableMap());
 
   return {
     set,
@@ -256,7 +191,7 @@ function createEditableMap() {
         state.items.delete(index);
         return state;
       }),
-    clearObjects: () =>
+    clearItems: () =>
       update((state) => {
         state.items.clear();
         return state;
@@ -291,7 +226,7 @@ function createSetStore(name: string) {
       value != "" &&
       update((state) => {
         state.add(value);
-        console.log(state);
+
         return state;
       }),
     remove: (value: string) =>
@@ -304,7 +239,6 @@ function createSetStore(name: string) {
 }
 
 // VANILLA
-export const currentItem = writable("");
 export const currentColor = writable("");
 export const currentEmoji = writable("");
 
@@ -313,13 +247,12 @@ export const saves = createSaves();
 export const map = createEditableMap();
 
 // SETS
-export const quickAccess = createSetStore("quickAccess");
-export const statics = createSetStore("statics");
 export const palette = createSetStore("palette");
+export const statics = createSetStore("statics");
 
 // MAPS
-export const pushes = createMapStore<Array<string>>("pushes");
-export const merges = createMapStore<Array<string>>("merges");
-export const loopEvents = createMapStore<TLoopEvent>("loopEvents");
-export const events = createMapStore<Array<SequenceItem>>("events");
-export const conditions = createMapStore<Condition>("conditions");
+export const pushers = createMapStore<Pusher>("pushers");
+export const mergers = createMapStore<Merger>("mergers");
+export const consumables = createMapStore<Consumable>("consumables");
+export const equippables = createMapStore<Equippable>("equippables");
+export const interactables = createMapStore<Interactable>("interactables");
