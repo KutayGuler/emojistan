@@ -28,32 +28,53 @@
   }
 
   .aside {
-    @apply relative h-[716px] w-80 rounded bg-base-200 p-8 md:h-[572px] md:w-64;
+    @apply relative h-[620px] w-72 rounded bg-base-200 p-8 2xl:h-[716px] 2xl:w-80;
   }
-
-  /* TODO: Change font size of md:cell */
 
   .simulation > div,
   .map > div {
     position: relative;
     display: flex;
-    height: 3.5rem;
-    width: 3.5rem;
+    width: 3rem;
+    height: 3rem;
+    font-size: 1.25rem; /* 20px */
+    line-height: 1.75rem; /* 28px */
     align-items: center;
     justify-content: center;
     border-radius: 0.25rem;
     --tw-bg-opacity: 1;
     background-color: hsl(var(--b3, var(--b2)) / var(--tw-bg-opacity));
   }
-}
 
-@media screen and (max-width: 1366px) {
-  .simulation > div,
-  .map > div {
-    width: 2.75rem;
-    height: 2.75rem;
-    font-size: 1.125rem; /* 18px */
-    line-height: 1.75rem; /* 28px */
+  .emojis > div {
+    width: 12%;
+    transition: 75ms ease-out;
+    box-sizing: border-box;
+    cursor: pointer;
+    font-size: 1rem; /* 16px */
+    line-height: 1.5rem; /* 24px */
+  }
+
+  .selected,
+  .emojis > div:hover {
+    transform: scale(1.5);
+  }
+
+  @media screen and (min-width: 1536px) {
+    .emojis > div {
+      font-size: 1.25rem;
+      line-height: 1.75rem; /* 28px */
+    }
+  }
+
+  @media screen and (min-width: 1536px) {
+    .simulation > div,
+    .map > div {
+      height: 3.5rem;
+      width: 3.5rem;
+      font-size: 1.5rem; /* 24px */
+      line-height: 2rem; /* 32px */
+    }
   }
 }
 

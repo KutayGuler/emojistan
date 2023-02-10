@@ -25,7 +25,7 @@
   import Equippable from "$rbx/Equippable.svelte";
 
   export let rbx: Rulebox;
-  export let props: any;
+  export let props: any = {};
 
   $: shouldMove = moving && $movementStore;
 

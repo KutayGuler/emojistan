@@ -90,7 +90,7 @@
 
   let innerWidth: number;
   let innerHeight: number;
-  let showIndex = false; // TODO: draw outline (parent class can be activated and then => .parent > div)
+  let showIndex = false;
   let hintsEnabled = false;
 
   type DeleteMode = "Item" | "Background" | "Both";
@@ -166,6 +166,10 @@
 </div>
 
 {#if $saves.currentSaveID != ""}
+  <div class="absolute left-4 bottom-4 flex flex-row items-center pt-8">
+    <kbd class="kbd kbd-sm mr-2 2xl:kbd-md">Esc</kbd>
+    <p class="2xl:text-md text-sm">untoggle emoji / color</p>
+  </div>
   {#if test}
     <button on:click={toggleTest} class="absolute top-4 right-4 z-10 text-4xl"
       >🞫</button
@@ -177,7 +181,7 @@
     {#if !test}
       <div
         transition:fly={{ y: -200 }}
-        class="absolute top-12 flex w-full flex-row items-center justify-center gap-8 text-2xl md:text-lg"
+        class="absolute top-24 flex w-full flex-row items-center justify-center gap-8 text-lg 2xl:top-8 2xl:text-2xl"
       >
         <div
           class="{view == 'editor'
@@ -211,15 +215,17 @@
                 🧙
               </button>
               <button
-                class="btn bg-primary text-primary-content hover:bg-primary-focus md:btn-sm  md:text-xs"
+                class="btn bg-primary text-xs text-primary-content hover:bg-primary-focus 2xl:btn-md"
                 on:click={toggleTest}>TEST</button
               >
               <div class="form-control">
                 <label class="label cursor-pointer">
-                  <span class="label-text md:text-xs">Show Indexes</span>
+                  <span class="label-text text-xs 2xl:text-base"
+                    >Show Indexes</span
+                  >
                   <input
                     type="checkbox"
-                    class="checkbox checkbox-secondary md:checkbox-sm"
+                    class="checkbox checkbox-secondary checkbox-sm 2xl:checkbox-md"
                     bind:checked={showIndex}
                   />
                 </label>
@@ -227,7 +233,7 @@
               <div class="flex flex-col gap-2">
                 <div class="form-control">
                   <label class="label">
-                    <span class="label-text md:text-xs"
+                    <span class="label-text text-xs 2xl:text-base"
                       >Copy Mode {#if hintsEnabled}<div
                           class="tooltip tooltip-right"
                           data-tip="Right click on any cell to copy the corresponding emoji or background."
@@ -237,7 +243,7 @@
                     </span>
                   </label>
                   <select
-                    class="select select-bordered md:select-sm md:text-xs"
+                    class="select select-bordered  2xl:text-base"
                     bind:value={copyMode}
                   >
                     {#each deleteModes as mode}
@@ -247,7 +253,7 @@
                 </div>
                 <div class="form-control">
                   <label class="label">
-                    <span class="label-text md:text-xs"
+                    <span class="label-text text-xs 2xl:text-base"
                       >Delete Mode {#if hintsEnabled}<div
                           class="tooltip tooltip-right"
                           data-tip="Left click on any cell to delete the corresponding emoji or background."
@@ -257,7 +263,7 @@
                     >
                   </label>
                   <select
-                    class="select select-bordered md:select-sm md:text-xs"
+                    class="select select-bordered 2xl:text-base"
                     bind:value={deleteMode}
                   >
                     {#each deleteModes as mode}
@@ -268,43 +274,45 @@
 
                 <div class="flex flex-row" />
                 <button
-                  class="btn bg-accent text-accent-content hover:bg-accent-focus md:btn-sm md:text-xs"
+                  class="btn bg-accent text-xs text-accent-content hover:bg-accent-focus 2xl:btn-md 2xl:text-base"
                   on:click={clearMap}
                   >CLEAR {deleteTexts[deleteMode]}
                 </button>
-
+                <div class="w-full">
+                  <label for="filler" class="label">
+                    <span class="label-text text-xs 2xl:text-base"
+                      >Filler {#if hintsEnabled}<div
+                          class="tooltip tooltip-right"
+                          data-tip="Select an emoji from the emoji container and click on the button below to fill the entire map with that emoji"
+                        >
+                          <button>🧙</button>
+                        </div>{/if}</span
+                    >
+                  </label>
+                  <button
+                    id="filler"
+                    disabled={$currentEmoji == ""}
+                    class="btn w-full text-xs 2xl:btn-md 2xl:text-base"
+                    on:click={fillMap}>Fill With {$currentEmoji}</button
+                  >
+                </div>
                 <label class="label">
-                  <span class="label-text md:text-xs"
-                    >Filler {#if hintsEnabled}<div
+                  <span class="label-text text-xs 2xl:text-base"
+                    >Palette ({$palette.size} / 8) {#if hintsEnabled}<div
                         class="tooltip tooltip-right"
-                        data-tip="Select an emoji from the emoji container and click on the button below to fill the entire map with that emoji"
+                        data-tip="Click on the box on the left to choose a color then click on [+] button to add that color to the palette"
                       >
                         <button>🧙</button>
                       </div>{/if}</span
                   >
                 </label>
-                <button
-                  disabled={$currentEmoji == ""}
-                  class="btn md:btn-sm"
-                  on:click={fillMap}>Fill With {$currentEmoji}</button
-                >
+                <Palette />
               </div>
             </div>
-            <label class="label">
-              <span class="label-text md:text-xs"
-                >Palette ({$palette.size} / 8) {#if hintsEnabled}<div
-                    class="tooltip tooltip-right"
-                    data-tip="Click on the box on the left to choose a color then click on [+] button to add that color to the palette"
-                  >
-                    <button>🧙</button>
-                  </div>{/if}</span
-              >
-            </label>
-            <Palette />
           {:else}
             <div class="form-control">
               <label class="label">
-                <span class="label-text md:text-xs">Objective</span>
+                <span class="label-text text-xs 2xl:text-base">Objective</span>
               </label>
               <textarea
                 class="textarea textarea-bordered h-24"
@@ -312,25 +320,15 @@
                 bind:value={$map.objective}
               />
             </div>
-            <p class="label-text pt-4 md:text-xs">Statics 🗿</p>
+            <label class="label pt-4">
+              <span class="label-text text-xs 2xl:text-base"
+                >Statics 🗿
+              </span></label
+            >
             <button
               disabled={$currentEmoji == ""}
-              class="btn w-full md:btn-sm "
-              on:click={() => {
-                // for (let val of [
-                //   ...$consumables.values(),
-                //   ...$interactables.values(),
-                // ]) {
-                //   if ($currentEmoji == val.emoji) {
-                //     notifications.warning(
-                //       "An emoji can only have one assigned type. Interactable, Consumable or Equippable"
-                //     );
-                //     return;
-                //   }
-                // }
-
-                statics.add($currentEmoji);
-              }}
+              class="btn w-full 2xl:btn-md"
+              on:click={() => statics.add($currentEmoji)}
             >
               {$currentEmoji} +
             </button>
@@ -344,7 +342,7 @@
                     animate:flip={flipParams}
                   >
                     <button
-                      class="remove btn h-full w-full md:btn-sm"
+                      class="remove btn h-full w-full 2xl:btn-md"
                       on:click={() => statics.remove(item)}>{item}</button
                     >
                   </div>
@@ -352,10 +350,6 @@
               </div>
             </div>
           {/if}
-          <div class="flex flex-row items-center pt-8">
-            <kbd class="kbd mr-2 md:kbd-sm">Esc</kbd>
-            <p class="md:text-sm">untoggle emoji / color</p>
-          </div>
         </aside>
       {/if}
       {#if test}
@@ -390,7 +384,7 @@
             class="sticky top-0 flex w-full flex-col items-center justify-center gap-4 bg-base-200 p-4 pt-8"
           >
             <input
-              class="input input-bordered w-full md:input-sm"
+              class="input input-bordered input-sm w-full 2xl:input-md"
               type="text"
               placeholder="Search"
               bind:value={filter}
@@ -434,26 +428,6 @@
 {/if}
 
 <style>
-  .emojis > div {
-    font-size: 1.25rem;
-    width: 12%;
-    transition: 75ms ease-out;
-    box-sizing: border-box;
-    cursor: pointer;
-  }
-
-  .selected,
-  .emojis > div:hover {
-    transform: scale(1.5);
-  }
-
-  @media screen and (max-width: 1366px) {
-    .emojis > div {
-      font-size: 1rem; /* 16px */
-      line-height: 1.5rem; /* 24px */
-    }
-  }
-
   .hintsEnabled {
     opacity: 1;
   }

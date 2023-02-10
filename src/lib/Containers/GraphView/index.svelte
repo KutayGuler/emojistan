@@ -12,7 +12,9 @@
     d3Scale,
   } from "$lib/stores/store";
   import Rulebox from "$lib/Rulebox.svelte";
-  import { GRAPH_SIZE } from "$src/constants";
+  import { GRAPH_SIZE_2XL } from "$src/constants";
+
+  export let graphSize: number = GRAPH_SIZE_2XL;
 
   // leveraging d3 library to zoom/pan
   let d3 = {
@@ -101,7 +103,7 @@
 </div>
 
 <!-- rendering dots on the background depending on the zoom level -->
-<svg class={`Edges`} viewBox="0 0 {GRAPH_SIZE} {GRAPH_SIZE}">
+<svg class={`Edges`} viewBox="0 0 {graphSize} {graphSize}">
   <defs>
     <pattern
       id={`background`}

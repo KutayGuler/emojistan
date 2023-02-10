@@ -77,8 +77,6 @@
       .select("data")
       .eq("owner", user.data.user?.id);
   }
-
-  // TODO: Responsivity
 </script>
 
 <svelte:head>
@@ -125,7 +123,7 @@
   </label>
 </label>
 
-<div class="drawer drawer-mobile">
+<div class="drawer-mobile drawer">
   <input id="my-drawer-2" type="checkbox" class="drawer-toggle" />
   <div class="drawer-content flex flex-col items-start justify-start">
     <!-- Page content here -->

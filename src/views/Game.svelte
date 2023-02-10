@@ -201,10 +201,6 @@
 
   initItems();
 
-  // FIXME: There is a problem with items that have maxxed
-  // and plussed out their hps when they are damaged
-  // (percentage issue)
-
   let player = items.get(ac) as Item;
   $: player = items.get(ac) as Item;
 
@@ -431,6 +427,7 @@
           player.emoji = mutateConsumerTo;
         } else {
           player.hp.add(hp);
+          console.log(player.hp.current);
 
           if (player.hp.current <= 0) {
             let playerDevolve = _interactables[player?.emoji || ""]?.devolve;
@@ -474,7 +471,7 @@
 
           let playerEvolve = _interactables[player?.emoji || ""]?.evolve;
 
-          if (playerEvolve.enabled && player.hp.current == playerEvolve?.at) {
+          if (playerEvolve?.enabled && player.hp.current == playerEvolve?.at) {
             player.emoji = playerEvolve.to;
             player.hp.max = _interactables[playerEvolve.to]?.hp || 1;
             player.hp.current = player.hp.max;
