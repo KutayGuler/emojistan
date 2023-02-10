@@ -1,6 +1,5 @@
 import { writable, get } from "svelte/store";
 import { Rulebox, type RuleboxType } from "../types/types";
-import { GRAPH_SIZE } from "../../constants";
 
 function createRuleboxes() {
   const arr: Array<Rulebox> = [];
@@ -55,8 +54,6 @@ function createRuleboxes() {
   };
 }
 
-export const widthStore = writable(GRAPH_SIZE);
-export const heightStore = writable(GRAPH_SIZE);
 export const backgroundStore = writable(true);
 export const movementStore = writable(true);
 export const rbxSelected = writable(false);

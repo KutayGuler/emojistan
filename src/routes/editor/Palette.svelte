@@ -39,16 +39,16 @@
 </script>
 
 <div class="flex flex-col gap-2">
-  <div class="flex flex-row gap-2">
+  <div class="flex flex-row items-center gap-2">
     <input
-      class="h-12 w-12 cursor-pointer"
+      class="h-12 w-12 cursor-pointer md:h-10 md:w-10"
       type="color"
       bind:value={pickedColor}
     />
     <button
       disabled={$cp.has(pickedColor)}
       title="Add selected color"
-      class="btn flex-grow text-2xl"
+      class="btn flex-grow text-2xl md:btn-sm md:h-10 md:text-lg"
       on:click={addColor}
     >
       +
@@ -60,7 +60,7 @@
       <div
         class="{color == $currentColor
           ? 'scale-125'
-          : ''} dropdown-hover dropdown h-12 w-12 cursor-pointer rounded duration-150 ease-out hover:scale-125"
+          : ''} dropdown-hover dropdown h-12 w-12 cursor-pointer rounded duration-150 ease-out hover:scale-125 md:h-10 md:w-10"
         transition:scale|local={flipParams}
         animate:flip={flipParams}
         style:background={color}

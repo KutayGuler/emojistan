@@ -28,8 +28,10 @@
   }
 
   .aside {
-    @apply relative h-[716px] w-80 rounded bg-base-200 p-8;
+    @apply relative h-[716px] w-80 rounded bg-base-200 p-8 md:h-[572px] md:w-64;
   }
+
+  /* TODO: Change font size of md:cell */
 
   .simulation > div,
   .map > div {
@@ -42,6 +44,16 @@
     border-radius: 0.25rem;
     --tw-bg-opacity: 1;
     background-color: hsl(var(--b3, var(--b2)) / var(--tw-bg-opacity));
+  }
+}
+
+@media screen and (max-width: 1366px) {
+  .simulation > div,
+  .map > div {
+    width: 2.75rem;
+    height: 2.75rem;
+    font-size: 1.125rem; /* 18px */
+    line-height: 1.75rem; /* 28px */
   }
 }
 

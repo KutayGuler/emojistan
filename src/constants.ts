@@ -11,6 +11,7 @@ export const DURATIONS = [50, 100, 200, 500, 1000, 2000, 5000, 10000];
 
 export const DEFAULT_BG = "#E6E6E6";
 export const GRAPH_SIZE = 716;
+export const GRAPH_SIZE_MD = 572;
 
 /* CONTEXT MENU */
 export const CTX_MENU_W = 108;

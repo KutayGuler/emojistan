@@ -177,7 +177,7 @@
     {#if !test}
       <div
         transition:fly={{ y: -200 }}
-        class="absolute top-12 flex w-full flex-row items-center justify-center gap-8 text-2xl"
+        class="absolute top-12 flex w-full flex-row items-center justify-center gap-8 text-2xl md:text-lg"
       >
         <div
           class="{view == 'editor'
@@ -211,15 +211,15 @@
                 🧙
               </button>
               <button
-                class="btn bg-primary text-primary-content hover:bg-primary-focus"
+                class="btn bg-primary text-primary-content hover:bg-primary-focus md:btn-sm  md:text-xs"
                 on:click={toggleTest}>TEST</button
               >
               <div class="form-control">
                 <label class="label cursor-pointer">
-                  <span class="label-text">Show Indexes</span>
+                  <span class="label-text md:text-xs">Show Indexes</span>
                   <input
                     type="checkbox"
-                    class="checkbox checkbox-secondary"
+                    class="checkbox checkbox-secondary md:checkbox-sm"
                     bind:checked={showIndex}
                   />
                 </label>
@@ -227,7 +227,7 @@
               <div class="flex flex-col gap-2">
                 <div class="form-control">
                   <label class="label">
-                    <span class="label-text"
+                    <span class="label-text md:text-xs"
                       >Copy Mode {#if hintsEnabled}<div
                           class="tooltip tooltip-right"
                           data-tip="Right click on any cell to copy the corresponding emoji or background."
@@ -236,7 +236,10 @@
                         </div>{/if}
                     </span>
                   </label>
-                  <select class="select select-bordered" bind:value={copyMode}>
+                  <select
+                    class="select select-bordered md:select-sm md:text-xs"
+                    bind:value={copyMode}
+                  >
                     {#each deleteModes as mode}
                       <option value={mode}>{mode}</option>
                     {/each}
@@ -244,7 +247,7 @@
                 </div>
                 <div class="form-control">
                   <label class="label">
-                    <span class="label-text"
+                    <span class="label-text md:text-xs"
                       >Delete Mode {#if hintsEnabled}<div
                           class="tooltip tooltip-right"
                           data-tip="Left click on any cell to delete the corresponding emoji or background."
@@ -254,7 +257,7 @@
                     >
                   </label>
                   <select
-                    class="select select-bordered"
+                    class="select select-bordered md:select-sm md:text-xs"
                     bind:value={deleteMode}
                   >
                     {#each deleteModes as mode}
@@ -265,13 +268,13 @@
 
                 <div class="flex flex-row" />
                 <button
-                  class="btn bg-accent text-accent-content hover:bg-accent-focus"
+                  class="btn bg-accent text-accent-content hover:bg-accent-focus md:btn-sm md:text-xs"
                   on:click={clearMap}
                   >CLEAR {deleteTexts[deleteMode]}
                 </button>
 
                 <label class="label">
-                  <span class="label-text"
+                  <span class="label-text md:text-xs"
                     >Filler {#if hintsEnabled}<div
                         class="tooltip tooltip-right"
                         data-tip="Select an emoji from the emoji container and click on the button below to fill the entire map with that emoji"
@@ -282,13 +285,13 @@
                 </label>
                 <button
                   disabled={$currentEmoji == ""}
-                  class="btn"
+                  class="btn md:btn-sm"
                   on:click={fillMap}>Fill With {$currentEmoji}</button
                 >
               </div>
             </div>
             <label class="label">
-              <span class="label-text"
+              <span class="label-text md:text-xs"
                 >Palette ({$palette.size} / 8) {#if hintsEnabled}<div
                     class="tooltip tooltip-right"
                     data-tip="Click on the box on the left to choose a color then click on [+] button to add that color to the palette"
@@ -301,7 +304,7 @@
           {:else}
             <div class="form-control">
               <label class="label">
-                <span class="label-text">Objective</span>
+                <span class="label-text md:text-xs">Objective</span>
               </label>
               <textarea
                 class="textarea textarea-bordered h-24"
@@ -309,10 +312,10 @@
                 bind:value={$map.objective}
               />
             </div>
-            <p class="label-text pt-4">Statics 🗿</p>
+            <p class="label-text pt-4 md:text-xs">Statics 🗿</p>
             <button
               disabled={$currentEmoji == ""}
-              class="btn w-full "
+              class="btn w-full md:btn-sm "
               on:click={() => {
                 // for (let val of [
                 //   ...$consumables.values(),
@@ -341,7 +344,7 @@
                     animate:flip={flipParams}
                   >
                     <button
-                      class="remove btn h-full w-full"
+                      class="remove btn h-full w-full md:btn-sm"
                       on:click={() => statics.remove(item)}>{item}</button
                     >
                   </div>
@@ -350,8 +353,8 @@
             </div>
           {/if}
           <div class="flex flex-row items-center pt-8">
-            <kbd class="kbd mr-2">Esc</kbd>
-            <p>untoggle emoji / color</p>
+            <kbd class="kbd mr-2 md:kbd-sm">Esc</kbd>
+            <p class="md:text-sm">untoggle emoji / color</p>
           </div>
         </aside>
       {/if}
@@ -387,7 +390,7 @@
             class="sticky top-0 flex w-full flex-col items-center justify-center gap-4 bg-base-200 p-4 pt-8"
           >
             <input
-              class="input input-bordered w-full"
+              class="input input-bordered w-full md:input-sm"
               type="text"
               placeholder="Search"
               bind:value={filter}
@@ -442,6 +445,13 @@
   .selected,
   .emojis > div:hover {
     transform: scale(1.5);
+  }
+
+  @media screen and (max-width: 1366px) {
+    .emojis > div {
+      font-size: 1rem; /* 16px */
+      line-height: 1.5rem; /* 24px */
+    }
   }
 
   .hintsEnabled {

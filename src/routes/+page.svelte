@@ -9,6 +9,8 @@
     pushers,
     mergers,
     interactables,
+    equippables,
+    consumables,
   } from "../store";
   import { navigating } from "$app/stores";
   import { rbxStore } from "$lib/stores/store";
@@ -59,6 +61,8 @@
           rbxs: Array.from($rbxStore),
           pushers: Object.fromEntries($pushers),
           mergers: Object.fromEntries($mergers),
+          equippables: Object.fromEntries($equippables),
+          consumables: Object.fromEntries($consumables),
           interactables: Object.fromEntries($interactables),
         },
         owner: owner.data.user.id,
@@ -121,7 +125,7 @@
   </label>
 </label>
 
-<div class="drawer-mobile drawer">
+<div class="drawer drawer-mobile">
   <input id="my-drawer-2" type="checkbox" class="drawer-toggle" />
   <div class="drawer-content flex flex-col items-start justify-start">
     <!-- Page content here -->

@@ -9,11 +9,10 @@
     rbxSelected,
     backgroundStore,
     movementStore,
-    widthStore,
-    heightStore,
     d3Scale,
   } from "$lib/stores/store";
   import Rulebox from "$lib/Rulebox.svelte";
+  import { GRAPH_SIZE } from "$src/constants";
 
   // leveraging d3 library to zoom/pan
   let d3 = {
@@ -102,7 +101,7 @@
 </div>
 
 <!-- rendering dots on the background depending on the zoom level -->
-<svg class={`Edges`} viewBox="0 0 {$widthStore} {$heightStore}">
+<svg class={`Edges`} viewBox="0 0 {GRAPH_SIZE} {GRAPH_SIZE}">
   <defs>
     <pattern
       id={`background`}
