@@ -41,14 +41,14 @@
 <div class="flex flex-col gap-2">
   <div class="flex flex-row items-center gap-2">
     <input
-      class="h-12 w-12 cursor-pointer md:h-10 md:w-10"
+      class="h-10 w-10 cursor-pointer 2xl:h-12 2xl:w-12"
       type="color"
       bind:value={pickedColor}
     />
     <button
       disabled={$cp.has(pickedColor)}
       title="Add selected color"
-      class="btn flex-grow text-2xl md:btn-sm md:h-10 md:text-lg"
+      class="btn btn-sm h-10 flex-grow text-lg 2xl:btn-md 2xl:text-2xl"
       on:click={addColor}
     >
       +
@@ -60,7 +60,7 @@
       <div
         class="{color == $currentColor
           ? 'scale-125'
-          : ''} dropdown-hover dropdown h-12 w-12 cursor-pointer rounded duration-150 ease-out hover:scale-125 md:h-10 md:w-10"
+          : ''} dropdown-hover dropdown h-10 w-10 cursor-pointer rounded duration-150 ease-out hover:scale-125 2xl:h-12 2xl:w-12"
         transition:scale|local={flipParams}
         animate:flip={flipParams}
         style:background={color}
@@ -76,7 +76,7 @@
       >
         <ul
           tabindex="0"
-          class="dropdown-content menu rounded-box mt-12 bg-base-100 p-2 shadow"
+          class="dropdown-content menu rounded-box mt-10 bg-base-100 p-2 shadow 2xl:mt-12"
         >
           <li
             on:click={() => setDefaultBackground(color)}
