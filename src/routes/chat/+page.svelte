@@ -136,7 +136,7 @@
       let keys = dialogueTree.keys();
       if (currentIndex + 1 == currentDialogue.length) {
         while (keys.next().value != currentKey) {}
-        currentKey = keys.next().value;
+        currentKey = keys.next().value || currentKey;
         currentKeyChanged();
         currentIndex = 0;
       } else {
