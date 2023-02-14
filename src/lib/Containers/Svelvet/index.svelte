@@ -25,7 +25,7 @@
   style={`width: ${graphSize}px; height: ${graphSize}px`}
 >
   <GraphView {graphSize} />
-  <p class="absolute right-0 bottom-0 pr-1 text-sm">
+  <p class="absolute right-0 bottom-0 pr-1 text-xs">
     Right click to spawn a Rulebox
   </p>
 </div>

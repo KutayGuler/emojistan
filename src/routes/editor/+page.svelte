@@ -320,6 +320,7 @@
                 bind:value={$map.objective}
               />
             </div>
+            <!-- TODO: add removing indicator when hovered -->
             <label class="label pt-4">
               <span class="label-text text-xs 2xl:text-base"
                 >Statics 🗿
@@ -349,6 +350,11 @@
                 {/each}
               </div>
             </div>
+            <label class="label pt-4">
+              <span class="label-text text-xs 2xl:text-base"
+                >Dialogues 🗿
+              </span></label
+            >
           {/if}
         </aside>
       {/if}

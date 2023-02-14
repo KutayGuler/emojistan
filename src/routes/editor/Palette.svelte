@@ -76,7 +76,7 @@
       >
         <ul
           tabindex="0"
-          class="dropdown-content menu rounded-box mt-12 bg-base-100 p-2 shadow"
+          class="dropdown-content menu rounded-box mt-10 bg-base-100 p-2 shadow 2xl:mt-12"
         >
           <li
             on:click={() => setDefaultBackground(color)}

@@ -22,8 +22,6 @@
     "what's up",
     "n-word",
     "will you help me recover racism?",
-    new Choice("1_1", "yes"),
-    new Choice("1_2", "no"),
   ]);
 
   // dialogueTree.set("1_2", ["get ready to get destroyed babi"]);
@@ -43,7 +41,9 @@
 
   let currentDialogue = dialogueTree.get(currentKey);
   let currentText = "";
+  let currentIndex = 0;
 
+  // TODO: insert by currentIndex
   function addText() {
     if (Array.isArray(currentDialogue?.at(-1))) {
       notifications.warning("You cannot add text after choice");
@@ -55,6 +55,7 @@
     currentText = "";
   }
 
+  // TODO: insert by currentIndex
   function addChoice() {
     let numberOfSiblings = 1;
 
@@ -69,10 +70,14 @@
     currentDialogue?.push(new Choice(to, currentText));
     dialogueTree = dialogueTree;
     currentText = "";
-    console.log(dialogueTree);
   }
 
   function remove(index: number) {
+    if (!currentDialogue) return;
+    let item = currentDialogue[index];
+    if (item instanceof Choice) {
+      dialogueTree.delete(item.to);
+    }
     currentDialogue?.splice(index, 1);
     dialogueTree = dialogueTree;
   }
@@ -120,6 +125,44 @@
       if ((currentDialogue || [])[chatIndex] instanceof Choice) {
         chatIndex = currentDialogue?.length || 1;
       }
+      return;
+    }
+
+    // console.log(dialogueTree);
+
+    if (!currentDialogue) return;
+
+    if (e.code == "ArrowDown") {
+      let keys = dialogueTree.keys();
+      if (currentIndex + 1 == currentDialogue.length) {
+        while (keys.next().value != currentKey) {}
+        currentKey = keys.next().value;
+        currentKeyChanged();
+        currentIndex = 0;
+      } else {
+        currentIndex++;
+      }
+      return;
+    }
+
+    if (e.code == "ArrowUp") {
+      let keys = dialogueTree.keys();
+      if (currentIndex == 0) {
+        let prev = currentKey;
+        for (let key of keys) {
+          if (key == currentKey) {
+            break;
+          } else {
+            prev = key;
+          }
+        }
+        currentKey = prev;
+        currentKeyChanged();
+        currentIndex = currentDialogue.length - 1;
+      } else {
+        currentIndex--;
+      }
+      return;
     }
   }}
 />
@@ -142,8 +185,6 @@
     <button class="btn" disabled={currentText == ""} on:click={addChoice}
       >ADD AS CHOICE</button
     >
-  </div>
-  <div class="flex-grow pl-12">
     <h1 class="text-2xl">List View</h1>
     <div class="flex flex-col items-start justify-start">
       {#each [...dialogueTree] as [key, dialogue]}
@@ -152,10 +193,18 @@
         >
         {#if expands.get(key)}
           {#each dialogue as text, i}
-            <p class="pl-4">
-              {#if typeof text == "string"}{text}{:else}{text.text} -> {text.to}{/if}
+            <div
+              class="flex w-full flex-row justify-between gap-4 pl-4"
+              on:click={() => (currentIndex = i)}
+            >
+              <p>
+                {#if key == currentKey && currentIndex == i}📍{/if}
+              </p>
+              <p class="flex-grow">
+                {#if typeof text == "string"}{text}{:else}{text.text} -> {text.to}{/if}
+              </p>
               <button on:click={() => remove(i)}>X</button>
-            </p>
+            </div>
           {/each}
         {/if}
       {/each}
