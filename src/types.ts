@@ -61,7 +61,7 @@ export interface _Equippables {
 
 export interface Consumable {
   emoji: string;
-  hp: number; // add to consumer hp
+  hp: number; // side effect
   mutateConsumerTo: string;
 }
 
