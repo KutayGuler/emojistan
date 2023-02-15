@@ -22,17 +22,24 @@
     "what's up",
     "n-word",
     "will you help me recover racism?",
+    new Choice("1_2", "no"),
   ]);
 
-  // dialogueTree.set("1_2", ["get ready to get destroyed babi"]);
+  dialogueTree.set("1_2", ["get ready to get destroyed babi"]);
 
   let currentKey = "1";
   let chatIndex = 0;
   let animating = false;
 
-  function makeChoice(to: string) {
-    chatIndex = 0;
+  let answerIndexes: Array<number> = [];
+
+  function makeChoice(to: string, text: string) {
+    chatIndex = chatIndex - choices.length + 1;
+    choices = [];
+    texts = [...texts, text];
+    answerIndexes.push(texts.length - 1);
     currentKey = to;
+    currentKeyChanged();
   }
 
   onMount(() => {
@@ -43,19 +50,37 @@
   let currentText = "";
   let currentIndex = 0;
 
-  // TODO: insert by currentIndex
-  function addText() {
-    if (Array.isArray(currentDialogue?.at(-1))) {
+  function addBranch() {
+    let biggestValue = 1;
+    for (let key of dialogueTree.keys()) {
+      let main = +key.split("_")[0];
+      if (biggestValue <= main) {
+        biggestValue = main + 1;
+      }
+    }
+
+    dialogueTree.set(biggestValue.toString(), []);
+    dialogueTree = dialogueTree;
+  }
+
+  function deleteBranch() {
+    dialogueTree.delete(currentKey);
+    currentKey = dialogueTree.keys().next().value;
+    dialogueTree = dialogueTree;
+  }
+
+  function insertText() {
+    if (!currentDialogue) return;
+    if (currentDialogue[currentIndex - 1] instanceof Choice) {
       notifications.warning("You cannot add text after choice");
       return;
     }
 
-    currentDialogue.push(currentText);
+    currentDialogue?.splice(currentIndex, 0, currentText);
     dialogueTree = dialogueTree;
     currentText = "";
   }
 
-  // TODO: insert by currentIndex
   function addChoice() {
     let numberOfSiblings = 1;
 
@@ -72,21 +97,20 @@
     currentText = "";
   }
 
-  function remove(index: number) {
-    if (!currentDialogue) return;
-    let item = currentDialogue[index];
-    if (item instanceof Choice) {
-      dialogueTree.delete(item.to);
+  function remove(key: string, index: number) {
+    if (key == currentKey) {
+      if (!currentDialogue) return;
+      currentDialogue.splice(index, 1);
+      currentIndex = currentDialogue.length - 1;
+    } else {
+      let clickedDialogue = dialogueTree.get(key);
+      if (!clickedDialogue) return;
+      clickedDialogue.splice(index, 1);
     }
-    currentDialogue?.splice(index, 1);
     dialogueTree = dialogueTree;
   }
 
-  function addTextBeforeLast() {
-    // edge-case: can't have more than 1 array (choice) inside a dialogue
-  }
-
-  let expands = new Map();
+  let expands = new Map<string, boolean>();
 
   function toggleExpandOf(key: string) {
     expands.set(key, !expands.get(key));
@@ -99,8 +123,6 @@
   function currentKeyChanged() {
     currentDialogue = dialogueTree.get(currentKey);
     if (!currentDialogue) return;
-    choices = [];
-    texts = [];
 
     for (let item of currentDialogue) {
       if (typeof item == "string") {
@@ -119,24 +141,25 @@
 
 <svelte:window
   on:keydown={(e) => {
+    if (!currentDialogue) return;
+
     if (e.code == "Space") {
+      if (chatIndex == currentDialogue.length) return;
       chatIndex++;
 
-      if ((currentDialogue || [])[chatIndex] instanceof Choice) {
-        chatIndex = currentDialogue?.length || 1;
+      if (currentDialogue[chatIndex - 1] instanceof Choice) {
+        chatIndex = currentDialogue.length;
       }
       return;
     }
-
-    // console.log(dialogueTree);
-
-    if (!currentDialogue) return;
 
     if (e.code == "ArrowDown") {
       let keys = dialogueTree.keys();
       if (currentIndex + 1 == currentDialogue.length) {
         while (keys.next().value != currentKey) {}
-        currentKey = keys.next().value || currentKey;
+        let value = keys.next().value;
+        if (dialogueTree.get(value)?.length == 0) return;
+        currentKey = value || currentKey;
         currentKeyChanged();
         currentIndex = 0;
       } else {
@@ -178,13 +201,23 @@
         <option value={key}>{key}</option>
       {/each}
     </select>
-    <input type="text" class="input input-bordered" bind:value={currentText} />
-    <button class="btn" disabled={currentText == ""} on:click={addText}
-      >add</button
+    <button class="btn" on:click={addBranch}>ADD BRANCH</button>
+    <button class="btn" on:click={deleteBranch}
+      >DELETE BRANCH # {currentKey}</button
     >
-    <button class="btn" disabled={currentText == ""} on:click={addChoice}
-      >ADD AS CHOICE</button
-    >
+    <div>
+      <input
+        type="text"
+        class="input input-bordered"
+        bind:value={currentText}
+      />
+      <button class="btn" disabled={currentText == ""} on:click={insertText}
+        >INSERT</button
+      >
+      <button class="btn" disabled={currentText == ""} on:click={addChoice}
+        >ADD CHOICE</button
+      >
+    </div>
     <h1 class="text-2xl">List View</h1>
     <div class="flex flex-col items-start justify-start">
       {#each [...dialogueTree] as [key, dialogue]}
@@ -193,17 +226,15 @@
         >
         {#if expands.get(key)}
           {#each dialogue as text, i}
-            <div
-              class="flex w-full flex-row justify-between gap-4 pl-4"
-              on:click={() => (currentIndex = i)}
-            >
+            {@const isString = typeof text == "string"}
+            <div class="flex w-full flex-row justify-between gap-4 pl-4">
               <p>
                 {#if key == currentKey && currentIndex == i}📍{/if}
               </p>
               <p class="flex-grow">
-                {#if typeof text == "string"}{text}{:else}{text.text} -> {text.to}{/if}
+                {#if isString}{text}{:else}{text.text} -> {text.to}{/if}
               </p>
-              <button on:click={() => remove(i)}>X</button>
+              <button on:click={() => remove(key, i)}>X</button>
             </div>
           {/each}
         {/if}
@@ -217,25 +248,23 @@
     <ul>
       {#each texts as text, i}
         {#if i < chatIndex && !animating}
-          <li class="chat chat-start" transition:fly={{ x: 100 }}>
+          <li
+            class="chat {answerIndexes.includes(i) ? 'chat-end' : 'chat-start'}"
+            transition:fly={{ x: -100 }}
+          >
             <span class="chat-bubble">
               {text}
             </span>
           </li>
         {/if}
       {/each}
-      <div
-        class="flex flex-row gap-2 pl-4"
-        transition:fly={{ x: 100 }}
-        on:outrostart={() => (animating = true)}
-        on:outroend={() => {
-          animating = false;
-          chatIndex++;
-        }}
-      >
+      <div class="flex flex-row gap-2 pl-4">
         {#each choices as choice, i}
           {#if i + texts.length < chatIndex && !animating}
-            <button class="btn flex-grow" on:click={() => makeChoice(choice.to)}
+            <button
+              transition:fly={{ x: 100 }}
+              class="btn flex-grow"
+              on:click={() => makeChoice(choice.to, choice.text)}
               ><p>{choice.text}</p>
             </button>
           {/if}
