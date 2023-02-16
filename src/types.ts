@@ -190,6 +190,7 @@ export interface Interactable {
   isStatic: boolean;
   evolve: Evolve;
   devolve: Devolve;
+  dialogueID: string;
 }
 
 export class Interactable {
@@ -201,7 +202,8 @@ export class Interactable {
     sideEffects: Array<[number | "any", number]>,
     isStatic: boolean,
     evolve: Evolve,
-    devolve: Devolve
+    devolve: Devolve,
+    dialogueID = ""
   ) {
     this.emoji = emoji;
     this.sequence = sequence;
@@ -211,6 +213,7 @@ export class Interactable {
     this.isStatic = isStatic;
     this.evolve = evolve;
     this.devolve = devolve;
+    this.dialogueID = dialogueID;
   }
 }
 

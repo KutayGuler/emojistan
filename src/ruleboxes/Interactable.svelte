@@ -119,6 +119,7 @@
   export let isStatic = false;
   export let evolve = new Evolve(false, "", 2);
   export let devolve = new Devolve(false, "");
+  export let dialogueID = "";
 
   // SEQUENCE RELATED
   let type = types.Map[0];

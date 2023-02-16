@@ -137,7 +137,7 @@
     dialogue: "💬",
   };
 
-  let viewKey: ViewKey = "editor";
+  let viewKey: ViewKey = "dialogue";
 
   function changeViewTo(to: string) {
     viewKey = to as ViewKey;
@@ -200,7 +200,7 @@
       />
     {:else}
       <div
-        class="flex h-1/6 w-full flex-row items-center justify-center gap-8 text-lg 2xl:top-8 2xl:text-2xl"
+        class="flex h-full w-full flex-row items-center justify-center gap-8 text-lg 2xl:top-8 2xl:text-2xl"
       >
         {#each Object.entries(views) as [key, icon]}
           <div
@@ -416,7 +416,7 @@
         </div>
       {/if}
 
-      <div class="relative h-1/6 w-full">
+      <div class="relative h-full w-full">
         <div class="absolute bottom-4 left-4 flex flex-row">
           <kbd class="kbd kbd-sm mr-2 2xl:kbd-md">Esc</kbd>
           <p class="2xl:text-md text-sm">untoggle emoji / color</p>
