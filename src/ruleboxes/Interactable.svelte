@@ -6,6 +6,7 @@
     MIN_INDEX,
     DEFAULT_SIDE_LENGTH,
     EQUIPPABLE_BORDER,
+    CROSS,
   } from "$src/constants";
   // interactables = {
   // "emoji": {interactable}
@@ -432,7 +433,7 @@
           {:else if modifierEmoji}
             <button
               class="absolute -top-2 -right-2 text-lg"
-              on:click={() => removeFromSideEffects(i)}>🞫</button
+              on:click={() => removeFromSideEffects(i)}>{CROSS}</button
             >
             <div class="slot-lg scale-75">
               {modifierEmoji}
@@ -453,7 +454,7 @@
       {/each}
       {#each pseudoSideEffects as [emoji, value]}
         <div class="relative flex flex-col items-center">
-          <button class="absolute -top-2 -right-2 text-lg">🞫</button>
+          <button class="absolute -top-2 -right-2 text-lg">{CROSS}</button>
           <div class="slot-lg scale-75">
             {emoji}
           </div>
@@ -555,7 +556,7 @@
         <button
           class="text-2xl"
           id="remove"
-          on:click={() => removeFromSequence(i)}>🞫</button
+          on:click={() => removeFromSequence(i)}>{CROSS}</button
         >
       </span>
     {/each}

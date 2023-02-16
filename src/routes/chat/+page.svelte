@@ -51,6 +51,7 @@
 
     dialogueTree.set(key, ["SAMPLE TEXT"]);
     mainBranches = [...mainBranches, key];
+    currentBranch = key;
     dialogueTree = dialogueTree;
   }
 
@@ -72,7 +73,8 @@
     currentText = "";
   }
 
-  // TODO: Switch to added branch | sub branch
+  // TODO: arrows shouldn't jump between main branches
+  // TODO: Add filters to beautify
 
   function addChoice() {
     let numberOfSiblings = 1;
@@ -80,8 +82,9 @@
 
     for (let key of dialogueTree.keys()) {
       if (
-        key[0] == currentBranch &&
-        key.split(currentBranch + "_").length > 1
+        key.includes(currentSubBranch) &&
+        key.length == currentSubBranch.length + 2 &&
+        key.split(currentSubBranch + "_").length > 1
       ) {
         numberOfSiblings++;
       }
@@ -189,7 +192,7 @@
   }}
 />
 
-<div class="flex flex-col gap-4 p-4">
+<div class="flex flex-col gap-4 overflow-auto p-4">
   <div class="flex flex-row gap-4">
     <div>
       <label class="label">

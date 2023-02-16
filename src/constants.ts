@@ -13,6 +13,10 @@ export const DEFAULT_BG = "#E6E6E6";
 export const GRAPH_SIZE_2XL = 716;
 export const GRAPH_SIZE_MD = 620;
 
+/* ICONS */
+export const CROSS = "🞫";
+export const GUIDE = "🧙‍♂️";
+
 /* CONTEXT MENU */
 export const CTX_MENU_W = 108;
 

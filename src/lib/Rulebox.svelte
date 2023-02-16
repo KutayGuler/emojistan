@@ -23,6 +23,7 @@
   import Merger from "$rbx/Merger.svelte";
   import Consumable from "$rbx/Consumable.svelte";
   import Equippable from "$rbx/Equippable.svelte";
+  import { CROSS } from "$src/constants";
 
   export let rbx: Rulebox;
   export let props: any = {};
@@ -116,7 +117,7 @@
       }
     }}
   >
-    🞫
+    {CROSS}
   </button>
   <!-- CF #2 -->
   {#if rbx.type == "ctxMenu"}

@@ -25,7 +25,7 @@
   } from "../../store";
 
   import { emojis } from "./emojis";
-  import { DEFAULT_SIDE_LENGTH } from "$src/constants";
+  import { CROSS, DEFAULT_SIDE_LENGTH } from "$src/constants";
   import { notifications } from "../notifications";
   import { rbxStore } from "$lib/stores/store";
 
@@ -128,17 +128,25 @@
   }
 
   let test = false;
-  let view: "editor" | "rules" = "editor";
+
+  type ViewKey = "editor" | "rules" | "dialogue";
+  const views: { [key in ViewKey]: string } = {
+    editor: "🗺️",
+    rules: "📚",
+    dialogue: "💬",
+  };
+
+  let viewKey: ViewKey = "editor";
+
+  function changeViewTo(to: string) {
+    viewKey = to as ViewKey;
+  }
 
   function toggleTest() {
     test = !test;
     if (!test) {
       $currentEmoji = "";
     }
-  }
-
-  function toggleView() {
-    view = view == "editor" ? "rules" : "editor";
   }
 
   let [x, y] = [0, 0];
@@ -172,7 +180,7 @@
   </div>
   {#if test}
     <button on:click={toggleTest} class="absolute top-4 right-4 z-10 text-4xl"
-      >🞫</button
+      >{CROSS}</button
     >
   {/if}
   <main
@@ -183,28 +191,22 @@
         transition:fly={{ y: -200 }}
         class="absolute top-24 flex w-full flex-row items-center justify-center gap-8 text-lg 2xl:top-8 2xl:text-2xl"
       >
-        <div
-          class="{view == 'editor'
-            ? 'scale-150 opacity-100'
-            : 'opacity-50'} cursor-pointer duration-200 ease-out hover:scale-150 hover:opacity-100"
-          on:click={toggleView}
-        >
-          🗺️
-        </div>
-        <div
-          class="{view == 'rules'
-            ? 'scale-150 opacity-100'
-            : 'opacity-50'} cursor-pointer duration-200 hover:scale-150 hover:opacity-100"
-          on:click={toggleView}
-        >
-          📚
-        </div>
+        {#each Object.entries(views) as [key, icon]}
+          <div
+            class="{viewKey == key
+              ? 'scale-150 opacity-100'
+              : 'opacity-50'} cursor-pointer duration-200 ease-out hover:scale-150 hover:opacity-100"
+            on:click={() => changeViewTo(key)}
+          >
+            {icon}
+          </div>
+        {/each}
       </div>
     {/if}
     <div class="relative box-border flex flex-row items-center justify-center">
       {#if !test}
         <aside transition:fly={{ x: -200 }} class="aside">
-          {#if view == "editor"}
+          {#if viewKey == "editor"}
             <div class="flex flex-col">
               <button
                 title="Enable/Disable Hints"
@@ -375,11 +377,11 @@
             test = false;
           }}
         />
-      {:else if view == "editor"}
+      {:else if viewKey == "editor"}
         <div class="flex flex-col justify-center px-8">
           <Editor {showIndex} {deleteMode} {copyMode} />
         </div>
-      {:else if view == "rules"}
+      {:else if viewKey == "rules"}
         <div class="flex flex-col justify-center px-8">
           <Svelvet />
         </div>
