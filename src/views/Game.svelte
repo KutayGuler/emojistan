@@ -648,66 +648,66 @@
 
 <svelte:window on:keydown={handle} />
 
-<div class={mapClass} use:noPlayer>
-  {#each { length: SIZE * SIZE } as _, i}
-    {@const active = ac == i}
-    {@const item = items.get(i)}
-    {@const equippable = item instanceof Equippable}
-    {@const consumable = item instanceof Consumable}
-    <div style:background={backgrounds.get(i) || map.dbg}>
-      {#if active}
-        <div class="absolute z-[2] text-base {directionKey}">
-          {player?.inventory[currentInventoryIndex]?.emoji ||
-            keys[directionKey].emoji}
-        </div>
-      {/if}
-      <span class:equippable class:consumable>
-        {item?.emoji || ""}
-      </span>
-    </div>
-  {/each}
-  {#if levelCompleted}
-    <dialog
-      open
-      style="background-color: rgba(0, 0, 0.5, 0.5);"
-      class="absolute z-20 flex h-full w-full flex-col items-center justify-center gap-4 self-center "
-      transition:scale|local
-    >
-      <p class="absolute top-4 w-full text-center text-white">
-        {completionMessage}
-      </p>
-      <button
-        class="btn btn-success btn-lg w-1/4 text-success-content"
-        on:click={() => m.resetLevel()}>REPLAY</button
-      >
-      <button
-        class="btn btn-error btn-lg w-1/4 text-error-content"
-        on:click={() => dispatch("quit")}>QUIT</button
-      >
-    </dialog>
-  {/if}
-</div>
-
-{#if ac != -2}
+<div class="flex h-full flex-col items-center justify-center">
   {#key ac}
-    {#if showHP}
+    {#if ac != -2 && showHP}
       {@const playerHP = $progress * (player?.hp.max || 1)}
+      <!-- class="absolute -top-16 flex w-64 flex-row items-center justify-center gap-2" -->
       <div
-        class="absolute -top-16 flex w-64 flex-row items-center justify-center gap-2"
+        class="my-8 flex h-full w-64 flex-grow flex-row items-center justify-center"
       >
-        <p class="absolute -left-4 z-10 self-start text-2xl">
-          {player?.emoji || ""}
-        </p>
+        <p class="z-10 text-2xl">{player?.emoji || ""}</p>
         <progress title="Health Bar" class="progress h-8" value={$progress} />
-        <p class="absolute">
+        <p class="absolute pl-6">
           {Number.isInteger(playerHP) ? playerHP : playerHP.toFixed(1)}
         </p>
       </div>
     {/if}
-    {#if showInventory}
+  {/key}
+  <div class={mapClass} use:noPlayer>
+    {#each { length: SIZE * SIZE } as _, i}
+      {@const active = ac == i}
+      {@const item = items.get(i)}
+      {@const equippable = item instanceof Equippable}
+      {@const consumable = item instanceof Consumable}
+      <div style:background={backgrounds.get(i) || map.dbg}>
+        {#if active}
+          <div class="absolute z-[2] text-base {directionKey}">
+            {player?.inventory[currentInventoryIndex]?.emoji ||
+              keys[directionKey].emoji}
+          </div>
+        {/if}
+        <span class:equippable class:consumable>
+          {item?.emoji || ""}
+        </span>
+      </div>
+    {/each}
+    {#if levelCompleted}
+      <dialog
+        open
+        style="background-color: rgba(0, 0, 0.5, 0.5);"
+        class="absolute z-20 flex h-full w-full flex-col items-center justify-center gap-4 self-center "
+        transition:scale|local
+      >
+        <p class="absolute top-4 w-full text-center text-white">
+          {completionMessage}
+        </p>
+        <button
+          class="btn btn-success btn-lg w-1/4 text-success-content"
+          on:click={() => m.resetLevel()}>REPLAY</button
+        >
+        <button
+          class="btn btn-error btn-lg w-1/4 text-error-content"
+          on:click={() => dispatch("quit")}>QUIT</button
+        >
+      </dialog>
+    {/if}
+  </div>
+  {#key ac}
+    {#if ac != -2 && showInventory}
       <div
         title="Inventory"
-        class="absolute -bottom-20 flex w-full flex-row items-center justify-center gap-2"
+        class="my-8 flex h-full w-full flex-row items-center justify-center gap-2"
       >
         {#each { length: MAX_INVENTORY_SIZE } as _, i}
           {@const item = player?.inventory[i]}
@@ -727,7 +727,7 @@
       </div>
     {/if}
   {/key}
-{/if}
+</div>
 
 <style>
   /* DIRECTIONS */

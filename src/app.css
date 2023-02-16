@@ -12,11 +12,11 @@
   }
 
   .map {
-    @apply grid w-auto grid-cols-12 grid-rows-12 gap-1 text-2xl;
+    @apply grid h-full w-auto grid-cols-12 grid-rows-12 gap-1 text-2xl;
   }
 
   .simulation {
-    @apply grid w-auto grid-cols-4 grid-rows-4 gap-1 text-2xl;
+    @apply grid h-full w-auto grid-cols-4 grid-rows-4 gap-1 text-2xl;
   }
 
   .slot {
