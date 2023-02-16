@@ -1,9 +1,8 @@
 import { DEFAULT_BG } from "./constants";
 
+export type CollisionType = "bump" | "push" | string;
 export type Pusher = [string, string, CollisionType];
 export type Merger = [string, string, CollisionType];
-
-export type CollisionType = "bump" | "push" | string;
 
 export interface HP {
   current: number;

@@ -3,9 +3,10 @@
   import { pushers, currentEmoji } from "../store";
   import { notifications } from "../routes/notifications";
   import { rbxStore } from "$src/lib/stores/store";
+  import type { Pusher } from "$src/types";
 
   export let id: number;
-  export let slots = ["", "", "push"];
+  export let slots: Pusher = ["", "", "push"];
 
   onMount(() => {
     slots = $pushers.get(id) || slots;
@@ -21,7 +22,6 @@
       }
     }
 
-    // @ts-expect-error
     pushers.update(id, slots);
   }
 

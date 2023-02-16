@@ -65,8 +65,7 @@
         animate:flip={flipParams}
         style:background={color}
         on:click={(e) => {
-          // @ts-expect-error
-          if (e.target.tagName == "LI") return;
+          if (e.target?.tagName == "LI") return;
           if ($currentColor == color) {
             $currentColor = "";
           } else {

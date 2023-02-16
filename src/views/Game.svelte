@@ -106,8 +106,7 @@
    * Transfers an item from "from" to "to"
    */
   function transferItem(from: number, to: number) {
-    // @ts-expect-error
-    items.set(to, items.get(from));
+    items.set(to, items.get(from) as Equippable | Consumable | Item);
     items.delete(from);
     items = items; // MAGIC UPDATE, NECESSARY FOR REACTIVITY
 
@@ -152,24 +151,23 @@
   for (let [id, interactable] of interactables) {
     const { emoji, ...args } = interactable;
     if (emoji == "") continue;
-    // @ts-expect-error
-    _interactables[emoji] = {};
+
+    _interactables[emoji] = {} as _Interactable;
     Object.assign(_interactables[emoji], args);
   }
 
   for (let [id, consumable] of consumables) {
     const { emoji, ...args } = consumable;
     if (emoji == "") continue;
-    // @ts-expect-error
-    _consumables[emoji] = {};
+
+    _consumables[emoji] = {} as Consumable;
     Object.assign(_consumables[emoji], args);
   }
 
   for (let [id, equippable] of equippables) {
     const { emoji, ...args } = equippable;
     if (emoji == "") continue;
-    // @ts-expect-error
-    _equippables[emoji] = {};
+    _equippables[emoji] = {} as Equippable;
     Object.assign(_equippables[emoji], args);
   }
 
@@ -300,8 +298,10 @@
     let collisionTypeSequence: Array<CollisionType> = [];
     for (let i = 0; i < collisionChain.length - 1; i++) {
       collisionTypeSequence.push(
-        // @ts-expect-error
-        getCollisionType(collisionChain[i], collisionChain[i + 1])
+        getCollisionType(
+          collisionChain[i] as CollisionType,
+          collisionChain[i + 1] as CollisionType
+        )
       );
     }
 
@@ -323,8 +323,7 @@
         break;
     }
 
-    // @ts-expect-error
-    if (calcOperation(code, finalIndex) == 0) return;
+    if (calcOperation(code as ArrowKey, finalIndex) == 0) return;
 
     if (collisionTypeSequence.every((str) => str == "push")) {
       let length = collisionChain.length;
@@ -509,8 +508,7 @@
       if (sideEffect[1] == 0) return;
       interactedItem.hp.current += sideEffect[1];
 
-      // @ts-expect-error
-      if (equippedItem != "any") {
+      if (equippedItem instanceof Equippable) {
         equippedItem.hp -= 1;
       }
 

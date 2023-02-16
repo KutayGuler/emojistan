@@ -18,8 +18,7 @@ function createMapStore<K, V>(name: string) {
     set,
     subscribe,
     useStorage: (id: string) => {
-      // @ts-expect-error
-      const val = JSON.parse(localStorage.getItem(id + "_" + name));
+      const val = JSON.parse(localStorage.getItem(id + "_" + name) as string);
       set(new Map(val) || new Map<number, V>());
       subscribe((state) => {
         localStorage.setItem(
@@ -62,8 +61,7 @@ function createSaves() {
     subscribe,
     useStorage: () => {
       const currentSaveID = localStorage.getItem("currentSaveID");
-      // @ts-expect-error
-      const saves = JSON.parse(localStorage.getItem("saves"));
+      const saves = JSON.parse(localStorage.getItem("saves") as string);
 
       if (
         get(page).routeId == "editor" &&
@@ -126,10 +124,8 @@ function createEditableMap() {
     subscribe,
     useStorage: (id: string) => {
       const dbg = localStorage.getItem(id + "_dbg") || DEFAULT_BG;
-      // @ts-expect-error
-      const items = JSON.parse(localStorage.getItem(id + "_items"));
-      // @ts-expect-error
-      const backgrounds = JSON.parse(localStorage.getItem(id + "_backgrounds"));
+      const items = JSON.parse(localStorage.getItem(id + "_items") as string);
+      const backgrounds = JSON.parse(localStorage.getItem(id + "_backgrounds") as string);
 
       update((state) => {
         state.items = new Map(items) || new Map();
@@ -209,8 +205,7 @@ function createSetStore(name: string) {
     set,
     subscribe,
     useStorage: (id: string) => {
-      // @ts-expect-error
-      const val = JSON.parse(localStorage.getItem(id + "_" + name));
+      const val = JSON.parse(localStorage.getItem(id + "_" + name) as string);
       set(new Set<string>(Array.from(val || [])));
       subscribe((state) => {
         localStorage.setItem(

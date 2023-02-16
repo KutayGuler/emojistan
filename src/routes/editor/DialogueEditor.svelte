@@ -73,8 +73,7 @@
 
   function renameText() {
     if (currentDialogue[currentIndex] instanceof Choice) {
-      // @ts-expect-error
-      currentDialogue[currentIndex].text = currentText;
+      (currentDialogue[currentIndex] as Choice).text = currentText;
     } else {
       currentDialogue[currentIndex] = currentText;
     }

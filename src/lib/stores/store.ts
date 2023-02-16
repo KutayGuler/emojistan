@@ -10,8 +10,7 @@ function createRuleboxes() {
     subscribe,
     update,
     useStorage: (id: string) => {
-      // @ts-expect-error
-      const val = JSON.parse(localStorage.getItem(id + "_rbxs"));
+      const val = JSON.parse(localStorage.getItem(id + "_rbxs") as string);
 
       set(val || []);
       subscribe((state) => {

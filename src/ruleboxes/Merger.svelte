@@ -3,9 +3,10 @@
   import { mergers, pushers, currentEmoji } from "../store";
   import { notifications } from "../routes/notifications";
   import { rbxStore } from "$src/lib/stores/store";
+  import type { Merger } from "$src/types";
 
   export let id: number;
-  export let slots = ["", "", ""];
+  export let slots: Merger = ["", "", ""];
 
   onMount(() => {
     slots = $mergers.get(id) || slots;
@@ -36,7 +37,6 @@
       }
     }
 
-    // @ts-expect-error
     mergers.update(id, slots);
   }
 
