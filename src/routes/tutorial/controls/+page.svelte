@@ -69,6 +69,6 @@
     </div>
   </div>
   <div class="relative flex w-full flex-col items-center justify-center">
-    <Game {...gameProps} showObjective={false} />
+    <Game {...gameProps} />
   </div>
 </div>

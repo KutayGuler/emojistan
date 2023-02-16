@@ -62,7 +62,6 @@ export const storeNames = [
   "palette",
   "items",
   "backgrounds",
-  "objective",
   "rbxs",
   "dbg",
 ];

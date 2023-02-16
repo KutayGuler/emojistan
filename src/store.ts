@@ -125,7 +125,6 @@ function createEditableMap() {
     set,
     subscribe,
     useStorage: (id: string) => {
-      const objective = localStorage.getItem(id + "_objective");
       const dbg = localStorage.getItem(id + "_dbg") || DEFAULT_BG;
       // @ts-expect-error
       const items = JSON.parse(localStorage.getItem(id + "_items"));
@@ -133,7 +132,6 @@ function createEditableMap() {
       const backgrounds = JSON.parse(localStorage.getItem(id + "_backgrounds"));
 
       update((state) => {
-        state.objective = objective || "";
         state.items = new Map(items) || new Map();
         state.backgrounds = new Map(backgrounds) || new Map();
         state.dbg = dbg || "";
@@ -149,7 +147,6 @@ function createEditableMap() {
           id + "_backgrounds",
           JSON.stringify(Array.from(state.backgrounds.entries()))
         );
-        localStorage.setItem(id + "_objective", state.objective);
         localStorage.setItem(id + "_dbg", state.dbg);
       });
     },

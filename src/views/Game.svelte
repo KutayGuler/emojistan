@@ -39,7 +39,6 @@
   export let SIZE = DEFAULT_SIDE_LENGTH;
   export let showHP = true;
   export let showInventory = true;
-  export let showObjective = true;
 
   let completionMessage: "Level Completed!" | "Game Over. No players left." =
     "Level Completed!";
@@ -690,23 +689,6 @@
 </div>
 
 {#if ac != -2}
-  {#if showObjective}
-    <label
-      title="Objective"
-      for="objective"
-      class="absolute -top-16 left-0 cursor-help text-2xl">🎯</label
-    >
-
-    <input type="checkbox" id="objective" class="modal-toggle" />
-    <label for="objective" class="modal cursor-pointer">
-      <label class="modal-box relative" for="">
-        <h3 class="text-lg font-bold">{$saves.currentSaveName}</h3>
-        <p class="py-4">
-          {map.objective}
-        </p>
-      </label>
-    </label>
-  {/if}
   {#key ac}
     {#if showHP}
       {@const playerHP = $progress * (player?.hp.max || 1)}

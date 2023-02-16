@@ -312,18 +312,8 @@
               </div>
             </div>
           {:else}
-            <div class="form-control">
-              <label class="label">
-                <span class="label-text text-xs 2xl:text-base">Objective</span>
-              </label>
-              <textarea
-                class="textarea textarea-bordered h-24"
-                placeholder="Describe the goal"
-                bind:value={$map.objective}
-              />
-            </div>
             <!-- TODO: add removing indicator when hovered -->
-            <label class="label pt-4">
+            <label class="label">
               <span class="label-text text-xs 2xl:text-base"
                 >Statics 🗿
               </span></label
@@ -352,11 +342,6 @@
                 {/each}
               </div>
             </div>
-            <label class="label pt-4">
-              <span class="label-text text-xs 2xl:text-base"
-                >Dialogues 🗿
-              </span></label
-            >
           {/if}
         </aside>
       {/if}

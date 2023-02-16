@@ -44,7 +44,7 @@
     class="relative flex w-full flex-col items-center justify-center self-center"
   >
     {#key gameProps}
-      <Game {...gameProps} showObjective={false} />
+      <Game {...gameProps} />
     {/key}
   </div>
 </div>

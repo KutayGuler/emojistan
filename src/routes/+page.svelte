@@ -55,7 +55,6 @@
           map: {
             items: Object.fromEntries($map.items),
             backgrounds: Object.fromEntries($map.backgrounds),
-            objective: $map.objective,
           },
           palette: Array.from($palette),
           rbxs: Array.from($rbxStore),
