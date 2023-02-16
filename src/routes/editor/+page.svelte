@@ -22,6 +22,7 @@
     equippables,
     consumables,
     statics,
+    dialogueTree,
   } from "../../store";
 
   import { emojis } from "./emojis";
@@ -65,6 +66,7 @@
       interactables,
       palette,
       rbxStore,
+      dialogueTree
     ]) {
       store.useStorage($saves.currentSaveID);
     }
@@ -137,7 +139,7 @@
     dialogue: "💬",
   };
 
-  let viewKey: ViewKey = "dialogue";
+  let viewKey: ViewKey = "editor";
 
   function changeViewTo(to: string) {
     viewKey = to as ViewKey;

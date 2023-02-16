@@ -2,17 +2,17 @@ import { page } from "$app/stores";
 import { writable, get } from "svelte/store";
 import { DEFAULT_BG, storeNames } from "./constants";
 import {
+  Choice,
   Consumable,
   EditableMap,
   Equippable,
-  type CollisionType,
   type Interactable,
   type Merger,
   type Pusher,
 } from "./types";
 
-function createMapStore<T>(name: string) {
-  const { set, subscribe, update } = writable(new Map<number, T>());
+function createMapStore<K, V>(name: string) {
+  const { set, subscribe, update } = writable(new Map<K, V>());
 
   return {
     set,
@@ -20,7 +20,7 @@ function createMapStore<T>(name: string) {
     useStorage: (id: string) => {
       // @ts-expect-error
       const val = JSON.parse(localStorage.getItem(id + "_" + name));
-      set(new Map(val) || new Map<number, T>());
+      set(new Map(val) || new Map<number, V>());
       subscribe((state) => {
         localStorage.setItem(
           id + "_" + name,
@@ -28,17 +28,17 @@ function createMapStore<T>(name: string) {
         );
       });
     },
-    add: (id: number, value: T) =>
+    add: (id: K, value: V) =>
       update((state) => {
         state.set(id, value);
         return state;
       }),
-    update: (id: number, value: T) =>
+    update: (id: K, value: V) =>
       update((state) => {
         state.set(id, value);
         return state;
       }),
-    remove: (id: number) =>
+    remove: (id: K) =>
       update((state) => {
         state.delete(id);
         return state;
@@ -248,8 +248,13 @@ export const palette = createSetStore("palette");
 export const statics = createSetStore("statics");
 
 // MAPS
-export const pushers = createMapStore<Pusher>("pushers");
-export const mergers = createMapStore<Merger>("mergers");
-export const consumables = createMapStore<Consumable>("consumables");
-export const equippables = createMapStore<Equippable>("equippables");
-export const interactables = createMapStore<Interactable>("interactables");
+export const pushers = createMapStore<number, Pusher>("pushers");
+export const mergers = createMapStore<number, Merger>("mergers");
+export const consumables = createMapStore<number, Consumable>("consumables");
+export const equippables = createMapStore<number, Equippable>("equippables");
+export const interactables = createMapStore<number, Interactable>(
+  "interactables"
+);
+export const dialogueTree = createMapStore<string, Array<string | Choice>>(
+  "dialogue"
+);

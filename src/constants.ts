@@ -64,6 +64,7 @@ export const storeNames = [
   "backgrounds",
   "rbxs",
   "dbg",
+  "dialogue",
 ];
 
 /* INTERACTABLE */

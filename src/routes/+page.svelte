@@ -11,6 +11,7 @@
     interactables,
     equippables,
     consumables,
+    dialogueTree,
   } from "../store";
   import { navigating } from "$app/stores";
   import { rbxStore } from "$lib/stores/store";
@@ -63,6 +64,7 @@
           equippables: Object.fromEntries($equippables),
           consumables: Object.fromEntries($consumables),
           interactables: Object.fromEntries($interactables),
+          dialogueTree: Object.fromEntries($dialogueTree)
         },
         owner: owner.data.user.id,
       },

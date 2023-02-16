@@ -71,6 +71,7 @@
     interactables,
     equippables,
     consumables,
+    dialogueTree,
   } from "../store";
 
   let defaultBackground = $map.dbg;
@@ -379,7 +380,16 @@
       <span class="label-text">Devolve</span>
       <input type="checkbox" class="checkbox" bind:checked={devolve.enabled} />
     </label>
+    <label class="label">
+      <span class="label-text">Dialogue ID</span>
+      <select class="select select-bordered" bind:value={dialogueID}>
+        {#each [...$dialogueTree.keys()].filter(key => key.length == 1) as id}
+          <option value={id}>{id}</option>
+        {/each}
+      </select>
+    </label>
   </div>
+  <!-- TODO: Update all update functions with dialogue -->
   <div class="form-control flex flex-col">
     <div
       class="flex w-full flex-row items-center justify-center gap-2 pb-6 text-xl"

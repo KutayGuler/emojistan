@@ -403,6 +403,7 @@
     }
 
     if (e.code == "Space") {
+      // TODO: Implement conversation
       // required so that items are not overflowing from the map
       if (calcOperation(wasdToArrow[directionKey], ac) == 0) {
         return;

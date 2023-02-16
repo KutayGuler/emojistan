@@ -2,6 +2,7 @@
   import { CROSS } from "$src/constants";
   import { Choice } from "$src/types";
   import { notifications } from "../notifications";
+  import { dialogueTree } from "$src/store";
   // [[
   //   "1",
   //   [
@@ -16,22 +17,22 @@
   let currentText = "";
   let currentIndex = 0;
 
-  let dialogueTree = new Map<string, Array<string | Choice>>();
+  // let dialogueTree = new Map<string, Array<string | Choice>>();
   let currentDialogue: Array<string | Choice> = [];
   let mainBranches: Array<string> = [];
   let subBranches: Array<string> = [];
   let currentSubBranch: string;
   let currentBranch: string;
 
-  $: mainBranches = [...dialogueTree.keys()].filter((key) => key.length == 1);
-  $: subBranches = [...dialogueTree.keys()].filter(
+  $: mainBranches = [...$dialogueTree.keys()].filter((key) => key.length == 1);
+  $: subBranches = [...$dialogueTree.keys()].filter(
     (key) => key[0] == currentBranch
   );
-  $: currentDialogue = dialogueTree.get(currentSubBranch) || [];
+  $: currentDialogue = $dialogueTree.get(currentSubBranch) || [];
 
   function addBranch() {
     let biggestValue = 1;
-    for (let key of dialogueTree.keys()) {
+    for (let key of $dialogueTree.keys()) {
       let main = +key.split("_")[0];
       if (biggestValue <= main) {
         biggestValue = main + 1;
@@ -40,17 +41,16 @@
 
     let key = biggestValue.toString();
 
-    dialogueTree.set(key, ["### SAMPLE TEXT ###"]);
+    dialogueTree.add(key, ["### SAMPLE TEXT ###"]);
     expands.set(key, true);
     currentBranch = key;
     currentSubBranch = key;
-    dialogueTree = dialogueTree;
+    $dialogueTree = $dialogueTree;
   }
 
   function deleteBranch() {
-    dialogueTree.delete(currentSubBranch);
-    currentSubBranch = dialogueTree.keys().next().value || "";
-    dialogueTree = dialogueTree;
+    dialogueTree.remove(currentSubBranch);
+    currentSubBranch = $dialogueTree.keys().next().value || "";
   }
 
   function branchChanged() {
@@ -67,7 +67,7 @@
     }
 
     currentDialogue?.splice(currentIndex + 1, 0, currentText);
-    dialogueTree = dialogueTree;
+    $dialogueTree = $dialogueTree;
     currentText = "";
   }
 
@@ -80,7 +80,7 @@
     }
 
     currentText = "";
-    dialogueTree = dialogueTree;
+    $dialogueTree = $dialogueTree;
   }
 
   // TODO: arrows shouldn't jump between main branches
@@ -89,7 +89,7 @@
     let numberOfSiblings = 1;
     // TODO: Sort based on biggest value
 
-    for (let key of dialogueTree.keys()) {
+    for (let key of $dialogueTree.keys()) {
       if (
         key.includes(currentSubBranch) &&
         key.length == currentSubBranch.length + 2 &&
@@ -102,9 +102,9 @@
     console.log(numberOfSiblings);
 
     let to = currentSubBranch + "_" + numberOfSiblings;
-    dialogueTree.set(to, ["### SAMPLE TEXT ###"]);
+    dialogueTree.add(to, ["### SAMPLE TEXT ###"]);
     currentDialogue?.push(new Choice(to, currentText));
-    dialogueTree = dialogueTree;
+    $dialogueTree = $dialogueTree;
     currentText = "";
   }
 
@@ -114,11 +114,11 @@
       currentDialogue.splice(index, 1);
       currentIndex = currentDialogue.length - 1;
     } else {
-      let clickedDialogue = dialogueTree.get(key);
+      let clickedDialogue = $dialogueTree.get(key);
       if (!clickedDialogue) return;
       clickedDialogue.splice(index, 1);
     }
-    dialogueTree = dialogueTree;
+    $dialogueTree = $dialogueTree;
   }
 
   let expands = new Map<string, boolean>();
@@ -150,7 +150,7 @@
     }
 
     if (e.code == "ArrowUp") {
-      let keys = dialogueTree.keys();
+      let keys = $dialogueTree.keys();
       if (currentIndex == 0) {
         let prev = currentSubBranch;
         for (let key of keys) {
@@ -169,9 +169,10 @@
 />
 
 <!-- TODO: respnsive -->
-<!-- TODO: Fix this bullshit -->
-<div class="ml-24 flex h-[620px] w-full flex-row gap-4">
-  <aside class="flex h-[620px] w-72 flex-col gap-4 rounded bg-base-200 p-8">
+<div class="ml-24 flex h-[620px] w-full flex-row gap-4 2xl:h-[716px]">
+  <aside
+    class="flex h-[620px] w-72 flex-col gap-4 rounded bg-base-200 p-8 2xl:h-[716px]"
+  >
     <button class="btn" on:click={addBranch}>ADD BRANCH</button>
     <button
       class="btn"
@@ -249,7 +250,7 @@
       </div>
     </div>
     <div class="flex flex-col items-start justify-start gap-2">
-      {#each [...dialogueTree] as [key, dialogue]}
+      {#each [...$dialogueTree] as [key, dialogue]}
         {#if key.split("_")[0] == currentBranch}
           <button on:click={() => toggleExpandOf(key)} class="text-xl"
             >{key} {expands.get(key) ? "⯆" : "⯈"}</button
