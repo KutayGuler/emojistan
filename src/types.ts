@@ -216,5 +216,17 @@ export class Interactable {
   }
 }
 
+export interface Choice {
+  to: string;
+  text: string;
+}
+
+export class Choice {
+  constructor(to: string, text: string) {
+    this.to = to;
+    this.text = text;
+  }
+}
+
 export type Wasd = "KeyW" | "KeyA" | "KeyS" | "KeyD";
 export type ArrowKey = "ArrowLeft" | "ArrowUp" | "ArrowRight" | "ArrowDown";

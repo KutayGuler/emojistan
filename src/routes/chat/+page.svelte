@@ -1,52 +1,40 @@
 <script lang="ts">
-  import { onMount } from "svelte";
-  import { fly } from "svelte/transition";
+  import { Choice } from "$src/types";
   import { notifications } from "../notifications";
 
-  interface Choice {
-    to: string;
-    text: string;
-  }
+  let dialogueTree = new Map<string, Array<string | Choice>>([
+    [
+      "1",
+      [
+        "hello",
+        "what's up",
+        "n-word",
+        "will you help me recover racism?",
+        new Choice("1_2", "no"),
+      ],
+    ],
+    // ["1_2", ["get ready to get destroyed babi"]],
+  ]);
 
-  class Choice {
-    constructor(to: string, text: string) {
-      this.to = to;
-      this.text = text;
+  let mainBranches: Array<string> = [];
+  let subBranches: Array<string> = [];
+
+  for (let key of dialogueTree.keys()) {
+    if (key.split("_").length == 1) {
+      mainBranches.push(key);
     }
   }
 
-  let character = "🐸";
-  let dialogueTree = new Map<string, Array<string | Choice>>();
-  dialogueTree.set("1", [
-    "hello",
-    "what's up",
-    "n-word",
-    "will you help me recover racism?",
-    new Choice("1_2", "no"),
-  ]);
+  let currentBranch = mainBranches[0];
+  let currentSubBranch = "1";
 
-  dialogueTree.set("1_2", ["get ready to get destroyed babi"]);
-
-  let currentKey = "1";
-  let chatIndex = 0;
-  let animating = false;
-
-  let answerIndexes: Array<number> = [];
-
-  function makeChoice(to: string, text: string) {
-    chatIndex = chatIndex - choices.length + 1;
-    choices = [];
-    texts = [...texts, text];
-    answerIndexes.push(texts.length - 1);
-    currentKey = to;
-    currentKeyChanged();
+  for (let key of dialogueTree.keys()) {
+    if (key[0] == currentBranch) {
+      subBranches.push(key);
+    }
   }
 
-  onMount(() => {
-    chatIndex++;
-  });
-
-  let currentDialogue = dialogueTree.get(currentKey);
+  let currentDialogue = dialogueTree.get(currentSubBranch);
   let currentText = "";
   let currentIndex = 0;
 
@@ -59,13 +47,16 @@
       }
     }
 
-    dialogueTree.set(biggestValue.toString(), []);
+    let key = biggestValue.toString();
+
+    dialogueTree.set(key, ["SAMPLE TEXT"]);
+    mainBranches = [...mainBranches, key];
     dialogueTree = dialogueTree;
   }
 
   function deleteBranch() {
-    dialogueTree.delete(currentKey);
-    currentKey = dialogueTree.keys().next().value;
+    dialogueTree.delete(currentSubBranch);
+    currentSubBranch = dialogueTree.keys().next().value;
     dialogueTree = dialogueTree;
   }
 
@@ -81,24 +72,33 @@
     currentText = "";
   }
 
+  // TODO: Switch to added branch | sub branch
+
   function addChoice() {
     let numberOfSiblings = 1;
+    // TODO: Sort based on biggest value
 
     for (let key of dialogueTree.keys()) {
-      if (key.includes(currentKey + "_")) {
+      if (
+        key[0] == currentBranch &&
+        key.split(currentBranch + "_").length > 1
+      ) {
         numberOfSiblings++;
       }
     }
 
-    let to = currentKey + "_" + numberOfSiblings;
-    dialogueTree.set(to, []);
+    console.log(numberOfSiblings);
+
+    let to = currentSubBranch + "_" + numberOfSiblings;
+    dialogueTree.set(to, ["SAMPLE TEXT"]);
     currentDialogue?.push(new Choice(to, currentText));
     dialogueTree = dialogueTree;
     currentText = "";
+    subBranches = [...subBranches, to];
   }
 
   function remove(key: string, index: number) {
-    if (key == currentKey) {
+    if (key == currentSubBranch) {
       if (!currentDialogue) return;
       currentDialogue.splice(index, 1);
       currentIndex = currentDialogue.length - 1;
@@ -120,8 +120,20 @@
   let texts: Array<string> = [];
   let choices: Array<Choice> = [];
 
-  function currentKeyChanged() {
-    currentDialogue = dialogueTree.get(currentKey);
+  function branchChanged() {
+    subBranches = [];
+    for (let key of dialogueTree.keys()) {
+      if (key[0] == currentBranch) {
+        subBranches.push(key);
+      }
+    }
+
+    currentSubBranch = subBranches[0];
+    currentDialogue = dialogueTree.get(currentSubBranch);
+  }
+
+  function subBranchChanged() {
+    currentDialogue = dialogueTree.get(currentSubBranch);
     if (!currentDialogue) return;
 
     for (let item of currentDialogue) {
@@ -136,31 +148,21 @@
     choices = choices;
   }
 
-  currentKeyChanged();
+  subBranchChanged();
 </script>
 
 <svelte:window
   on:keydown={(e) => {
     if (!currentDialogue) return;
 
-    if (e.code == "Space") {
-      if (chatIndex == currentDialogue.length) return;
-      chatIndex++;
-
-      if (currentDialogue[chatIndex - 1] instanceof Choice) {
-        chatIndex = currentDialogue.length;
-      }
-      return;
-    }
-
     if (e.code == "ArrowDown") {
       let keys = dialogueTree.keys();
       if (currentIndex + 1 == currentDialogue.length) {
-        while (keys.next().value != currentKey) {}
+        while (keys.next().value != currentSubBranch) {}
         let value = keys.next().value;
         if (dialogueTree.get(value)?.length == 0) return;
-        currentKey = value || currentKey;
-        currentKeyChanged();
+        currentSubBranch = value || currentSubBranch;
+        subBranchChanged();
         currentIndex = 0;
       } else {
         currentIndex++;
@@ -171,16 +173,13 @@
     if (e.code == "ArrowUp") {
       let keys = dialogueTree.keys();
       if (currentIndex == 0) {
-        let prev = currentKey;
+        let prev = currentSubBranch;
         for (let key of keys) {
-          if (key == currentKey) {
-            break;
-          } else {
-            prev = key;
-          }
+          if (key == currentSubBranch) break;
+          prev = key;
         }
-        currentKey = prev;
-        currentKeyChanged();
+        currentSubBranch = prev;
+        subBranchChanged();
         currentIndex = currentDialogue.length - 1;
       } else {
         currentIndex--;
@@ -190,37 +189,54 @@
   }}
 />
 
-<main class="flex w-full flex-row justify-evenly p-4">
-  <div>
-    <select
-      class="select select-bordered"
-      bind:value={currentKey}
-      on:change={currentKeyChanged}
-    >
-      {#each [...dialogueTree.keys()] as key}
-        <option value={key}>{key}</option>
-      {/each}
-    </select>
-    <button class="btn" on:click={addBranch}>ADD BRANCH</button>
-    <button class="btn" on:click={deleteBranch}
-      >DELETE BRANCH # {currentKey}</button
-    >
+<div class="flex flex-col gap-4 p-4">
+  <div class="flex flex-row gap-4">
     <div>
-      <input
-        type="text"
-        class="input input-bordered"
-        bind:value={currentText}
-      />
-      <button class="btn" disabled={currentText == ""} on:click={insertText}
-        >INSERT</button
+      <label class="label">
+        <span class="label-text"> Main Branch </span>
+      </label>
+      <select
+        class="select select-bordered w-full"
+        bind:value={currentBranch}
+        on:change={branchChanged}
       >
-      <button class="btn" disabled={currentText == ""} on:click={addChoice}
-        >ADD CHOICE</button
-      >
+        {#each mainBranches as key}
+          <option value={key}>{key}</option>
+        {/each}
+      </select>
     </div>
-    <h1 class="text-2xl">List View</h1>
-    <div class="flex flex-col items-start justify-start">
-      {#each [...dialogueTree] as [key, dialogue]}
+    <div>
+      <label class="label">
+        <span class="label-text"> Sub Branch </span>
+      </label>
+      <select
+        class="select select-bordered w-full"
+        bind:value={currentSubBranch}
+        on:change={subBranchChanged}
+      >
+        {#each subBranches as key}
+          <option value={key}>{key == currentBranch ? "main" : key}</option>
+        {/each}
+      </select>
+    </div>
+  </div>
+  <button class="btn" on:click={addBranch}>ADD BRANCH</button>
+  <button class="btn" on:click={deleteBranch}
+    >DELETE BRANCH # {currentSubBranch}</button
+  >
+  <div>
+    <input type="text" class="input input-bordered" bind:value={currentText} />
+    <button class="btn" disabled={currentText == ""} on:click={insertText}
+      >INSERT</button
+    >
+    <button class="btn" disabled={currentText == ""} on:click={addChoice}
+      >ADD CHOICE</button
+    >
+  </div>
+  <h1 class="text-2xl">List View</h1>
+  <div class="flex flex-col items-start justify-start">
+    {#each [...dialogueTree] as [key, dialogue]}
+      {#if key.split("_")[0] == currentBranch}
         <button on:click={() => toggleExpandOf(key)} class="text-xl"
           >{key}</button
         >
@@ -229,7 +245,7 @@
             {@const isString = typeof text == "string"}
             <div class="flex w-full flex-row justify-between gap-4 pl-4">
               <p>
-                {#if key == currentKey && currentIndex == i}📍{/if}
+                {#if key == currentSubBranch && currentIndex == i}📍{/if}
               </p>
               <p class="flex-grow">
                 {#if isString}{text}{:else}{text.text} -> {text.to}{/if}
@@ -238,48 +254,7 @@
             </div>
           {/each}
         {/if}
-      {/each}
-    </div>
+      {/if}
+    {/each}
   </div>
-
-  <div>
-    <h1 class="text-2xl">PREVIEW</h1>
-    <h1 class="text-2xl">{character}</h1>
-    <ul>
-      {#each texts as text, i}
-        {#if i < chatIndex && !animating}
-          <li
-            class="chat {answerIndexes.includes(i) ? 'chat-end' : 'chat-start'}"
-            transition:fly={{ x: -100 }}
-          >
-            <span class="chat-bubble">
-              {text}
-            </span>
-          </li>
-        {/if}
-      {/each}
-      <div class="flex flex-row gap-2 pl-4">
-        {#each choices as choice, i}
-          {#if i + texts.length < chatIndex && !animating}
-            <button
-              transition:fly={{ x: 100 }}
-              class="btn flex-grow"
-              on:click={() => makeChoice(choice.to, choice.text)}
-              ><p>{choice.text}</p>
-            </button>
-          {/if}
-        {/each}
-      </div>
-    </ul>
-  </div>
-</main>
-
-<style>
-  .chat span {
-    border-bottom-left-radius: 12px !important;
-  }
-
-  .chat span::before {
-    display: none;
-  }
-</style>
+</div>
