@@ -74,7 +74,7 @@
               [],
               1,
               1,
-              [["any", 0]],
+              [["any", 1]],
               true,
               new Evolve(false, "", 2),
               new Devolve(false, "")
@@ -220,7 +220,7 @@
               [],
               1,
               1,
-              [["any", 0]],
+              [["any", 1]],
               true,
               new Evolve(false, "", 2),
               new Devolve(false, "")
@@ -272,7 +272,7 @@
               1,
               1,
               [
-                ["any", 0],
+                ["any", 1],
                 [69, -1],
               ],
               true,
@@ -341,7 +341,7 @@
               1,
               1,
               [
-                ["any", 0],
+                ["any", 1],
                 [69, -1],
               ],
               true,

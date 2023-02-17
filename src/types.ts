@@ -84,6 +84,7 @@ export interface _Interactable {
   sideEffects: Array<[string, number]>;
   evolve: Evolve;
   devolve: Devolve;
+  dialogueID: string;
 }
 
 export interface _Interactables {

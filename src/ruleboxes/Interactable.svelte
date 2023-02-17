@@ -115,7 +115,7 @@
   export let sequence: Array<SequenceItem> = [];
   export let hp = 1;
   export let points = 1;
-  export let sideEffects: Array<[number | "any", number]> = [["any", 0]];
+  export let sideEffects: Array<[number | "any", number]> = [["any", 1]];
   export let pseudoSideEffects: Array<[string, number]> = [];
   export let isStatic = false;
   export let evolve = new Evolve(false, "", 2);
@@ -131,8 +131,17 @@
   onMount(() => {
     let obj = $interactables.get(id);
     if (obj) {
-      ({ emoji, sequence, hp, points, sideEffects, isStatic, evolve, devolve } =
-        obj);
+      ({
+        emoji,
+        sequence,
+        hp,
+        points,
+        sideEffects,
+        isStatic,
+        evolve,
+        devolve,
+        dialogueID,
+      } = obj);
     }
   });
 
@@ -147,7 +156,8 @@
         sideEffects,
         isStatic,
         evolve,
-        devolve
+        devolve,
+        dialogueID
       )
     );
 
@@ -367,29 +377,39 @@
   {/if}
 </div>
 <main class="flex flex-col items-center justify-center gap-12 pt-16">
-  <div class="form-control w-3/4">
-    <label class="label cursor-pointer">
-      <span class="label-text">Static</span>
-      <input type="checkbox" class="checkbox" bind:checked={isStatic} />
-    </label>
-    <label class="label cursor-pointer">
-      <span class="label-text">Evolve</span>
-      <input type="checkbox" class="checkbox" bind:checked={evolve.enabled} />
-    </label>
-    <label class="label cursor-pointer">
-      <span class="label-text">Devolve</span>
-      <input type="checkbox" class="checkbox" bind:checked={devolve.enabled} />
-    </label>
-    <label class="label">
-      <span class="label-text">Dialogue ID</span>
-      <select class="select select-bordered" bind:value={dialogueID}>
-        {#each [...$dialogueTree.keys()].filter(key => key.length == 1) as id}
-          <option value={id}>{id}</option>
-        {/each}
-      </select>
-    </label>
+  <div class="flex flex-row gap-4 text-xl">
+    <button
+      class:enabled={devolve.enabled}
+      class="opacity-50 hover:cursor-pointer"
+      on:click={() => (devolve.enabled = !devolve.enabled)}
+    >
+      🧬
+    </button>
+    <button
+      class:enabled={isStatic}
+      class="opacity-50 hover:cursor-pointer"
+      on:click={() => (isStatic = !isStatic)}
+    >
+      🗿
+    </button>
+    <button
+      class:enabled={evolve.enabled}
+      class="opacity-50 hover:cursor-pointer"
+      on:click={() => (evolve.enabled = !evolve.enabled)}
+    >
+      🧬
+    </button>
   </div>
-  <!-- TODO: Update all update functions with dialogue -->
+
+  <label class="label">
+    <span class="label-text">Dialogue ID</span>
+    &nbsp;
+    <select class="select select-bordered" bind:value={dialogueID}>
+      {#each [...$dialogueTree.keys()].filter((key) => key.length == 1) as id}
+        <option value={id}>{id}</option>
+      {/each}
+    </select>
+  </label>
   <div class="form-control flex flex-col">
     <div
       class="flex w-full flex-row items-center justify-center gap-2 pb-6 text-xl"
@@ -586,20 +606,15 @@
   </div>
 </main>
 
-<!-- <div
-  class="slot absolute -bottom-20"
-  on:click={() => {
-    evolve.to = $currentEmoji;
-    updateStore();
-  }}
->
-  {evolve.to}
-</div> -->
 <style>
   span {
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
     align-items: center;
+  }
+
+  .enabled {
+    opacity: 1;
   }
 </style>

@@ -84,7 +84,7 @@
 <div
   title="Mutate consumer"
   class:mutateConsumer
-  class="absolute top-0.5 left-1 opacity-50 hover:cursor-pointer"
+  class="absolute bottom-0.5 left-1 opacity-50 hover:cursor-pointer"
   on:click={() => (mutateConsumer = !mutateConsumer)}
 >
   🧬

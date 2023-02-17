@@ -37,6 +37,13 @@
 </script>
 
 <svelte:window
+  on:keydown={(e) => {
+    if (e.code == "KeyR") {
+      $rbxSelected = false;
+      moving = false;
+      moved = false;
+    }
+  }}
   on:mousemove={(e) => {
     e.preventDefault();
     if (shouldMove) {

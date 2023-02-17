@@ -3,7 +3,7 @@
   import { tweened } from "svelte/motion";
   import { cubicOut } from "svelte/easing";
   import { createEventDispatcher, onDestroy, onMount } from "svelte/internal";
-  import { currentColor, currentEmoji, saves } from "../store";
+  import { currentColor, currentEmoji, dialogueTree, saves } from "../store";
   import {
     DEFAULT_MAP_CLASS,
     DEFAULT_SIDE_LENGTH,
@@ -26,6 +26,7 @@
     type _Equippables,
     HP,
   } from "$src/types";
+  import Chat from "./Chat.svelte";
 
   /* ## DATA ## */
   export let map: EditableMap;
@@ -56,6 +57,10 @@
   let _equippables: _Equippables = {};
   let timeouts: Array<NodeJS.Timeout> = [];
   let intervals: Array<NodeJS.Timer> = [];
+
+  /* ## DIALOGUE ## */
+  let character = "";
+  let dialogueID = "";
 
   onMount(() => {
     [$currentColor, $currentEmoji] = ["", ""];
@@ -359,6 +364,8 @@
     }
   }
 
+  let openDialogue = false;
+
   async function handle(e: KeyboardEvent) {
     e.preventDefault();
     if (!items.has(ac) || (player?.hp.current || -1) <= 0) return;
@@ -401,13 +408,13 @@
       return;
     }
 
-    if (e.code == "Space") {
-      // TODO: Implement conversation
+    if (e.code == "Space" && !openDialogue) {
       // required so that items are not overflowing from the map
       if (calcOperation(wasdToArrow[directionKey], ac) == 0) {
         return;
       }
       let interactedItem = items.get(ic);
+      console.log(interactedItem);
 
       if (interactedItem == undefined) return;
       if (interactedItem instanceof Equippable) {
@@ -486,6 +493,8 @@
 
       let interactable: _Interactable = _interactables[interactedItem.emoji];
 
+      console.log(interactable);
+
       if (interactable == undefined || interactable.executing) return;
       let { sequence, sideEffects, evolve, devolve } = interactable;
 
@@ -557,6 +566,15 @@
 
       items = items;
       _interactables[interactedItem.emoji].executing = false;
+      character = interactedItem.emoji;
+      dialogueID = interactable.dialogueID;
+      console.log(dialogueID);
+
+      if ($dialogueTree.has(dialogueID)) {
+        openDialogue = true;
+      }
+      console.log(openDialogue);
+
       return;
     }
 
@@ -647,7 +665,7 @@
 
 <svelte:window on:keydown={handle} />
 
-<div class="flex h-full flex-col items-center justify-center">
+<div class="relative flex h-full flex-col items-center justify-center">
   {#key ac}
     {#if ac != -2 && showHP}
       {@const playerHP = $progress * (player?.hp.max || 1)}
@@ -726,6 +744,13 @@
       </div>
     {/if}
   {/key}
+  {#if openDialogue}
+    <Chat
+      {character}
+      {dialogueID}
+      on:dialogueEnded={() => (openDialogue = false)}
+    />
+  {/if}
 </div>
 
 <style>

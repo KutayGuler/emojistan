@@ -28,6 +28,7 @@
   <p class="absolute right-0 bottom-0 pr-1 text-xs">
     Right click to spawn a Rulebox
   </p>
+  <p class="absolute left-0 bottom-0 pl-1 text-xs">Press R to unstuck</p>
 </div>
 
 <style>

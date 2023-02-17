@@ -168,7 +168,9 @@
 />
 
 <!-- TODO: respnsive -->
-<div class="ml-24 flex h-[620px] w-full flex-row gap-4 2xl:h-[716px]">
+<div
+  class="flex h-[620px] flex-row items-start justify-center gap-4 2xl:h-[716px]"
+>
   <aside
     class="flex h-[620px] w-72 flex-col gap-4 rounded bg-base-200 p-8 2xl:h-[716px]"
   >
@@ -214,7 +216,10 @@
       </span>
     </div>
   </aside>
-  <div class="w-1/3 overflow-y-auto p-4">
+
+  <!-- TODO: replace 972 with accurate value -->
+  <!-- TODO: respnsive -->
+  <div class="w-[972px] overflow-y-auto p-4">
     <div class="flex flex-row gap-4">
       <div class="flex-grow">
         <label for="main-branch" class="label">
