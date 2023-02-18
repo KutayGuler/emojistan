@@ -3,21 +3,9 @@
   import { Choice } from "$src/types";
   import { notifications } from "../notifications";
   import { dialogueTree } from "$src/store";
-  // [[
-  //   "1",
-  //   [
-  //     "hello",
-  //     "what's up",
-  //     "n-word",
-  //     "will you help me recover racism?",
-  //     new Choice("1_2", "no"),
-  //   ],
-  // ],
-  // ["1_2", ["get ready to get destroyed babi"]]],
+
   let currentText = "";
   let currentIndex = 0;
-
-  // let dialogueTree = new Map<string, Array<string | Choice>>();
   let currentDialogue: Array<string | Choice> = [];
   let mainBranches: Array<string> = [];
   let subBranches: Array<string> = [];
@@ -58,11 +46,9 @@
   }
 
   function insertText() {
-    console.log(currentDialogue[currentIndex]);
-
     if (!currentDialogue) return;
-    if (currentDialogue[currentIndex] instanceof Choice) {
-      notifications.warning("You cannot add text after choice");
+    if (typeof currentDialogue[currentIndex] == "object") {
+      notifications.warning("You cannot add text after player choice");
       return;
     }
 
@@ -72,7 +58,7 @@
   }
 
   function renameText() {
-    if (currentDialogue[currentIndex] instanceof Choice) {
+    if (typeof currentDialogue[currentIndex] == "object") {
       (currentDialogue[currentIndex] as Choice).text = currentText;
     } else {
       currentDialogue[currentIndex] = currentText;
@@ -97,8 +83,6 @@
         numberOfSiblings++;
       }
     }
-
-    console.log(numberOfSiblings);
 
     let to = currentSubBranch + "_" + numberOfSiblings;
     dialogueTree.add(to, ["### SAMPLE TEXT ###"]);
@@ -126,6 +110,8 @@
     expands.set(key, !expands.get(key));
     expands = expands;
   }
+
+  // TODO: Guide
 </script>
 
 <svelte:window

@@ -364,11 +364,18 @@
     }
   }
 
-  let openDialogue = false;
+  let chatting = false;
 
   async function handle(e: KeyboardEvent) {
     e.preventDefault();
     if (!items.has(ac) || (player?.hp.current || -1) <= 0) return;
+
+    if (chatting) {
+      if (e.code == "Escape") {
+        chatting = false;
+      }
+      return;
+    }
 
     if (e.code.includes("Arrow")) {
       let operation = calcOperation(e.code as ArrowKey, ac);
@@ -408,7 +415,7 @@
       return;
     }
 
-    if (e.code == "Space" && !openDialogue) {
+    if (e.code == "Space" && !chatting) {
       // required so that items are not overflowing from the map
       if (calcOperation(wasdToArrow[directionKey], ac) == 0) {
         return;
@@ -568,13 +575,9 @@
       _interactables[interactedItem.emoji].executing = false;
       character = interactedItem.emoji;
       dialogueID = interactable.dialogueID;
-      console.log(dialogueID);
-
       if ($dialogueTree.has(dialogueID)) {
-        openDialogue = true;
+        chatting = true;
       }
-      console.log(openDialogue);
-
       return;
     }
 
@@ -589,6 +592,11 @@
       items.set(ic, player?.inventory[currentInventoryIndex]);
       player.inventory.splice(currentInventoryIndex, 1);
       items = items;
+      return;
+    }
+
+    if (e.code == "Escape") {
+      dispatch("quit");
       return;
     }
 
@@ -744,11 +752,11 @@
       </div>
     {/if}
   {/key}
-  {#if openDialogue}
+  {#if chatting}
     <Chat
       {character}
       {dialogueID}
-      on:dialogueEnded={() => (openDialogue = false)}
+      on:dialogueEnded={() => (chatting = false)}
     />
   {/if}
 </div>

@@ -61,6 +61,7 @@
   }
 
   subBranchChanged();
+  // TODO: Being able to choose with keyboard (a11y)
 </script>
 
 <svelte:window
@@ -85,7 +86,8 @@
         chatIndex = currentDialogue.length;
         console.log(chatIndex);
       }
-      return;
+    } else if (e.code == "Escape") {
+      dispatch("dialogueEnded");
     }
   }}
 />

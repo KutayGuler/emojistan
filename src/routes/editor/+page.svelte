@@ -66,7 +66,7 @@
       interactables,
       palette,
       rbxStore,
-      dialogueTree
+      dialogueTree,
     ]) {
       store.useStorage($saves.currentSaveID);
     }
@@ -80,10 +80,6 @@
     if (e.code == "Escape") {
       $currentEmoji = "";
       $currentColor = "";
-
-      if (test) {
-        test = false;
-      }
     }
   }
 

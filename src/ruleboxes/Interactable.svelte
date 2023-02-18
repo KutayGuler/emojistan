@@ -376,49 +376,53 @@
     </div>
   {/if}
 </div>
-<main class="flex flex-col items-center justify-center gap-12 pt-16">
-  <div class="flex flex-row gap-4 text-xl">
-    <button
-      class:enabled={devolve.enabled}
-      class="opacity-50 hover:cursor-pointer"
-      on:click={() => (devolve.enabled = !devolve.enabled)}
-    >
-      🧬
-    </button>
-    <button
-      class:enabled={isStatic}
-      class="opacity-50 hover:cursor-pointer"
-      on:click={() => (isStatic = !isStatic)}
-    >
-      🗿
-    </button>
-    <button
-      class:enabled={evolve.enabled}
-      class="opacity-50 hover:cursor-pointer"
-      on:click={() => (evolve.enabled = !evolve.enabled)}
-    >
-      🧬
-    </button>
+<main class="flex w-full flex-col items-center justify-center gap-12 pt-16">
+  <div class="flex flex-col items-center justify-center">
+    <div class="flex flex-row gap-4 text-xl">
+      <button
+        class:enabled={devolve.enabled}
+        class="opacity-50 hover:cursor-pointer"
+        on:click={() => (devolve.enabled = !devolve.enabled)}
+      >
+        🧬
+      </button>
+      <button
+        class:enabled={isStatic}
+        class="opacity-50 hover:cursor-pointer"
+        on:click={() => (isStatic = !isStatic)}
+      >
+        🗿
+      </button>
+      <button
+        class:enabled={evolve.enabled}
+        class="opacity-50 hover:cursor-pointer"
+        on:click={() => (evolve.enabled = !evolve.enabled)}
+      >
+        🧬
+      </button>
+    </div>
+    <label class="label">
+      <span class="label-text">💬 ID</span>
+      &nbsp;
+      <select class="select select-bordered select-sm" bind:value={dialogueID}>
+        <option value="">none</option>
+        {#each [...$dialogueTree.keys()].filter((key) => key.length == 1) as id}
+          <option value={id}>{id}</option>
+        {/each}
+      </select>
+    </label>
   </div>
 
-  <label class="label">
-    <span class="label-text">Dialogue ID</span>
-    &nbsp;
-    <select class="select select-bordered" bind:value={dialogueID}>
-      {#each [...$dialogueTree.keys()].filter((key) => key.length == 1) as id}
-        <option value={id}>{id}</option>
-      {/each}
-    </select>
-  </label>
-  <div class="form-control flex flex-col">
-    <div
-      class="flex w-full flex-row items-center justify-center gap-2 pb-6 text-xl"
-    >
-      <p style="color: {EQUIPPABLE_BORDER};">
-        Side Effects ({sideEffects.length} / 3)
-      </p>
+  <div class="form-control flex w-full flex-col p-4">
+    <div class="divider flex flex-row pb-6">
+      <p>SIDE EFFECTS ({sideEffects.length} / 3)</p>
       <div class="dropdown-hover dropdown-right dropdown">
-        <label for="" tabindex="0" class="btn text-2xl">+</label>
+        <label
+          for=""
+          tabindex="0"
+          class="btn text-2xl"
+          style:background={EQUIPPABLE_BORDER}>+</label
+        >
         <ul
           tabindex="0"
           class="dropdown-content menu rounded-box bg-base-100 p-2 shadow "
@@ -441,10 +445,10 @@
           data-tip="An interactable needs at least one side effect with positive or negative value to be interactable"
         >
           <button class="btn text-2xl text-warning">!</button>
-        </div>{/if}
+        </div>
+      {/if}
     </div>
-
-    <div class="flex flex-wrap items-center justify-center gap-8 pb-6">
+    <div class="flex flex-wrap items-center justify-center gap-8">
       {#each sideEffects as [equippableID, value], i}
         {@const modifierEmoji = $equippables.get(equippableID)?.emoji}
         <div class="relative flex flex-col items-center">
@@ -497,10 +501,10 @@
       {/each}
     </div>
   </div>
-  <div class="flex flex-col gap-2">
-    <p class="text-xl">Event Sequence</p>
+  <div class="flex w-full flex-col gap-2 p-4">
+    <div class="divider">EVENT SEQUENCE</div>
     {#each sequence as s, i}
-      <span class="flex w-full flex-row items-start justify-between gap-2">
+      <span class="flex w-full flex-row items-start justify-center gap-2">
         <select class="select" title="event type" bind:value={s.type}>
           {#each Object.entries(types) as [group, values]}
             <optgroup label={`${group} ${typeIcons[group]}`}>
@@ -584,14 +588,16 @@
             </select>
           {/if}
         {/if}
-        <button
-          class="text-2xl"
-          id="remove"
-          on:click={() => removeFromSequence(i)}>{CROSS}</button
-        >
+        <div class="flex flex-grow justify-end">
+          <button
+            class="text-2xl"
+            id="remove"
+            on:click={() => removeFromSequence(i)}>{CROSS}</button
+          >
+        </div>
       </span>
     {/each}
-    <label>
+    <label class="flex items-center justify-center gap-2">
       <select class="select" title="event type" bind:value={type}>
         {#each Object.entries(types) as [group, values]}
           <optgroup label={`${group} ${typeIcons[group]}`}>
@@ -601,7 +607,7 @@
           </optgroup>
         {/each}
       </select>
-      <button class="btn ml-1 text-2xl" on:click={addToSequence}>+</button>
+      <button class="btn text-2xl" on:click={addToSequence}>+</button>
     </label>
   </div>
 </main>

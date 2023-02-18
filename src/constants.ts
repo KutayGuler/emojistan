@@ -33,7 +33,7 @@ export const MERGER_BG = "#f8fafc";
 export const MERGER_BORDER = "#334155";
 
 /* INTERACTABLE */
-export const INTERACTABLE_W = 400;
+export const INTERACTABLE_W = 450;
 export const INTERACTABLE_H = 600;
 export const INTERACTABLE_BG = "#eef2ff";
 export const INTERACTABLE_BORDER = "#6366f1";
