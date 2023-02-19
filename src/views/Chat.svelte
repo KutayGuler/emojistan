@@ -1,13 +1,14 @@
 <script lang="ts">
-  import { Choice } from "$src/types";
+  import type { Choice } from "$src/types";
   import { createEventDispatcher, onMount } from "svelte";
   import { fly, scale } from "svelte/transition";
   import { dialogueTree } from "$src/store";
   const dispatch = createEventDispatcher();
 
   export let character = "🐸";
-  // export let dialogueTree = new Map<string, Array<string | Choice>>();
   export let dialogueID: string;
+  let choicesForm: HTMLFormElement;
+  let choiceIndex = 0;
 
   let mainBranches: Array<string> = [];
   let subBranches: Array<string> = [];
@@ -31,7 +32,10 @@
     }
   }
 
-  function makeChoice(to: string, text: string) {
+  // TODO: Shouldn't be able to start dialogue with choice
+
+  function makeChoice() {
+    let { to, text } = choices[choiceIndex];
     chatIndex = chatIndex - choices.length + 1;
     choices = [];
     texts = [...texts, text];
@@ -61,12 +65,40 @@
   }
 
   subBranchChanged();
-  // TODO: Being able to choose with keyboard (a11y)
 </script>
 
 <svelte:window
   on:keydown={(e) => {
     if (!currentDialogue) return;
+
+    // choosing
+    if (chatIndex == currentDialogue.length) {
+      const children = choicesForm.children;
+      if (e.code == "Space") {
+        children[choiceIndex].click();
+        return;
+      }
+
+      if (e.code.includes("Arrow")) {
+        console.log(choicesForm);
+        console.log(choicesForm.children);
+
+        if (e.code == "ArrowRight") {
+          choiceIndex++;
+          if (choiceIndex == children.length) {
+            choiceIndex = 0;
+          }
+        } else if (e.code == "ArrowLeft") {
+          choiceIndex--;
+          if (choiceIndex < 0) {
+            choiceIndex = children.length - 1;
+          }
+        }
+
+        children[choiceIndex % children.length].focus();
+      }
+      return;
+    }
 
     if (e.code == "Space") {
       if (
@@ -112,18 +144,26 @@
         </li>
       {/if}
     {/each}
-    <div class="flex flex-row gap-2 px-4 pt-1">
+    <!-- TODO: Don't add more than 4 choices -->
+    <form
+      class="flex flex-row gap-2 px-4 pt-1"
+      bind:this={choicesForm}
+      on:submit|preventDefault={makeChoice}
+    >
       {#each choices as choice, i}
         {#if i + texts.length < chatIndex && !animating}
+          {@const autofocus = i == 0}
           <button
+            {autofocus}
+            class="btn flex-grow focus:bg-green-500 focus:text-primary-content"
+            type="submit"
+            tabindex="0"
             transition:fly|local={{ x: 100 }}
-            class="btn flex-grow"
-            on:click={() => makeChoice(choice.to, choice.text)}
-            ><p>{choice.text}</p>
+            >{choice.text}
           </button>
         {/if}
       {/each}
-    </div>
+    </form>
   </ul>
 </div>
 

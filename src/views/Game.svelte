@@ -371,9 +371,9 @@
     if (!items.has(ac) || (player?.hp.current || -1) <= 0) return;
 
     if (chatting) {
-      if (e.code == "Escape") {
-        chatting = false;
-      }
+      // if (e.code == "Escape") {
+      //   chatting = false;
+      // }
       return;
     }
 
