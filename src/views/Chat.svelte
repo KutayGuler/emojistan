@@ -70,6 +70,10 @@
 <svelte:window
   on:keydown={(e) => {
     if (!currentDialogue) return;
+    if (e.code == "Escape") {
+      dispatch("end");
+      return;
+    }
 
     // choosing
     if (chatIndex == currentDialogue.length) {
@@ -106,7 +110,7 @@
         choices.length == 0 &&
         typeof texts.at(-1) == "string"
       ) {
-        dispatch("dialogueEnded");
+        dispatch("end");
         return;
       }
 
@@ -118,8 +122,6 @@
         chatIndex = currentDialogue.length;
         console.log(chatIndex);
       }
-    } else if (e.code == "Escape") {
-      dispatch("dialogueEnded");
     }
   }}
 />

@@ -1,6 +1,7 @@
 import { page } from "$app/stores";
-import { writable, get } from "svelte/store";
+import { writable, get, type Writable } from "svelte/store";
 import { DEFAULT_BG, storeNames } from "./constants";
+
 import {
   Choice,
   Consumable,
@@ -125,7 +126,9 @@ function createEditableMap() {
     useStorage: (id: string) => {
       const dbg = localStorage.getItem(id + "_dbg") || DEFAULT_BG;
       const items = JSON.parse(localStorage.getItem(id + "_items") as string);
-      const backgrounds = JSON.parse(localStorage.getItem(id + "_backgrounds") as string);
+      const backgrounds = JSON.parse(
+        localStorage.getItem(id + "_backgrounds") as string
+      );
 
       update((state) => {
         state.items = new Map(items) || new Map();

@@ -248,8 +248,8 @@
           {#if expands.get(key)}
             {#each dialogue as text, i}
               {@const isString = typeof text == "string"}
-              <div class="flex w-full flex-row justify-between gap-2 pl-4">
-                <p class="flex-grow rounded bg-base-200 p-1">
+              <div class="flex w-full flex-row justify-between gap-1 pl-4">
+                <p class="flex-grow rounded bg-base-200 p-1 pl-2">
                   {#if key == currentSubBranch && currentIndex == i}📍&nbsp;{/if}
                   {#if isString}{text}{:else}{text.text} -> {text.to}{/if}
                 </p>

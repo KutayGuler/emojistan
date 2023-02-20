@@ -25,13 +25,15 @@
     type _Consumables,
     type _Equippables,
     HP,
+    type Pusher,
+    type Merger,
   } from "$src/types";
   import Chat from "./Chat.svelte";
 
   /* ## DATA ## */
   export let map: EditableMap;
-  export let pushers = new Map<number, [string, string, CollisionType]>();
-  export let mergers = new Map<number, [string, string, CollisionType]>();
+  export let pushers = new Map<number, Pusher>();
+  export let mergers = new Map<number, Merger>();
   export let equippables = new Map<number, Equippable>();
   export let interactables = new Map<number, Interactable>();
   export let consumables = new Map<number, Consumable>();
@@ -156,7 +158,6 @@
   for (let [id, interactable] of interactables) {
     const { emoji, ...args } = interactable;
     if (emoji == "") continue;
-
     _interactables[emoji] = {} as _Interactable;
     Object.assign(_interactables[emoji], args);
   }
@@ -164,7 +165,6 @@
   for (let [id, consumable] of consumables) {
     const { emoji, ...args } = consumable;
     if (emoji == "") continue;
-
     _consumables[emoji] = {} as Consumable;
     Object.assign(_consumables[emoji], args);
   }
@@ -368,15 +368,7 @@
 
   async function handle(e: KeyboardEvent) {
     e.preventDefault();
-    if (!items.has(ac) || (player?.hp.current || -1) <= 0) return;
-
-    if (chatting) {
-      // if (e.code == "Escape") {
-      //   chatting = false;
-      // }
-      return;
-    }
-
+    if (!items.has(ac) || (player?.hp.current || -1) <= 0 || chatting) return;
     if (e.code.includes("Arrow")) {
       let operation = calcOperation(e.code as ArrowKey, ac);
       if (!player || statics.has(player.emoji) || operation == 0) return;
@@ -753,11 +745,7 @@
     {/if}
   {/key}
   {#if chatting}
-    <Chat
-      {character}
-      {dialogueID}
-      on:dialogueEnded={() => (chatting = false)}
-    />
+    <Chat {character} {dialogueID} on:end={() => (chatting = false)} />
   {/if}
 </div>
 
