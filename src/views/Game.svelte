@@ -27,10 +27,12 @@
     HP,
     type Pusher,
     type Merger,
+    Choice,
   } from "$src/types";
   import Chat from "./Chat.svelte";
 
   /* ## DATA ## */
+  export let dt = new Map<string, Array<string | Choice>>(); // dialogue tree
   export let map: EditableMap;
   export let pushers = new Map<number, Pusher>();
   export let mergers = new Map<number, Merger>();
@@ -342,7 +344,7 @@
     } else {
       collisionTypeSequence = collisionTypeSequence.slice(
         0,
-        collisionTypeSequence.findIndex((str) => str == "bump")
+        collisionTypeSequence.findIndex((str) => str != "push") + 1
       );
 
       if (
@@ -380,6 +382,7 @@
       }
 
       let collisionType = getCollisionType(player.emoji, facingItem.emoji);
+      console.log(collisionType);
 
       switch (collisionType) {
         case "push":
@@ -432,7 +435,6 @@
           player.emoji = mutateConsumerTo;
         } else {
           player.hp.add(hp);
-          console.log(player.hp.current);
 
           if (player.hp.current <= 0) {
             let playerDevolve = _interactables[player?.emoji || ""]?.devolve;
@@ -491,8 +493,6 @@
       }
 
       let interactable: _Interactable = _interactables[interactedItem.emoji];
-
-      console.log(interactable);
 
       if (interactable == undefined || interactable.executing) return;
       let { sequence, sideEffects, evolve, devolve } = interactable;
@@ -670,8 +670,9 @@
     {#if ac != -2 && showHP}
       {@const playerHP = $progress * (player?.hp.max || 1)}
       <!-- class="absolute -top-16 flex w-64 flex-row items-center justify-center gap-2" -->
+      <!-- 2xl:my-8 -->
       <div
-        class="my-8 flex h-full w-64 flex-grow flex-row items-center justify-center"
+        class=" flex h-full w-64 flex-grow flex-row items-center justify-center"
       >
         <p class="z-10 text-2xl">{player?.emoji || ""}</p>
         <progress title="Health Bar" class="progress h-8" value={$progress} />
@@ -722,16 +723,17 @@
   </div>
   {#key ac}
     {#if ac != -2 && showInventory}
+      <!-- 2xl:my-8 py-8 -->
       <div
         title="Inventory"
-        class="my-8 flex h-full w-full flex-row items-center justify-center gap-2"
+        class="flex h-full w-full flex-row items-center justify-center gap-2"
       >
         {#each { length: MAX_INVENTORY_SIZE } as _, i}
           {@const item = player?.inventory[i]}
           {@const equipped = i == currentInventoryIndex}
           <div
             class:equipped
-            class="relative flex h-12 w-12 flex-col items-center justify-center bg-base-300 p-2"
+            class="relative flex h-10 w-10 flex-col items-center justify-center rounded bg-base-300 p-2 2xl:h-12 2xl:w-12"
           >
             {#if item}
               <div>{item.emoji || ""}</div>
@@ -745,7 +747,12 @@
     {/if}
   {/key}
   {#if chatting}
-    <Chat {character} {dialogueID} on:end={() => (chatting = false)} />
+    <Chat
+      {character}
+      {dialogueID}
+      dialogueTree={dt}
+      on:end={() => (chatting = false)}
+    />
   {/if}
 </div>
 

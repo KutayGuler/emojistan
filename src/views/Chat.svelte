@@ -2,11 +2,12 @@
   import type { Choice } from "$src/types";
   import { createEventDispatcher, onMount } from "svelte";
   import { fly, scale } from "svelte/transition";
-  import { dialogueTree } from "$src/store";
+  import { dialogueTree as dt } from "$src/store";
   const dispatch = createEventDispatcher();
 
   export let character = "🐸";
   export let dialogueID: string;
+  export let dialogueTree = new Map<string, Array<string | Choice>>();
   let choicesForm: HTMLFormElement;
   let choiceIndex = 0;
 
@@ -17,22 +18,29 @@
   let chatIndex = 0;
   let animating = false;
   let answerIndexes: Array<number> = [];
+  let currentDialogue: Array<string | Choice>;
+  let texts: Array<string> = [];
+  let choices: Array<Choice> = [];
 
   onMount(() => {
+    if (dialogueTree.size == 0) {
+      dialogueTree = new Map<string, Array<string | Choice>>($dt);
+    }
+
+    for (let key of dialogueTree.keys()) {
+      if (key.split("_").length == 1) {
+        mainBranches.push(key);
+      }
+
+      if (key[0] == currentBranch) {
+        subBranches.push(key);
+      }
+    }
+
+    currentDialogue = dialogueTree.get(currentSubBranch) || [];
+    subBranchChanged();
     chatIndex++;
   });
-
-  for (let key of $dialogueTree.keys()) {
-    if (key.split("_").length == 1) {
-      mainBranches.push(key);
-    }
-
-    if (key[0] == currentBranch) {
-      subBranches.push(key);
-    }
-  }
-
-  // TODO: Shouldn't be able to start dialogue with choice
 
   function makeChoice() {
     let { to, text } = choices[choiceIndex];
@@ -44,12 +52,8 @@
     subBranchChanged();
   }
 
-  let currentDialogue = $dialogueTree.get(currentSubBranch);
-  let texts: Array<string> = [];
-  let choices: Array<Choice> = [];
-
   function subBranchChanged() {
-    currentDialogue = $dialogueTree.get(currentSubBranch);
+    currentDialogue = dialogueTree.get(currentSubBranch) || [];
     if (!currentDialogue) return;
 
     for (let item of currentDialogue) {
@@ -63,8 +67,6 @@
     texts = texts;
     choices = choices;
   }
-
-  subBranchChanged();
 </script>
 
 <svelte:window
@@ -84,9 +86,6 @@
       }
 
       if (e.code.includes("Arrow")) {
-        console.log(choicesForm);
-        console.log(choicesForm.children);
-
         if (e.code == "ArrowRight") {
           choiceIndex++;
           if (choiceIndex == children.length) {
@@ -120,16 +119,14 @@
 
       if (typeof currentDialogue[chatIndex - 1] == "object") {
         chatIndex = currentDialogue.length;
-        console.log(chatIndex);
       }
     }
   }}
 />
 
-<!-- TODO: responsive -->
 <div
   style="background-color: rgba(0, 0, 0.5, 0.5);"
-  class="absolute z-50 h-[620px] w-full"
+  class="absolute z-50 h-[620px] w-full 2xl:h-[716px]"
   transition:scale|local
 >
   <h1 class="p-4 text-4xl">{character}</h1>
@@ -146,7 +143,6 @@
         </li>
       {/if}
     {/each}
-    <!-- TODO: Don't add more than 4 choices -->
     <form
       class="flex flex-row gap-2 px-4 pt-1"
       bind:this={choicesForm}

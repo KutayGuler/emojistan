@@ -84,6 +84,13 @@
       }
     }
 
+    if (numberOfSiblings > 4) {
+      notifications.warning(
+        "Cannot have more than 4 choices in a single branch"
+      );
+      return;
+    }
+
     let to = currentSubBranch + "_" + numberOfSiblings;
     dialogueTree.add(to, ["### SAMPLE TEXT ###"]);
     currentDialogue?.push(new Choice(to, currentText));
@@ -153,19 +160,20 @@
   }}
 />
 
-<!-- TODO: respnsive -->
 <div
   class="flex h-[620px] flex-row items-start justify-center gap-4 2xl:h-[716px]"
 >
-  <aside
-    class="flex h-[620px] w-72 flex-col gap-4 rounded bg-base-200 p-8 2xl:h-[716px]"
-  >
-    <button class="btn" on:click={addBranch}>ADD BRANCH</button>
-    <button
-      class="btn"
-      disabled={currentSubBranch == ""}
-      on:click={deleteBranch}>DELETE BRANCH # {currentSubBranch || "?"}</button
-    >
+  <!-- flex h-[620px] w-72 flex-col gap-4 rounded bg-base-200 p-8 2xl:h-[716px] 2xl:w-80 -->
+  <aside class="aside">
+    <div class="flex flex-col gap-2">
+      <button class="btn w-full" on:click={addBranch}>ADD BRANCH</button>
+      <button
+        class="btn w-full"
+        disabled={currentSubBranch == ""}
+        on:click={deleteBranch}
+        >DELETE BRANCH # {currentSubBranch || "?"}</button
+      >
+    </div>
     <div class="divider">TEXT</div>
     <div class="flex flex-col gap-2">
       <input
@@ -203,9 +211,7 @@
     </div>
   </aside>
 
-  <!-- TODO: replace 972 with accurate value -->
-  <!-- TODO: respnsive -->
-  <div class="w-[972px] overflow-y-auto p-4">
+  <div class="w-[972px] overflow-y-auto p-4 2xl:w-[1068px]">
     <div class="flex flex-row gap-4">
       <div class="flex-grow">
         <label for="main-branch" class="label">

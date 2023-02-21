@@ -24,9 +24,11 @@
   let deletedGameName = "";
   let deletedGameID = "";
   let creating = false;
+  let showModal = false;
 
   function newGame() {
     if (creating) return;
+    showModal = false;
     saves.add(gameName);
     goto("/editor");
     creating = true;
@@ -64,7 +66,7 @@
           equippables: Object.fromEntries($equippables),
           consumables: Object.fromEntries($consumables),
           interactables: Object.fromEntries($interactables),
-          dialogueTree: Object.fromEntries($dialogueTree)
+          dialogueTree: Object.fromEntries($dialogueTree),
         },
         owner: owner.data.user.id,
       },
@@ -85,7 +87,12 @@
 </svelte:head>
 
 <!-- Put this part before </body> tag -->
-<input type="checkbox" id="new-game" class="modal-toggle" />
+<input
+  type="checkbox"
+  id="new-game"
+  class="modal-toggle"
+  bind:checked={showModal}
+/>
 <label for="new-game" class="modal cursor-pointer">
   <label class="modal-box relative" for="">
     <h3 class="text-lg font-bold">What's the name of the game?</h3>

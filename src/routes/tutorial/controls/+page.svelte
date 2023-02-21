@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { EditableMap, Equippable } from "$src/types";
+  import { Choice, EditableMap, Equippable } from "$src/types";
   import Game from "$src/views/Game.svelte";
 
   const gameProps = {
@@ -10,6 +10,11 @@
         [11, "🦴"],
       ])
     ),
+    // TODO: Add dialogue to tutorial
+    // dt: new Map<string, Array<string | Choice>>([
+    //   ["dog", ]
+    //   ["human", ]
+    // ]),
     equippables: new Map<number, Equippable>([[1, new Equippable("🦴", 1)]]),
     mapClass: "simulation",
     SIZE: 4,

@@ -115,7 +115,7 @@
   export let sequence: Array<SequenceItem> = [];
   export let hp = 1;
   export let points = 1;
-  export let sideEffects: Array<[number | "any", number]> = [["any", 1]];
+  export let sideEffects: Array<[number | "any", number]> = [["any", 0]];
   export let pseudoSideEffects: Array<[string, number]> = [];
   export let isStatic = false;
   export let evolve = new Evolve(false, "", 2);
@@ -381,7 +381,7 @@
     <div class="flex flex-row gap-4 text-xl">
       <button
         class:enabled={devolve.enabled}
-        class="opacity-50 hover:cursor-pointer"
+        class="rotate-90 opacity-50 hover:cursor-pointer"
         on:click={() => (devolve.enabled = !devolve.enabled)}
       >
         🧬

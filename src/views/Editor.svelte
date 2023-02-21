@@ -43,12 +43,24 @@
         break;
     }
   }
+
+  let holding = false;
+
+  function mouseEnter(index: number) {
+    if (holding) clickedCell(index);
+  }
 </script>
+
+<svelte:window
+  on:mousedown={() => (holding = true)}
+  on:mouseup={() => (holding = false)}
+/>
 
 <div class="map">
   {#each { length: DEFAULT_SIDE_LENGTH * DEFAULT_SIDE_LENGTH } as _, i}
     <div
       style:background={$map.backgrounds.get(i) || $map.dbg}
+      on:mouseenter={() => mouseEnter(i)}
       on:click={() => clickedCell(i)}
       on:contextmenu|preventDefault={() => rightClickedCell(i)}
     >

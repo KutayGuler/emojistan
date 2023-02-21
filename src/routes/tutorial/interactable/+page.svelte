@@ -43,8 +43,8 @@
     {
       header: "Interactable",
       description:
-        "Static means this Interactable cannot be controlled by the player. Try switching players (Press E or Q) and you will see that the bricks cannot be controlled.",
-      veilHeight: 464,
+        "Static [ 🗿 ] means this Interactable cannot be controlled by the player. Try switching players (Press E or Q) and you will see that the bricks cannot be controlled.",
+      veilHeight: 476,
       props: {
         id: "static",
         emoji: "🧱",
@@ -74,7 +74,7 @@
               [],
               1,
               1,
-              [["any", 1]],
+              [["any", 0]],
               true,
               new Evolve(false, "", 2),
               new Devolve(false, "")
@@ -89,8 +89,8 @@
     {
       header: "Interactable",
       description:
-        "Evolve, as the name suggests, makes the Interactable evolvable. When Interactable's HP reaches to evolve limit, the emoji transforms and HP resets to evolved version's [ 🚶 ] HP. Which in this case is 1.",
-      veilHeight: 440,
+        "Evolve [ 🧬 ], as the name suggests, makes the Interactable evolvable. When Interactable's HP reaches to evolve limit, the emoji transforms and HP resets to evolved version's [ 🚶 ] HP. Which in this case is 1.",
+      veilHeight: 476,
       props: {
         id: "evolution",
         emoji: "👶",
@@ -139,7 +139,7 @@
       header: "Interactable",
       description:
         "It would be unfair to not have a devolve feature. When Interactable's HP reaches 0 it disappears, unless devolve is enabled. If devolve is enabled, same dynamics with evolve occurs.",
-      veilHeight: 400,
+      veilHeight: 476,
       props: {
         id: "devolution",
         emoji: "🐒",
@@ -181,7 +181,9 @@
         SIZE: 4,
       },
     },
+    // TODO: Dialogue system tutorial
     // SIDE EFFECTS CAN'T OPEN DOOR (door and monkey, interacting with "any" will be of no use, will have to use a key)
+    // TODO: Better definiton
     {
       header: "Interactable",
       description:
@@ -220,7 +222,7 @@
               [],
               1,
               1,
-              [["any", 1]],
+              [["any", 0]],
               true,
               new Evolve(false, "", 2),
               new Devolve(false, "")
@@ -272,7 +274,7 @@
               1,
               1,
               [
-                ["any", 1],
+                ["any", 0],
                 [69, -1],
               ],
               true,
@@ -341,7 +343,7 @@
               1,
               1,
               [
-                ["any", 1],
+                ["any", 0],
                 [69, -1],
               ],
               true,
