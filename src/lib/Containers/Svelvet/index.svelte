@@ -21,7 +21,7 @@
 <svelte:window bind:innerWidth on:resize={resize} />
 <!-- Now that a store has been created from the initial nodes and initial edges we drill props from the store down to the D3 GraphView along with the unique key -->
 <div
-  class="Svelvet shadow-lg"
+  class="Svelvet border border-r-4 border-b-4 border-black"
   style={`width: ${graphSize}px; height: ${graphSize}px`}
 >
   <GraphView {graphSize} />

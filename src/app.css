@@ -2,131 +2,139 @@
 @tailwind components;
 @tailwind utilities;
 
+/* TODO: replace palette with existing tailwind colors */
+
 @layer components {
-  .btn {
-    border: none;
-  }
+	.brutal {
+		@apply border border-r-4 border-b-4 border-black;
+	}
 
-  .info {
-    @apply cursor-help text-center text-lg duration-200 ease-out hover:scale-150;
-  }
+	.btn {
+		@apply brutal;
+	}
 
-  .map {
-    @apply grid h-full w-auto grid-cols-12 grid-rows-12 gap-1 text-2xl;
-  }
+	.info {
+		@apply cursor-help text-center text-lg duration-200 ease-out hover:scale-150;
+	}
 
-  .simulation {
-    @apply grid h-full w-auto grid-cols-4 grid-rows-4 gap-1 py-4 text-2xl;
-  }
+	.map {
+		@apply grid h-full w-auto grid-cols-12 grid-rows-12 gap-1 text-2xl;
+	}
 
-  .slot {
-    @apply flex h-12 w-12 flex-col items-center justify-center rounded border-2 bg-white text-lg;
-  }
+	.simulation {
+		@apply grid h-full w-auto grid-cols-4 grid-rows-4 gap-1 py-4 text-2xl;
+	}
 
-  .slot-lg {
-    @apply flex h-20 w-20 flex-col items-center justify-center rounded border-2 bg-white text-4xl;
-  }
+	.slot {
+		@apply flex h-12 w-12 flex-col items-center justify-center rounded border-2 bg-white text-lg;
+	}
 
-  .aside {
-    @apply relative h-[620px] w-72 rounded bg-base-200 p-8 2xl:h-[716px] 2xl:w-80;
-  }
+	.slot-lg {
+		@apply flex h-20 w-20 flex-col items-center justify-center rounded border-2 bg-white text-4xl;
+	}
 
-  .simulation > div,
-  .map > div {
-    position: relative;
-    display: flex;
-    width: 3rem;
-    height: 3rem;
-    font-size: 1.25rem; /* 20px */
-    line-height: 1.75rem; /* 28px */
-    align-items: center;
-    justify-content: center;
-    border-radius: 0.25rem;
-    --tw-bg-opacity: 1;
-    background-color: hsl(var(--b3, var(--b2)) / var(--tw-bg-opacity));
-  }
+	.aside {
+		@apply brutal relative h-[620px] w-72 rounded bg-slate-300 p-8 2xl:h-[716px] 2xl:w-80;
+	}
 
-  .emojis > div {
-    width: 12%;
-    transition: 75ms ease-out;
-    box-sizing: border-box;
-    cursor: pointer;
-    font-size: 1rem; /* 16px */
-    line-height: 1.5rem; /* 24px */
-  }
+	/* TODO: Fuck around and find out */
 
-  .selected,
-  .emojis > div:hover {
-    transform: scale(1.5);
-  }
+	.simulation > div,
+	.map > div {
+		position: relative;
+		display: flex;
+		width: 3rem;
+		height: 3rem;
+		font-size: 1.25rem; /* 20px */
+		line-height: 1.75rem; /* 28px */
+		align-items: center;
+		justify-content: center;
+		border-radius: 0.25rem;
+		background-color: #94a3b8;
+		--tw-bg-opacity: 1;
+	}
 
-  @media screen and (min-width: 1536px) {
-    .emojis > div {
-      font-size: 1.25rem;
-      line-height: 1.75rem; /* 28px */
-    }
-  }
+	.emojis > div {
+		width: 12%;
+		transition: 75ms ease-out;
+		box-sizing: border-box;
+		cursor: pointer;
+		font-size: 1rem; /* 16px */
+		line-height: 1.5rem; /* 24px */
+	}
 
-  @media screen and (min-width: 1536px) {
-    .simulation > div,
-    .map > div {
-      height: 3.5rem;
-      width: 3.5rem;
-      font-size: 1.5rem; /* 24px */
-      line-height: 2rem; /* 32px */
-    }
-  }
+	.selected,
+	.emojis > div:hover {
+		transform: scale(1.5);
+	}
+
+	@media screen and (min-width: 1536px) {
+		.emojis > div {
+			font-size: 1.25rem;
+			line-height: 1.75rem; /* 28px */
+		}
+	}
+
+	@media screen and (min-width: 1536px) {
+		.simulation > div,
+		.map > div {
+			height: 3.5rem;
+			width: 3.5rem;
+			font-size: 1.5rem; /* 24px */
+			line-height: 2rem; /* 32px */
+		}
+	}
 }
 
 @font-face {
-  font-family: regular;
-  src: url("/fonts/Montserrat-ExtraBold.ttf") format("truetype");
+	font-family: regular;
+	src: url('/fonts/Montserrat-ExtraBold.ttf') format('truetype');
 }
 
 :root {
-  /* font-family: Inter, Avenir, Helvetica, Arial, sans-serif; */
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-text-size-adjust: 100%;
+	/* font-family: Inter, Avenir, Helvetica, Arial, sans-serif; */
+	font-synthesis: none;
+	text-rendering: optimizeLegibility;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	-webkit-text-size-adjust: 100%;
 
-  /* RULEBOXES */
-  --pusher: #64748b;
-  --merger: #334155;
-  --interactable: #6366f1;
-  --consumable: #22c55e;
-  --equippable: #f97316;
+	/* RULEBOXES */
+	--pusher: #64748b;
+	--merger: #334155;
+	--interactable: #6366f1;
+	--consumable: #22c55e;
+	--equippable: #f97316;
 
-  /* --primary: #111827; */
-  --primary: white;
-  background-color: hsl(var(--primary));
+	/* --primary: #111827; */
+	--primary: white;
+	background-color: hsl(var(--primary));
 }
 
 * {
-  font-family: regular;
+	font-family: regular;
 }
 
 html,
 body {
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
 }
 
 ::-webkit-scrollbar-track {
-  border-radius: 10px;
-  background-color: transparent;
+	border-radius: 10px;
+	background-color: transparent;
 }
 
 ::-webkit-scrollbar {
-  width: 12px;
-  background-color: transparent;
+	width: 12px;
+	background-color: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  border-radius: 10px;
-  background-color: #e6e6e6;
+	border-radius: 10px;
+	background-color: #475569;
 }
 
 /* RULEBOXES */
@@ -136,21 +144,21 @@ body {
 .Interactable:hover,
 .Equippable:hover,
 .Consumable:hover {
-  color: var(--primary);
+	color: var(--primary);
 }
 
 .Pusher:hover {
-  background-color: var(--pusher);
+	background-color: var(--pusher);
 }
 .Merger:hover {
-  background-color: var(--merger);
+	background-color: var(--merger);
 }
 .Interactable:hover {
-  background-color: var(--interactable);
+	background-color: var(--interactable);
 }
 .Equippable:hover {
-  background-color: var(--equippable);
+	background-color: var(--equippable);
 }
 .Consumable:hover {
-  background-color: var(--consumable);
+	background-color: var(--consumable);
 }

@@ -54,7 +54,7 @@
 />
 
 <div
-  class="rulebox"
+  class="rulebox border border-r-4 border-b-4 border-black"
   style="left: {rbx.position.x}px;
     top: {rbx.position.y}px;
     width: {rbx.width}px;
@@ -154,6 +154,6 @@
     overscroll-behavior: auto;
     font-size: 14px;
     text-align: center;
-    box-shadow: 1px 1px 3px 1px rgba(0, 0, 0, 0.2);
+    /* box-shadow: 1px 1px 3px 1px rgba(0, 0, 0, 0.2); */
   }
 </style>
