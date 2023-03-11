@@ -204,14 +204,14 @@
 				class="flex h-full w-full flex-row items-center justify-center gap-8 text-lg 2xl:top-8 2xl:text-2xl"
 			>
 				{#each Object.entries(views) as [key, icon]}
-					<div
+					<button
 						class="{viewKey == key
 							? 'scale-150 opacity-100'
-							: 'opacity-50'} cursor-pointer duration-200 ease-out hover:scale-150 hover:opacity-100"
+							: 'opacity-50'} duration-200 ease-out hover:scale-150 hover:opacity-100"
 						on:click={() => changeViewTo(key)}
 					>
 						{icon}
-					</div>
+					</button>
 				{/each}
 			</div>
 			{#if viewKey == 'dialogue'}
@@ -395,14 +395,14 @@
 							/>
 							<div class="my-4 grid grid-cols-4 grid-rows-2 gap-4">
 								{#each Object.keys(emojis) as category}
-									<div
+									<button
 										class="{category == currentCategory
 											? 'scale-125'
-											: 'opacity-50 hover:scale-125 hover:opacity-100'} cursor-pointer duration-75 ease-out"
+											: 'opacity-50 hover:scale-125 hover:opacity-100'} duration-75 ease-out"
 										on:click={() => (currentCategory = category)}
 									>
 										{category}
-									</div>
+									</button>
 								{/each}
 							</div>
 						</div>
@@ -412,13 +412,13 @@
 									<div class="emojis flex flex-wrap justify-center">
 										{#each emojis[category] as [emoji, name]}
 											{#if name.includes(filter)}
-												<div
+												<button
 													class:selected={$currentEmoji == emoji}
 													on:click={() => pickEmoji(emoji)}
 													title={name}
 												>
 													{emoji}
-												</div>
+												</button>
 											{/if}
 										{/each}
 									</div>

@@ -35,8 +35,8 @@
 		@apply brutal relative h-[620px] w-72 rounded bg-slate-300 p-8 2xl:h-[716px] 2xl:w-80;
 	}
 
-	.simulation > div,
-	.map > div {
+	.simulation > *,
+	.map > * {
 		position: relative;
 		display: flex;
 		width: 3rem;
@@ -50,7 +50,7 @@
 		--tw-bg-opacity: 1;
 	}
 
-	.emojis > div {
+	.emojis > * {
 		width: 12%;
 		transition: 75ms ease-out;
 		box-sizing: border-box;
@@ -60,20 +60,20 @@
 	}
 
 	.selected,
-	.emojis > div:hover {
+	.emojis > *:hover {
 		transform: scale(1.5);
 	}
 
 	@media screen and (min-width: 1536px) {
-		.emojis > div {
+		.emojis > * {
 			font-size: 1.25rem;
 			line-height: 1.75rem; /* 28px */
 		}
 	}
 
 	@media screen and (min-width: 1536px) {
-		.simulation > div,
-		.map > div {
+		.simulation > *,
+		.map > * {
 			height: 3.5rem;
 			width: 3.5rem;
 			font-size: 1.5rem; /* 24px */
