@@ -504,7 +504,7 @@
 		<div class="divider">EVENT SEQUENCE</div>
 		{#each sequence as s, i}
 			<span class="flex w-full flex-row items-start justify-center gap-2">
-				<select class="select" title="event type" bind:value={s.type}>
+				<select class="select select-bordered" title="event type" bind:value={s.type}>
 					{#each Object.entries(types) as [group, values]}
 						<optgroup label={`${group} ${typeIcons[group]}`}>
 							{#each values as t}
@@ -517,7 +517,7 @@
 					<div class="slot" on:click={() => updateSlot(i)}>{s.emoji || ''}</div>
 					at
 					<select
-						class="select"
+						class="select select-bordered"
 						title="index"
 						id="index"
 						bind:value={s.index}
@@ -531,7 +531,7 @@
 					<div class="slot" on:click={() => updateSlot(i)}>{s.emoji || ''}</div>
 				{:else if s.type == 'destroy' || s.type == 'erase'}
 					<select
-						class="select"
+						class="select select-bordered"
 						title="index"
 						id="index"
 						bind:value={s.index}
@@ -543,7 +543,7 @@
 					</select>
 				{:else if s.type == 'wait'}
 					<select
-						class="select"
+						class="select select-bordered"
 						title="duration"
 						id="duration"
 						bind:value={s.duration}
@@ -555,7 +555,7 @@
 					</select>
 				{:else if s.type == 'paint'}
 					<select
-						class="select"
+						class="select select-bordered"
 						title="index"
 						id="index"
 						bind:value={s.index}
@@ -567,7 +567,7 @@
 					</select>
 					to
 					<select
-						class="select"
+						class="select select-bordered"
 						title="color"
 						bind:value={s.background}
 						style:background={s.background}
@@ -588,7 +588,7 @@
 			</span>
 		{/each}
 		<label class="flex items-center justify-center gap-2">
-			<select class="select" title="event type" bind:value={type}>
+			<select class="select select-bordered" title="event type" bind:value={type}>
 				{#each Object.entries(types) as [group, values]}
 					<optgroup label={`${group} ${typeIcons[group]}`}>
 						{#each values as t}

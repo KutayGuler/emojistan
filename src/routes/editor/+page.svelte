@@ -260,7 +260,7 @@
 											</span>
 										</label>
 										<select
-											class="brutal select-bordered select 2xl:text-base"
+											class="select-bordered select 2xl:text-base"
 											bind:value={copyMode}
 										>
 											{#each deleteModes as mode}
@@ -280,7 +280,7 @@
 											>
 										</label>
 										<select
-											class="brutal select-bordered select 2xl:text-base"
+											class="select-bordered select 2xl:text-base"
 											bind:value={deleteMode}
 										>
 											{#each deleteModes as mode}
@@ -388,7 +388,7 @@
 							class="sticky top-0 flex w-full flex-col items-center justify-center gap-4 bg-slate-300 p-4 pt-8"
 						>
 							<input
-								class="brutal input-bordered input input-sm w-full 2xl:input-md"
+								class="input-bordered input input-sm w-full 2xl:input-md"
 								type="text"
 								placeholder="Search"
 								bind:value={filter}

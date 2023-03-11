@@ -11,6 +11,14 @@
 		@apply brutal;
 	}
 
+	.input-bordered {
+		@apply brutal;
+	}
+
+	.select-bordered {
+		@apply brutal;
+	}
+
 	.info {
 		@apply cursor-help text-center text-lg duration-200 ease-out hover:scale-150;
 	}
@@ -24,11 +32,11 @@
 	}
 
 	.slot {
-		@apply flex h-12 w-12 flex-col items-center justify-center rounded border-2 bg-white text-lg;
+		@apply flex h-12 w-12 flex-col items-center justify-center rounded border-2 border-black bg-white text-lg shadow-inner;
 	}
 
 	.slot-lg {
-		@apply flex h-20 w-20 flex-col items-center justify-center rounded border-2 bg-white text-4xl;
+		@apply flex h-20 w-20 flex-col items-center justify-center rounded border-2 border-black bg-white text-4xl shadow-inner;
 	}
 
 	.aside {
