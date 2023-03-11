@@ -1,19 +1,20 @@
 <script>
-  import Toast from "./Toast.svelte";
-  import { navigating } from "$app/stores";
-  import "../app.css";
-  import supabase from "../supabase";
+	import Toast from './Toast.svelte'
+	import { navigating } from '$app/stores'
+	import '../app.css'
+	import supabase from '../supabase'
 
-  supabase.auth.onAuthStateChange((event, session) => {});
+	supabase.auth.onAuthStateChange((event, session) => {})
+	$: console.log($navigating)
 </script>
 
-{#if $navigating?.from.pathname == "/" && $navigating?.to.pathname == "/editor"}
-  <div
-    class="absolute z-20 flex h-full w-full items-center justify-center bg-white text-2xl"
-  >
-    LOADING
-    <span class="px-2" id="loading">👾</span>
-  </div>
+{#if $navigating?.from.pathname == '/' && $navigating?.to.pathname == '/editor'}
+	<div
+		class="absolute z-20 flex h-full w-full items-center justify-center bg-white text-2xl"
+	>
+		LOADING
+		<span class="px-2" id="loading">👾</span>
+	</div>
 {/if}
 
 <Toast />
@@ -21,13 +22,13 @@
 <slot />
 
 <style>
-  @keyframes idle {
-    100% {
-      transform: translateY(-20px);
-    }
-  }
+	@keyframes idle {
+		100% {
+			transform: translateY(-20px);
+		}
+	}
 
-  #loading {
-    animation: idle 300ms ease-out infinite alternate;
-  }
+	#loading {
+		animation: idle 300ms ease-out infinite alternate;
+	}
 </style>

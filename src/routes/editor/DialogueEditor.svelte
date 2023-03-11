@@ -8,15 +8,14 @@
 	let currentIndex = 0
 	let currentDialogue: Array<string | Choice> = []
 	let mainBranches: Array<string> = []
-	let subBranches: Array<string> = []
-	let currentSubBranch: string
+	let siblingBranches: Array<string> = []
 	let currentBranch: string
 
 	$: mainBranches = [...$dialogueTree.keys()].filter((key) => key.length == 1)
-	$: subBranches = [...$dialogueTree.keys()].filter(
-		(key) => key[0] == currentBranch
+	$: siblingBranches = [...$dialogueTree.keys()].filter(
+		(key) => key[0] == currentBranch?.split('_')[0]
 	)
-	$: currentDialogue = $dialogueTree.get(currentSubBranch) || []
+	$: currentDialogue = $dialogueTree.get(currentBranch) || []
 
 	function addBranch() {
 		let biggestValue = 1
@@ -32,17 +31,16 @@
 		dialogueTree.add(key, ['### SAMPLE TEXT ###'])
 		expands.set(key, true)
 		currentBranch = key
-		currentSubBranch = key
+		// currentSubBranch = key
 		$dialogueTree = $dialogueTree
 	}
 
 	function deleteBranch() {
-		dialogueTree.remove(currentSubBranch)
-		currentSubBranch = 'main'
+		dialogueTree.remove(currentBranch)
+		currentBranch = $dialogueTree.values().next().value
 	}
 
 	function branchChanged() {
-		currentSubBranch = currentBranch
 		currentIndex = 0
 	}
 
@@ -73,9 +71,9 @@
 		let numberOfSiblings = 1
 		for (let key of $dialogueTree.keys()) {
 			if (
-				key.includes(currentSubBranch) &&
-				key.length == currentSubBranch.length + 2 &&
-				key.split(currentSubBranch + '_').length > 1
+				key.includes(currentBranch) &&
+				key.length == currentBranch.length + 2 &&
+				key.split(currentBranch + '_').length > 1
 			) {
 				numberOfSiblings++
 			}
@@ -88,7 +86,7 @@
 			return
 		}
 
-		let to = currentSubBranch + '_' + numberOfSiblings
+		let to = currentBranch + '_' + numberOfSiblings
 		dialogueTree.add(to, ['### SAMPLE TEXT ###'])
 		currentDialogue?.push(new Choice(to, currentText))
 		$dialogueTree = $dialogueTree
@@ -96,7 +94,7 @@
 	}
 
 	function remove(key: string, index: number) {
-		if (key == currentSubBranch) {
+		if (key == currentBranch) {
 			if (!currentDialogue) return
 			currentDialogue.splice(index, 1)
 			currentIndex = currentDialogue.length - 1
@@ -153,9 +151,8 @@
 			<button class="btn w-full" on:click={addBranch}>ADD BRANCH</button>
 			<button
 				class="btn w-full"
-				disabled={currentSubBranch == ''}
-				on:click={deleteBranch}
-				>DELETE BRANCH # {currentSubBranch || '?'}</button
+				disabled={currentBranch == ''}
+				on:click={deleteBranch}>DELETE BRANCH # {currentBranch || '?'}</button
 			>
 		</div>
 		<div class="divider">TEXT</div>
@@ -168,17 +165,17 @@
 			/>
 			<button
 				class="btn"
-				disabled={currentText == '' || currentSubBranch == ''}
+				disabled={currentText == '' || currentBranch == ''}
 				on:click={insertText}>INSERT</button
 			>
 			<button
 				class="btn flex-grow"
-				disabled={currentText == '' || currentSubBranch == ''}
+				disabled={currentText == '' || currentBranch == ''}
 				on:click={appendChoice}>ADD PLAYER CHOICE (SUBBRANCH)</button
 			>
 			<button
 				class="btn"
-				disabled={currentText == '' || currentSubBranch == ''}
+				disabled={currentText == '' || currentBranch == ''}
 				on:click={renameText}>RENAME</button
 			>
 		</div>
@@ -199,7 +196,7 @@
 		<div class="flex flex-row gap-4">
 			<div class="flex-grow">
 				<label for="main-branch" class="label">
-					<span class="label-text"> Main Branch </span>
+					<span class="label-text"> Main Branches </span>
 				</label>
 				<select
 					class="select-bordered select w-full"
@@ -215,14 +212,15 @@
 			</div>
 			<div class="flex-grow">
 				<label for="sub-branch" class="label">
-					<span class="label-text"> Sub Branch </span>
+					<span class="label-text"> Sibling Branches </span>
 				</label>
 				<select
 					class="select-bordered select w-full"
-					bind:value={currentSubBranch}
+					bind:value={currentBranch}
+					on:change={branchChanged}
 				>
-					{#each subBranches as key}
-						<option value={key}>{key == currentBranch ? 'main' : key}</option>
+					{#each siblingBranches as key}
+						<option value={key}>{key}</option>
 					{:else}
 						<option value="" disabled>No subbranch</option>
 					{/each}
@@ -231,18 +229,18 @@
 		</div>
 		<div class="flex flex-col items-start justify-start gap-2">
 			{#each [...$dialogueTree] as [key, dialogue]}
-				{#if key == (currentSubBranch == 'main' ? currentBranch : currentSubBranch)}
+				{#if key == currentBranch}
 					{#each dialogue as text, i}
 						{@const isString = typeof text == 'string'}
 						<div class="flex w-full flex-row justify-between gap-1 pl-4">
 							<button
 								on:click={() => {
-									currentSubBranch = key
+									currentBranch = key
 									currentIndex = i
 								}}
 								class="flex-grow rounded bg-base-200 p-1 pl-2"
 							>
-								{#if key == currentSubBranch && currentIndex == i}📍&nbsp;{/if}
+								{#if key == currentBranch && currentIndex == i}📍&nbsp;{/if}
 								{#if isString}{text}{:else}{text.text} -> {text.to}{/if}
 							</button>
 							<button class="self-start" on:click={() => remove(key, i)}

@@ -10,7 +10,6 @@
         [11, "🦴"],
       ])
     ),
-    // TODO: Add dialogue to tutorial
     // dt: new Map<string, Array<string | Choice>>([
     //   ["dog", ]
     //   ["human", ]
