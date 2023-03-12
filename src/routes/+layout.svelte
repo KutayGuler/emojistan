@@ -8,7 +8,7 @@
 	$: console.log($navigating)
 </script>
 
-{#if $navigating?.from.pathname == '/' && $navigating?.to.pathname == '/editor'}
+{#if $navigating?.from?.route.id == '/' && $navigating?.to?.route.id == '/editor'}
 	<div
 		class="absolute z-20 flex h-full w-full items-center justify-center bg-white text-2xl"
 	>
