@@ -1,13 +1,13 @@
 <script lang="ts">
 	// SVELTEKIT
-	import { onMount } from 'svelte'
-	import { goto } from '$app/navigation'
-	import { flip } from 'svelte/animate'
-	import { scale } from 'svelte/transition'
+	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
+	import { flip } from 'svelte/animate';
+	import { scale } from 'svelte/transition';
 
 	// VIEWS
-	import Game from '../../views/Game.svelte'
-	import Editor from '../../views/Editor.svelte'
+	import Game from '../../views/Game.svelte';
+	import Editor from '../../views/Editor.svelte';
 
 	// STORES
 	import {
@@ -22,41 +22,41 @@
 		consumables,
 		statics,
 		dialogueTree,
-	} from '../../store'
+	} from '../../store';
 
-	import { emojis } from './emojis'
+	import { emojis } from './emojis';
 	import {
 		CROSS,
 		DEFAULT_BG,
 		DEFAULT_SIDE_LENGTH,
 		GUIDE,
 		palette,
-	} from '$src/constants'
-	import { notifications } from '../notifications'
-	import { rbxStore } from '$lib/stores/store'
+	} from '$src/constants';
+	import { notifications } from '../notifications';
+	import { rbxStore } from '$lib/stores/store';
 
-	import Svelvet from '$lib'
-	import DialogueEditor from './DialogueEditor.svelte'
+	import Svelvet from '$lib';
+	import DialogueEditor from './DialogueEditor.svelte';
 
 	function getStatics() {
-		let _statics = new Set<string>($statics)
+		let _statics = new Set<string>($statics);
 		$interactables.forEach(({ emoji, isStatic }) => {
-			isStatic && _statics.add(emoji)
-		})
+			isStatic && _statics.add(emoji);
+		});
 		for (let [id, { emoji }] of [...$equippables, ...$consumables]) {
-			_statics.add(emoji)
+			_statics.add(emoji);
 		}
 
-		return _statics
+		return _statics;
 	}
 
 	onMount(() => {
 		if ($saves.currentSaveID == '') {
-			let saveExists = saves.useStorage()
+			let saveExists = saves.useStorage();
 			if (!saveExists) {
-				goto('/', { replaceState: true })
-				notifications.info('Failed to find save file.')
-				return
+				goto('/', { replaceState: true });
+				notifications.info('Failed to find save file.');
+				return;
 			}
 		}
 		// STORE NAMES
@@ -71,87 +71,87 @@
 			rbxStore,
 			dialogueTree,
 		]) {
-			store.useStorage($saves.currentSaveID)
+			store.useStorage($saves.currentSaveID);
 		}
-	})
+	});
 
-	const flipParams = { duration: 300 }
-	let currentCategory = '💩'
-	let filter = ''
+	const flipParams = { duration: 300 };
+	let currentCategory = '💩';
+	let filter = '';
 
 	function handleKeydown(e: KeyboardEvent) {
 		if (e.code == 'Escape') {
-			$currentEmoji = ''
-			$currentColor = ''
+			$currentEmoji = '';
+			$currentColor = '';
 		}
 	}
 
 	function pickEmoji(emoji: string) {
-		$currentEmoji = emoji == $currentEmoji ? '' : emoji
+		$currentEmoji = emoji == $currentEmoji ? '' : emoji;
 	}
 
-	let innerWidth: number
-	let innerHeight: number
-	let showIndex = false
-	let hintsEnabled = false
+	let innerWidth: number;
+	let innerHeight: number;
+	let showIndex = false;
+	let hintsEnabled = false;
 
-	type DeleteMode = 'Item' | 'Background' | 'Both'
+	type DeleteMode = 'Item' | 'Background' | 'Both';
 
-	const deleteModes: Array<DeleteMode> = ['Item', 'Background', 'Both']
+	const deleteModes: Array<DeleteMode> = ['Item', 'Background', 'Both'];
 	const deleteTexts: { [key in DeleteMode]: string } = {
 		Item: 'ITEMS',
 		Background: 'BGS',
 		Both: 'ALL',
-	}
+	};
 
-	let deleteMode = deleteModes[2]
-	let copyMode = deleteModes[2]
+	let deleteMode = deleteModes[2];
+	let copyMode = deleteModes[2];
 
 	function fillMap() {
-		if ($currentEmoji == '') return
+		if ($currentEmoji == '') return;
 		for (let i = 0; i < DEFAULT_SIDE_LENGTH * DEFAULT_SIDE_LENGTH; i++) {
-			$map.items.set(i, $currentEmoji)
+			$map.items.set(i, $currentEmoji);
 		}
-		$map = $map
+		$map = $map;
 	}
 
 	function clearMap() {
 		switch (deleteMode) {
 			case 'Item':
-				map.clearItems()
-				break
+				map.clearItems();
+				break;
 			case 'Background':
-				map.clearBackgrounds()
-				break
+				map.clearBackgrounds();
+				break;
 			case 'Both':
-				map.clearAll()
-				break
+				map.clearAll();
+				break;
 		}
 	}
 
-	let test = false
+	let test = false;
 
-	type ViewKey = 'editor' | 'rules' | 'dialogue'
+	type ViewKey = 'editor' | 'rules' | 'dialogue';
 	const views: { [key in ViewKey]: string } = {
 		editor: '🗺️',
 		rules: '📚',
 		dialogue: '💬',
-	}
+	};
 
-	let viewKey: ViewKey = 'editor'
+	let viewKey: ViewKey = 'editor';
 
 	function changeViewTo(to: string) {
-		viewKey = to as ViewKey
+		viewKey = to as ViewKey;
 	}
 
 	function toggleTest() {
-		test = !test
+		test = !test;
 		if (!test) {
-			$currentEmoji = ''
+			$currentEmoji = '';
 		}
 	}
 
-	let [x, y] = [0, 0]
+	let [x, y] = [0, 0];
 </script>
 
 <svelte:head>
@@ -160,8 +160,8 @@
 
 <svelte:window
 	on:mousemove={(e) => {
-		x = e.clientX
-		y = e.clientY
+		x = e.clientX;
+		y = e.clientY;
 	}}
 	on:keydown={handleKeydown}
 	bind:innerWidth
@@ -192,11 +192,11 @@
 				consumables={$consumables}
 				statics={getStatics()}
 				on:noPlayer={() => {
-					test = false
-					notifications.warning('No controllable player in the map')
+					test = false;
+					notifications.warning('No controllable player in the map');
 				}}
 				on:quit={() => {
-					test = false
+					test = false;
 				}}
 			/>
 		{:else}
@@ -251,12 +251,21 @@
 									<div class="form-control">
 										<label class="label">
 											<span class="label-text text-xs 2xl:text-base"
-												>Copy Mode {#if hintsEnabled}<div
-														class="tooltip tooltip-right"
-														data-tip="Right click on any cell to copy the corresponding emoji or background."
-													>
+												>Copy Mode {#if hintsEnabled}
+													<div class="dropdown">
 														<button>{GUIDE}</button>
-													</div>{/if}
+														<div
+															class="card-compact card dropdown-content w-64 bg-primary p-2 text-primary-content shadow"
+														>
+															<div class="card-body">
+																<p>
+																	Right click on any cell to copy the
+																	corresponding emoji or background.
+																</p>
+															</div>
+														</div>
+													</div>
+												{/if}
 											</span>
 										</label>
 										<select
@@ -271,12 +280,20 @@
 									<div class="form-control">
 										<label class="label">
 											<span class="label-text text-xs 2xl:text-base"
-												>Delete Mode {#if hintsEnabled}<div
-														class="tooltip tooltip-right"
-														data-tip="Left click on any cell to delete the corresponding emoji or background."
-													>
+												>Delete Mode {#if hintsEnabled}
+													<div class="dropdown">
 														<button>{GUIDE}</button>
-													</div>{/if}</span
+														<div
+															class="card-compact card dropdown-content w-64 bg-primary p-2 text-primary-content shadow"
+														>
+															<div class="card-body">
+																<p>
+																	Left click on any cell to delete the corresponding emoji or background.
+																</p>
+															</div>
+														</div>
+													</div>
+													{/if}</span
 											>
 										</label>
 										<select
@@ -308,7 +325,7 @@
 											{#each palette as color}
 												<button
 													on:click={() => {
-														$currentColor = $currentColor == color ? '' : color
+														$currentColor = $currentColor == color ? '' : color;
 													}}
 													class="h-4 w-4 rounded border border-black duration-75 ease-out hover:scale-125 2xl:h-6 2xl:w-6"
 													style:background-color={color}
@@ -316,14 +333,14 @@
 											{/each}
 											<button
 												on:click={() => {
-													if ($currentColor == '') return
+													if ($currentColor == '') return;
 													if ($currentColor == $map.dbg) {
-														map.updateDbg(DEFAULT_BG)
-														return
+														map.updateDbg(DEFAULT_BG);
+														return;
 													}
 
-													map.updateDbg($currentColor)
-													map.filterBackgrounds()
+													map.updateDbg($currentColor);
+													map.filterBackgrounds();
 												}}
 												disabled={$currentColor == ''}
 												class="btn-xs btn flex w-full flex-row items-center"
@@ -339,6 +356,14 @@
 								</div>
 							</div>
 						{:else}
+							<button
+								title="Enable/Disable Hints"
+								class:hintsEnabled
+								class="absolute top-0.5 left-1 opacity-50 hover:cursor-pointer"
+								on:click={() => (hintsEnabled = !hintsEnabled)}
+							>
+								{GUIDE}
+							</button>
 							<label class="label">
 								<span class="label-text text-xs 2xl:text-base"
 									>Statics 🗿
