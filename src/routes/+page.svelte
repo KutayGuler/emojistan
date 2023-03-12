@@ -1,7 +1,7 @@
 <script lang="ts">
-	import supabase from '../supabase'
-	import { goto } from '$app/navigation'
-	import { onMount } from 'svelte'
+	import supabase from '../supabase';
+	import { goto } from '$app/navigation';
+	import { onMount } from 'svelte';
 	import {
 		saves,
 		map,
@@ -11,59 +11,60 @@
 		equippables,
 		consumables,
 		dialogueTree,
-	} from '../store'
-	import { navigating } from '$app/stores'
-	import { rbxStore } from '$lib/stores/store'
-	import { emojis } from './editor/emojis'
-	import { fly } from 'svelte/transition'
-	import { CROSS } from '$src/constants'
+		modal,
+	} from '../store';
+	import { navigating } from '$app/stores';
+	import { rbxStore } from '$lib/stores/store';
+	import { emojis } from './editor/emojis';
+	import { fly } from 'svelte/transition';
+	import { CROSS } from '$src/constants';
 
 	onMount(() => {
-		if ($saves.currentSaveID == '') saves.useStorage()
-	})
+		if ($saves.currentSaveID == '') saves.useStorage();
+	});
 
-	let emojiArray: string[] = []
-	let emojiString = ''
+	let emojiArray: string[] = [];
+	let emojiString = '';
 
 	for (let [key, val] of Object.entries(emojis)) {
 		for (let [emoji, _] of val) {
-			emojiArray.push(emoji)
+			emojiArray.push(emoji);
 		}
 	}
 
-	emojiString = shuffleArray(emojiArray).toString().replaceAll(',', '')
+	emojiString = shuffleArray(emojiArray).toString().replaceAll(',', '');
 
-	let showSaves = true
+	let showSaves = true;
 
-	let gameName = ''
-	let deletedGameName = ''
-	let deletedGameID = ''
-	let creating = false
-	let showModal = false
+	let gameName = '';
+	let deletedGameName = '';
+	let deletedGameID = '';
+	let creating = false;
+	let showModal = false;
 
 	function newGame() {
-		if (creating) return
-		showModal = false
-		saves.add(gameName)
-		goto('/editor')
-		creating = true
+		if (creating) return;
+		showModal = false;
+		saves.add(gameName);
+		goto('/editor');
+		creating = true;
 	}
 
 	function openSave(id: string) {
-		$saves.currentSaveID = id
-		goto('/editor')
+		$saves.currentSaveID = id;
+		goto('/editor');
 	}
 
 	async function signInWithGoogle() {
 		const { data, error } = await supabase.auth.signInWithOAuth({
 			provider: 'google',
-		})
+		});
 	}
 
 	async function addIsland() {
-		let owner = await supabase.auth.getUser()
+		let owner = await supabase.auth.getUser();
 		if (!owner.data.user) {
-			return
+			return;
 		}
 
 		// CF #8
@@ -84,23 +85,23 @@
 				},
 				owner: owner.data.user.id,
 			},
-		])
+		]);
 	}
 
 	async function getIslands() {
-		let user = await supabase.auth.getUser()
+		let user = await supabase.auth.getUser();
 		let { data: islands, error } = await supabase
 			.from('islands')
 			.select('data')
-			.eq('owner', user.data.user?.id)
+			.eq('owner', user.data.user?.id);
 	}
 
 	function shuffleArray(array: Array<string>) {
 		for (let i = array.length - 1; i > 0; i--) {
-			const j = Math.floor(Math.random() * (i + 1))
-			;[array[i], array[j]] = [array[j], array[i]]
+			const j = Math.floor(Math.random() * (i + 1));
+			[array[i], array[j]] = [array[j], array[i]];
 		}
-		return array
+		return array;
 	}
 </script>
 
@@ -245,7 +246,9 @@
 			<li><a href="/">Logout</a></li>
 		</ul>
 	</div>
-	<div class="aside mt-8 flex flex-col gap-2 overflow-y-auto bg-neutral">
+	<div
+		class="aside prose mt-16 flex h-[806px] w-96 flex-col gap-2 overflow-y-auto bg-neutral"
+	>
 		{#if showSaves}
 			<div class="flex flex-row gap-2">
 				<button class="btn w-fit" on:click={() => (showSaves = false)}
@@ -267,9 +270,16 @@
 				<button class="btn-primary btn flex-grow">NEW GAME</button>
 			</div>
 			{#each [...$saves.saves] as [id, name]}
-				<div class="brutal relative flex flex-col rounded bg-primary p-4">
-					<button class="absolute top-2 right-4">{CROSS}</button>
-					<h3>{name}</h3>
+				<div class="brutal relative flex flex-col rounded bg-primary p-4 pt-0">
+					<button
+						on:click={() =>
+							modal.show('Deleting ' + name, 'Are you sure?', 'DELETE', () => {
+								saves.delete(deletedGameID);
+								location.reload(); // REQUIRED FOR DELETING SAVES PROPERLY
+							})}
+						class="absolute top-2 right-4">{CROSS}</button
+					>
+					<h4>{name}</h4>
 					<p>date</p>
 					<button on:click={() => openSave(id)} class="btn-sm btn self-end"
 						>OPEN</button
@@ -277,7 +287,7 @@
 				</div>
 			{/each}
 		{:else}
-			<h1 class="text-xl text-neutral-content">Emojistan</h1>
+			<h1 class="text-neutral-content">Emojistan</h1>
 			<button on:click={() => (showSaves = true)} class="btn-primary btn w-full"
 				>PLAY</button
 			>

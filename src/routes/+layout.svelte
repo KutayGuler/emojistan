@@ -3,9 +3,9 @@
 	import { navigating } from '$app/stores'
 	import '../app.css'
 	import supabase from '../supabase'
+	import Modal from './Modal.svelte'
 
 	supabase.auth.onAuthStateChange((event, session) => {})
-	$: console.log($navigating)
 </script>
 
 {#if $navigating?.from?.route.id == '/' && $navigating?.to?.route.id == '/editor'}
@@ -20,6 +20,8 @@
 <Toast />
 
 <slot />
+
+<Modal />
 
 <style>
 	@keyframes idle {

@@ -5,18 +5,18 @@
 		EQUIPPABLE_BORDER,
 		CONSUMABLE_BORDER,
 		INTERACTABLE_BORDER,
-	} from '../../constants'
-	import { page } from '$app/stores'
-	import { goto } from '$app/navigation'
+	} from '../../constants';
+	import { page } from '$app/stores';
+	import { goto } from '$app/navigation';
 
 	function capitalizeFirst(str: string) {
-		return str.charAt(0).toUpperCase() + str.slice(1)
+		return str.charAt(0).toUpperCase() + str.slice(1);
 	}
 
 	interface Rulebox {
-		link: string
-		next?: string
-		color?: string
+		link: string;
+		next?: string;
+		color?: string;
 	}
 
 	const ruleboxes: { [key: string]: Rulebox } = {
@@ -49,13 +49,10 @@
 			color: INTERACTABLE_BORDER,
 			next: '',
 		},
-	}
+	};
 
-	let rulebox = ruleboxes[$page.url.pathname.split('/')[2]]
-	$: rulebox = ruleboxes[$page.url.pathname.split('/')[2]]
-
-	// TODO: Global modal system
-	// TODO: Delete save option
+	let rulebox = ruleboxes[$page.url.pathname.split('/')[2]];
+	$: rulebox = ruleboxes[$page.url.pathname.split('/')[2]];
 </script>
 
 <main class="flex flex-row">

@@ -16,6 +16,7 @@
     "@playwright/test": "^1.22.2",
     "@sveltejs/adapter-auto": "^2.0.0",
     "@sveltejs/kit": "^1.11.0",
+    "@tailwindcss/typography": "^0.5.9",
     "autoprefixer": "^10.4.8",
     "daisyui": "^2.42.1",
     "postcss": "^8.4.16",

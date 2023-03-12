@@ -230,6 +230,37 @@ function createSetStore(name: string) {
 	}
 }
 
+function createModal() {
+	const { set, subscribe, update } = writable({
+		visible: false,
+		header: '',
+		content: '',
+		confirmText: '',
+		onConfirm: () => {},
+	})
+
+	return {
+		set,
+		subscribe,
+		show: (
+			header: string,
+			content: string,
+			confirmText: string,
+			onConfirm: () => {}
+		) =>
+			update((state) => {
+				state.header = header
+				state.content = content
+				state.confirmText = confirmText
+				state.onConfirm = onConfirm
+				state.visible = true
+				return state
+			}),
+	}
+}
+
+export const modal = createModal()
+
 // VANILLA
 export const currentColor = writable('')
 export const currentEmoji = writable('')
