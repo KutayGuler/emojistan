@@ -12,6 +12,7 @@
 		consumables,
 		dialogueTree,
 		modal,
+		showLoading,
 	} from '../store';
 	import { rbxStore } from '$lib/stores/store';
 	import { emojis } from './editor/emojis';
@@ -45,20 +46,25 @@
 	let showSaves = true;
 
 	let gameName = '';
-	let creating = false;
-	let showModal = false;
 
 	function newGamePopup() {
-		// modal.show();
-		// TODO:
+		modal.show({
+			header: 'Creating a new game',
+			content: 'What will you name it?',
+			confirmText: 'Create',
+			input: true,
+			danger: false,
+			// @ts-expect-error
+			onConfirm: (name: string) => {
+				createNewGame(name);
+			},
+		});
 	}
 
-	function createNewGame() {
-		if (creating) return;
-		showModal = false;
-		saves.add(gameName);
+	function createNewGame(name: string) {
+		$showLoading = true;
+		saves.add(name);
 		goto('/editor');
-		creating = true;
 	}
 
 	function openSave(id: string) {
@@ -163,7 +169,7 @@
 						/>
 					</svg>
 				</button>
-				<button on:click={createNewGame} class="btn-primary btn flex-grow"
+				<button on:click={newGamePopup} class="btn-primary btn flex-grow"
 					>NEW GAME</button
 				>
 			</div>
@@ -173,17 +179,22 @@
 				>
 					<button
 						on:click={() =>
-							modal.show('Deleting ' + name, 'Are you sure?', 'DELETE', () => {
-								saves.delete(id);
-								// location.reload(); // REQUIRED FOR DELETING SAVES PROPERLY
+							modal.show({
+								header: 'Deleting ' + name,
+								content: 'Are you sure?',
+								confirmText: 'DELETE',
+								onConfirm: () => {
+									saves.delete(id);
+									location.reload();
+								},
 							})}
 						class="absolute top-2 right-4">{CROSS}</button
 					>
 					<h4>{name}</h4>
 					<p>
-						{#each [...emojiFreqs.get(id)] as e}{e}{/each}
+						{#each [...(emojiFreqs.get(id) || [])] as e}{e}{/each}
 					</p>
-					<button on:click={() => openSave(id)} class="btn-sm btn self-end"
+					<button on:click={() => openSave(id)} class="btn btn-sm self-end"
 						>OPEN</button
 					>
 				</div>

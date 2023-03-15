@@ -1,33 +1,27 @@
 <script lang="ts">
-	const filters = ['Today', 'This Week', 'This Month', 'This Year', 'All Time']
-	let filterType = 'new'
+	const filters = ['Today', 'This Week', 'This Month', 'This Year', 'All Time'];
+	let filterType = 'new';
 </script>
 
 <main
 	class="flex h-screen w-screen flex-row items-center justify-around gap-4 p-4"
 >
 	<div
-		class="brutal flex h-full w-full flex-col items-start justify-start rounded bg-accent p-8"
+		class="brutal flex h-full w-full flex-col items-start justify-start rounded bg-neutral p-8"
 	>
 		<h3 class="text-accent-content">Discover</h3>
 		<div class="flex flex-row gap-2">
 			<div class="btn-group">
-				<input
-					value="new"
-					type="radio"
-					name="options"
-					data-title="New"
-					class="btn"
-					bind:group={filterType}
-				/>
-				<input
-					value="top"
-					type="radio"
-					name="options"
-					data-title="Top"
-					class="btn"
-					bind:group={filterType}
-				/>
+				{#each ['new', 'top'] as value}
+					<input
+						{value}
+						type="radio"
+						name="options"
+						data-title={value}
+						class={filterType == value ? 'btn-accent btn' : 'btn'}
+						bind:group={filterType}
+					/>
+				{/each}
 			</div>
 			{#if filterType == 'top'}
 				<select class="select-bordered select">

@@ -4,6 +4,7 @@
 	import { goto } from '$app/navigation';
 	import { flip } from 'svelte/animate';
 	import { scale } from 'svelte/transition';
+	import { xd } from '../twemoji/xd';
 
 	// VIEWS
 	import Game from '../../views/Game.svelte';
@@ -22,6 +23,7 @@
 		consumables,
 		statics,
 		dialogueTree,
+		showLoading,
 	} from '../../store';
 
 	import { emojis } from './emojis';
@@ -58,6 +60,8 @@
 				notifications.info('Failed to find save file.');
 				return;
 			}
+		} else {
+			$showLoading = false;
 		}
 		// STORE NAMES
 		// CF #7
@@ -152,6 +156,22 @@
 	}
 
 	let [x, y] = [0, 0];
+
+	type SkinTone =
+		| 'light-skin-tone'
+		| 'medium-light-skin-tone'
+		| 'medium-skin-tone'
+		| 'medium-dark-skin-tone'
+		| 'dark-skin-tone'
+		| '';
+	const skins: [string, SkinTone][] = [
+		['#f7d7c4', 'light-skin-tone'],
+		['#d8b094', 'medium-light-skin-tone'],
+		['#bb9167', 'medium-skin-tone'],
+		['#8e562e', 'medium-dark-skin-tone'],
+		['#613d30', 'dark-skin-tone'],
+	];
+	let skin: SkinTone = '';
 </script>
 
 <svelte:head>
@@ -255,7 +275,7 @@
 													<div class="dropdown">
 														<button>{GUIDE}</button>
 														<div
-															class="card-compact card dropdown-content w-64 bg-primary p-2 text-primary-content shadow"
+															class="card dropdown-content card-compact w-64 bg-primary p-2 text-primary-content shadow"
 														>
 															<div class="card-body">
 																<p>
@@ -284,16 +304,17 @@
 													<div class="dropdown">
 														<button>{GUIDE}</button>
 														<div
-															class="card-compact card dropdown-content w-64 bg-primary p-2 text-primary-content shadow"
+															class="card dropdown-content card-compact w-64 bg-primary p-2 text-primary-content shadow"
 														>
 															<div class="card-body">
 																<p>
-																	Left click on any cell to delete the corresponding emoji or background.
+																	Left click on any cell to delete the
+																	corresponding emoji or background.
 																</p>
 															</div>
 														</div>
 													</div>
-													{/if}</span
+												{/if}</span
 											>
 										</label>
 										<select
@@ -323,11 +344,15 @@
 											class="flex flex-wrap items-center justify-center gap-1"
 										>
 											{#each palette as color}
+												{@const disabled = color == $map.dbg}
 												<button
+													{disabled}
 													on:click={() => {
 														$currentColor = $currentColor == color ? '' : color;
 													}}
-													class="h-4 w-4 rounded border border-black duration-75 ease-out hover:scale-125 2xl:h-6 2xl:w-6"
+													class="h-4 w-4 rounded border border-black duration-75 ease-out {disabled
+														? ''
+														: 'hover:scale-125'}  2xl:h-6 2xl:w-6"
 													style:background-color={color}
 												/>
 											{/each}
@@ -430,9 +455,20 @@
 									</button>
 								{/each}
 							</div>
+							<div class="flex flex-col">
+								{#each skins as [hexcode, skinName]}
+									<button
+										class="h-6 w-6"
+										style:background={hexcode}
+										on:click={() => {
+											skin = skin == skinName ? "" : skinName;
+										}}
+									/>
+								{/each}
+							</div>
 						</div>
 						<div id="flex flex-col">
-							{#each Object.keys(emojis) as category}
+							<!-- {#each Object.keys(emojis) as category}
 								{#if currentCategory == category}
 									<div class="emojis flex flex-wrap justify-center">
 										{#each emojis[category] as [emoji, name]}
@@ -443,6 +479,25 @@
 													title={name}
 												>
 													{emoji}
+												</button>
+											{/if}
+										{/each}
+									</div>
+								{/if}
+							{/each} -->
+							{#each Object.keys(xd) as category}
+								{#if currentCategory == category}
+									<div class="emojis flex flex-wrap justify-center">
+										{#each xd[category] as name}
+											{#if name.includes(filter)}
+												{@const skinnedName =
+													skin != ''
+														? name.replace('_', '-' + skin)
+														: name.replace('_', '')}
+												<!-- class:selected={$currentEmoji == emoji}
+										on:click={() => pickEmoji(emoji)} -->
+												<button title={name.replaceAll('-', ' ')}>
+													<i class="twa twa-{skinnedName}" />
 												</button>
 											{/if}
 										{/each}

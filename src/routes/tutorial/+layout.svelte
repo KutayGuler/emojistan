@@ -62,16 +62,14 @@
 			<slot />
 		</div>
 		{#if rulebox?.next}
-			<button
-				class="btn-lg btn absolute bottom-4 right-4"
-				on:click={() => goto('/tutorial/' + rulebox.next)}
-				>{rulebox.next} ⮞</button
+			<a
+				href={'/tutorial/' + rulebox.next}
+				class="btn-lg btn absolute bottom-4 right-4">{rulebox.next} ⮞</a
 			>
 		{/if}
 		{#if $page.url.pathname.includes('controls')}
-			<button
-				class="btn-lg btn absolute bottom-4 right-4"
-				on:click={() => goto('/tutorial/ruleboxes')}>Ruleboxes ⮞</button
+			<a href="/tutorial/ruleboxes" class="btn-lg btn absolute bottom-4 right-4"
+				>Ruleboxes ⮞</a
 			>
 		{/if}
 		<div class="drawer-side">

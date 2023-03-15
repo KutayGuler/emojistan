@@ -12,6 +12,8 @@ import {
 	type Pusher,
 } from './types';
 
+// TODO: try twemoji amazing
+
 function createMapStore<K, V>(name: string) {
 	const { set, subscribe, update } = writable(new Map<K, V>());
 
@@ -233,35 +235,40 @@ function createSetStore(name: string) {
 	};
 }
 
+interface ModalData {
+	header: string;
+	content: string;
+	confirmText: string;
+	onConfirm: (arg?: string) => void | (() => void);
+	input?: boolean;
+	danger?: boolean;
+}
+
 function createModal() {
 	const { set, subscribe, update } = writable({
 		visible: false,
 		header: '',
 		content: '',
 		confirmText: '',
-		onConfirm: () => {},
+		onConfirm: (arg?: string) => {},
+		danger: false,
+		input: false,
 	});
 
 	return {
 		set,
 		subscribe,
-		show: (
-			header: string,
-			content: string,
-			confirmText: string,
-			onConfirm: () => {}
-		) =>
+		show: (modalData: ModalData) =>
 			update((state) => {
-				state.header = header;
-				state.content = content;
-				state.confirmText = confirmText;
-				state.onConfirm = onConfirm;
+				// @ts-expect-error
+				state = modalData;
 				state.visible = true;
 				return state;
 			}),
 	};
 }
 
+export const showLoading = writable(false);
 export const modal = createModal();
 
 // VANILLA

@@ -5,17 +5,24 @@
 	let dialog: HTMLDialogElement;
 
 	$: if (dialog && $modal.visible) dialog.showModal();
+
+	let inputValue = '';
+
+	function confirm() {
+		dialog.close();
+		$modal.onConfirm(inputValue);
+	}
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <dialog
-	class="brutal prose h-fit w-96 bg-neutral text-neutral-content"
+	class="brutal h-fit w-96 bg-neutral"
 	bind:this={dialog}
 	on:close={() => ($modal.visible = false)}
 	on:click|self={() => dialog.close()}
 >
 	<div on:click|stopPropagation>
-		<h3 class="text-neutral-content">{$modal.header}</h3>
+		<h3>{$modal.header}</h3>
 		<p>{$modal.content}</p>
 		<!-- svelte-ignore a11y-autofocus -->
 		<button
@@ -24,6 +31,9 @@
 			on:click={() => dialog.close()}>{CROSS}</button
 		>
 	</div>
+	{#if $modal.input}
+		<input type="text" class="input-bordered input" bind:value={inputValue} />
+	{/if}
 	<div class="flex flex-row justify-end gap-2">
 		<button
 			class="btn"
@@ -32,8 +42,10 @@
 				dialog.close();
 			}}>CANCEL</button
 		>
-		<button class="btn-error btn" on:click={$modal.onConfirm}
-			>{$modal.confirmText}</button
+		<button
+			disabled={$modal.input && inputValue.length < 2}
+			class="btn {$modal.danger ? 'btn-error' : 'btn-primary'}"
+			on:click={confirm}>{$modal.confirmText}</button
 		>
 	</div>
 </dialog>
