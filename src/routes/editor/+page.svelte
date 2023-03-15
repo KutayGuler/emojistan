@@ -158,20 +158,22 @@
 	let [x, y] = [0, 0];
 
 	type SkinTone =
-		| 'light-skin-tone'
-		| 'medium-light-skin-tone'
-		| 'medium-skin-tone'
-		| 'medium-dark-skin-tone'
-		| 'dark-skin-tone'
+		| '-light-skin-tone'
+		| '-medium-light-skin-tone'
+		| '-medium-skin-tone'
+		| '-medium-dark-skin-tone'
+		| '-dark-skin-tone'
 		| '';
 	const skins: [string, SkinTone][] = [
-		['#f7d7c4', 'light-skin-tone'],
-		['#d8b094', 'medium-light-skin-tone'],
-		['#bb9167', 'medium-skin-tone'],
-		['#8e562e', 'medium-dark-skin-tone'],
-		['#613d30', 'dark-skin-tone'],
+		['#f7d7c4', '-light-skin-tone'],
+		['#d8b094', '-medium-light-skin-tone'],
+		['#bb9167', '-medium-skin-tone'],
+		['#8e562e', '-medium-dark-skin-tone'],
+		['#613d30', '-dark-skin-tone'],
 	];
 	let skin: SkinTone = '';
+
+	$: formattedEmoji = $currentEmoji.replace('_', skin);
 </script>
 
 <svelte:head>
@@ -192,7 +194,7 @@
 	class="absolute z-50 flex h-6 w-6 items-center justify-center rounded bg-red-500"
 	style="transform: translate({x + 12}px, {y - 12}px);"
 >
-	{$currentEmoji}
+	<i class="twa twa-{formattedEmoji}" />
 </div>
 
 {#if $saves.currentSaveID != ''}
@@ -461,7 +463,7 @@
 										class="h-6 w-6"
 										style:background={hexcode}
 										on:click={() => {
-											skin = skin == skinName ? "" : skinName;
+											skin = skin == skinName ? '' : skinName;
 										}}
 									/>
 								{/each}
@@ -490,14 +492,12 @@
 									<div class="emojis flex flex-wrap justify-center">
 										{#each xd[category] as name}
 											{#if name.includes(filter)}
-												{@const skinnedName =
-													skin != ''
-														? name.replace('_', '-' + skin)
-														: name.replace('_', '')}
-												<!-- class:selected={$currentEmoji == emoji}
-										on:click={() => pickEmoji(emoji)} -->
-												<button title={name.replaceAll('-', ' ')}>
-													<i class="twa twa-{skinnedName}" />
+												<button
+													class:selected={$currentEmoji == name}
+													on:click={() => pickEmoji(name)}
+													title={name.replaceAll('-', ' ')}
+												>
+													<i class="twa twa-{name.replace("_", skin)}" />
 												</button>
 											{/if}
 										{/each}
