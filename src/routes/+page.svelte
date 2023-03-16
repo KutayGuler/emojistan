@@ -133,7 +133,7 @@
 		{emojiString}
 	</div> -->
 	<div class="absolute top-0 h-full w-full bg-black opacity-75" />
-	<div class="dropdown dropdown-bottom dropdown-end absolute right-4 top-4">
+	<div class="dropdown-bottom dropdown-end dropdown absolute right-4 top-4">
 		<button class="avatar ">
 			<div class="w-12 rounded-full ring ring-neutral-content">
 				<img src="https://picsum.photos/200" alt="profile picture" />
@@ -192,7 +192,9 @@
 					>
 					<h4>{name}</h4>
 					<p>
-						{#each [...(emojiFreqs.get(id) || [])] as e}{e}{/each}
+						{#each [...(emojiFreqs.get(id) || [])] as e}
+							<i class="twa twa-{e}" />
+						{/each}
 					</p>
 					<button on:click={() => openSave(id)} class="btn-sm btn self-end"
 						>OPEN</button

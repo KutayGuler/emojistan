@@ -12,8 +12,6 @@ import {
 	type Pusher,
 } from './types';
 
-// TODO: try twemoji amazing
-
 function createMapStore<K, V>(name: string) {
 	const { set, subscribe, update } = writable(new Map<K, V>());
 

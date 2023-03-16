@@ -59,9 +59,9 @@
 
 <div class="absolute -top-8 flex flex-row items-center justify-center gap-2">
   <div class="flex flex-col items-center justify-center">
-    <div class="slot-lg" on:click={updateEmoji}>
-      {emoji}
-    </div>
+    <button class="slot-lg" on:click={updateEmoji}>
+      <i class="twa twa-{emoji}"></i>
+    </button>
     <div class="absolute -bottom-4">
       <select
         class="select select-bordered select-sm text-xl"

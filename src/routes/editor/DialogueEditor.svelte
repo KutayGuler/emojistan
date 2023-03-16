@@ -233,7 +233,7 @@
 				disabled={!siblingBranch}
 				class="btn">Switch to {siblingBranch || ''}</button
 			>
-			<!-- TODO: when there are only two children in a branch "switch to" behaviours undesirably -->
+			<!-- FIXME: when there are only two children in a branch "switch to" behaviours undesirably -->
 		</div>
 		<div class="flex flex-col items-start justify-start gap-2">
 			<h3 class="py-4 text-2xl">{currentBranch || ''}</h3>

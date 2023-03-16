@@ -81,19 +81,19 @@
   }
 </script>
 
-<div
+<button
   title="Mutate consumer"
   class:mutateConsumer
   class="absolute bottom-0.5 left-1 opacity-50 hover:cursor-pointer"
   on:click={() => (mutateConsumer = !mutateConsumer)}
 >
-  🧬
-</div>
+<i class="twa twa-dna"></i>
+</button>
 <div class="absolute -top-8 flex flex-row items-center justify-center gap-2">
   <div class="flex flex-col items-center justify-center">
-    <div class="slot-lg" on:click={updateEmoji}>
-      {emoji}
-    </div>
+    <button class="slot-lg" on:click={updateEmoji}>
+      <i class="twa twa-{emoji}"></i>
+    </button>
     {#if !mutateConsumer}
       <div class="absolute -bottom-4">
         <select
@@ -112,9 +112,9 @@
   {#if mutateConsumer}
     <!-- content here -->
     <div class="flex flex-col items-center justify-center">
-      <div class="slot-lg scale-75" on:click={updateMutationEmoji}>
-        {mutateConsumerTo}
-      </div>
+      <button class="slot-lg scale-75" on:click={updateMutationEmoji}>
+        <i class="twa twa-{mutateConsumerTo}"></i>
+      </button>
     </div>
   {/if}
 </div>
