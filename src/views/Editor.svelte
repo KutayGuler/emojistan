@@ -2,7 +2,7 @@
 	import { DEFAULT_SIDE_LENGTH } from '$src/constants';
 	import { currentEmoji, currentColor, map } from '../store';
 
-	export let showIndex = false;
+	export let sectionIndex = 0;
 	export let deleteMode: 'Item' | 'Background' | 'Both';
 	export let copyMode: 'Item' | 'Background' | 'Both';
 	export let formattedEmoji: string;
@@ -10,37 +10,38 @@
 	function clickedCell(index: number) {
 		switch (deleteMode) {
 			case 'Item':
-				if ($currentEmoji == '') map.removeEmoji(index);
+				if ($currentEmoji == '') map.removeEmoji(sectionIndex, index);
 				break;
 			case 'Background':
-				if ($currentColor == '') map.deleteBackground(index);
+				if ($currentColor == '') map.deleteBackground(sectionIndex, index);
 				break;
 			case 'Both':
-				if ($currentColor == '') map.deleteBackground(index);
-				if ($currentEmoji == '') map.removeEmoji(index);
+				if ($currentColor == '') map.deleteBackground(sectionIndex, index);
+				if ($currentEmoji == '') map.removeEmoji(sectionIndex, index);
 				break;
 		}
 
 		if ($currentColor != '' && $currentColor != $map.dbg) {
-			map.updateBackground(index, $currentColor);
+			map.updateBackground(sectionIndex, index, $currentColor);
 		}
 
 		if ($currentEmoji != '') {
-			map.addEmoji(index, formattedEmoji);
+			map.addEmoji(sectionIndex, index, formattedEmoji);
 		}
 	}
 
 	function rightClickedCell(index: number) {
+		let key = sectionIndex + '_' + index;
 		switch (copyMode) {
 			case 'Item':
-				$currentEmoji = $map.items.get(index) || '';
+				$currentEmoji = $map.items.get(key) || '';
 				break;
 			case 'Background':
-				$currentColor = $map.backgrounds.get(index) || '';
+				$currentColor = $map.backgrounds.get(key) || '';
 				break;
 			case 'Both':
-				$currentEmoji = $map.items.get(index) || '';
-				$currentColor = $map.backgrounds.get(index) || '';
+				$currentEmoji = $map.items.get(key) || '';
+				$currentColor = $map.backgrounds.get(key) || '';
 				break;
 		}
 	}
@@ -59,17 +60,17 @@
 
 <div class="map">
 	{#each { length: DEFAULT_SIDE_LENGTH * DEFAULT_SIDE_LENGTH } as _, i}
-		{@const mapItem = $map?.items.get(i)}
+		{@const key = sectionIndex + '_' + i}
+		{@const mapItem = $map?.items.get(key)}
 		<button
-			style:background={$map.backgrounds.get(i) || $map.dbg}
+			title="Cell #{i}"
+			style:background={$map.backgrounds.get(key) || $map.dbg}
 			on:mouseenter={() => mouseEnter(i)}
 			on:click={() => clickedCell(i)}
 			on:contextmenu|preventDefault={() => rightClickedCell(i)}
 		>
 			{#if mapItem}
 				<i class="twa twa-{mapItem}" />
-			{:else}
-				{showIndex ? i : ''}
 			{/if}
 		</button>
 	{/each}

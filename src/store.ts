@@ -154,14 +154,14 @@ function createEditableMap() {
 				state.dbg = color;
 				return state;
 			}),
-		updateBackground: (index: number, color: string) =>
+		updateBackground: (sectionIndex: number, index: number, color: string) =>
 			update((state) => {
-				state.backgrounds.set(index, color);
+				state.backgrounds.set(sectionIndex + '_' + index, color);
 				return state;
 			}),
-		deleteBackground: (index: number) =>
+		deleteBackground: (sectionIndex: number, index: number) =>
 			update((state) => {
-				state.backgrounds.delete(index);
+				state.backgrounds.delete(sectionIndex + '_' + index);
 				return state;
 			}),
 		clearBackgrounds: () =>
@@ -177,14 +177,14 @@ function createEditableMap() {
 				}
 				return state;
 			}),
-		addEmoji: (index: number, emoji: string) =>
+		addEmoji: (sectionIndex: number, index: number, emoji: string) =>
 			update((state) => {
-				state.items.set(index, emoji);
+				state.items.set(sectionIndex + '_' + index, emoji);
 				return state;
 			}),
-		removeEmoji: (index: number) =>
+		removeEmoji: (sectionIndex: number, index: number) =>
 			update((state) => {
-				state.items.delete(index);
+				state.items.delete(sectionIndex + '_' + index);
 				return state;
 			}),
 		clearItems: () =>

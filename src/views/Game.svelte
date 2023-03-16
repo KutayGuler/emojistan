@@ -663,6 +663,8 @@
 	}
 
 	console.log(items);
+
+	// TODO: implement section switching
 </script>
 
 <svelte:window on:keydown={handle} />

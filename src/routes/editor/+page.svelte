@@ -82,6 +82,7 @@
 	const flipParams = { duration: 300 };
 	let currentCategory = '💩';
 	let filter = '';
+	let sectionIndex = 0;
 
 	function handleKeydown(e: KeyboardEvent) {
 		if (e.code == 'Escape') {
@@ -96,7 +97,6 @@
 
 	let innerWidth: number;
 	let innerHeight: number;
-	let showIndex = false;
 	let hintsEnabled = false;
 
 	type DeleteMode = 'Item' | 'Background' | 'Both';
@@ -114,7 +114,7 @@
 	function fillMap() {
 		if ($currentEmoji == '') return;
 		for (let i = 0; i < DEFAULT_SIDE_LENGTH * DEFAULT_SIDE_LENGTH; i++) {
-			$map.items.set(i, $currentEmoji);
+			$map.items.set(sectionIndex + '_' + i, $currentEmoji);
 		}
 		$map = $map;
 	}
@@ -173,8 +173,11 @@
 	];
 	let skin: SkinTone = '';
 
+	// TODO: formatted emoji should be derived
 	let formattedEmoji = $currentEmoji.replace('_', skin);
 	$: formattedEmoji = $currentEmoji.replace('_', skin);
+
+	// TODO: do something about disabled buttons
 </script>
 
 <svelte:head>
@@ -243,7 +246,7 @@
 				<div
 					class="relative box-border flex flex-row items-center justify-center"
 				>
-					<aside class="aside">
+					<aside class="aside overflow-y-auto">
 						{#if viewKey == 'editor'}
 							<div class="flex flex-col">
 								<button
@@ -258,19 +261,7 @@
 									class="btn bg-primary text-lg text-primary-content 2xl:btn-md hover:bg-primary-focus"
 									on:click={toggleTest}>TEST</button
 								>
-								<div class="form-control">
-									<label class="label cursor-pointer">
-										<span
-											class="label-text text-xs text-neutral-content 2xl:text-base"
-											>Show Indexes</span
-										>
-										<input
-											type="checkbox"
-											class="checkbox checkbox-sm border border-r-2 border-b-2 border-black 2xl:checkbox-md"
-											bind:checked={showIndex}
-										/>
-									</label>
-								</div>
+								<div class="form-control" />
 								<div class="flex flex-col gap-2">
 									<div class="form-control">
 										<label class="label">
@@ -280,7 +271,7 @@
 													<div class="dropdown">
 														<button>{GUIDE}</button>
 														<div
-															class="dropdown-content card card-compact w-64 bg-primary p-2 text-primary-content shadow"
+															class="card dropdown-content card-compact w-64 bg-primary p-2 text-primary-content shadow"
 														>
 															<div class="card-body">
 																<p>
@@ -310,7 +301,7 @@
 													<div class="dropdown">
 														<button>{GUIDE}</button>
 														<div
-															class="dropdown-content card card-compact w-64 bg-primary p-2 text-primary-content shadow"
+															class="card dropdown-content card-compact w-64 bg-primary p-2 text-primary-content shadow"
 														>
 															<div class="card-body">
 																<p>
@@ -346,9 +337,13 @@
 											class="twa twa-{formattedEmoji}"
 										/></button
 									>
-									<div
-										class="flex flex-wrap items-center justify-center gap-1 overflow-y-auto"
+									<label class="label">
+										<span
+											class="label-text text-xs text-neutral-content 2xl:text-base"
+											>Palette
+										</span></label
 									>
+									<div class="flex flex-wrap items-center justify-center gap-1">
 										{#each palette as color}
 											{@const disabled = color == $map.dbg}
 											<button
@@ -356,7 +351,7 @@
 												on:click={() => {
 													$currentColor = $currentColor == color ? '' : color;
 												}}
-												class="h-5 w-5 rounded border border-black duration-75 ease-out {disabled
+												class="h-4 w-4 rounded border border-black duration-75 ease-out {disabled
 													? ''
 													: 'hover:scale-125'}  2xl:h-6 2xl:w-6"
 												style:background-color={color}
@@ -374,7 +369,7 @@
 												map.filterBackgrounds();
 											}}
 											disabled={$currentColor == ''}
-											class="btn-xs btn flex w-full flex-row items-center"
+											class="btn flex w-full flex-row items-center"
 										>
 											Set <div
 												class="m-1 h-4 w-4 rounded border border-black 2xl:h-6 2xl:w-6"
@@ -383,6 +378,27 @@
 											as default
 										</button>
 									</div>
+								</div>
+
+								<label class="label">
+									<span
+										class="label-text text-xs text-neutral-content 2xl:text-base"
+										>World Map
+									</span>
+								</label>
+								<div class="grid grid-cols-12 grid-rows-12 gap-1 self-center">
+									{#each { length: DEFAULT_SIDE_LENGTH * DEFAULT_SIDE_LENGTH } as _, i}
+										<button
+											on:click={() => (sectionIndex = i)}
+											title="Section #{i}"
+											class="h-4 w-4 rounded border border-black"
+											style:background={$map.dbg}
+										>
+											{#if i == sectionIndex}
+												<i class="twa twa-triangular-flag" />
+											{/if}
+										</button>
+									{/each}
 								</div>
 							</div>
 						{:else}
@@ -433,7 +449,7 @@
 					</aside>
 					{#if viewKey == 'editor'}
 						<div class="flex flex-col justify-center px-8">
-							<Editor {formattedEmoji} {showIndex} {deleteMode} {copyMode} />
+							<Editor {sectionIndex} {formattedEmoji} {deleteMode} {copyMode} />
 						</div>
 					{:else if viewKey == 'rules'}
 						<div class="flex flex-col justify-center px-8">
@@ -517,6 +533,7 @@
 			<div
 				class="relative flex h-full w-full flex-col items-center justify-center"
 			>
+				<!-- TODO: Add shortcuts  -->
 				<div class="absolute bottom-8 left-8 flex flex-row">
 					<kbd class="kbd kbd-sm mr-2 2xl:kbd-md">Esc</kbd>
 					<p class="2xl:text-md text-sm">untoggle emoji / color</p>

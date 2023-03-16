@@ -7,11 +7,12 @@
 		INTERACTABLE_BORDER,
 	} from '../../constants';
 	import { page } from '$app/stores';
-	import { goto } from '$app/navigation';
 
 	function capitalizeFirst(str: string) {
 		return str.charAt(0).toUpperCase() + str.slice(1);
 	}
+
+	// TODO: Change every emoji with their corresponding twa classes
 
 	interface Rulebox {
 		link: string;

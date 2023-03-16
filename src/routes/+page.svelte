@@ -133,7 +133,7 @@
 		{emojiString}
 	</div> -->
 	<div class="absolute top-0 h-full w-full bg-black opacity-75" />
-	<div class="dropdown-bottom dropdown-end dropdown absolute right-4 top-4">
+	<div class="dropdown dropdown-bottom dropdown-end absolute right-4 top-4">
 		<button class="avatar ">
 			<div class="w-12 rounded-full ring ring-neutral-content">
 				<img src="https://picsum.photos/200" alt="profile picture" />
@@ -201,8 +201,6 @@
 					>
 				</div>
 			{/each}
-			<!-- TODO: Add example projects -->
-			<div class="divider text-neutral-content">EXAMPLE PROJECTS</div>
 		{:else}
 			<h1 class="text-neutral-content">Emojistan</h1>
 			<button on:click={() => (showSaves = true)} class="btn-primary btn w-full"
