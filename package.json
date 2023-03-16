@@ -34,7 +34,9 @@
   "type": "module",
   "dependencies": {
     "@supabase/supabase-js": "^2.1.1",
+    "@sveltejs/svelte-virtual-list": "^3.0.1",
     "d3-selection": "^3.0.0",
-    "d3-zoom": "^3.0.0"
+    "d3-zoom": "^3.0.0",
+    "svelte-tiny-virtual-list": "^2.0.5"
   }
 }

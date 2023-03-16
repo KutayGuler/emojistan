@@ -33,7 +33,7 @@
 	});
 
 	let emojiArray: string[] = [];
-	let emojiString = '';
+	// let emojiString = '';
 
 	for (let [key, val] of Object.entries(emojis)) {
 		for (let [emoji, _] of val) {
@@ -41,7 +41,7 @@
 		}
 	}
 
-	emojiString = shuffleArray(emojiArray).toString().replaceAll(',', '');
+	// emojiString = shuffleArray(emojiArray).toString().replaceAll(',', '');
 
 	let showSaves = true;
 
@@ -127,13 +127,13 @@
 </svelte:head>
 
 <main>
-	<div
+	<!-- <div
 		class="absolute top-0 flex h-full w-full -rotate-6 skew-x-6 scale-125 select-none flex-wrap text-2xl text-opacity-10 2xl:text-4xl"
 	>
 		{emojiString}
-	</div>
+	</div> -->
 	<div class="absolute top-0 h-full w-full bg-black opacity-75" />
-	<div class="dropdown-bottom dropdown-end dropdown absolute right-4 top-4">
+	<div class="dropdown dropdown-bottom dropdown-end absolute right-4 top-4">
 		<button class="avatar ">
 			<div class="w-12 rounded-full ring ring-neutral-content">
 				<img src="https://picsum.photos/200" alt="profile picture" />
@@ -194,7 +194,7 @@
 					<p>
 						{#each [...(emojiFreqs.get(id) || [])] as e}{e}{/each}
 					</p>
-					<button on:click={() => openSave(id)} class="btn btn-sm self-end"
+					<button on:click={() => openSave(id)} class="btn-sm btn self-end"
 						>OPEN</button
 					>
 				</div>

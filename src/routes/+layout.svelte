@@ -2,7 +2,7 @@
 	import Toast from './Toast.svelte';
 	import { navigating } from '$app/stores';
 	import '../app.css';
-	import './twemoji/twemoji.css';
+	import '../twemoji.css';
 	import supabase from '../supabase';
 	import Modal from './Modal.svelte';
 	import { showLoading } from '$src/store';

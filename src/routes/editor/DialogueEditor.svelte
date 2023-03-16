@@ -143,7 +143,7 @@
 />
 
 <div
-	class="flex h-[620px] flex-row items-start justify-center gap-4 2xl:h-[716px]"
+	class="flex h-[672px] flex-row items-start justify-center gap-4 2xl:h-[716px]"
 >
 	<aside class="aside">
 		<div class="flex flex-col gap-2">

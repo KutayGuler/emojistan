@@ -1,54 +1,55 @@
 <script lang="ts">
-	import { DEFAULT_SIDE_LENGTH } from '$src/constants'
-	import { currentEmoji, currentColor, map } from '../store'
+	import { DEFAULT_SIDE_LENGTH } from '$src/constants';
+	import { currentEmoji, currentColor, map } from '../store';
 
-	export let showIndex = false
-	export let deleteMode: 'Item' | 'Background' | 'Both'
-	export let copyMode: 'Item' | 'Background' | 'Both'
+	export let showIndex = false;
+	export let deleteMode: 'Item' | 'Background' | 'Both';
+	export let copyMode: 'Item' | 'Background' | 'Both';
+	export let formattedEmoji: string;
 
 	function clickedCell(index: number) {
 		switch (deleteMode) {
 			case 'Item':
-				if ($currentEmoji == '') map.removeEmoji(index)
-				break
+				if ($currentEmoji == '') map.removeEmoji(index);
+				break;
 			case 'Background':
-				if ($currentColor == '') map.deleteBackground(index)
-				break
+				if ($currentColor == '') map.deleteBackground(index);
+				break;
 			case 'Both':
-				if ($currentColor == '') map.deleteBackground(index)
-				if ($currentEmoji == '') map.removeEmoji(index)
-				break
+				if ($currentColor == '') map.deleteBackground(index);
+				if ($currentEmoji == '') map.removeEmoji(index);
+				break;
 		}
 
 		if ($currentColor != '' && $currentColor != $map.dbg) {
-			map.updateBackground(index, $currentColor)
+			map.updateBackground(index, $currentColor);
 		}
 
 		if ($currentEmoji != '') {
-			map.addEmoji(index, $currentEmoji)
+			map.addEmoji(index, formattedEmoji);
 		}
 	}
 
 	function rightClickedCell(index: number) {
 		switch (copyMode) {
 			case 'Item':
-				$currentEmoji = $map.items.get(index) || ''
-				break
+				$currentEmoji = $map.items.get(index) || '';
+				break;
 			case 'Background':
-				$currentColor = $map.backgrounds.get(index) || ''
-				break
+				$currentColor = $map.backgrounds.get(index) || '';
+				break;
 			case 'Both':
-				$currentEmoji = $map.items.get(index) || ''
-				$currentColor = $map.backgrounds.get(index) || ''
-				break
+				$currentEmoji = $map.items.get(index) || '';
+				$currentColor = $map.backgrounds.get(index) || '';
+				break;
 		}
 	}
 
-	let holding = false
+	let holding = false;
 
 	function mouseEnter(index: number) {
-		if (holding) clickedCell(index)
-	} 
+		if (holding) clickedCell(index);
+	}
 </script>
 
 <svelte:window
@@ -58,13 +59,18 @@
 
 <div class="map">
 	{#each { length: DEFAULT_SIDE_LENGTH * DEFAULT_SIDE_LENGTH } as _, i}
+		{@const mapItem = $map?.items.get(i)}
 		<button
 			style:background={$map.backgrounds.get(i) || $map.dbg}
 			on:mouseenter={() => mouseEnter(i)}
 			on:click={() => clickedCell(i)}
 			on:contextmenu|preventDefault={() => rightClickedCell(i)}
 		>
-			{$map?.items.get(i) || (showIndex ? i : '')}
+			{#if mapItem}
+				<i class="twa twa-{mapItem}" />
+			{:else}
+				{showIndex ? i : ''}
+			{/if}
 		</button>
 	{/each}
 </div>

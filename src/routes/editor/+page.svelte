@@ -4,7 +4,7 @@
 	import { goto } from '$app/navigation';
 	import { flip } from 'svelte/animate';
 	import { scale } from 'svelte/transition';
-	import { xd } from '../twemoji/xd';
+	import { xd } from './xd';
 
 	// VIEWS
 	import Game from '../../views/Game.svelte';
@@ -137,9 +137,9 @@
 
 	type ViewKey = 'editor' | 'rules' | 'dialogue';
 	const views: { [key in ViewKey]: string } = {
-		editor: '🗺️',
-		rules: '📚',
-		dialogue: '💬',
+		editor: 'world-map',
+		rules: 'books',
+		dialogue: 'speech-balloon',
 	};
 
 	let viewKey: ViewKey = 'editor';
@@ -173,6 +173,7 @@
 	];
 	let skin: SkinTone = '';
 
+	let formattedEmoji = $currentEmoji.replace('_', skin);
 	$: formattedEmoji = $currentEmoji.replace('_', skin);
 </script>
 
@@ -191,7 +192,7 @@
 />
 <div
 	style:background={$currentColor || 'none'}
-	class="absolute z-50 flex h-6 w-6 items-center justify-center rounded bg-red-500"
+	class="absolute z-50 flex h-6 w-6 items-center justify-center rounded bg-red-500 text-lg"
 	style="transform: translate({x + 12}px, {y - 12}px);"
 >
 	<i class="twa twa-{formattedEmoji}" />
@@ -232,7 +233,7 @@
 							: 'opacity-50'} duration-200 ease-out hover:scale-150 hover:opacity-100"
 						on:click={() => changeViewTo(key)}
 					>
-						{icon}
+						<i class="twa twa-{icon}" />
 					</button>
 				{/each}
 			</div>
@@ -254,12 +255,13 @@
 									{GUIDE}
 								</button>
 								<button
-									class="btn bg-primary text-xs text-primary-content 2xl:btn-md hover:bg-primary-focus"
+									class="btn bg-primary text-lg text-primary-content 2xl:btn-md hover:bg-primary-focus"
 									on:click={toggleTest}>TEST</button
 								>
 								<div class="form-control">
 									<label class="label cursor-pointer">
-										<span class="label-text text-xs 2xl:text-base"
+										<span
+											class="label-text text-xs text-neutral-content 2xl:text-base"
 											>Show Indexes</span
 										>
 										<input
@@ -272,7 +274,8 @@
 								<div class="flex flex-col gap-2">
 									<div class="form-control">
 										<label class="label">
-											<span class="label-text text-xs 2xl:text-base"
+											<span
+												class="label-text text-xs text-neutral-content 2xl:text-base"
 												>Copy Mode {#if hintsEnabled}
 													<div class="dropdown">
 														<button>{GUIDE}</button>
@@ -301,7 +304,8 @@
 									</div>
 									<div class="form-control">
 										<label class="label">
-											<span class="label-text text-xs 2xl:text-base"
+											<span
+												class="label-text text-xs text-neutral-content 2xl:text-base"
 												>Delete Mode {#if hintsEnabled}
 													<div class="dropdown">
 														<button>{GUIDE}</button>
@@ -329,56 +333,55 @@
 										</select>
 									</div>
 									<button
-										class="btn bg-accent text-xs text-accent-content 2xl:btn-md hover:bg-accent-focus 2xl:text-base"
+										class="btn bg-accent text-lg text-accent-content 2xl:btn-md hover:bg-accent-focus"
 										on:click={clearMap}
 										>CLEAR {deleteTexts[deleteMode]}
 									</button>
 									<button
 										id="filler"
 										disabled={$currentEmoji == ''}
-										class="btn w-full text-xs 2xl:btn-md 2xl:text-base"
-										on:click={fillMap}>Fill With {$currentEmoji}</button
+										class="btn w-full text-lg 2xl:btn-md"
+										on:click={fillMap}
+										>Fill With &nbsp;<i
+											class="twa twa-{formattedEmoji}"
+										/></button
 									>
 									<div
-										class="absolute -bottom-12 z-10 mx-9 self-center overflow-y-auto  rounded rounded border border-black bg-slate-300 p-2 delay-75 duration-150 ease-out 2xl:mx-4"
+										class="flex flex-wrap items-center justify-center gap-1 overflow-y-auto"
 									>
-										<div
-											class="flex flex-wrap items-center justify-center gap-1"
-										>
-											{#each palette as color}
-												{@const disabled = color == $map.dbg}
-												<button
-													{disabled}
-													on:click={() => {
-														$currentColor = $currentColor == color ? '' : color;
-													}}
-													class="h-4 w-4 rounded border border-black duration-75 ease-out {disabled
-														? ''
-														: 'hover:scale-125'}  2xl:h-6 2xl:w-6"
-													style:background-color={color}
-												/>
-											{/each}
+										{#each palette as color}
+											{@const disabled = color == $map.dbg}
 											<button
+												{disabled}
 												on:click={() => {
-													if ($currentColor == '') return;
-													if ($currentColor == $map.dbg) {
-														map.updateDbg(DEFAULT_BG);
-														return;
-													}
-
-													map.updateDbg($currentColor);
-													map.filterBackgrounds();
+													$currentColor = $currentColor == color ? '' : color;
 												}}
-												disabled={$currentColor == ''}
-												class="btn-xs btn flex w-full flex-row items-center"
-											>
-												Set <div
-													class="m-1 h-4 w-4 rounded border border-black 2xl:h-6 2xl:w-6"
-													style:background={$currentColor}
-												/>
-												as default
-											</button>
-										</div>
+												class="h-5 w-5 rounded border border-black duration-75 ease-out {disabled
+													? ''
+													: 'hover:scale-125'}  2xl:h-6 2xl:w-6"
+												style:background-color={color}
+											/>
+										{/each}
+										<button
+											on:click={() => {
+												if ($currentColor == '') return;
+												if ($currentColor == $map.dbg) {
+													map.updateDbg(DEFAULT_BG);
+													return;
+												}
+
+												map.updateDbg($currentColor);
+												map.filterBackgrounds();
+											}}
+											disabled={$currentColor == ''}
+											class="btn-xs btn flex w-full flex-row items-center"
+										>
+											Set <div
+												class="m-1 h-4 w-4 rounded border border-black 2xl:h-6 2xl:w-6"
+												style:background={$currentColor}
+											/>
+											as default
+										</button>
 									</div>
 								</div>
 							</div>
@@ -392,7 +395,8 @@
 								{GUIDE}
 							</button>
 							<label class="label">
-								<span class="label-text text-xs 2xl:text-base"
+								<span
+									class="label-text text-xs text-neutral-content 2xl:text-base"
 									>Statics 🗿
 								</span></label
 							>
@@ -428,16 +432,16 @@
 					</aside>
 					{#if viewKey == 'editor'}
 						<div class="flex flex-col justify-center px-8">
-							<Editor {showIndex} {deleteMode} {copyMode} />
+							<Editor {formattedEmoji} {showIndex} {deleteMode} {copyMode} />
 						</div>
 					{:else if viewKey == 'rules'}
-						<div class="flex flex-col  justify-center px-8">
+						<div class="flex flex-col justify-center px-8">
 							<Svelvet />
 						</div>
 					{/if}
 					<aside class="aside overflow-y-auto pt-0">
 						<div
-							class="sticky top-0 flex w-full flex-col items-center justify-center gap-4 bg-slate-300 p-4 pt-8"
+							class="sticky top-0 flex w-full flex-col items-center justify-center gap-4 bg-neutral p-4 pt-8"
 						>
 							<input
 								class="input-bordered input input-sm w-full 2xl:input-md"
@@ -457,10 +461,10 @@
 									</button>
 								{/each}
 							</div>
-							<div class="flex flex-col">
+							<div class="flex flex-row gap-2">
 								{#each skins as [hexcode, skinName]}
 									<button
-										class="h-6 w-6"
+										class="h-6 w-6 rounded"
 										style:background={hexcode}
 										on:click={() => {
 											skin = skin == skinName ? '' : skinName;
@@ -497,7 +501,7 @@
 													on:click={() => pickEmoji(name)}
 													title={name.replaceAll('-', ' ')}
 												>
-													<i class="twa twa-{name.replace("_", skin)}" />
+													<i class="twa twa-{name.replace('_', skin)}" />
 												</button>
 											{/if}
 										{/each}

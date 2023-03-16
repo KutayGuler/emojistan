@@ -661,6 +661,8 @@
 	function noPlayer(rbx: any) {
 		if (ac == -2) dispatch('noPlayer');
 	}
+
+	console.log(items);
 </script>
 
 <svelte:window on:keydown={handle} />
@@ -674,7 +676,7 @@
 			<div
 				class=" flex h-full w-64 flex-grow flex-row items-center justify-center"
 			>
-				<p class="z-10 text-2xl">{player?.emoji || ''}</p>
+				<i class="twa z-10 text-2xl twa-{player?.emoji}" />
 				<progress title="Health Bar" class="progress h-8" value={$progress} />
 				<p class="absolute pl-6">
 					{Number.isInteger(playerHP) ? playerHP : playerHP.toFixed(1)}
@@ -697,10 +699,8 @@
 				{/if}
 				<span class:equippable class:consumable>
 					{#if item}
-						<!-- content here -->
-						<i class="twa twa-farmer" />
+						<i class="twa twa-{item.emoji.replaceAll('_', '')}" />
 					{/if}
-					<!-- {item?.emoji || ""} -->
 				</span>
 			</div>
 		{/each}

@@ -12,28 +12,28 @@
 	}
 
 	.btn:focus {
-	animation: click 200ms ease-out;
-}
-
-@keyframes click {
-	0% {
-		border-width: 1px;
-		border-right-width: 4px;
-		border-bottom-width: 4px;
-		border-color: #000000;
+		animation: click 200ms ease-out;
 	}
 
-	50% {
-		border: none;
-	}
+	@keyframes click {
+		0% {
+			border-width: 1px;
+			border-right-width: 4px;
+			border-bottom-width: 4px;
+			border-color: #000000;
+		}
 
-	100% {
-		border-width: 1px;
-		border-right-width: 4px;
-		border-bottom-width: 4px;
-		border-color: #000000;
+		50% {
+			border: none;
+		}
+
+		100% {
+			border-width: 1px;
+			border-right-width: 4px;
+			border-bottom-width: 4px;
+			border-color: #000000;
+		}
 	}
-}
 
 	.input-bordered {
 		@apply brutal;
@@ -48,11 +48,11 @@
 	}
 
 	.map {
-		@apply grid h-full w-auto grid-cols-12 grid-rows-12 gap-1 text-2xl;
+		@apply brutal grid h-full w-auto grid-cols-12 grid-rows-12 text-2xl;
 	}
 
 	.simulation {
-		@apply grid h-full w-auto grid-cols-4 grid-rows-4 gap-1 py-4 text-2xl;
+		@apply brutal grid h-full w-auto grid-cols-4 grid-rows-4 gap-1 py-4 text-2xl;
 	}
 
 	.slot {
@@ -64,21 +64,21 @@
 	}
 
 	.aside {
-		@apply brutal relative h-[620px] w-72 rounded bg-slate-300 p-8 2xl:h-[716px] 2xl:w-80;
+		@apply brutal relative h-[672px] w-72 rounded bg-neutral p-8 2xl:h-[716px] 2xl:w-80;
 	}
 
 	.simulation > *,
 	.map > * {
 		position: relative;
 		display: flex;
-		width: 3rem;
-		height: 3rem;
+		width: 3.5rem; /* 56px */
+		height: 3.5rem; /* 56px */
 		font-size: 1.25rem; /* 20px */
 		line-height: 1.75rem; /* 28px */
 		align-items: center;
 		justify-content: center;
-		border-radius: 0.25rem;
-		background-color: #94a3b8;
+		/* border-radius: 0.25rem; */
+		background-color: #333c4d;
 		--tw-bg-opacity: 1;
 	}
 
@@ -87,16 +87,14 @@
 		transition: 75ms ease-out;
 		box-sizing: border-box;
 		cursor: pointer;
-		font-size: 1rem; /* 16px */
-		line-height: 1.5rem; /* 24px */
+		font-size: 1.25rem; /* 20px */
+		line-height: 1.75rem; /* 28px */
 	}
 
 	.selected,
 	.emojis > *:hover {
 		transform: scale(1.5);
 	}
-
-	
 
 	@media screen and (min-width: 1536px) {
 		.emojis > * {
