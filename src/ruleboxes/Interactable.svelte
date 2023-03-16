@@ -470,7 +470,7 @@
 							on:click={() => removeFromSideEffects(i)}>{CROSS}</button
 						>
 						<div class="slot-lg scale-75">
-							{modifierEmoji}
+							<i class="twa twa-{modifierEmoji}" />
 						</div>
 						<select
 							class="select-bordered select select-sm absolute -bottom-4"

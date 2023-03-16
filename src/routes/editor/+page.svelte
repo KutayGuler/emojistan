@@ -280,7 +280,7 @@
 													<div class="dropdown">
 														<button>{GUIDE}</button>
 														<div
-															class="card dropdown-content card-compact w-64 bg-primary p-2 text-primary-content shadow"
+															class="dropdown-content card card-compact w-64 bg-primary p-2 text-primary-content shadow"
 														>
 															<div class="card-body">
 																<p>
@@ -310,7 +310,7 @@
 													<div class="dropdown">
 														<button>{GUIDE}</button>
 														<div
-															class="card dropdown-content card-compact w-64 bg-primary p-2 text-primary-content shadow"
+															class="dropdown-content card card-compact w-64 bg-primary p-2 text-primary-content shadow"
 														>
 															<div class="card-body">
 																<p>
@@ -405,7 +405,8 @@
 								class="btn w-full 2xl:btn-md"
 								on:click={() => statics.add($currentEmoji)}
 							>
-								{$currentEmoji} +
+								<i class="twa twa-{formattedEmoji}" />
+								&nbsp; +
 							</button>
 							<div class="overflow-y-auto">
 								<div
