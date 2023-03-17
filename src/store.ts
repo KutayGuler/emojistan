@@ -1,5 +1,5 @@
 import { page } from '$app/stores';
-import { writable, get, type Writable } from 'svelte/store';
+import { writable, get, type Writable, derived } from 'svelte/store';
 import { DEFAULT_BG, storeNames } from './constants';
 
 import {
@@ -10,6 +10,7 @@ import {
 	type Interactable,
 	type Merger,
 	type Pusher,
+	type SkinTone,
 } from './types';
 
 function createMapStore<K, V>(name: string) {
@@ -124,6 +125,9 @@ function createEditableMap() {
 		set,
 		subscribe,
 		useStorage: (id: string) => {
+			const startingSectionIndex = parseInt(
+				localStorage.getItem(id + '_ssi') || '0'
+			);
 			const dbg = localStorage.getItem(id + '_dbg') || DEFAULT_BG;
 			const items = JSON.parse(localStorage.getItem(id + '_items') as string);
 			const backgrounds = JSON.parse(
@@ -131,6 +135,7 @@ function createEditableMap() {
 			);
 
 			update((state) => {
+				state.startingSectionIndex = startingSectionIndex;
 				state.items = new Map(items) || new Map();
 				state.backgrounds = new Map(backgrounds) || new Map();
 				state.dbg = dbg || '';
@@ -149,6 +154,11 @@ function createEditableMap() {
 				localStorage.setItem(id + '_dbg', state.dbg);
 			});
 		},
+		updateStartingSection: (index: number) =>
+			update((state) => {
+				state.startingSectionIndex = index;
+				return state;
+			}),
 		updateDbg: (color: string) =>
 			update((state) => {
 				state.dbg = color;
@@ -272,6 +282,12 @@ export const modal = createModal();
 // VANILLA
 export const currentColor = writable('');
 export const currentEmoji = writable('');
+export const currentSkin: Writable<SkinTone> = writable('');
+
+export const formattedEmoji = derived(
+	[currentEmoji, currentSkin],
+	([$currentEmoji, $currentSkin]) => $currentEmoji?.replace('_', $currentSkin)
+);
 
 // CUSTOM
 export const saves = createSaves();

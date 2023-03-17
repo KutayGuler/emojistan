@@ -115,13 +115,15 @@ export interface Mutations {
 }
 
 export interface EditableMap {
+	startingSectionIndex: number;
 	items: Map<string, string>;
 	backgrounds: Map<string, string>;
 	dbg: string;
 }
 
 export class EditableMap {
-	constructor(items = new Map<string, string>()) {
+	constructor(items = new Map<string, string>(), startingSectionIndex = 0) {
+		this.startingSectionIndex = startingSectionIndex;
 		this.items = items;
 		this.backgrounds = new Map<string, string>();
 		this.dbg = DEFAULT_BG;
@@ -231,3 +233,11 @@ export class Choice {
 
 export type Wasd = 'KeyW' | 'KeyA' | 'KeyS' | 'KeyD';
 export type ArrowKey = 'ArrowLeft' | 'ArrowUp' | 'ArrowRight' | 'ArrowDown';
+
+export type SkinTone =
+	| '-light-skin-tone'
+	| '-medium-light-skin-tone'
+	| '-medium-skin-tone'
+	| '-medium-dark-skin-tone'
+	| '-dark-skin-tone'
+	| '';

@@ -1,11 +1,10 @@
 <script lang="ts">
 	import { DEFAULT_SIDE_LENGTH } from '$src/constants';
-	import { currentEmoji, currentColor, map } from '../store';
+	import { currentEmoji, currentColor, map, formattedEmoji } from '../store';
 
 	export let sectionIndex = 0;
 	export let deleteMode: 'Item' | 'Background' | 'Both';
 	export let copyMode: 'Item' | 'Background' | 'Both';
-	export let formattedEmoji: string;
 
 	function clickedCell(index: number) {
 		switch (deleteMode) {
@@ -26,7 +25,7 @@
 		}
 
 		if ($currentEmoji != '') {
-			map.addEmoji(sectionIndex, index, formattedEmoji);
+			map.addEmoji(sectionIndex, index, $formattedEmoji);
 		}
 	}
 

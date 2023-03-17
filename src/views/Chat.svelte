@@ -67,6 +67,8 @@
 		texts = texts;
 		choices = choices;
 	}
+
+	// TODO: test the component it's giving error when dialog is finished
 </script>
 
 <svelte:window
@@ -81,7 +83,7 @@
 		if (chatIndex == currentDialogue.length) {
 			const children = choicesForm.children;
 			if (e.code == 'Space') {
-				children[choiceIndex].click();
+				children[choiceIndex]?.click();
 				return;
 			}
 
@@ -126,7 +128,7 @@
 
 <div
 	style="background-color: rgba(0, 0, 0.5, 0.5);"
-	class="absolute z-50 h-[672px] w-full 2xl:h-[716px]"
+	class="absolute z-50 h-[620px] w-full 2xl:h-[716px]"
 	transition:scale|local
 >
 	<h1 class="p-4 text-4xl">{character}</h1>

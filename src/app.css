@@ -3,7 +3,11 @@
 @tailwind utilities;
 
 @layer components {
-	.brutal {
+	.btn {
+		border: none;
+	}
+
+	/* .brutal {
 		@apply border border-r-4 border-b-4 border-black;
 	}
 
@@ -41,43 +45,43 @@
 
 	.select-bordered {
 		@apply brutal;
-	}
+	} */
 
 	.info {
 		@apply cursor-help text-center text-lg duration-200 ease-out hover:scale-150;
 	}
 
 	.map {
-		@apply brutal grid h-full w-auto grid-cols-12 grid-rows-12 text-2xl;
+		@apply grid h-full w-auto grid-cols-12 grid-rows-12 gap-1 text-2xl;
 	}
 
 	.simulation {
-		@apply brutal grid h-full w-auto grid-cols-4 grid-rows-4 gap-1 py-4 text-2xl;
+		@apply grid h-full w-auto grid-cols-4 grid-rows-4 gap-1 py-4 text-2xl;
 	}
 
 	.slot {
-		@apply flex h-12 w-12 flex-col items-center justify-center rounded border-2 border-black bg-white text-lg shadow-inner;
+		@apply flex h-12 w-12 flex-col items-center justify-center rounded border bg-white text-lg shadow-inner;
 	}
 
 	.slot-lg {
-		@apply flex h-20 w-20 flex-col items-center justify-center rounded border-2 border-black bg-white text-4xl shadow-inner;
+		@apply flex h-20 w-20 flex-col items-center justify-center rounded border bg-white text-4xl shadow-inner;
 	}
 
 	.aside {
-		@apply brutal relative h-[672px] w-72 rounded bg-neutral p-8 2xl:h-[716px] 2xl:w-80;
+		@apply relative h-[620px] w-72 rounded bg-slate-500 p-8 2xl:h-[716px] 2xl:w-80;
 	}
 
 	.simulation > *,
 	.map > * {
 		position: relative;
 		display: flex;
-		width: 3.5rem; /* 56px */
-		height: 3.5rem; /* 56px */
+		width: 3rem; /* 48px */
+		height: 3rem; /* 48px */
 		font-size: 1.5rem; /* 24px */
 		line-height: 2rem; /* 32px */
 		align-items: center;
 		justify-content: center;
-		/* border-radius: 0.25rem; */
+		border-radius: 0.25rem;
 		background-color: #333c4d;
 		--tw-bg-opacity: 1;
 	}

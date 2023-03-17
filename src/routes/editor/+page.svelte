@@ -13,6 +13,8 @@
 	// STORES
 	import {
 		currentEmoji,
+		formattedEmoji,
+		currentSkin,
 		currentColor,
 		saves,
 		map,
@@ -39,6 +41,7 @@
 
 	import Svelvet from '$lib';
 	import DialogueEditor from './DialogueEditor.svelte';
+	import type { SkinTone } from '$src/types';
 
 	function getStatics() {
 		let _statics = new Set<string>($statics);
@@ -83,6 +86,7 @@
 	let currentCategory = '💩';
 	let filter = '';
 	let sectionIndex = 0;
+	let startingSectionIndex = 0;
 
 	function handleKeydown(e: KeyboardEvent) {
 		if (e.code == 'Escape') {
@@ -157,13 +161,6 @@
 
 	let [x, y] = [0, 0];
 
-	type SkinTone =
-		| '-light-skin-tone'
-		| '-medium-light-skin-tone'
-		| '-medium-skin-tone'
-		| '-medium-dark-skin-tone'
-		| '-dark-skin-tone'
-		| '';
 	const skins: [string, SkinTone][] = [
 		['#f7d7c4', '-light-skin-tone'],
 		['#d8b094', '-medium-light-skin-tone'],
@@ -171,13 +168,6 @@
 		['#8e562e', '-medium-dark-skin-tone'],
 		['#613d30', '-dark-skin-tone'],
 	];
-	let skin: SkinTone = '';
-
-	// TODO: formatted emoji should be derived
-	let formattedEmoji = $currentEmoji.replace('_', skin);
-	$: formattedEmoji = $currentEmoji.replace('_', skin);
-
-	// TODO: do something about disabled buttons
 </script>
 
 <svelte:head>
@@ -198,7 +188,7 @@
 	class="absolute z-50 flex h-6 w-6 items-center justify-center rounded bg-red-500 text-lg"
 	style="transform: translate({x + 12}px, {y - 12}px);"
 >
-	<i class="twa twa-{formattedEmoji}" />
+	<i class="twa twa-{$formattedEmoji}" />
 </div>
 
 {#if $saves.currentSaveID != ''}
@@ -219,7 +209,9 @@
 				statics={getStatics()}
 				on:noPlayer={() => {
 					test = false;
-					notifications.warning('No controllable player in the map');
+					notifications.warning(
+						'No controllable player in the starting section.'
+					);
 				}}
 				on:quit={() => {
 					test = false;
@@ -334,16 +326,18 @@
 										class="btn w-full text-lg 2xl:btn-md"
 										on:click={fillMap}
 										>Fill With &nbsp;<i
-											class="twa twa-{formattedEmoji}"
+											class="twa twa-{$formattedEmoji}"
 										/></button
 									>
-									<label class="label">
+									<label class="label pt-8">
 										<span
 											class="label-text text-xs text-neutral-content 2xl:text-base"
 											>Palette
 										</span></label
 									>
-									<div class="flex flex-wrap items-center justify-center gap-1">
+									<div
+										class="grid grid-cols-9 grid-rows-10 items-center justify-center gap-1"
+									>
 										{#each palette as color}
 											{@const disabled = color == $map.dbg}
 											<button
@@ -351,36 +345,36 @@
 												on:click={() => {
 													$currentColor = $currentColor == color ? '' : color;
 												}}
-												class="h-4 w-4 rounded border border-black duration-75 ease-out {disabled
+												class="h-5 w-5 rounded duration-75 ease-out {disabled
 													? ''
 													: 'hover:scale-125'}  2xl:h-6 2xl:w-6"
 												style:background-color={color}
 											/>
 										{/each}
-										<button
-											on:click={() => {
-												if ($currentColor == '') return;
-												if ($currentColor == $map.dbg) {
-													map.updateDbg(DEFAULT_BG);
-													return;
-												}
-
-												map.updateDbg($currentColor);
-												map.filterBackgrounds();
-											}}
-											disabled={$currentColor == ''}
-											class="btn flex w-full flex-row items-center"
-										>
-											Set <div
-												class="m-1 h-4 w-4 rounded border border-black 2xl:h-6 2xl:w-6"
-												style:background={$currentColor}
-											/>
-											as default
-										</button>
 									</div>
+									<button
+										on:click={() => {
+											if ($currentColor == '') return;
+											if ($currentColor == $map.dbg) {
+												map.updateDbg(DEFAULT_BG);
+												return;
+											}
+
+											map.updateDbg($currentColor);
+											map.filterBackgrounds();
+										}}
+										disabled={$currentColor == ''}
+										class="btn flex w-full flex-row items-center"
+									>
+										Set <div
+											class="m-1 h-4 w-4 rounded  2xl:h-6 2xl:w-6"
+											style:background={$currentColor}
+										/>
+										as default
+									</button>
 								</div>
 
-								<label class="label">
+								<label class="label pt-8">
 									<span
 										class="label-text text-xs text-neutral-content 2xl:text-base"
 										>World Map
@@ -391,7 +385,7 @@
 										<button
 											on:click={() => (sectionIndex = i)}
 											title="Section #{i}"
-											class="h-4 w-4 rounded border border-black"
+											class="h-4 w-4 rounded"
 											style:background={$map.dbg}
 										>
 											{#if i == sectionIndex}
@@ -400,6 +394,22 @@
 										</button>
 									{/each}
 								</div>
+								<label class="label pt-8">
+									<span
+										class="label-text text-xs text-neutral-content 2xl:text-base"
+										>Starting Section
+									</span>
+								</label>
+								<select
+									class="select-bordered select"
+									bind:value={startingSectionIndex}
+									on:change={() =>
+										map.updateStartingSection(startingSectionIndex)}
+								>
+									{#each { length: 144 } as _, value}
+										<option {value}>{value}</option>
+									{/each}
+								</select>
 							</div>
 						{:else}
 							<button
@@ -421,7 +431,7 @@
 								class="btn w-full 2xl:btn-md"
 								on:click={() => statics.add($currentEmoji)}
 							>
-								<i class="twa twa-{formattedEmoji}" />
+								<i class="twa twa-{$formattedEmoji}" />
 								&nbsp; +
 							</button>
 							<div class="overflow-y-auto">
@@ -449,7 +459,7 @@
 					</aside>
 					{#if viewKey == 'editor'}
 						<div class="flex flex-col justify-center px-8">
-							<Editor {sectionIndex} {formattedEmoji} {deleteMode} {copyMode} />
+							<Editor {sectionIndex} {deleteMode} {copyMode} />
 						</div>
 					{:else if viewKey == 'rules'}
 						<div class="flex flex-col justify-center px-8">
@@ -458,7 +468,7 @@
 					{/if}
 					<aside class="aside overflow-y-auto pt-0">
 						<div
-							class="sticky top-0 flex w-full flex-col items-center justify-center gap-4 bg-neutral p-4 pt-8"
+							class="sticky top-0 flex w-full flex-col items-center justify-center gap-4 bg-slate-500 p-4 pt-8"
 						>
 							<input
 								class="input-bordered input input-sm w-full 2xl:input-md"
@@ -484,41 +494,27 @@
 										class="h-6 w-6 rounded"
 										style:background={hexcode}
 										on:click={() => {
-											skin = skin == skinName ? '' : skinName;
+											$currentSkin = $currentSkin == skinName ? '' : skinName;
 										}}
 									/>
 								{/each}
 							</div>
 						</div>
 						<div id="flex flex-col">
-							<!-- {#each Object.keys(emojis) as category}
-								{#if currentCategory == category}
-									<div class="emojis flex flex-wrap justify-center">
-										{#each emojis[category] as [emoji, name]}
-											{#if name.includes(filter)}
-												<button
-													class:selected={$currentEmoji == emoji}
-													on:click={() => pickEmoji(emoji)}
-													title={name}
-												>
-													{emoji}
-												</button>
-											{/if}
-										{/each}
-									</div>
-								{/if}
-							{/each} -->
 							{#each Object.keys(xd) as category}
 								{#if currentCategory == category}
 									<div class="emojis flex flex-wrap justify-center">
 										{#each xd[category] as name}
-											{#if name.includes(filter)}
+											{@const title = name.replaceAll('-', ' ')}
+											{#if title.includes(filter)}
 												<button
 													class:selected={$currentEmoji == name}
 													on:click={() => pickEmoji(name)}
-													title={name.replaceAll('-', ' ')}
+													{title}
 												>
-													<i class="twa twa-{name.replace('_', skin)}" />
+													<i
+														class="twa twa-{name.replace('_', $currentSkin)}"
+													/>
 												</button>
 											{/if}
 										{/each}

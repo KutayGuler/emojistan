@@ -2,7 +2,7 @@
   import { notifications } from "$src/routes/notifications";
   import {
     consumables,
-    currentEmoji,
+    formattedEmoji,
     equippables,
     interactables,
   } from "$src/store";
@@ -54,7 +54,7 @@
     for (let [_id, val] of $consumables.entries()) {
       if (_id == id) continue;
 
-      if ($currentEmoji == val.emoji) {
+      if ($formattedEmoji == val.emoji) {
         notifications.warning("Cannot have two consumables with same emoji");
         return;
       }
@@ -62,8 +62,8 @@
 
     for (let val of [...$interactables.values(), ...$equippables.values()]) {
       if (
-        (typeof val == "string" && val != "" && $currentEmoji == val) ||
-        (typeof val == "object" && $currentEmoji == val.emoji)
+        (typeof val == "string" && val != "" && $formattedEmoji == val) ||
+        (typeof val == "object" && $formattedEmoji == val.emoji)
       ) {
         notifications.warning(
           "An emoji can only have one assigned type. Interactable, Consumable or Equippable"
@@ -72,12 +72,12 @@
       }
     }
 
-    emoji = $currentEmoji;
+    emoji = $formattedEmoji;
     updateStore();
   }
 
   function updateMutationEmoji() {
-    mutateConsumerTo = $currentEmoji;
+    mutateConsumerTo = $formattedEmoji;
   }
 </script>
 

@@ -133,7 +133,7 @@
 		{emojiString}
 	</div> -->
 	<div class="absolute top-0 h-full w-full bg-black opacity-75" />
-	<div class="dropdown dropdown-bottom dropdown-end absolute right-4 top-4">
+	<!-- <div class="dropdown dropdown-bottom dropdown-end absolute right-4 top-4">
 		<button class="avatar ">
 			<div class="w-12 rounded-full ring ring-neutral-content">
 				<img src="https://picsum.photos/200" alt="profile picture" />
@@ -147,7 +147,7 @@
 			<li><a href="/account">Account</a></li>
 			<li><a href="/">Logout</a></li>
 		</ul>
-	</div>
+	</div> -->
 	<div
 		class="aside prose mt-16 flex h-[806px] w-96 flex-col gap-2 overflow-y-auto bg-neutral"
 	>
@@ -207,8 +207,8 @@
 				>PLAY</button
 			>
 			<a href="/tutorial/controls" class="btn-secondary btn">TUTORIAL</a>
-			<a href="/discover" class="btn-accent btn">DISCOVER</a>
-			<button class="btn w-full">OPTIONS</button>
+			<!-- <a href="/discover" class="btn-accent btn">DISCOVER</a>
+			<button class="btn w-full">OPTIONS</button> -->
 		{/if}
 	</div>
 </main>

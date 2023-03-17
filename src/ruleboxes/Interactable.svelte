@@ -67,7 +67,7 @@
 	import { notifications } from '../routes/notifications';
 	import {
 		map,
-		currentEmoji,
+		formattedEmoji,
 		interactables,
 		equippables,
 		consumables,
@@ -225,8 +225,8 @@
 
 	function updateEmoji() {
 		if (
-			$currentEmoji != '' &&
-			[evolve.to, devolve.to].includes($currentEmoji)
+			$formattedEmoji != '' &&
+			[evolve.to, devolve.to].includes($formattedEmoji)
 		) {
 			notifications.warning(
 				'An interactable cannot evolve or devolve to itself'
@@ -237,7 +237,7 @@
 		for (let [_id, val] of $interactables.entries()) {
 			if (_id == id) continue;
 
-			if ($currentEmoji == val.emoji) {
+			if ($formattedEmoji == val.emoji) {
 				notifications.warning('Cannot have two interactables with same emoji');
 				return;
 			}
@@ -245,8 +245,8 @@
 
 		for (let val of [...$consumables.values(), ...$equippables.values()]) {
 			if (
-				(typeof val == 'string' && val != '' && $currentEmoji == val) ||
-				(typeof val == 'object' && $currentEmoji == val.emoji)
+				(typeof val == 'string' && val != '' && $formattedEmoji == val) ||
+				(typeof val == 'object' && $formattedEmoji == val.emoji)
 			) {
 				notifications.warning(
 					'An emoji can only have one assigned type. Interactable, Consumable or Equippable'
@@ -255,17 +255,17 @@
 			}
 		}
 
-		emoji = $currentEmoji;
+		emoji = $formattedEmoji;
 		updateStore();
 	}
 
 	function updateEvolveEmoji() {
-		if (emoji == $currentEmoji) {
+		if (emoji == $formattedEmoji) {
 			notifications.warning('An interactable cannot evolve to itself');
 			return;
 		}
 
-		evolve.to = $currentEmoji;
+		evolve.to = $formattedEmoji;
 		updateStore();
 	}
 
@@ -294,17 +294,17 @@
 	}
 
 	function updateDevolveEmoji() {
-		if (emoji == $currentEmoji) {
+		if (emoji == $formattedEmoji) {
 			notifications.warning('An interactable cannot devolve to itself');
 			return;
 		}
 
-		devolve.to = $currentEmoji;
+		devolve.to = $formattedEmoji;
 		updateStore();
 	}
 
 	function updateSlot(i: number) {
-		sequence[i].emoji = $currentEmoji;
+		sequence[i].emoji = $formattedEmoji;
 		updateStore();
 	}
 
@@ -438,15 +438,13 @@
 					{/each}
 				</ul>
 			</div>
-			{#if !hasInteraction}
-				<div
-					class="tooltip"
-					data-tip="An interactable needs at least one side effect with positive or negative value to be interactable"
-				>
-					<button class="btn text-2xl text-warning">!</button>
-				</div>
-			{/if}
 		</div>
+		{#if !hasInteraction}
+			<p class="text-error">
+				An interactable needs at least one side effect with positive or negative
+				value to be interactable!
+			</p>
+		{/if}
 		<div class="flex flex-wrap items-center justify-center gap-8">
 			{#each sideEffects as [equippableID, value], i}
 				{@const modifierEmoji = $equippables.get(equippableID)?.emoji}

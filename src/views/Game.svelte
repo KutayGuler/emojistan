@@ -52,9 +52,10 @@
 	let levelCompleted = false;
 	let ac = -2; // ACTIVE CELL
 	let ic: number; // INTERACTED CELL
+	let currentSection = map.startingSectionIndex;
 	let directionKey: Wasd = 'KeyD';
 	let currentInventoryIndex = 0;
-	let items = new Map<number, Item | Equippable | Consumable>();
+	let items = new Map<string, Item | Equippable | Consumable>();
 	let backgrounds = new Map(map.backgrounds);
 	let _interactables: _Interactables = {};
 	let _consumables: _Consumables = {};
@@ -84,10 +85,10 @@
 	const keys: {
 		[key in Wasd]: { emoji: string; operation: number };
 	} = {
-		KeyW: { emoji: '⬆️', operation: -SIZE },
-		KeyA: { emoji: '⬅️', operation: -1 },
-		KeyS: { emoji: '⬇️', operation: SIZE },
-		KeyD: { emoji: '➡️', operation: 1 },
+		KeyW: { emoji: 'up-arrow', operation: -SIZE },
+		KeyA: { emoji: 'left-arrow', operation: -1 },
+		KeyS: { emoji: 'down-arrow', operation: SIZE },
+		KeyD: { emoji: 'right-arrow', operation: 1 },
 	};
 
 	const wasd = ['KeyW', 'KeyA', 'KeyS', 'KeyD'];
@@ -99,11 +100,54 @@
 		KeyS: 'ArrowDown',
 	};
 
+	function changeSection(acSideEffect: number, sectionSideEffect: number) {
+		let _id = currentSection + '_' + ac;
+		let playerData = items.get(_id) as Item;
+		items.delete(_id);
+		currentSection += sectionSideEffect;
+		ic += acSideEffect;
+		ac += acSideEffect;
+		items.set(currentSection + '_' + ac, playerData);
+		items = items;
+	}
+
 	function calcOperation(code: ArrowKey, index: number) {
-		if (code == 'ArrowLeft' && index % SIZE == 0) return 0;
-		if (code == 'ArrowUp' && index < SIZE) return 0;
-		if (code == 'ArrowRight' && (index + 1) % SIZE == 0) return 0;
-		if (code == 'ArrowDown' && index >= SIZE * SIZE - SIZE) return 0;
+		if (code == 'ArrowLeft' && index % SIZE == 0) {
+			if (
+				currentSection % SIZE != 0 &&
+				!items.has(currentSection - 1 + '_' + (ac + SIZE - 1))
+			) {
+				changeSection(SIZE - 1, -1);
+			}
+			return 0;
+		}
+		if (code == 'ArrowUp' && index < SIZE) {
+			if (
+				currentSection >= SIZE &&
+				!items.has(currentSection - SIZE + '_' + (ac + SIZE * (SIZE - 1)))
+			) {
+				changeSection(SIZE * (SIZE - 1), -SIZE);
+			}
+			return 0;
+		}
+		if (code == 'ArrowRight' && (index + 1) % SIZE == 0) {
+			if (
+				(currentSection + 1) % SIZE != 0 &&
+				!items.has(currentSection + 1 + '_' + (ac - SIZE + 1))
+			) {
+				changeSection(-(SIZE - 1), 1);
+			}
+			return 0;
+		}
+		if (code == 'ArrowDown' && index >= SIZE * SIZE - SIZE) {
+			if (
+				currentSection < SIZE * SIZE - SIZE &&
+				!items.has(currentSection + SIZE + '_' + (ac - SIZE * (SIZE - 1)))
+			) {
+				changeSection(-(SIZE * (SIZE - 1)), SIZE);
+			}
+			return 0;
+		}
 		return (
 			(['ArrowUp', 'ArrowDown'].includes(code) ? SIZE : 1) *
 			(['ArrowRight', 'ArrowDown'].includes(code) ? 1 : -1)
@@ -115,8 +159,10 @@
 	 * Transfers an item from "from" to "to"
 	 */
 	function transferItem(from: number, to: number) {
-		items.set(to, items.get(from) as Equippable | Consumable | Item);
-		items.delete(from);
+		let _to = currentSection + '_' + to;
+		let _from = currentSection + '_' + from;
+		items.set(_to, items.get(_from) as Equippable | Consumable | Item);
+		items.delete(_from);
 		items = items; // MAGIC UPDATE, NECESSARY FOR REACTIVITY
 
 		if (ac == from) {
@@ -130,7 +176,10 @@
 	 * Transfers an item from "from" to "to" and applies mergeResult
 	 */
 	function transferAndMerge(fromID: number, toID: number, mergeResult: string) {
-		let from = items.get(fromID) as Item;
+		let _fromID = currentSection + '_' + fromID;
+		let _toID = currentSection + '_' + toID;
+
+		let from = items.get(_fromID) as Item;
 		let fromInventory: Array<Equippable> = from?.inventory || [];
 		let fromHP = from?.hp.current || 1;
 		// @ts-expect-error
@@ -141,14 +190,14 @@
 		}
 
 		items.set(
-			toID,
+			_toID,
 			new Item(
 				mergeResult,
 				mergedInventory,
 				_interactables[mergeResult]?.hp || fromHP
 			)
 		);
-		items.delete(fromID);
+		items.delete(_fromID);
 		items = items; // MAGIC UPDATE, NECESSARY FOR REACTIVITY
 
 		if (ac == fromID) {
@@ -190,10 +239,16 @@
 			}
 		}
 
-		for (let [index, { emoji, hp }] of items) {
+		console.log(items);
+
+		for (let [id, { emoji, hp }] of items) {
 			if (typeof hp == 'number') continue; // consumable and equippables' hp types are numbers
-			if (ac == -2 && !statics.has(emoji)) {
-				ac = index;
+			if (
+				ac == -2 &&
+				+id.split('_')[0] == currentSection &&
+				!statics.has(emoji)
+			) {
+				ac = +id.split('_')[1];
 				ic = ac + 1;
 				directionKey = 'KeyD';
 			}
@@ -205,8 +260,8 @@
 
 	initItems();
 
-	let player = items.get(ac) as Item;
-	$: player = items.get(ac) as Item;
+	let player = items.get(currentSection + '_' + ac) as Item;
+	$: player = items.get(currentSection + '_' + ac) as Item;
 
 	let numbers = new Map<number, number>();
 
@@ -251,18 +306,18 @@
 	// MUTATIONS
 	const m: Mutations = {
 		paint({ index, background }) {
-			backgrounds.set(index, background);
+			backgrounds.set(currentSection + '_' + index, background);
 			backgrounds = backgrounds;
 		},
 		erase({ index }) {
-			backgrounds.delete(index);
+			backgrounds.delete(currentSection + '_' + index);
 		},
 		spawn({ index, emoji }) {
-			items.set(index, new Item(emoji));
+			items.set(currentSection + '_' + index, new Item(emoji));
 			items = items;
 		},
 		destroy({ index }) {
-			items.delete(index);
+			items.delete(currentSection + '_' + index);
 		},
 		wait: async (duration) => {
 			return new Promise((resolve) => {
@@ -297,8 +352,10 @@
 		let collisionChain = [];
 		let i = 0;
 
-		while (items.has(ac + operation * i)) {
-			collisionChain.push(items.get(ac + operation * i)?.emoji);
+		while (items.has(currentSection + '_' + (ac + operation * i))) {
+			collisionChain.push(
+				items.get(currentSection + '_' + (ac + operation * i))?.emoji
+			);
 			i++;
 		}
 
@@ -370,11 +427,16 @@
 
 	async function handle(e: KeyboardEvent) {
 		e.preventDefault();
-		if (!items.has(ac) || (player?.hp.current || -1) <= 0 || chatting) return;
+		if (
+			!items.has(currentSection + '_' + ac) ||
+			(player?.hp.current || -1) <= 0 ||
+			chatting
+		)
+			return;
 		if (e.code.includes('Arrow')) {
 			let operation = calcOperation(e.code as ArrowKey, ac);
 			if (!player || statics.has(player.emoji) || operation == 0) return;
-			let facingItem = items.get(ac + operation);
+			let facingItem = items.get(currentSection + '_' + (ac + operation));
 
 			if (!facingItem) {
 				transferItem(ac, ac + operation);
@@ -415,14 +477,14 @@
 			if (calcOperation(wasdToArrow[directionKey], ac) == 0) {
 				return;
 			}
-			let interactedItem = items.get(ic);
+			let interactedItem = items.get(currentSection + '_' + ic);
 			console.log(interactedItem);
 
 			if (interactedItem == undefined) return;
 			if (interactedItem instanceof Equippable) {
 				if (player.inventory.length != MAX_INVENTORY_SIZE) {
 					player.inventory.push(interactedItem);
-					items.delete(ic);
+					items.delete(currentSection + '_' + ic);
 					items = items;
 				}
 				return;
@@ -444,13 +506,13 @@
 							player.hp.max = _interactables[playerDevolve.to]?.hp || 1;
 							player.hp.current = player.hp.max;
 							progress.set(calcPlayerHpPercentage());
-							items.delete(ic);
+							items.delete(currentSection + '_' + ic);
 
 							items = items;
 							return;
 						}
 
-						items.delete(ac);
+						items.delete(currentSection + '_' + ac);
 						items = items;
 
 						for (let [id, { emoji, hp }] of items) {
@@ -461,7 +523,7 @@
 								!_equippables[emoji]
 							) {
 								player = items.get(id) as Item;
-								ac = id;
+								ac = +id.split('_')[1];
 								progress = tweened(calcPlayerHpPercentage(), {
 									duration: 200,
 									easing: cubicOut,
@@ -487,7 +549,7 @@
 					progress.set(calcPlayerHpPercentage());
 				}
 
-				items.delete(ic);
+				items.delete(currentSection + '_' + ic);
 				items = items;
 				return;
 			}
@@ -543,7 +605,7 @@
 				if (playerDevolve?.enabled && playerDevolve.to != '') {
 					player.emoji = playerDevolve.to;
 				} else {
-					items.delete(ac);
+					items.delete(currentSection + '_' + ac);
 				}
 			} else if (
 				playerEvolve?.enabled &&
@@ -557,7 +619,7 @@
 				if (devolve?.enabled && devolve.to != '') {
 					interactedItem.emoji = devolve.to;
 				} else {
-					items.delete(ic);
+					items.delete(currentSection + '_' + ic);
 				}
 			} else if (evolve?.enabled && evolve.at == interactedItem.hp.current) {
 				interactedItem.emoji = evolve.to;
@@ -577,11 +639,14 @@
 			if (
 				calcOperation(wasdToArrow[directionKey], ac) == 0 ||
 				!player?.inventory ||
-				items.has(ic)
+				items.has(currentSection + '_' + ic)
 			) {
 				return;
 			}
-			items.set(ic, player?.inventory[currentInventoryIndex]);
+			items.set(
+				currentSection + '_' + ic,
+				player?.inventory[currentInventoryIndex]
+			);
 			player.inventory.splice(currentInventoryIndex, 1);
 			items = items;
 			return;
@@ -601,17 +666,19 @@
 
 		if (e.code == 'KeyE') {
 			for (let [id, _] of _items) {
-				if (id == ac) continue;
-				if (id > ac && id - ac < closestDistance) {
-					closestDistance = id - ac;
-					closestID = id;
+				let _id = +id.split('_')[1];
+				if (_id == ac) continue;
+				if (_id > ac && _id - ac < closestDistance) {
+					closestDistance = _id - ac;
+					closestID = _id;
 				}
 			}
 
 			if (closestDistance == 300) {
 				let smallest = 300;
 				for (let [id, _] of _items) {
-					if (id < smallest) smallest = id;
+					let _id = +id.split('_')[1];
+					if (_id < smallest) smallest = _id;
 				}
 				ac = smallest;
 				ic = ac + keys[directionKey].operation;
@@ -620,7 +687,7 @@
 				ic = ac + keys[directionKey].operation;
 			}
 
-			player = items.get(ac) as Item;
+			player = items.get(currentSection + '_' + ac) as Item;
 			progress = tweened(calcPlayerHpPercentage(), {
 				duration: 200,
 				easing: cubicOut,
@@ -630,17 +697,19 @@
 
 		if (e.code == 'KeyQ') {
 			for (let [id, _] of _items) {
-				if (id == ac) continue;
-				if (ac > id && ac - id < closestDistance) {
-					closestDistance = ac - id;
-					closestID = id;
+				let _id = +id.split('_')[1];
+				if (_id == ac) continue;
+				if (ac > _id && ac - _id < closestDistance) {
+					closestDistance = ac - _id;
+					closestID = _id;
 				}
 			}
 
 			if (closestDistance == 300) {
 				let biggest = 0;
 				for (let [id, _] of _items) {
-					if (id > biggest) biggest = id;
+					let _id = +id.split('_')[1];
+					if (_id > biggest) biggest = _id;
 				}
 				ac = biggest;
 				ic = ac + keys[directionKey].operation;
@@ -649,7 +718,7 @@
 				ic = ac + keys[directionKey].operation;
 			}
 
-			player = items.get(ac) as Item;
+			player = items.get(currentSection + '_' + ac) as Item;
 			progress = tweened(calcPlayerHpPercentage(), {
 				duration: 200,
 				easing: cubicOut,
@@ -661,10 +730,6 @@
 	function noPlayer(rbx: any) {
 		if (ac == -2) dispatch('noPlayer');
 	}
-
-	console.log(items);
-
-	// TODO: implement section switching
 </script>
 
 <svelte:window on:keydown={handle} />
@@ -673,8 +738,6 @@
 	{#key ac}
 		{#if ac != -2 && showHP}
 			{@const playerHP = $progress * (player?.hp.max || 1)}
-			<!-- class="absolute -top-16 flex w-64 flex-row items-center justify-center gap-2" -->
-			<!-- 2xl:my-8 -->
 			<div
 				class=" flex h-full w-64 flex-grow flex-row items-center justify-center"
 			>
@@ -689,21 +752,26 @@
 	<div class={mapClass} use:noPlayer>
 		{#each { length: SIZE * SIZE } as _, i}
 			{@const active = ac == i}
-			{@const item = items.get(i)}
-			{@const equippable = item instanceof Equippable}
-			{@const consumable = item instanceof Consumable}
-			<div style:background={backgrounds.get(i) || map.dbg}>
+			{@const item = items.get(currentSection + '_' + i)}
+			{@const hand =
+				player?.inventory[currentInventoryIndex]?.emoji ||
+				keys[directionKey].emoji}
+			<div
+				class="cell"
+				style:background={backgrounds.get(currentSection + '_' + i) || map.dbg}
+			>
 				{#if active}
 					<div class="absolute z-[2] text-base {directionKey}">
-						{player?.inventory[currentInventoryIndex]?.emoji ||
-							keys[directionKey].emoji}
+						<i class="twa twa-{hand}" />
 					</div>
 				{/if}
-				<span class:equippable class:consumable>
-					{#if item}
-						<i class="twa twa-{item.emoji.replaceAll('_', '')}" />
-					{/if}
-				</span>
+				{#if item}
+					{@const equippable = item instanceof Equippable}
+					{@const consumable = item instanceof Consumable}
+					<span class:equippable class:consumable>
+						<i class="twa twa-{item.emoji}" />
+					</span>
+				{/if}
 			</div>
 		{/each}
 		{#if levelCompleted}
@@ -729,7 +797,6 @@
 	</div>
 	{#key ac}
 		{#if ac != -2 && showInventory}
-			<!-- 2xl:my-8 py-8 -->
 			<div
 				title="Inventory"
 				class="flex h-full w-full flex-row items-center justify-center gap-2"

@@ -33,7 +33,7 @@
 			description:
 				'Interactables are the most complex ruleboxes. We will explain each feature with examples.',
 			gameProps: {
-				map: new EditableMap(new Map<number, string>()),
+				map: new EditableMap(new Map<string, string>()),
 				mapClass: 'simulation',
 				SIZE: 4,
 			},
@@ -47,7 +47,7 @@
 			veilHeight: 476,
 			props: {
 				id: 'static',
-				emoji: '🧱',
+				emoji: 'brick',
 				isStatic: true,
 				evolve: new Evolve(false, '', 2),
 				devolve: new Devolve(false, ''),
@@ -55,22 +55,23 @@
 			},
 			gameProps: {
 				map: new EditableMap(
-					new Map<number, string>([
-						[5, '👶'],
-						[3, '🧱'],
-						[6, '🧱'],
-						[9, '🧱'],
-						[12, '🧱'],
-						[7, '👶'],
-					])
+					new Map<string, string>([
+						['155_5', 'baby'],
+						['155_3', 'brick'],
+						['155_6', 'brick'],
+						['155_9', 'brick'],
+						['155_12', 'brick'],
+						['155_7', 'baby'],
+					]),
+					-2
 				),
-				statics: new Set<string>(['🧱']),
+				statics: new Set<string>(['brick']),
 				// @ts-expect-error
 				interactables: new Map<number, TInteractable>([
 					[
 						'static',
 						new TInteractable(
-							'🧱',
+							'brick',
 							[],
 							1,
 							1,
@@ -89,42 +90,42 @@
 		{
 			header: 'Interactable',
 			description:
-				"Evolve [ 🧬 ], as the name suggests, makes the Interactable evolvable. When Interactable's HP reaches to evolve limit, the emoji transforms and HP resets to evolved version's [ 🚶 ] HP. Which in this case is 1.",
+				"Evolve [ 🧬 ], as the name suggests, makes the Interactable evolvable. When Interactable's HP reaches to evolve limit, the emoji transforms and HP resets to evolved version's [ man-walking ] HP. Which in this case is 1.",
 			veilHeight: 476,
 			props: {
 				id: 'evolution',
-				emoji: '👶',
+				emoji: 'baby',
 				isStatic: false,
-				evolve: new Evolve(true, '🚶', 5),
+				evolve: new Evolve(true, 'man-walking', 5),
 				devolve: new Devolve(false, ''),
 				hp: 1,
 			},
 			gameProps: {
 				map: new EditableMap(
-					new Map<number, string>([
-						[0, '👶'],
-						[10, '🍼'],
-						[11, '🍼'],
-						[14, '🍼'],
-						[15, '🍼'],
+					new Map<string, string>([
+						['155_0', 'baby'],
+						['155_10', 'baby-bottle'],
+						['155_11', 'baby-bottle'],
+						['155_14', 'baby-bottle'],
+						['155_15', 'baby-bottle'],
 					])
 				),
-				statics: new Set<string>(['🍼']),
+				statics: new Set<string>(['baby-bottle']),
 				consumables: new Map<number, Consumable>([
-					[-1, { emoji: '🍼', hp: 1, mutateConsumerTo: '' }],
+					[-1, { emoji: 'baby-bottle', hp: 1, mutateConsumerTo: '' }],
 				]),
 				// @ts-expect-error
 				interactables: new Map<number, TInteractable>([
 					[
 						'evolution',
 						new TInteractable(
-							'👶',
+							'baby',
 							[],
 							1,
 							1,
 							[],
 							true,
-							new Evolve(true, '🚶', 5),
+							new Evolve(true, 'man-walking', 5),
 							new Devolve(false, '')
 						),
 					],
@@ -134,7 +135,7 @@
 				SIZE: 4,
 			},
 		},
-		// DEVOLUTION (human eats 4 🧪's devolves to 🐀)
+		// DEVOLUTION (human eats 4 test-tube's devolves to rat)
 		{
 			header: 'Interactable',
 			description:
@@ -142,38 +143,38 @@
 			veilHeight: 476,
 			props: {
 				id: 'devolution',
-				emoji: '🐒',
+				emoji: 'monkey',
 				evolve: new Evolve(false, '', 2),
-				devolve: new Devolve(true, '🐀'),
+				devolve: new Devolve(true, 'rat'),
 				hp: 4,
 			},
 			gameProps: {
 				map: new EditableMap(
-					new Map<number, string>([
-						[0, '🐒'],
-						[10, '🧪'],
-						[11, '🧪'],
-						[14, '🧪'],
-						[15, '🧪'],
+					new Map<string, string>([
+						['155_0', 'monkey'],
+						['155_10', 'test-tube'],
+						['155_11', 'test-tube'],
+						['155_14', 'test-tube'],
+						['155_15', 'test-tube'],
 					])
 				),
-				statics: new Set<string>(['🧪']),
+				statics: new Set<string>(['test-tube']),
 				consumables: new Map<number, Consumable>([
-					[-2, { emoji: '🧪', hp: -1, mutateConsumerTo: '' }],
+					[-2, { emoji: 'test-tube', hp: -1, mutateConsumerTo: '' }],
 				]),
 				// @ts-expect-error
 				interactables: new Map<number, TInteractable>([
 					[
 						'devolution',
 						new TInteractable(
-							'🐒',
+							'monkey',
 							[],
 							4,
 							1,
 							[],
 							true,
 							new Evolve(false, '', 2),
-							new Devolve(true, '🐀')
+							new Devolve(true, 'rat')
 						),
 					],
 				]),
@@ -181,7 +182,9 @@
 				SIZE: 4,
 			},
 		},
+		// TODO: Prevent tutorial from changing section (if size == 4) dont
 		// TODO: Better definiton
+		// TODO: turn description text into html
 		{
 			header: 'Interactable',
 			description:
@@ -189,7 +192,7 @@
 			veilHeight: 164,
 			props: {
 				id: 'sideEffects',
-				emoji: '🚪',
+				emoji: 'door',
 				isStatic: true,
 				evolve: new Evolve(false, '', 2),
 				devolve: new Devolve(false, ''),
@@ -197,26 +200,26 @@
 			},
 			gameProps: {
 				map: new EditableMap(
-					new Map<number, string>([
-						[0, '🐒'],
-						[2, '🚪'],
-						[6, '🧱'],
-						[10, '🧱'],
-						[12, '🗝️'],
-						[14, '🧱'],
-						[15, '🍌'],
+					new Map<string, string>([
+						['155_0', 'monkey'],
+						['155_2', 'door'],
+						['155_6', 'brick'],
+						['155_10', 'brick'],
+						['155_12', 'key'],
+						['155_14', 'brick'],
+						['155_15', 'banana'],
 					])
 				),
-				statics: new Set<string>(['🧱', '🚪', '🍌']),
+				statics: new Set<string>(['brick', 'door', 'banana']),
 				equippables: new Map<number, Equippable>([
-					[69, new Equippable('🗝️', 1)],
+					[69, new Equippable('key', 1)],
 				]),
 				// @ts-expect-error
 				interactables: new Map<number, TInteractable>([
 					[
 						'sideEffects',
 						new TInteractable(
-							'🚪',
+							'door',
 							[],
 							1,
 							1,
@@ -235,39 +238,39 @@
 		{
 			header: 'Interactable',
 			description:
-				"Look! A new side effect has been added. It says [ 🗝️ ] and [ -1 ]. Let's see if we can open that door now 🧐.",
+				"Look! A new side effect has been added. It says [ key ] and [ -1 ]. Let's see if we can open that door now 🧐.",
 			veilHeight: 164,
 			props: {
 				id: 'sideEffects',
-				emoji: '🚪',
+				emoji: 'door',
 				isStatic: true,
 				evolve: new Evolve(false, '', 2),
 				devolve: new Devolve(false, ''),
 				hp: 1,
-				pseudoSideEffects: [['🗝️', -1]],
+				pseudoSideEffects: [['key', -1]],
 			},
 			gameProps: {
 				map: new EditableMap(
-					new Map<number, string>([
-						[0, '🐒'],
-						[2, '🚪'],
-						[6, '🧱'],
-						[10, '🧱'],
-						[12, '🗝️'],
-						[14, '🧱'],
-						[15, '🍌'],
+					new Map<string, string>([
+						['155_0', 'monkey'],
+						['155_2', 'door'],
+						['155_6', 'brick'],
+						['155_10', 'brick'],
+						['155_12', 'key'],
+						['155_14', 'brick'],
+						['155_15', 'banana'],
 					])
 				),
-				statics: new Set<string>(['🧱', '🚪', '🍌']),
+				statics: new Set<string>(['brick', 'door', 'banana']),
 				equippables: new Map<number, Equippable>([
-					[69, new Equippable('🗝️', 1)],
+					[69, new Equippable('key', 1)],
 				]),
 				// @ts-expect-error
 				interactables: new Map<number, TInteractable>([
 					[
 						'sideEffects',
 						new TInteractable(
-							'🚪',
+							'door',
 							[],
 							1,
 							1,
@@ -294,7 +297,7 @@
 			props: {
 				id: 'sequence',
 				sequence: [{ type: 'completeLevel' }],
-				emoji: '🍌',
+				emoji: 'banana',
 				isStatic: true,
 				sideEffects: [['any', -1]],
 				evolve: new Evolve(false, '', 2),
@@ -303,26 +306,26 @@
 			},
 			gameProps: {
 				map: new EditableMap(
-					new Map<number, string>([
-						[0, '🐒'],
-						[2, '🚪'],
-						[6, '🧱'],
-						[10, '🧱'],
-						[12, '🗝️'],
-						[14, '🧱'],
-						[15, '🍌'],
+					new Map<string, string>([
+						['155_0', 'monkey'],
+						['155_2', 'door'],
+						['155_6', 'brick'],
+						['155_10', 'brick'],
+						['155_12', 'key'],
+						['155_14', 'brick'],
+						['155_15', 'banana'],
 					])
 				),
-				statics: new Set<string>(['🧱', '🚪', '🍌']),
+				statics: new Set<string>(['brick', 'door', 'banana']),
 				equippables: new Map<number, Equippable>([
-					[69, new Equippable('🗝️', 1)],
+					[69, new Equippable('key', 1)],
 				]),
 				// @ts-expect-error
 				interactables: new Map<number, TInteractable>([
 					[
 						'sequence',
 						new TInteractable(
-							'🍌',
+							'banana',
 							// @ts-expect-error
 							[{ type: 'completeLevel' }],
 							1,
@@ -336,7 +339,7 @@
 					[
 						'sideEffects',
 						new TInteractable(
-							'🚪',
+							'door',
 							[],
 							1,
 							1,
