@@ -25,8 +25,8 @@
 		gameProps: {
 			map: new EditableMap(
 				new Map<string, string>([
-					['155_5', 'cloud'],
-					['155_6', 'snowflake'],
+					['0_5', 'cloud'],
+					['0_6', 'snowflake'],
 				]),
 				-2
 			),

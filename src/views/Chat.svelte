@@ -5,6 +5,7 @@
 	import { dialogueTree as dt } from '$src/store';
 	const dispatch = createEventDispatcher();
 
+	export let isTutorial = false;
 	export let character = '🐸';
 	export let dialogueID: string;
 	export let dialogueTree = new Map<string, Array<string | Choice>>();
@@ -68,7 +69,7 @@
 		choices = choices;
 	}
 
-	// TODO: test the component it's giving error when dialog is finished
+	// TODO: Dialogue should be coupled with Interactables
 </script>
 
 <svelte:window
@@ -83,11 +84,15 @@
 		if (chatIndex == currentDialogue.length) {
 			const children = choicesForm.children;
 			if (e.code == 'Space') {
+				if (children.length == 0) {
+					dispatch('end');
+					return;
+				}
 				children[choiceIndex]?.click();
 				return;
 			}
 
-			if (e.code.includes('Arrow')) {
+			if (e.code.includes('Arrow') && children.length != 0) {
 				if (e.code == 'ArrowRight') {
 					choiceIndex++;
 					if (choiceIndex == children.length) {
@@ -127,21 +132,25 @@
 />
 
 <div
-	style="background-color: rgba(0, 0, 0.5, 0.5);"
-	class="absolute z-50 h-[620px] w-full 2xl:h-[716px]"
+	style="background-color: rgba(0, 0, 0.5, 0.8);"
+	class="absolute z-50 flex flex-col items-start justify-start {isTutorial
+		? 'h-[204px] w-[204px] 2xl:h-[236px] 2xl:w-[236px]'
+		: 'h-[620px] w-[620px] 2xl:h-[716px] 2xl:w-[716px]'} w-full"
 	transition:scale|local
 >
-	<h1 class="p-4 text-4xl">{character}</h1>
+	<h1 class="p-4 text-2xl"><i class="twa twa-{character}" /></h1>
 	<ul>
 		{#each texts as text, i}
 			{#if i < chatIndex && !animating}
 				<li
-					class="chat {answerIndexes.includes(i) ? 'chat-end' : 'chat-start'}"
+					class="rounded-xl bg-neutral p-2 text-lg text-neutral-content {answerIndexes.includes(
+						i
+					)
+						? 'mr-2 self-end'
+						: 'ml-2 self-start'}"
 					transition:fly|local={{ x: -100 }}
 				>
-					<span class="chat-bubble">
-						{text}
-					</span>
+					{text}
 				</li>
 			{/if}
 		{/each}
@@ -166,13 +175,3 @@
 		</form>
 	</ul>
 </div>
-
-<style>
-	.chat span {
-		border-bottom-left-radius: 12px !important;
-	}
-
-	.chat span::before {
-		display: none;
-	}
-</style>

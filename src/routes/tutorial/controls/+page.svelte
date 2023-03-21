@@ -1,24 +1,62 @@
 <script lang="ts">
-	import { Choice, EditableMap, Equippable } from '$src/types';
+	import { dialogueTree } from '$src/store';
+	import {
+		Choice,
+		Devolve,
+		EditableMap,
+		Equippable,
+		Evolve,
+		Interactable,
+	} from '$src/types';
 	import Game from '$src/views/Game.svelte';
+	import { onDestroy } from 'svelte';
+
+	// TODO: make a demo for itch.io
+
+	// hello fellow itch.io wanderer,
+	// what brings you here?
+	//
+	// in fact this is a game made with emojistan's editor!
+	$dialogueTree.set('dog', ['woof']);
 
 	const gameProps = {
 		map: new EditableMap(
 			new Map<string, string>([
-				['155_5', 'woman-walking'],
-				['155_6', 'dog'],
-				['155_11', 'bone'],
-			]),
-			-2
+				['0_5', 'woman-walking'],
+				['0_6', 'dog'],
+				['0_11', 'bone'],
+			])
 		),
-		// dt: new Map<string, Array<string | Choice>>([
-		//   ["dog", ]
-		//   ["human", ]
-		// ]),
-		equippables: new Map<number, Equippable>([[1, new Equippable('🦴', 1)]]),
+		interactables: new Map<number, Interactable>([
+			[
+				0,
+				new Interactable(
+					'dog',
+					[],
+					1,
+					1,
+					[['any', 1]],
+					false,
+					new Evolve(false, '', 0),
+					new Devolve(false, ''),
+					'dog'
+				),
+			],
+		]),
+		dt: new Map<string, Array<string | Choice>>([
+			['dog', ['woof']],
+			['woman-walking', ['lololo']],
+		]),
+		equippables: new Map<number, Equippable>([[1, new Equippable('bone', 1)]]),
 		mapClass: 'simulation',
 		SIZE: 4,
 	};
+
+	console.log($dialogueTree);
+
+	onDestroy(() => {
+		$dialogueTree.delete('dog');
+	});
 </script>
 
 <div

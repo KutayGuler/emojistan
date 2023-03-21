@@ -238,7 +238,7 @@
 				<div
 					class="relative box-border flex flex-row items-center justify-center"
 				>
-					<aside class="aside overflow-y-auto">
+					<aside class="aside overflow-y-auto overflow-x-visible">
 						{#if viewKey == 'editor'}
 							<div class="flex flex-col">
 								<button
@@ -374,7 +374,7 @@
 									</button>
 								</div>
 
-								<label class="label pt-8">
+								<!-- <label class="label pt-8">
 									<span
 										class="label-text text-xs text-neutral-content 2xl:text-base"
 										>World Map
@@ -385,7 +385,7 @@
 										<button
 											on:click={() => (sectionIndex = i)}
 											title="Section #{i}"
-											class="h-4 w-4 rounded"
+											class="h-4 w-4 rounded border border-black"
 											style:background={$map.dbg}
 										>
 											{#if i == sectionIndex}
@@ -393,8 +393,8 @@
 											{/if}
 										</button>
 									{/each}
-								</div>
-								<label class="label pt-8">
+								</div> -->
+								<!-- <label class="label pt-8">
 									<span
 										class="label-text text-xs text-neutral-content 2xl:text-base"
 										>Starting Section
@@ -409,7 +409,7 @@
 									{#each { length: 144 } as _, value}
 										<option {value}>{value}</option>
 									{/each}
-								</select>
+								</select> -->
 							</div>
 						{:else}
 							<button
@@ -450,7 +450,7 @@
 											>
 												{CROSS}
 											</button>
-											{item}
+											<i class="twa twa-{item}"></i>
 										</div>
 									{/each}
 								</div>

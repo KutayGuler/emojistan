@@ -30,8 +30,8 @@
 		gameProps: {
 			map: new EditableMap(
 				new Map<string, string>([
-					['155_5', 'monkey'],
-					['155_6', 'banana'],
+					['0_5', 'monkey'],
+					['0_6', 'banana'],
 				]),
 				155
 			),
@@ -65,8 +65,8 @@
 		gameProps: {
 			map: new EditableMap(
 				new Map<string, string>([
-					['155_5', 'monkey'],
-					['155_6', 'test-tube'],
+					['0_5', 'monkey'],
+					['0_6', 'test-tube'],
 				]),
 				-2
 			),

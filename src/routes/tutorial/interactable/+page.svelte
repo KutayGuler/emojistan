@@ -56,12 +56,12 @@
 			gameProps: {
 				map: new EditableMap(
 					new Map<string, string>([
-						['155_5', 'baby'],
-						['155_3', 'brick'],
-						['155_6', 'brick'],
-						['155_9', 'brick'],
-						['155_12', 'brick'],
-						['155_7', 'baby'],
+						['0_5', 'baby'],
+						['0_3', 'brick'],
+						['0_6', 'brick'],
+						['0_9', 'brick'],
+						['0_12', 'brick'],
+						['0_7', 'baby'],
 					]),
 					-2
 				),
@@ -103,11 +103,11 @@
 			gameProps: {
 				map: new EditableMap(
 					new Map<string, string>([
-						['155_0', 'baby'],
-						['155_10', 'baby-bottle'],
-						['155_11', 'baby-bottle'],
-						['155_14', 'baby-bottle'],
-						['155_15', 'baby-bottle'],
+						['0_0', 'baby'],
+						['0_10', 'baby-bottle'],
+						['0_11', 'baby-bottle'],
+						['0_14', 'baby-bottle'],
+						['0_15', 'baby-bottle'],
 					])
 				),
 				statics: new Set<string>(['baby-bottle']),
@@ -151,11 +151,11 @@
 			gameProps: {
 				map: new EditableMap(
 					new Map<string, string>([
-						['155_0', 'monkey'],
-						['155_10', 'test-tube'],
-						['155_11', 'test-tube'],
-						['155_14', 'test-tube'],
-						['155_15', 'test-tube'],
+						['0_0', 'monkey'],
+						['0_10', 'test-tube'],
+						['0_11', 'test-tube'],
+						['0_14', 'test-tube'],
+						['0_15', 'test-tube'],
 					])
 				),
 				statics: new Set<string>(['test-tube']),
@@ -182,7 +182,6 @@
 				SIZE: 4,
 			},
 		},
-		// TODO: Prevent tutorial from changing section (if size == 4) dont
 		// TODO: Better definiton
 		// TODO: turn description text into html
 		{
@@ -201,13 +200,13 @@
 			gameProps: {
 				map: new EditableMap(
 					new Map<string, string>([
-						['155_0', 'monkey'],
-						['155_2', 'door'],
-						['155_6', 'brick'],
-						['155_10', 'brick'],
-						['155_12', 'key'],
-						['155_14', 'brick'],
-						['155_15', 'banana'],
+						['0_0', 'monkey'],
+						['0_2', 'door'],
+						['0_6', 'brick'],
+						['0_10', 'brick'],
+						['0_12', 'key'],
+						['0_14', 'brick'],
+						['0_15', 'banana'],
 					])
 				),
 				statics: new Set<string>(['brick', 'door', 'banana']),
@@ -252,13 +251,13 @@
 			gameProps: {
 				map: new EditableMap(
 					new Map<string, string>([
-						['155_0', 'monkey'],
-						['155_2', 'door'],
-						['155_6', 'brick'],
-						['155_10', 'brick'],
-						['155_12', 'key'],
-						['155_14', 'brick'],
-						['155_15', 'banana'],
+						['0_0', 'monkey'],
+						['0_2', 'door'],
+						['0_6', 'brick'],
+						['0_10', 'brick'],
+						['0_12', 'key'],
+						['0_14', 'brick'],
+						['0_15', 'banana'],
 					])
 				),
 				statics: new Set<string>(['brick', 'door', 'banana']),
@@ -307,13 +306,13 @@
 			gameProps: {
 				map: new EditableMap(
 					new Map<string, string>([
-						['155_0', 'monkey'],
-						['155_2', 'door'],
-						['155_6', 'brick'],
-						['155_10', 'brick'],
-						['155_12', 'key'],
-						['155_14', 'brick'],
-						['155_15', 'banana'],
+						['0_0', 'monkey'],
+						['0_2', 'door'],
+						['0_6', 'brick'],
+						['0_10', 'brick'],
+						['0_12', 'key'],
+						['0_14', 'brick'],
+						['0_15', 'banana'],
 					])
 				),
 				statics: new Set<string>(['brick', 'door', 'banana']),

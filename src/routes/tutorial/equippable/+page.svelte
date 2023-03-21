@@ -37,13 +37,13 @@
 		gameProps: {
 			map: new EditableMap(
 				new Map<string, string>([
-					['155_0', 'monkey'],
-					['155_2', 'door'],
-					['155_6', 'brick'],
-					['155_10', 'brick'],
-					['155_12', 'key'],
-					['155_14', 'brick'],
-					['155_15', 'banana'],
+					['0_0', 'monkey'],
+					['0_2', 'door'],
+					['0_6', 'brick'],
+					['0_10', 'brick'],
+					['0_12', 'key'],
+					['0_14', 'brick'],
+					['0_15', 'banana'],
 				]),
 				-2
 			),

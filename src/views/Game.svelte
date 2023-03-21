@@ -93,6 +93,8 @@
 
 	const wasd = ['KeyW', 'KeyA', 'KeyS', 'KeyD'];
 
+	// FIXME: If array length is 2 push collision doesn't work properly
+
 	const wasdToArrow: { [key in Wasd]: ArrowKey } = {
 		KeyW: 'ArrowUp',
 		KeyA: 'ArrowLeft',
@@ -111,48 +113,59 @@
 		items = items;
 	}
 
-	function calcOperation(code: ArrowKey, index: number) {
-		if (code == 'ArrowLeft' && index % SIZE == 0) {
-			if (
-				currentSection % SIZE != 0 &&
-				!items.has(currentSection - 1 + '_' + (ac + SIZE - 1))
-			) {
-				changeSection(SIZE - 1, -1);
-			}
-			return 0;
-		}
-		if (code == 'ArrowUp' && index < SIZE) {
-			if (
-				currentSection >= SIZE &&
-				!items.has(currentSection - SIZE + '_' + (ac + SIZE * (SIZE - 1)))
-			) {
-				changeSection(SIZE * (SIZE - 1), -SIZE);
-			}
-			return 0;
-		}
-		if (code == 'ArrowRight' && (index + 1) % SIZE == 0) {
-			if (
-				(currentSection + 1) % SIZE != 0 &&
-				!items.has(currentSection + 1 + '_' + (ac - SIZE + 1))
-			) {
-				changeSection(-(SIZE - 1), 1);
-			}
-			return 0;
-		}
-		if (code == 'ArrowDown' && index >= SIZE * SIZE - SIZE) {
-			if (
-				currentSection < SIZE * SIZE - SIZE &&
-				!items.has(currentSection + SIZE + '_' + (ac - SIZE * (SIZE - 1)))
-			) {
-				changeSection(-(SIZE * (SIZE - 1)), SIZE);
-			}
-			return 0;
-		}
-		return (
-			(['ArrowUp', 'ArrowDown'].includes(code) ? SIZE : 1) *
-			(['ArrowRight', 'ArrowDown'].includes(code) ? 1 : -1)
-		);
-	}
+	const calcOperation = true
+		? (code: ArrowKey, index: number) => {
+				if (code == 'ArrowLeft' && index % SIZE == 0) return 0;
+				if (code == 'ArrowUp' && index < SIZE) return 0;
+				if (code == 'ArrowRight' && (index + 1) % SIZE == 0) return 0;
+				if (code == 'ArrowDown' && index >= SIZE * SIZE - SIZE) return 0;
+				return (
+					(['ArrowUp', 'ArrowDown'].includes(code) ? SIZE : 1) *
+					(['ArrowRight', 'ArrowDown'].includes(code) ? 1 : -1)
+				);
+		  }
+		: (code: ArrowKey, index: number) => {
+				if (code == 'ArrowLeft' && index % SIZE == 0) {
+					if (
+						currentSection % SIZE != 0 &&
+						!items.has(currentSection - 1 + '_' + (ac + SIZE - 1))
+					) {
+						changeSection(SIZE - 1, -1);
+					}
+					return 0;
+				}
+				if (code == 'ArrowUp' && index < SIZE) {
+					if (
+						currentSection >= SIZE &&
+						!items.has(currentSection - SIZE + '_' + (ac + SIZE * (SIZE - 1)))
+					) {
+						changeSection(SIZE * (SIZE - 1), -SIZE);
+					}
+					return 0;
+				}
+				if (code == 'ArrowRight' && (index + 1) % SIZE == 0) {
+					if (
+						(currentSection + 1) % SIZE != 0 &&
+						!items.has(currentSection + 1 + '_' + (ac - SIZE + 1))
+					) {
+						changeSection(-(SIZE - 1), 1);
+					}
+					return 0;
+				}
+				if (code == 'ArrowDown' && index >= SIZE * SIZE - SIZE) {
+					if (
+						currentSection < SIZE * SIZE - SIZE &&
+						!items.has(currentSection + SIZE + '_' + (ac - SIZE * (SIZE - 1)))
+					) {
+						changeSection(-(SIZE * (SIZE - 1)), SIZE);
+					}
+					return 0;
+				}
+				return (
+					(['ArrowUp', 'ArrowDown'].includes(code) ? SIZE : 1) *
+					(['ArrowRight', 'ArrowDown'].includes(code) ? 1 : -1)
+				);
+		  };
 
 	/**
 	 * function mutates ac if it is equal to "from" parameter
@@ -478,7 +491,6 @@
 				return;
 			}
 			let interactedItem = items.get(currentSection + '_' + ic);
-			console.log(interactedItem);
 
 			if (interactedItem == undefined) return;
 			if (interactedItem instanceof Equippable) {
@@ -572,13 +584,17 @@
 
 			let sideEffect =
 				sideEffects.find(
-					(m) => equippables.get(m[0])?.emoji == equippedItem.emoji
+					([effect, value]) =>
+						equippables.get(effect)?.emoji == equippedItem.emoji
 				) || sideEffects[0];
 
 			if (sideEffect[1] == 0) return;
 			interactedItem.hp.current += sideEffect[1];
 
-			if (equippedItem instanceof Equippable) {
+			if (
+				equippedItem instanceof Equippable &&
+				sideEffect[0] == equippedItem.emoji
+			) {
 				equippedItem.hp -= 1;
 			}
 
@@ -629,6 +645,8 @@
 			_interactables[interactedItem.emoji].executing = false;
 			character = interactedItem.emoji;
 			dialogueID = interactable.dialogueID;
+			console.log($dialogueTree, dialogueID);
+
 			if ($dialogueTree.has(dialogueID)) {
 				chatting = true;
 			}
@@ -750,6 +768,15 @@
 		{/if}
 	{/key}
 	<div class={mapClass} use:noPlayer>
+		{#if chatting}
+			<Chat
+				isTutorial={SIZE == 4}
+				{character}
+				{dialogueID}
+				dialogueTree={dt}
+				on:end={() => (chatting = false)}
+			/>
+		{/if}
 		{#each { length: SIZE * SIZE } as _, i}
 			{@const active = ac == i}
 			{@const item = items.get(currentSection + '_' + i)}
@@ -809,7 +836,7 @@
 						class="relative flex h-10 w-10 flex-col items-center justify-center rounded bg-base-300 p-2 2xl:h-12 2xl:w-12"
 					>
 						{#if item}
-							<div>{item.emoji || ''}</div>
+							<i class="twa twa-{item.emoji || ''}" />
 							<div class="absolute -top-0.5 right-0.5 text-sm">
 								{item.hp > 1 ? item.hp : ''}
 							</div>
@@ -819,14 +846,6 @@
 			</div>
 		{/if}
 	{/key}
-	{#if chatting}
-		<Chat
-			{character}
-			{dialogueID}
-			dialogueTree={dt}
-			on:end={() => (chatting = false)}
-		/>
-	{/if}
 </div>
 
 <style>

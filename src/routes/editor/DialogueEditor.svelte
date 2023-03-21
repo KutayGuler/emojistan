@@ -2,21 +2,16 @@
 	import { CROSS } from '$src/constants';
 	import { Choice } from '$src/types';
 	import { notifications } from '../notifications';
-	import { dialogueTree } from '$src/store';
+	import { dialogueTree, interactables } from '$src/store';
 
 	let currentText = '';
 	let currentIndex = 0;
 	let currentDialogue: Array<string | Choice> = [];
 	let mainBranches: Array<string> = [];
-	let siblingBranches: Array<string> = [];
 	let currentBranch: string;
 	let mainBranch: string;
-	let siblingBranch: string;
 
 	$: mainBranches = [...$dialogueTree.keys()].filter((key) => key.length == 1);
-	$: siblingBranches = [...$dialogueTree.keys()].filter(
-		(key) => key != currentBranch && key[0] == currentBranch?.split('_')[0]
-	);
 	$: currentDialogue = $dialogueTree.get(currentBranch) || [];
 
 	function addBranch() {
@@ -47,7 +42,6 @@
 
 	function branchChanged() {
 		currentIndex = 0;
-		siblingBranch = siblingBranches[0];
 		currentBranch = mainBranch;
 	}
 
@@ -112,8 +106,6 @@
 		}
 		$dialogueTree = $dialogueTree;
 	}
-
-	// TODO: Guide
 </script>
 
 <svelte:window
@@ -192,65 +184,50 @@
 	</aside>
 
 	<div class="w-[972px] overflow-y-auto p-4 2xl:w-[1068px]">
-		<div class="flex flex-row items-end gap-4">
-			<div class="flex-grow">
-				<label for="main-branch" class="label">
-					<span class="label-text"> Main Branches </span>
-				</label>
-				<select
-					class="select-bordered select w-full"
-					bind:value={mainBranch}
-					on:change={branchChanged}
-				>
-					{#each mainBranches as key}
-						<option value={key}>{key}</option>
-					{:else}
-						<option value="" disabled>No branch</option>
-					{/each}
-				</select>
-			</div>
-			<div class="flex-grow">
-				<label for="sub-branch" class="label">
-					<span class="label-text"> Sibling Branches </span>
-				</label>
-				<select
-					class="select-bordered select w-full"
-					bind:value={siblingBranch}
-				>
-					{#each siblingBranches as key}
-						<option value={key}>{key}</option>
-					{:else}
-						<option value="" disabled>No siblings</option>
-					{/each}
-				</select>
-			</div>
-			<button
-				on:click={() => {
-					currentBranch = siblingBranch;
-					siblingBranch =
-						siblingBranches.find((b) => b != siblingBranch) || siblingBranch;
-				}}
-				disabled={!siblingBranch}
-				class="btn">Switch to {siblingBranch || ''}</button
+		<div class="flex-grow">
+			<label for="main-branch" class="label">
+				<span class="label-text"> Interactables </span>
+			</label>
+			<select
+				class="select-bordered select w-full"
+				bind:value={mainBranch}
+				on:change={branchChanged}
 			>
+				{#each [...$interactables] as [key, { emoji }]}
+					<option value={emoji}>{emoji}</option>
+				{/each}
+			</select>
+		</div>
+		<div class="flex-grow">
+			<label for="main-branch" class="label">
+				<span class="label-text"> Main Branches </span>
+			</label>
+			<select
+				class="select-bordered select w-full"
+				bind:value={mainBranch}
+				on:change={branchChanged}
+			>
+				{#each mainBranches as key}
+					<option value={key}>{key}</option>
+				{:else}
+					<option value="" disabled>No branch</option>
+				{/each}
+			</select>
 		</div>
 		<div class="flex flex-col items-start justify-start gap-2">
 			<h3 class="py-4 text-2xl">{currentBranch || ''}</h3>
 			{#each [...$dialogueTree] as [key, dialogue]}
 				{#if key == currentBranch}
 					{#each dialogue as text, i}
-						{@const isString = typeof text == 'string'}
 						<div class="flex w-full flex-row justify-between gap-1">
-							<button
-								on:click={() => {
-									currentBranch = key;
-									currentIndex = i;
-								}}
+							<div
+								contenteditable="true"
 								class="flex-grow rounded bg-base-200 p-1 pl-2 text-start"
+								bind:textContent={dialogue[i]}
 							>
 								{#if key == currentBranch && currentIndex == i}📍&nbsp;{/if}
-								{#if isString}{text}{:else}{text.text} -> {text.to}{/if}
-							</button>
+								{text}
+							</div>
 							<button class="self-start" on:click={() => remove(key, i)}
 								>{CROSS}</button
 							>
