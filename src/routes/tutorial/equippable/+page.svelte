@@ -47,7 +47,6 @@
 				]),
 				-2
 			),
-			statics: new Set<string>(['brick', 'door', 'banana']),
 			equippables: new Map<number, TEquippable>([
 				[-69, new TEquippable('key', 1)],
 			]),

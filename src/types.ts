@@ -81,6 +81,7 @@ export interface _Interactable {
 	sequence: Array<SequenceItem>;
 	points: number;
 	hp: number;
+	isControllable: boolean;
 	sideEffects: Array<[string, number]>;
 	evolve: Evolve;
 	devolve: Devolve;
@@ -189,7 +190,7 @@ export interface Interactable {
 	points: number;
 	hp: number;
 	sideEffects: Array<[number | 'any', number]>;
-	isStatic: boolean;
+	isControllable: boolean;
 	evolve: Evolve;
 	devolve: Devolve;
 	dialogueID: string;
@@ -202,7 +203,7 @@ export class Interactable {
 		hp: number,
 		points: number,
 		sideEffects: Array<[number | 'any', number]>,
-		isStatic: boolean,
+		isControllable: boolean,
 		evolve: Evolve,
 		devolve: Devolve,
 		dialogueID = ''
@@ -212,7 +213,7 @@ export class Interactable {
 		this.hp = hp;
 		this.points = points;
 		this.sideEffects = sideEffects;
-		this.isStatic = isStatic;
+		this.isControllable = isControllable;
 		this.evolve = evolve;
 		this.devolve = devolve;
 		this.dialogueID = dialogueID;
@@ -220,14 +221,16 @@ export class Interactable {
 }
 
 export interface Choice {
-	to: string;
+	label: string;
 	text: string;
+	next: string;
 }
 
 export class Choice {
-	constructor(to: string, text: string) {
-		this.to = to;
+	constructor(label: string, text: string, next: string) {
+		this.label = label;
 		this.text = text;
+		this.next = next;
 	}
 }
 

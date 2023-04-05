@@ -48,7 +48,7 @@
 			props: {
 				id: 'static',
 				emoji: 'brick',
-				isStatic: true,
+				isControllable: false,
 				evolve: new Evolve(false, '', 2),
 				devolve: new Devolve(false, ''),
 				hp: 1,
@@ -65,7 +65,6 @@
 					]),
 					-2
 				),
-				statics: new Set<string>(['brick']),
 				// @ts-expect-error
 				interactables: new Map<number, TInteractable>([
 					[
@@ -95,7 +94,7 @@
 			props: {
 				id: 'evolution',
 				emoji: 'baby',
-				isStatic: false,
+				isControllable: true,
 				evolve: new Evolve(true, 'man-walking', 5),
 				devolve: new Devolve(false, ''),
 				hp: 1,
@@ -110,7 +109,6 @@
 						['0_15', 'baby-bottle'],
 					])
 				),
-				statics: new Set<string>(['baby-bottle']),
 				consumables: new Map<number, Consumable>([
 					[-1, { emoji: 'baby-bottle', hp: 1, mutateConsumerTo: '' }],
 				]),
@@ -158,7 +156,6 @@
 						['0_15', 'test-tube'],
 					])
 				),
-				statics: new Set<string>(['test-tube']),
 				consumables: new Map<number, Consumable>([
 					[-2, { emoji: 'test-tube', hp: -1, mutateConsumerTo: '' }],
 				]),
@@ -182,17 +179,15 @@
 				SIZE: 4,
 			},
 		},
-		// TODO: Better definiton
-		// TODO: turn description text into html
 		{
 			header: 'Interactable',
 			description:
-				'Side Effects need two questions: "What is going to have side effects?" and "How much will it increase/decrease the HP?" In this example, the answers are "any" and "0" consecutively. Meaning, nothing can destroy that door, even that giant key.',
+				'Side effects are basically Equippables that affect the health of the Interactable. Side Effects need two questions: "What" and "How much?" In this example, the answers are "any" and "0" consecutively. Meaning, nothing can destroy that door, even that giant key.',
 			veilHeight: 164,
 			props: {
 				id: 'sideEffects',
 				emoji: 'door',
-				isStatic: true,
+				isControllable: false,
 				evolve: new Evolve(false, '', 2),
 				devolve: new Devolve(false, ''),
 				hp: 1,
@@ -209,7 +204,6 @@
 						['0_15', 'banana'],
 					])
 				),
-				statics: new Set<string>(['brick', 'door', 'banana']),
 				equippables: new Map<number, Equippable>([
 					[69, new Equippable('key', 1)],
 				]),
@@ -242,7 +236,7 @@
 			props: {
 				id: 'sideEffects',
 				emoji: 'door',
-				isStatic: true,
+				isControllable: false,
 				evolve: new Evolve(false, '', 2),
 				devolve: new Devolve(false, ''),
 				hp: 1,
@@ -260,7 +254,6 @@
 						['0_15', 'banana'],
 					])
 				),
-				statics: new Set<string>(['brick', 'door', 'banana']),
 				equippables: new Map<number, Equippable>([
 					[69, new Equippable('key', 1)],
 				]),
@@ -297,7 +290,7 @@
 				id: 'sequence',
 				sequence: [{ type: 'completeLevel' }],
 				emoji: 'banana',
-				isStatic: true,
+				isControllable: false,
 				sideEffects: [['any', -1]],
 				evolve: new Evolve(false, '', 2),
 				devolve: new Devolve(false, ''),
@@ -315,7 +308,6 @@
 						['0_15', 'banana'],
 					])
 				),
-				statics: new Set<string>(['brick', 'door', 'banana']),
 				equippables: new Map<number, Equippable>([
 					[69, new Equippable('key', 1)],
 				]),

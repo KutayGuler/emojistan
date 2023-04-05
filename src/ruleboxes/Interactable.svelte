@@ -117,7 +117,7 @@
 	export let points = 1;
 	export let sideEffects: Array<[number | 'any', number]> = [['any', 0]];
 	export let pseudoSideEffects: Array<[string, number]> = [];
-	export let isStatic = false;
+	export let isControllable = false;
 	export let evolve = new Evolve(false, '', 2);
 	export let devolve = new Devolve(false, '');
 	export let dialogueID = '';
@@ -137,7 +137,7 @@
 				hp,
 				points,
 				sideEffects,
-				isStatic,
+				isControllable,
 				evolve,
 				devolve,
 				dialogueID,
@@ -154,7 +154,7 @@
 				hp,
 				points,
 				sideEffects,
-				isStatic,
+				isControllable,
 				evolve,
 				devolve,
 				dialogueID
@@ -386,11 +386,11 @@
 				🧬
 			</button>
 			<button
-				class:enabled={isStatic}
+				class:enabled={isControllable}
 				class="opacity-50 hover:cursor-pointer"
-				on:click={() => (isStatic = !isStatic)}
+				on:click={() => (isControllable = !isControllable)}
 			>
-				🗿
+			🕹️
 			</button>
 			<button
 				class:enabled={evolve.enabled}

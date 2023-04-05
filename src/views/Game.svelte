@@ -39,7 +39,6 @@
 	export let equippables = new Map<number, Equippable>();
 	export let interactables = new Map<number, Interactable>();
 	export let consumables = new Map<number, Consumable>();
-	export let statics = new Set<string>();
 	export let mapClass = DEFAULT_MAP_CLASS;
 	export let SIZE = DEFAULT_SIDE_LENGTH;
 	export let showHP = true;
@@ -92,8 +91,6 @@
 	};
 
 	const wasd = ['KeyW', 'KeyA', 'KeyS', 'KeyD'];
-
-	// FIXME: If array length is 2 push collision doesn't work properly
 
 	const wasdToArrow: { [key in Wasd]: ArrowKey } = {
 		KeyW: 'ArrowUp',
@@ -252,14 +249,12 @@
 			}
 		}
 
-		console.log(items);
-
 		for (let [id, { emoji, hp }] of items) {
 			if (typeof hp == 'number') continue; // consumable and equippables' hp types are numbers
 			if (
 				ac == -2 &&
 				+id.split('_')[0] == currentSection &&
-				!statics.has(emoji)
+				_interactables[emoji]?.isControllable
 			) {
 				ac = +id.split('_')[1];
 				ic = ac + 1;
@@ -382,6 +377,8 @@
 			);
 		}
 
+		console.log(collisionTypeSequence);
+
 		let finalIndex = ac + operation * (i - 1);
 		let code = '';
 
@@ -412,10 +409,17 @@
 				transferItem(from, to);
 			}
 		} else {
-			collisionTypeSequence = collisionTypeSequence.slice(
-				0,
-				collisionTypeSequence.findIndex((str) => str != 'push') + 1
-			);
+			if (collisionTypeSequence.includes('bump')) {
+				collisionTypeSequence = collisionTypeSequence.slice(
+					0,
+					collisionTypeSequence.findIndex((str) => str == 'bump')
+				);
+			} else {
+				collisionTypeSequence = collisionTypeSequence.slice(
+					0,
+					collisionTypeSequence.findIndex((str) => str != 'push') + 1
+				);
+			}
 
 			if (
 				collisionTypeSequence.length == 0 ||
@@ -448,7 +452,8 @@
 			return;
 		if (e.code.includes('Arrow')) {
 			let operation = calcOperation(e.code as ArrowKey, ac);
-			if (!player || statics.has(player.emoji) || operation == 0) return;
+			// || statics.has(player.emoji) // TODO: check how it affects logic
+			if (!player || operation == 0 || !_interactables[player.emoji]?.isControllable) return;
 			let facingItem = items.get(currentSection + '_' + (ac + operation));
 
 			if (!facingItem) {
@@ -529,11 +534,8 @@
 
 						for (let [id, { emoji, hp }] of items) {
 							if (typeof hp == 'number') continue; // consumables and equippables' hp types are numbers
-							if (
-								hp.current > 0 &&
-								!statics.has(emoji) &&
-								!_equippables[emoji]
-							) {
+							// !statics.has(emoji) && // TODO: Check how it affects logic
+							if (hp.current > 0 && !_equippables[emoji] && _interactables[emoji]?.isControllable) {
 								player = items.get(id) as Item;
 								ac = +id.split('_')[1];
 								progress = tweened(calcPlayerHpPercentage(), {
@@ -679,7 +681,8 @@
 		let closestID = ac;
 
 		let _items = Array.from(items).filter(
-			([id, { emoji }]) => !statics.has(emoji) && !_equippables[emoji]
+			// !statics.has(emoji) && TODO: check how it affects the logic
+			([id, { emoji }]) => !_equippables[emoji]
 		);
 
 		if (e.code == 'KeyE') {

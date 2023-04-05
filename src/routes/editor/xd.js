@@ -1461,7 +1461,6 @@ export const xd = {
 		'man-dancing_',
 		'woman-dancing_',
 		'person-in-suit-levitating_',
-		// TODO: skins are missing in css file
 		'people-with-bunny-ears',
 		'men-with-bunny-ears',
 		'women-with-bunny-ears',
@@ -1502,7 +1501,6 @@ export const xd = {
 		'person-cartwheeling_',
 		'man-cartwheeling_',
 		'woman-cartwheeling_',
-		// TODO: skins are missing
 		'people-wrestling',
 		'men-wrestling',
 		'women-wrestling',
@@ -1532,7 +1530,6 @@ export const xd = {
 		'couple-with-heart-woman-man',
 		'couple-with-heart-man-man',
 		'couple-with-heart-woman-woman',
-		// TODO: skins missing
 		'family',
 		'family-man-woman-boy',
 		'family-man-woman-girl',

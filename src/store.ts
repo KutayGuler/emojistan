@@ -293,9 +293,6 @@ export const formattedEmoji = derived(
 export const saves = createSaves();
 export const map = createEditableMap();
 
-// SETS
-export const statics = createSetStore('statics');
-
 // MAPS
 export const pushers = createMapStore<number, Pusher>('pushers');
 export const mergers = createMapStore<number, Merger>('mergers');

@@ -2,8 +2,6 @@
 	// SVELTEKIT
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { flip } from 'svelte/animate';
-	import { scale } from 'svelte/transition';
 	import { xd } from './xd';
 
 	// VIEWS
@@ -23,7 +21,6 @@
 		interactables,
 		equippables,
 		consumables,
-		statics,
 		dialogueTree,
 		showLoading,
 	} from '../../store';
@@ -43,17 +40,17 @@
 	import DialogueEditor from './DialogueEditor.svelte';
 	import type { SkinTone } from '$src/types';
 
-	function getStatics() {
-		let _statics = new Set<string>($statics);
-		$interactables.forEach(({ emoji, isStatic }) => {
-			isStatic && _statics.add(emoji);
-		});
-		for (let [id, { emoji }] of [...$equippables, ...$consumables]) {
-			_statics.add(emoji);
-		}
+	// function getStatics() {
+	// 	let _statics = new Set<string>($statics);
+	// 	$interactables.forEach(({ emoji, isStatic }) => {
+	// 		isStatic && _statics.add(emoji);
+	// 	});
+	// 	for (let [id, { emoji }] of [...$equippables, ...$consumables]) {
+	// 		_statics.add(emoji);
+	// 	}
 
-		return _statics;
-	}
+	// 	return _statics;
+	// }
 
 	onMount(() => {
 		if ($saves.currentSaveID == '') {
@@ -224,12 +221,9 @@
 				interactables={$interactables}
 				equippables={$equippables}
 				consumables={$consumables}
-				statics={getStatics()}
 				on:noPlayer={() => {
 					test = false;
-					notifications.warning(
-						'No controllable player in the starting section.'
-					);
+					notifications.warning('No controllable player in the map.');
 				}}
 				on:quit={() => {
 					test = false;
@@ -281,7 +275,7 @@
 													<div class="dropdown">
 														<button>{GUIDE}</button>
 														<div
-															class="card dropdown-content card-compact w-64 bg-primary p-2 text-primary-content shadow"
+															class="dropdown-content card card-compact w-64 bg-primary p-2 text-primary-content shadow"
 														>
 															<div class="card-body">
 																<p>
@@ -311,7 +305,7 @@
 													<div class="dropdown">
 														<button>{GUIDE}</button>
 														<div
-															class="card dropdown-content card-compact w-64 bg-primary p-2 text-primary-content shadow"
+															class="dropdown-content card card-compact w-64 bg-primary p-2 text-primary-content shadow"
 														>
 															<div class="card-body">
 																<p>
@@ -438,41 +432,6 @@
 							>
 								{GUIDE}
 							</button>
-							<label class="label">
-								<span
-									class="label-text text-xs text-neutral-content 2xl:text-base"
-									>Statics 🗿
-								</span></label
-							>
-							<button
-								disabled={$currentEmoji == ''}
-								class="btn w-full 2xl:btn-md"
-								on:click={() => statics.add($currentEmoji)}
-							>
-								<i class="twa twa-{$formattedEmoji}" />
-								&nbsp; +
-							</button>
-							<div class="overflow-y-auto">
-								<div
-									class="mt-2 grid w-full grid-flow-row grid-cols-4 justify-center gap-2 overflow-y-auto "
-								>
-									{#each [...$statics] as item (item)}
-										<div
-											class="relative flex items-center justify-center p-4"
-											transition:scale|local={flipParams}
-											animate:flip={flipParams}
-										>
-											<button
-												class="absolute top-0 right-0"
-												on:click={() => statics.remove(item)}
-											>
-												{CROSS}
-											</button>
-											<i class="twa twa-{item}" />
-										</div>
-									{/each}
-								</div>
-							</div>
 						{/if}
 					</aside>
 					{#if viewKey == 'editor'}
@@ -547,8 +506,7 @@
 			<div
 				class="relative flex h-full w-full flex-col items-center justify-center"
 			>
-				<!-- TODO: Add shortcuts  -->
-				<div class="absolute bottom-8 left-8 flex flex-row">
+				<div class="absolute bottom-8 left-8 flex flex-row items-center">
 					<kbd class="kbd kbd-sm mr-2 2xl:kbd-md">Esc</kbd>
 					<p class="2xl:text-md text-sm">untoggle emoji / color</p>
 				</div>

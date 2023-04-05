@@ -101,6 +101,9 @@
 		style="border-color: {rbx.borderColor}"
 		class="absolute top-0 right-0 flex h-6 w-6 cursor-pointer items-center justify-center rounded border-2 bg-white text-center text-xl"
 		on:click={() => {
+			if (rbx.type == 'interactable') {
+				// TODO: warn the player if interactable has dialogue attached
+			}
 			rbxStore.remove(rbx.id);
 
 			switch (rbx.type) {

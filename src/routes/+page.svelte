@@ -15,7 +15,6 @@
 		showLoading,
 	} from '../store';
 	import { rbxStore } from '$lib/stores/store';
-	import { emojis } from './editor/emojis';
 	import { CROSS } from '$src/constants';
 
 	let emojiFreqs = new Map<string, Set<string>>();
@@ -28,23 +27,8 @@
 				saveID,
 				new Set(items.map(([key, val]: [string, string]) => val))
 			);
-			console.log(emojiFreqs);
 		}
 	});
-
-	let emojiArray: string[] = [];
-	// let emojiString = '';
-
-	for (let [key, val] of Object.entries(emojis)) {
-		for (let [_, emoji] of val) {
-			if (emoji.includes(',') || emoji.includes("'")) continue;
-			emojiArray.push(emoji.replaceAll(' ', '-').toLowerCase());
-		}
-	}
-
-	emojiArray = shuffleArray(emojiArray);
-
-	// emojiString = shuffleArray(emojiArray).toString().replaceAll(',', '');
 
 	let showSaves = true;
 
@@ -130,17 +114,7 @@
 </svelte:head>
 
 <main>
-	<!-- <div
-		id="emojis"
-		class="absolute top-0 -4 flex h-full w-full -rotate-6 skew-x-6 scale-125 select-none flex-wrap text-2xl text-opacity-10"
-	> -->
-	<!-- {emojiString} -->
-	<!-- {#each emojiArray as emoji}
-			<i class="twa twa-lg twa-{emoji}" />
-		{/each} -->
-	<!-- </div> -->
 	<div id="emojis" class="absolute top-0 h-full w-full" />
-	<!-- <div class="absolute top-0 h-full w-full bg-black opacity-75" /> -->
 	<!-- <div class="dropdown dropdown-bottom dropdown-end absolute right-4 top-4">
 		<button class="avatar ">
 			<div class="w-12 rounded-full ring ring-neutral-content">
@@ -156,11 +130,11 @@
 			<li><a href="/">Logout</a></li>
 		</ul>
 	</div> -->
-	<!-- <div
-		class="aside prose mt-16 flex h-[806px] w-96 flex-col gap-2 overflow-y-auto bg-neutral"
-	> -->
-	{#if showSaves}
-		<!-- <div class="flex flex-row gap-2">
+	<div
+		class="aside prose mt-16 flex h-[806px] w-96 flex-col gap-2 overflow-y-auto bg-neutral shadow-xl"
+	>
+		{#if showSaves}
+			<div class="flex flex-row gap-2">
 				<button class="btn w-fit" on:click={() => (showSaves = false)}
 					><svg
 						xmlns="http://www.w3.org/2000/svg"
@@ -180,9 +154,9 @@
 				<button on:click={newGamePopup} class="btn-primary btn flex-grow"
 					>NEW GAME</button
 				>
-			</div> -->
-		{#each [...$saves.saves] as [id, name]}
-			<!-- <div
+			</div>
+			{#each [...$saves.saves] as [id, name]}
+				<div
 					class="brutal relative flex flex-col rounded bg-slate-300 p-4 pt-0"
 				>
 					<button
@@ -207,18 +181,18 @@
 					<button on:click={() => openSave(id)} class="btn-sm btn self-end"
 						>OPEN</button
 					>
-				</div> -->
-		{/each}
-	{:else}
-		<!-- <h1 class="text-neutral-content">Emojistan</h1>
+				</div>
+			{/each}
+		{:else}
+			<h1 class="text-neutral-content">Emojistan</h1>
 			<button on:click={() => (showSaves = true)} class="btn-primary btn w-full"
 				>PLAY</button
 			>
-			<a href="/tutorial/controls" class="btn-secondary btn">TUTORIAL</a> -->
-		<!-- <a href="/discover" class="btn-accent btn">DISCOVER</a>
+			<a href="/tutorial/controls" class="btn-secondary btn">TUTORIAL</a>
+			<!-- <a href="/discover" class="btn-accent btn">DISCOVER</a>
 			<button class="btn w-full">OPTIONS</button> -->
-	{/if}
-	<!-- </div> -->
+		{/if}
+	</div>
 </main>
 
 <style>
