@@ -36,10 +36,13 @@
 	// let emojiString = '';
 
 	for (let [key, val] of Object.entries(emojis)) {
-		for (let [emoji, _] of val) {
-			emojiArray.push(emoji);
+		for (let [_, emoji] of val) {
+			if (emoji.includes(',') || emoji.includes("'")) continue;
+			emojiArray.push(emoji.replaceAll(' ', '-').toLowerCase());
 		}
 	}
+
+	emojiArray = shuffleArray(emojiArray);
 
 	// emojiString = shuffleArray(emojiArray).toString().replaceAll(',', '');
 
@@ -128,11 +131,16 @@
 
 <main>
 	<!-- <div
-		class="absolute top-0 flex h-full w-full -rotate-6 skew-x-6 scale-125 select-none flex-wrap text-2xl text-opacity-10 2xl:text-4xl"
-	>
-		{emojiString}
-	</div> -->
-	<div class="absolute top-0 h-full w-full bg-black opacity-75" />
+		id="emojis"
+		class="absolute top-0 -4 flex h-full w-full -rotate-6 skew-x-6 scale-125 select-none flex-wrap text-2xl text-opacity-10"
+	> -->
+	<!-- {emojiString} -->
+	<!-- {#each emojiArray as emoji}
+			<i class="twa twa-lg twa-{emoji}" />
+		{/each} -->
+	<!-- </div> -->
+	<div id="emojis" class="absolute top-0 h-full w-full" />
+	<!-- <div class="absolute top-0 h-full w-full bg-black opacity-75" /> -->
 	<!-- <div class="dropdown dropdown-bottom dropdown-end absolute right-4 top-4">
 		<button class="avatar ">
 			<div class="w-12 rounded-full ring ring-neutral-content">
@@ -148,11 +156,11 @@
 			<li><a href="/">Logout</a></li>
 		</ul>
 	</div> -->
-	<div
+	<!-- <div
 		class="aside prose mt-16 flex h-[806px] w-96 flex-col gap-2 overflow-y-auto bg-neutral"
-	>
-		{#if showSaves}
-			<div class="flex flex-row gap-2">
+	> -->
+	{#if showSaves}
+		<!-- <div class="flex flex-row gap-2">
 				<button class="btn w-fit" on:click={() => (showSaves = false)}
 					><svg
 						xmlns="http://www.w3.org/2000/svg"
@@ -172,9 +180,9 @@
 				<button on:click={newGamePopup} class="btn-primary btn flex-grow"
 					>NEW GAME</button
 				>
-			</div>
-			{#each [...$saves.saves] as [id, name]}
-				<div
+			</div> -->
+		{#each [...$saves.saves] as [id, name]}
+			<!-- <div
 					class="brutal relative flex flex-col rounded bg-slate-300 p-4 pt-0"
 				>
 					<button
@@ -199,18 +207,18 @@
 					<button on:click={() => openSave(id)} class="btn-sm btn self-end"
 						>OPEN</button
 					>
-				</div>
-			{/each}
-		{:else}
-			<h1 class="text-neutral-content">Emojistan</h1>
+				</div> -->
+		{/each}
+	{:else}
+		<!-- <h1 class="text-neutral-content">Emojistan</h1>
 			<button on:click={() => (showSaves = true)} class="btn-primary btn w-full"
 				>PLAY</button
 			>
-			<a href="/tutorial/controls" class="btn-secondary btn">TUTORIAL</a>
-			<!-- <a href="/discover" class="btn-accent btn">DISCOVER</a>
+			<a href="/tutorial/controls" class="btn-secondary btn">TUTORIAL</a> -->
+		<!-- <a href="/discover" class="btn-accent btn">DISCOVER</a>
 			<button class="btn w-full">OPTIONS</button> -->
-		{/if}
-	</div>
+	{/if}
+	<!-- </div> -->
 </main>
 
 <style>
@@ -233,8 +241,8 @@
 		height: 100vh;
 	}
 
-	#emoji-background {
-		background-color: #dfdbe5;
-		background-image: url("data:image/svg+xml,%3Csvg width='52' height='26' viewBox='0 0 52 26' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.4'%3E%3Cpath d='M10 10c0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6h2c0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4v2c-3.314 0-6-2.686-6-6 0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6zm25.464-1.95l8.486 8.486-1.414 1.414-8.486-8.486 1.414-1.414z' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+	#emojis {
+		background-image: url('emojis.png');
+		background-size: cover;
 	}
 </style>
