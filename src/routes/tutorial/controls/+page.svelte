@@ -11,8 +11,6 @@
 	import Game from '$src/views/Game.svelte';
 	import { onDestroy } from 'svelte';
 
-	// TODO: make a demo for itch.io
-
 	// hello fellow itch.io wanderer,
 	// what brings you here?
 	//
