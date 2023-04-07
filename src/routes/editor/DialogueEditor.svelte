@@ -1,27 +1,26 @@
 <script lang="ts">
-	import { Choice } from '$src/types';
 	import BranchViewer from './BranchViewer.svelte';
-
-	const tree = {
-		'grinning-face': [
-			'stuff',
-			'stuff',
-			[new Choice('yes', 'hell yeah', 'lol')],
-		],
-		lol: ['lolski', [new Choice('yes', 'hell yeah', 'wow')]],
-		wow: ['wowski'],
-	};
-
-	let nextBranch = '';
-	let interactable = 'grinning-face';
-	let currentBranch: Array<any> = [];
-	$: currentBranch = tree[interactable];
+	import { interactables } from '$src/store';
+	let currentBranch = '';
 </script>
 
-<select name="interactable" bind:value={interactable}>
-	{#each Object.keys(tree) as value}
-		<option {value}>{value}</option>
-	{/each}
-</select>
+<div
+	class="flex h-[620px] w-[972px] flex-col items-start justify-center 2xl:h-[716px] 2xl:w-[1068px]"
+>
+	<div class="flex flex-row items-center gap-2">
+		<select
+			class="select-bordered select"
+			name="interactable"
+			bind:value={currentBranch}
+		>
+			{#each [...$interactables] as [key, value]}
+				<option value={key}>{value.emoji}</option>
+			{/each}
+		</select>
+		<span class="flex w-full justify-start py-4 text-4xl">
+			<i class="twa twa-{$interactables.get(currentBranch)?.emoji}" />
+		</span>
+	</div>
 
-<BranchViewer {tree} {currentBranch} />
+	<BranchViewer {currentBranch} />
+</div>

@@ -7,11 +7,13 @@ import {
 	Consumable,
 	EditableMap,
 	Equippable,
+	type Branch,
 	type Interactable,
 	type Merger,
 	type Pusher,
 	type SkinTone,
 } from './types';
+import { generateID } from './routes/utils';
 
 function createMapStore<K, V>(name: string) {
 	const { set, subscribe, update } = writable(new Map<K, V>());
@@ -100,7 +102,7 @@ function createSaves() {
 			}),
 		add: (name: string) =>
 			update((state) => {
-				let id = (Math.random() + 1).toString(36).substring(7);
+				let id = generateID();
 				state.currentSaveID = id;
 				state.currentSaveName = name;
 				state.saves.set(id, name);
@@ -276,6 +278,50 @@ function createModal() {
 	};
 }
 
+function createDialogueTree() {
+	const { set, subscribe, update } = writable(new Map<string, Branch>());
+
+	return {
+		set,
+		subscribe,
+		useStorage: (id: string) => {
+			const val = JSON.parse(localStorage.getItem(id + '_' + name) as string);
+			set(new Map(val) || new Map<number, Branch>());
+			subscribe((state) => {
+				localStorage.setItem(
+					id + '_' + name,
+					JSON.stringify(Array.from(state.entries()))
+				);
+			});
+		},
+		add: () =>
+			update((state) => {
+				let id = generateID();
+				while (state.has(id)) {
+					id = generateID();
+				}
+				state.set(id, []);
+				return state;
+			}),
+		addTextTo: (id: string, text: string) =>
+			update((state) => {
+				state.get(id)?.push(text);
+				return state;
+			}),
+		addChoiceTo: (id: string, text: string) =>
+			update((state) => {
+				const branch = state.get(id);
+				const choice = new Choice(text.slice(0, 4), text, generateID());
+				if (typeof branch?.at(-1) == 'string') {
+					branch?.push([choice]);
+				} else {
+					(branch?.at(-1) as Array<Choice>)?.push(choice);
+				}
+				return state;
+			}),
+	};
+}
+
 export const showLoading = writable(false);
 export const modal = createModal();
 
@@ -301,6 +347,4 @@ export const equippables = createMapStore<number, Equippable>('equippables');
 export const interactables = createMapStore<number, Interactable>(
 	'interactables'
 );
-export const dialogueTree = createMapStore<string, Array<string | Choice>>(
-	'dialogue'
-);
+export const dialogueTree = createDialogueTree();

@@ -220,6 +220,10 @@ export class Interactable {
 	}
 }
 
+export type Branch =
+	| []
+	| [...texts: Array<string>, lastItem: Array<Choice> | string];
+
 export interface Choice {
 	label: string;
 	text: string;
