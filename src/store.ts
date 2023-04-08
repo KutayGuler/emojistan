@@ -14,6 +14,7 @@ import {
 	type SkinTone,
 } from './types';
 import { generateID } from './routes/utils';
+import { root } from 'postcss';
 
 function createMapStore<K, V>(name: string) {
 	const { set, subscribe, update } = writable(new Map<K, V>());
@@ -285,33 +286,56 @@ function createDialogueTree() {
 		set,
 		subscribe,
 		useStorage: (id: string) => {
-			const val = JSON.parse(localStorage.getItem(id + '_' + name) as string);
+			const val = JSON.parse(localStorage.getItem(id + '_dialogue') as string);
 			set(new Map(val) || new Map<number, Branch>());
 			subscribe((state) => {
 				localStorage.setItem(
-					id + '_' + name,
+					id + '_dialogue',
 					JSON.stringify(Array.from(state.entries()))
 				);
 			});
 		},
-		add: () =>
+		add: (id: string) =>
 			update((state) => {
-				let id = generateID();
-				while (state.has(id)) {
-					id = generateID();
-				}
 				state.set(id, []);
+				return state;
+			}),
+		remove: (id: string) =>
+			update((state) => {
+				state.delete(id);
+				if (typeof state.get(id)?.at(-1) !== 'string') {
+					// delete all subbranches
+					state.forEach((_, key) => {
+						if (key.includes(id)) {
+							state.delete(key);
+						}
+					});
+				}
 				return state;
 			}),
 		addTextTo: (id: string, text: string) =>
 			update((state) => {
-				state.get(id)?.push(text);
+				if (typeof state.get(id)?.at(-1) !== 'string') {
+					state.get(id)?.splice(state.get(id)?.length - 1, 0, text);
+				} else {
+					state.get(id)?.push(text);
+				}
 				return state;
 			}),
-		addChoiceTo: (id: string, text: string) =>
+		addChoiceTo: (rootID: string, text: string) =>
 			update((state) => {
-				const branch = state.get(id);
-				const choice = new Choice(text.slice(0, 4), text, generateID());
+				const branch = state.get(rootID);
+				let id = '';
+
+				if (rootID.includes('_')) {
+					id = rootID.split('_')[0] + '_' + generateID();
+				} else {
+					id = rootID + '_' + generateID();
+				}
+
+				state.set(id, []);
+				const choice = new Choice(text.slice(0, 4), text, id);
+
 				if (typeof branch?.at(-1) == 'string') {
 					branch?.push([choice]);
 				} else {

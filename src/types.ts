@@ -189,11 +189,10 @@ export interface Interactable {
 	sequence: Array<SequenceItem>;
 	points: number;
 	hp: number;
-	sideEffects: Array<[number | 'any', number]>;
+	sideEffects: Array<[number | 'any', number | 'talk']>;
 	isControllable: boolean;
 	evolve: Evolve;
 	devolve: Devolve;
-	dialogueID: string;
 }
 
 export class Interactable {
@@ -205,8 +204,7 @@ export class Interactable {
 		sideEffects: Array<[number | 'any', number]>,
 		isControllable: boolean,
 		evolve: Evolve,
-		devolve: Devolve,
-		dialogueID = ''
+		devolve: Devolve
 	) {
 		this.emoji = emoji;
 		this.sequence = sequence;
@@ -216,7 +214,6 @@ export class Interactable {
 		this.isControllable = isControllable;
 		this.evolve = evolve;
 		this.devolve = devolve;
-		this.dialogueID = dialogueID;
 	}
 }
 

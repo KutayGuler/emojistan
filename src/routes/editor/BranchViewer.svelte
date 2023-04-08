@@ -1,9 +1,7 @@
 <script lang="ts">
 	import { dialogueTree } from '$src/store';
-	import { onMount } from 'svelte';
 	export let currentBranch = '';
 	export let nextBranch = '';
-
 	let text = '';
 
 	function toggleNextBranch(next: string) {
@@ -11,25 +9,34 @@
 	}
 
 	function addChoice() {
+		if (text == '') return;
 		dialogueTree.addChoiceTo(currentBranch, text);
+		text = '';
 	}
 
 	function addText() {
+		if (text == '') return;
 		dialogueTree.addTextTo(currentBranch, text);
+		text = '';
 	}
 
-	onMount(() => {
-		if (currentBranch !== '' && !$dialogueTree.has(currentBranch)) {
-			dialogueTree.add();
-		}
-	});
+	$: if (currentBranch !== '' && !$dialogueTree.has(currentBranch)) {
+		dialogueTree.add(currentBranch);
+		break $;
+	}
 </script>
 
-<div class="flex flex-row gap-2">
-	<input class="input-bordered input" bind:value={text} />
-	<button class="btn" on:click={addText}>ADD AS TEXT</button>
-	<button class="btn" on:click={addChoice}>ADD AS CHOICE</button>
-</div>
+{#if currentBranch}
+	<div class="flex flex-row gap-2">
+		<input class="input-bordered input" bind:value={text} />
+		<button class="btn" on:click={addText}>ADD AS TEXT</button>
+		<button
+			disabled={$dialogueTree.get(currentBranch)?.at(-1)?.length == 4}
+			class="btn"
+			on:click={addChoice}>ADD AS CHOICE</button
+		>
+	</div>
+{/if}
 
 {#if $dialogueTree.get(currentBranch)}
 	{@const branch = $dialogueTree.get(currentBranch)}

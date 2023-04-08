@@ -69,7 +69,7 @@
 		choices = choices;
 	}
 
-	// TODO: Dialogue should be coupled with Interactables
+	// TODO: implement chatting
 </script>
 
 <svelte:window

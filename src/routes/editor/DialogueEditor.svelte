@@ -13,7 +13,7 @@
 			name="interactable"
 			bind:value={currentBranch}
 		>
-			{#each [...$interactables] as [key, value]}
+			{#each [...$interactables].filter(([_, { emoji }]) => emoji != '') as [key, value]}
 				<option value={key}>{value.emoji}</option>
 			{/each}
 		</select>
@@ -22,5 +22,5 @@
 		</span>
 	</div>
 
-	<BranchViewer {currentBranch} />
+	<BranchViewer currentBranch={currentBranch.toString()} />
 </div>

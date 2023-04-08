@@ -8,53 +8,8 @@
 		EQUIPPABLE_BORDER,
 		CROSS,
 		palette,
+		MAX_SIDE_EFFECT,
 	} from '$src/constants';
-	// interactables = {
-	// "emoji": {interactable}
-	// }
-
-	// example TREE
-	// emoji: 🌲
-	// onInteract: dropEquippable {🍁} x {5}
-	// hp: 100
-	// sideEffects: any: 0 | {🪓}: {-1}
-
-	// example DOOR
-	// emoji: 🚪
-	// onInteract: ""
-	// hp: 1
-	// sideEffects: any: 0 | {🔑}: {-1}
-
-	// example KEY
-	// emoji: 🔑
-	// onInteract: dropEquippable {🔑} x {1}
-	// hp: 1
-	// sideEffects: any: -1
-
-	// example FOOD
-	// emoji: 🍔
-	// onInteract: addToPlayerHP {20}
-	// hp: 1
-	// sideEffects: any: -1
-
-	// example POISONOUS MUSHROOM
-	// emoji: 🍄
-	// onInteract: addToPlayerHP {-20}
-	// hp: 1
-	// sideEffects: any: -1
-
-	// example MONEY
-	// emoji: 💵
-	// onInteract: changePlayerTo {🤑}
-	// hp: 1
-	// sideEffects: any: -1
-
-	// example GROWING A PLANT
-	// emoji: 🌱
-	// hp: 1
-	// sideEffects: any: 0 | 💧: +1
-	// evolveAt: hp 10 to {🌳}
-
 	import { rbxStore } from '$src/lib/stores/store';
 	import {
 		Devolve,
@@ -94,12 +49,15 @@
 
 	let indexes: Array<number> = [];
 	let hps: Array<number> = [];
-	let modifierPoints: Array<number> = [];
+	let modifierPoints: Array<number | 'talk'> = [];
 
 	for (let i = 0; i < 100; i++) {
 		hps[i] = i + 1;
 		modifierPoints[i] = i + 1;
 	}
+
+	modifierPoints.unshift('talk');
+	// TODO: implement this, dialogue should only appear when it's talk
 
 	for (let i = 0; i >= -100; i--) {
 		modifierPoints.unshift(i);
@@ -115,12 +73,13 @@
 	export let sequence: Array<SequenceItem> = [];
 	export let hp = 1;
 	export let points = 1;
-	export let sideEffects: Array<[number | 'any', number]> = [['any', 0]];
+	export let sideEffects: Array<[number | 'any', number | 'talk']> = [
+		['any', 'talk'],
+	];
 	export let pseudoSideEffects: Array<[string, number]> = [];
 	export let isControllable = false;
 	export let evolve = new Evolve(false, '', 2);
 	export let devolve = new Devolve(false, '');
-	export let dialogueID = '';
 
 	// SEQUENCE RELATED
 	let type = types.Map[0];
@@ -140,7 +99,6 @@
 				isControllable,
 				evolve,
 				devolve,
-				dialogueID,
 			} = obj);
 		}
 	});
@@ -156,8 +114,7 @@
 				sideEffects,
 				isControllable,
 				evolve,
-				devolve,
-				dialogueID
+				devolve
 			)
 		);
 
@@ -165,30 +122,28 @@
 	}
 
 	onDestroy(() => {
-		if (emoji == '') {
-			interactables.remove(id);
-			rbxStore.remove(id);
-			return;
-		}
-
-		if (evolve.to == '') evolve.enabled = false;
-		if (devolve.to == '') devolve.enabled = false;
-
-		sideEffects = sideEffects.filter((m) => {
-			if (m[0] == 'any') return true;
-			return $equippables.get(m[0])?.emoji != '';
-		});
-		sideEffects = sideEffects.filter((m, i) => {
-			if (i == 0) return true;
-			return m[1] != 0;
-		});
-
-		updateStore();
+		// TODO: disable all onDestroys
+		// if (emoji == '') {
+		// 	interactables.remove(id);
+		// 	rbxStore.remove(id);
+		// 	return;
+		// }
+		// if (evolve.to == '') evolve.enabled = false;
+		// if (devolve.to == '') devolve.enabled = false;
+		// sideEffects = sideEffects.filter((m) => {
+		// 	if (m[0] == 'any') return true;
+		// 	return $equippables.get(m[0])?.emoji != '';
+		// });
+		// sideEffects = sideEffects.filter((m, i) => {
+		// 	if (i == 0) return true;
+		// 	return m[1] != 0;
+		// });
+		// updateStore();
 	});
 
 	function addTosideEffects(equippableID: number) {
 		if (sideEffects.some(([id, val]) => id == equippableID)) return;
-		if (sideEffects.length == 3) {
+		if (sideEffects.length == MAX_SIDE_EFFECT) {
 			notifications.warning('Cannot have more than 3 side effects');
 			return;
 		}
@@ -375,9 +330,10 @@
 		</div>
 	{/if}
 </div>
-<main class="flex w-full flex-col items-center justify-center gap-12 pt-16">
+<main class="flex w-full flex-col items-center justify-center gap-4 pt-16">
 	<div class="flex flex-col items-center justify-center">
 		<div class="flex flex-row gap-4 text-xl">
+			<!-- TODO: change emojis to svgs -->
 			<button
 				class:enabled={devolve.enabled}
 				class="rotate-90 opacity-50 hover:cursor-pointer"
@@ -390,7 +346,7 @@
 				class="opacity-50 hover:cursor-pointer"
 				on:click={() => (isControllable = !isControllable)}
 			>
-			🕹️
+				🕹️
 			</button>
 			<button
 				class:enabled={evolve.enabled}
@@ -400,22 +356,12 @@
 				🧬
 			</button>
 		</div>
-		<label class="label">
-			<span class="label-text">💬 ID</span>
-			&nbsp;
-			<select class="select-bordered select select-sm" bind:value={dialogueID}>
-				<option value="">none</option>
-				{#each [...$dialogueTree.keys()].filter((key) => key.length == 1) as id}
-					<option value={id}>{id}</option>
-				{/each}
-			</select>
-		</label>
 	</div>
 
 	<div class="form-control flex w-full flex-col p-4">
 		<div class="divider flex flex-row pb-6">
-			<p>SIDE EFFECTS ({sideEffects.length} / 3)</p>
-			<div class="dropdown dropdown-right dropdown-hover">
+			<p>SIDE EFFECTS ({sideEffects.length} / {MAX_SIDE_EFFECT})</p>
+			<div class="dropdown-right dropdown-hover dropdown">
 				<label
 					for=""
 					tabindex="0"
@@ -445,60 +391,66 @@
 				value to be interactable!
 			</p>
 		{/if}
-		<div class="flex flex-wrap items-center justify-center gap-8">
-			{#each sideEffects as [equippableID, value], i}
-				{@const modifierEmoji = $equippables.get(equippableID)?.emoji}
-				<div class="relative flex flex-col items-center">
-					{#if equippableID == 'any'}
-						<div class="slot-lg scale-75">
-							{equippableID}
-						</div>
-						<select
-							class="select-bordered select select-sm absolute -bottom-4"
-							bind:value
-							on:change={updateStore}
-						>
-							{#each modifierPoints as point}
-								<option value={point}>{point > 0 ? `+${point}` : point}</option>
-							{/each}
-						</select>
-					{:else if modifierEmoji}
-						<button
-							class="absolute -top-2 -right-2 text-lg"
-							on:click={() => removeFromSideEffects(i)}>{CROSS}</button
-						>
-						<div class="slot-lg scale-75">
-							<i class="twa twa-{modifierEmoji}" />
-						</div>
-						<select
-							class="select-bordered select select-sm absolute -bottom-4"
-							bind:value
-							on:change={updateStore}
-						>
-							{#each modifierPoints as point}
-								<option value={point}>{point > 0 ? `+${point}` : point}</option>
-							{/each}
-						</select>
-					{:else}
-						<div use:removeEmptySideEffect={i} />
-					{/if}
-				</div>
-			{/each}
-			{#each pseudoSideEffects as [emoji, value]}
-				<div class="relative flex flex-col items-center">
-					<button class="absolute -top-2 -right-2 text-lg">{CROSS}</button>
-					<div class="slot-lg scale-75">
-						<i class="twa twa-{emoji}" />
+		<div class="flex items-center justify-center px-12">
+			<div class="flex w-fit flex-wrap items-start justify-start gap-8">
+				{#each sideEffects as [equippableID, value], i}
+					{@const modifierEmoji = $equippables.get(equippableID)?.emoji}
+					<div class="relative flex flex-col items-center">
+						{#if equippableID == 'any'}
+							<div class="slot-lg scale-75">
+								{equippableID}
+							</div>
+							<select
+								class="select-bordered select select-sm absolute -bottom-4"
+								bind:value
+								on:change={updateStore}
+							>
+								{#each modifierPoints as point}
+									<option value={point}
+										>{point > 0 ? `+${point}` : point}</option
+									>
+								{/each}
+							</select>
+						{:else if modifierEmoji}
+							<button
+								class="absolute -top-2 -right-2 text-lg"
+								on:click={() => removeFromSideEffects(i)}>{CROSS}</button
+							>
+							<div class="slot-lg scale-75">
+								<i class="twa twa-{modifierEmoji}" />
+							</div>
+							<select
+								class="select-bordered select select-sm absolute -bottom-4"
+								bind:value
+								on:change={updateStore}
+							>
+								{#each modifierPoints as point}
+									<option value={point}
+										>{point > 0 ? `+${point}` : point}</option
+									>
+								{/each}
+							</select>
+						{:else}
+							<div use:removeEmptySideEffect={i} />
+						{/if}
 					</div>
-					<select class="select-bordered select select-sm absolute -bottom-4">
-						<option selected {value}>{value}</option>
-						<option value="+100">+100</option>
-					</select>
-				</div>
-			{/each}
+				{/each}
+				{#each pseudoSideEffects as [emoji, value]}
+					<div class="relative flex flex-col items-center">
+						<button class="absolute -top-2 -right-2 text-lg">{CROSS}</button>
+						<div class="slot-lg scale-75">
+							<i class="twa twa-{emoji}" />
+						</div>
+						<select class="select-bordered select select-sm absolute -bottom-4">
+							<option selected {value}>{value}</option>
+							<option value="+100">+100</option>
+						</select>
+					</div>
+				{/each}
+			</div>
 		</div>
 	</div>
-	<div class="flex w-full flex-col gap-2 p-4">
+	<!-- <div class="flex w-full flex-col gap-2 p-4">
 		<div class="divider">EVENT SEQUENCE</div>
 		{#each sequence as s, i}
 			<span class="flex w-full flex-row items-start justify-center gap-2">
@@ -609,7 +561,7 @@
 			</select>
 			<button class="btn text-2xl" on:click={addToSequence}>+</button>
 		</label>
-	</div>
+	</div> -->
 </main>
 
 <style>

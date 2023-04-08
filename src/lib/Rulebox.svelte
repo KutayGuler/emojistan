@@ -10,6 +10,7 @@
 	} from '$lib/stores/store';
 	import {
 		consumables,
+		dialogueTree,
 		equippables,
 		interactables,
 		mergers,
@@ -101,9 +102,13 @@
 		style="border-color: {rbx.borderColor}"
 		class="absolute top-0 right-0 flex h-6 w-6 cursor-pointer items-center justify-center rounded border-2 bg-white text-center text-xl"
 		on:click={() => {
-			if (rbx.type == 'interactable') {
+			if ($dialogueTree.has(rbx.id.toString())) {
 				// TODO: warn the player if interactable has dialogue attached
+				dialogueTree.remove(rbx.id.toString());
+				// TODO: remove sub branches too
+				// e.g if you delete 1 you should also delete 1_fdsf 1_dfds etc.
 			}
+
 			rbxStore.remove(rbx.id);
 
 			switch (rbx.type) {
@@ -120,7 +125,10 @@
 					equippables.remove(rbx.id);
 					break;
 				case 'interactable':
+					console.log($interactables.get(rbx.id));
 					interactables.remove(rbx.id);
+					console.log($interactables);
+					console.log($interactables.get(rbx.id));
 					break;
 				default:
 					break;

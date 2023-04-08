@@ -275,7 +275,7 @@
 													<div class="dropdown">
 														<button>{GUIDE}</button>
 														<div
-															class="dropdown-content card card-compact w-64 bg-primary p-2 text-primary-content shadow"
+															class="card dropdown-content card-compact w-64 bg-primary p-2 text-primary-content shadow"
 														>
 															<div class="card-body">
 																<p>
@@ -305,7 +305,7 @@
 													<div class="dropdown">
 														<button>{GUIDE}</button>
 														<div
-															class="dropdown-content card card-compact w-64 bg-primary p-2 text-primary-content shadow"
+															class="card dropdown-content card-compact w-64 bg-primary p-2 text-primary-content shadow"
 														>
 															<div class="card-body">
 																<p>
@@ -423,15 +423,6 @@
 									{/each}
 								</select> -->
 							</div>
-						{:else}
-							<button
-								title="Enable/Disable Hints"
-								class:hintsEnabled
-								class="absolute top-0.5 left-1 opacity-50 hover:cursor-pointer"
-								on:click={() => (hintsEnabled = !hintsEnabled)}
-							>
-								{GUIDE}
-							</button>
 						{/if}
 					</aside>
 					{#if viewKey == 'editor'}
