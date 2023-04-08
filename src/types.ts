@@ -77,15 +77,14 @@ export interface _Consumables {
 }
 
 export interface _Interactable {
-	executing: boolean;
+	id: number;
 	sequence: Array<SequenceItem>;
 	points: number;
 	hp: number;
 	isControllable: boolean;
-	sideEffects: Array<[string, number]>;
+	sideEffects: Array<[string, number | 'talk']>;
 	evolve: Evolve;
 	devolve: Devolve;
-	dialogueID: string;
 }
 
 export interface _Interactables {

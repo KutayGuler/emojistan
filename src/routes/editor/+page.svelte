@@ -191,7 +191,7 @@
 
 {#if $saves.currentSaveID != ''}
 	<main
-		class="editor relative box-border flex h-screen select-none flex-col items-center justify-center overflow-hidden overflow-x-hidden"
+		class="editor relative box-border flex h-screen flex-col items-center justify-center overflow-hidden"
 	>
 		<a href="/" class="btn-ghost btn absolute top-0 left-0"
 			><svg

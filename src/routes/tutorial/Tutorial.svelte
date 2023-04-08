@@ -10,8 +10,6 @@
 	export let props: any;
 	export let gameProps: any;
 	export let veilHeight = 0;
-
-	// TODO: comment out event sequence tutorial
 </script>
 
 <div

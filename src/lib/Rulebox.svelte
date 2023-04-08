@@ -105,8 +105,6 @@
 			if ($dialogueTree.has(rbx.id.toString())) {
 				// TODO: warn the player if interactable has dialogue attached
 				dialogueTree.remove(rbx.id.toString());
-				// TODO: remove sub branches too
-				// e.g if you delete 1 you should also delete 1_fdsf 1_dfds etc.
 			}
 
 			rbxStore.remove(rbx.id);

@@ -28,11 +28,12 @@
 		type Pusher,
 		type Merger,
 		Choice,
+		type Branch,
 	} from '$src/types';
 	import Chat from './Chat.svelte';
 
 	/* ## DATA ## */
-	export let dt = new Map<string, Array<string | Choice>>(); // dialogue tree
+	export let dt = new Map<string, Branch>(); // dialogue tree
 	export let map: EditableMap;
 	export let pushers = new Map<number, Pusher>();
 	export let mergers = new Map<number, Merger>();
@@ -68,6 +69,7 @@
 
 	onMount(() => {
 		[$currentColor, $currentEmoji] = ['', ''];
+		dt = $dialogueTree;
 	});
 
 	onDestroy(() => {
@@ -221,6 +223,7 @@
 		if (emoji == '') continue;
 		_interactables[emoji] = {} as _Interactable;
 		Object.assign(_interactables[emoji], args);
+		_interactables[emoji].id = id;
 	}
 
 	for (let [id, consumable] of consumables) {
@@ -453,7 +456,12 @@
 		if (e.code.includes('Arrow')) {
 			let operation = calcOperation(e.code as ArrowKey, ac);
 			// || statics.has(player.emoji) // TODO: check how it affects logic
-			if (!player || operation == 0 || !_interactables[player.emoji]?.isControllable) return;
+			if (
+				!player ||
+				operation == 0 ||
+				!_interactables[player.emoji]?.isControllable
+			)
+				return;
 			let facingItem = items.get(currentSection + '_' + (ac + operation));
 
 			if (!facingItem) {
@@ -535,7 +543,11 @@
 						for (let [id, { emoji, hp }] of items) {
 							if (typeof hp == 'number') continue; // consumables and equippables' hp types are numbers
 							// !statics.has(emoji) && // TODO: Check how it affects logic
-							if (hp.current > 0 && !_equippables[emoji] && _interactables[emoji]?.isControllable) {
+							if (
+								hp.current > 0 &&
+								!_equippables[emoji] &&
+								_interactables[emoji]?.isControllable
+							) {
 								player = items.get(id) as Item;
 								ac = +id.split('_')[1];
 								progress = tweened(calcPlayerHpPercentage(), {
@@ -570,18 +582,17 @@
 
 			let interactable: _Interactable = _interactables[interactedItem.emoji];
 
-			if (interactable == undefined || interactable.executing) return;
-			let { sequence, sideEffects, evolve, devolve } = interactable;
+			if (!interactable) return;
+			let { id, sideEffects, evolve, devolve } = interactable;
 
-			for (let { type } of sequence) {
-				if (type == 'dropEquippable') {
-					if (player?.inventory.length == MAX_INVENTORY_SIZE) {
-						return;
-					}
-				}
-			}
+			// for (let { type } of sequence) {
+			// 	if (type == 'dropEquippable') {
+			// 		if (player?.inventory.length == MAX_INVENTORY_SIZE) {
+			// 			return;
+			// 		}
+			// 	}
+			// }
 
-			_interactables[interactedItem.emoji].executing = true;
 			let equippedItem = player?.inventory[currentInventoryIndex] || 'any';
 
 			let sideEffect =
@@ -589,6 +600,12 @@
 					([effect, value]) =>
 						equippables.get(effect)?.emoji == equippedItem.emoji
 				) || sideEffects[0];
+
+			if (sideEffect[1] === 'talk') {
+				dialogueID = id.toString();
+				chatting = true;
+				return;
+			}
 
 			if (sideEffect[1] == 0) return;
 			interactedItem.hp.current += sideEffect[1];
@@ -604,16 +621,16 @@
 				player.inventory.splice(currentInventoryIndex, 1);
 			}
 
-			for (let { type, ...args } of sequence) {
-				if (type == 'wait') {
-					await m.wait(args.duration);
-				} else {
-					let res = m[type](args);
-					if (res == 'cancelLoop') {
-						break;
-					}
-				}
-			}
+			// for (let { type, ...args } of sequence) {
+			// 	if (type == 'wait') {
+			// 		await m.wait(args.duration);
+			// 	} else {
+			// 		let res = m[type](args);
+			// 		if (res == 'cancelLoop') {
+			// 			break;
+			// 		}
+			// 	}
+			// }
 
 			let playerEvolve = _interactables[player?.emoji || '']?.evolve;
 			let playerDevolve = _interactables[player?.emoji || '']?.devolve;
@@ -644,14 +661,6 @@
 			}
 
 			items = items;
-			_interactables[interactedItem.emoji].executing = false;
-			character = interactedItem.emoji;
-			dialogueID = interactable.dialogueID;
-			console.log($dialogueTree, dialogueID);
-
-			if ($dialogueTree.has(dialogueID)) {
-				chatting = true;
-			}
 			return;
 		}
 
@@ -677,75 +686,75 @@
 			return;
 		}
 
-		let closestDistance = 300;
-		let closestID = ac;
+		// let closestDistance = 300;
+		// let closestID = ac;
 
-		let _items = Array.from(items).filter(
-			// !statics.has(emoji) && TODO: check how it affects the logic
-			([id, { emoji }]) => !_equippables[emoji]
-		);
+		// let _items = Array.from(items).filter(
+		// 	// !statics.has(emoji) && TODO: check how it affects the logic
+		// 	([id, { emoji }]) => !_equippables[emoji]
+		// );
 
-		if (e.code == 'KeyE') {
-			for (let [id, _] of _items) {
-				let _id = +id.split('_')[1];
-				if (_id == ac) continue;
-				if (_id > ac && _id - ac < closestDistance) {
-					closestDistance = _id - ac;
-					closestID = _id;
-				}
-			}
+		// if (e.code == 'KeyE') {
+		// 	for (let [id, _] of _items) {
+		// 		let _id = +id.split('_')[1];
+		// 		if (_id == ac) continue;
+		// 		if (_id > ac && _id - ac < closestDistance) {
+		// 			closestDistance = _id - ac;
+		// 			closestID = _id;
+		// 		}
+		// 	}
 
-			if (closestDistance == 300) {
-				let smallest = 300;
-				for (let [id, _] of _items) {
-					let _id = +id.split('_')[1];
-					if (_id < smallest) smallest = _id;
-				}
-				ac = smallest;
-				ic = ac + keys[directionKey].operation;
-			} else {
-				ac = closestID;
-				ic = ac + keys[directionKey].operation;
-			}
+		// 	if (closestDistance == 300) {
+		// 		let smallest = 300;
+		// 		for (let [id, _] of _items) {
+		// 			let _id = +id.split('_')[1];
+		// 			if (_id < smallest) smallest = _id;
+		// 		}
+		// 		ac = smallest;
+		// 		ic = ac + keys[directionKey].operation;
+		// 	} else {
+		// 		ac = closestID;
+		// 		ic = ac + keys[directionKey].operation;
+		// 	}
 
-			player = items.get(currentSection + '_' + ac) as Item;
-			progress = tweened(calcPlayerHpPercentage(), {
-				duration: 200,
-				easing: cubicOut,
-			});
-			return;
-		}
+		// 	player = items.get(currentSection + '_' + ac) as Item;
+		// 	progress = tweened(calcPlayerHpPercentage(), {
+		// 		duration: 200,
+		// 		easing: cubicOut,
+		// 	});
+		// 	return;
+		// }
 
-		if (e.code == 'KeyQ') {
-			for (let [id, _] of _items) {
-				let _id = +id.split('_')[1];
-				if (_id == ac) continue;
-				if (ac > _id && ac - _id < closestDistance) {
-					closestDistance = ac - _id;
-					closestID = _id;
-				}
-			}
+		// if (e.code == 'KeyQ') {
+		// 	for (let [id, _] of _items) {
+		// 		let _id = +id.split('_')[1];
+		// 		if (_id == ac) continue;
+		// 		if (ac > _id && ac - _id < closestDistance) {
+		// 			closestDistance = ac - _id;
+		// 			closestID = _id;
+		// 		}
+		// 	}
 
-			if (closestDistance == 300) {
-				let biggest = 0;
-				for (let [id, _] of _items) {
-					let _id = +id.split('_')[1];
-					if (_id > biggest) biggest = _id;
-				}
-				ac = biggest;
-				ic = ac + keys[directionKey].operation;
-			} else {
-				ac = closestID;
-				ic = ac + keys[directionKey].operation;
-			}
+		// 	if (closestDistance == 300) {
+		// 		let biggest = 0;
+		// 		for (let [id, _] of _items) {
+		// 			let _id = +id.split('_')[1];
+		// 			if (_id > biggest) biggest = _id;
+		// 		}
+		// 		ac = biggest;
+		// 		ic = ac + keys[directionKey].operation;
+		// 	} else {
+		// 		ac = closestID;
+		// 		ic = ac + keys[directionKey].operation;
+		// 	}
 
-			player = items.get(currentSection + '_' + ac) as Item;
-			progress = tweened(calcPlayerHpPercentage(), {
-				duration: 200,
-				easing: cubicOut,
-			});
-			return;
-		}
+		// 	player = items.get(currentSection + '_' + ac) as Item;
+		// 	progress = tweened(calcPlayerHpPercentage(), {
+		// 		duration: 200,
+		// 		easing: cubicOut,
+		// 	});
+		// 	return;
+		// }
 	}
 
 	function noPlayer(rbx: any) {

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Choice } from '$src/types';
+	import type { Branch, Choice } from '$src/types';
 	import { createEventDispatcher, onMount } from 'svelte';
 	import { fly, scale } from 'svelte/transition';
 	import { dialogueTree as dt } from '$src/store';
@@ -8,68 +8,58 @@
 	export let isTutorial = false;
 	export let character = '🐸';
 	export let dialogueID: string;
-	export let dialogueTree = new Map<string, Array<string | Choice>>();
+	export let dialogueTree = new Map<string, Branch>();
 	let choicesForm: HTMLFormElement;
 	let choiceIndex = 0;
-
-	let mainBranches: Array<string> = [];
-	let subBranches: Array<string> = [];
-	let currentBranch = dialogueID[0];
-	let currentSubBranch = dialogueID;
+	let currentBranch = dialogueID;
 	let chatIndex = 0;
 	let animating = false;
 	let answerIndexes: Array<number> = [];
-	let currentDialogue: Array<string | Choice>;
+	let currentDialogue: Branch;
 	let texts: Array<string> = [];
 	let choices: Array<Choice> = [];
 
 	onMount(() => {
 		if (dialogueTree.size == 0) {
-			dialogueTree = new Map<string, Array<string | Choice>>($dt);
+			dialogueTree = new Map<string, Branch>($dt);
 		}
 
-		for (let key of dialogueTree.keys()) {
-			if (key.split('_').length == 1) {
-				mainBranches.push(key);
-			}
-
-			if (key[0] == currentBranch) {
-				subBranches.push(key);
-			}
-		}
-
-		currentDialogue = dialogueTree.get(currentSubBranch) || [];
-		subBranchChanged();
+		currentDialogue = dialogueTree.get(currentBranch) || [];
+		branchChanged();
 		chatIndex++;
 	});
 
 	function makeChoice() {
-		let { to, text } = choices[choiceIndex];
+    console.log(choices, choiceIndex);
+		let { text, next, label } = choices[choiceIndex];
 		chatIndex = chatIndex - choices.length + 1;
 		choices = [];
 		texts = [...texts, text];
 		answerIndexes.push(texts.length - 1);
-		currentSubBranch = to;
-		subBranchChanged();
+		currentBranch = next;
+		// branchChanged();
 	}
 
-	function subBranchChanged() {
-		currentDialogue = dialogueTree.get(currentSubBranch) || [];
+	function branchChanged() {
+		currentDialogue = dialogueTree.get(currentBranch) || [];
 		if (!currentDialogue) return;
 
-		for (let item of currentDialogue) {
-			if (typeof item == 'string') {
-				texts.push(item);
-			} else {
-				choices.push(item);
-			}
+		for (let i = 0; i < currentDialogue.length - 1; i++) {
+			texts.push(currentDialogue[i] as string);
 		}
 
-		texts = texts;
-		choices = choices;
-	}
+		let lastItem = currentDialogue.at(-1);
 
-	// TODO: implement chatting
+		if (typeof lastItem === 'string') {
+			texts.push(lastItem);
+			texts = texts;
+		} else {
+			choices = lastItem as Array<Choice>;
+		}
+
+    console.log(texts, choices);
+    
+	}
 </script>
 
 <svelte:window
@@ -161,14 +151,12 @@
 		>
 			{#each choices as choice, i}
 				{#if i + texts.length < chatIndex && !animating}
-					{@const autofocus = i == 0}
 					<button
-						{autofocus}
 						class="btn flex-grow focus:bg-green-500 focus:text-primary-content"
 						type="submit"
 						tabindex="0"
 						transition:fly|local={{ x: 100 }}
-						>{choice.text}
+						>{choice.label}
 					</button>
 				{/if}
 			{/each}

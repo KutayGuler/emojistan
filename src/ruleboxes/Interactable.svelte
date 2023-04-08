@@ -57,7 +57,6 @@
 	}
 
 	modifierPoints.unshift('talk');
-	// TODO: implement this, dialogue should only appear when it's talk
 
 	for (let i = 0; i >= -100; i--) {
 		modifierPoints.unshift(i);
@@ -128,17 +127,17 @@
 		// 	rbxStore.remove(id);
 		// 	return;
 		// }
-		// if (evolve.to == '') evolve.enabled = false;
-		// if (devolve.to == '') devolve.enabled = false;
-		// sideEffects = sideEffects.filter((m) => {
-		// 	if (m[0] == 'any') return true;
-		// 	return $equippables.get(m[0])?.emoji != '';
-		// });
-		// sideEffects = sideEffects.filter((m, i) => {
-		// 	if (i == 0) return true;
-		// 	return m[1] != 0;
-		// });
-		// updateStore();
+		if (evolve.to == '') evolve.enabled = false;
+		if (devolve.to == '') devolve.enabled = false;
+		sideEffects = sideEffects.filter((m) => {
+			if (m[0] == 'any') return true;
+			return $equippables.get(m[0])?.emoji != '';
+		});
+		sideEffects = sideEffects.filter((m, i) => {
+			if (i == 0) return true;
+			return m[1] != 0;
+		});
+		updateStore();
 	});
 
 	function addTosideEffects(equippableID: number) {
@@ -333,27 +332,26 @@
 <main class="flex w-full flex-col items-center justify-center gap-4 pt-16">
 	<div class="flex flex-col items-center justify-center">
 		<div class="flex flex-row gap-4 text-xl">
-			<!-- TODO: change emojis to svgs -->
 			<button
 				class:enabled={devolve.enabled}
 				class="rotate-90 opacity-50 hover:cursor-pointer"
 				on:click={() => (devolve.enabled = !devolve.enabled)}
 			>
-				🧬
+				<i class="twa twa-dna" />
 			</button>
 			<button
 				class:enabled={isControllable}
 				class="opacity-50 hover:cursor-pointer"
 				on:click={() => (isControllable = !isControllable)}
 			>
-				🕹️
+				<i class="twa twa-joystick" />
 			</button>
 			<button
 				class:enabled={evolve.enabled}
 				class="opacity-50 hover:cursor-pointer"
 				on:click={() => (evolve.enabled = !evolve.enabled)}
 			>
-				🧬
+				<i class="twa twa-dna" />
 			</button>
 		</div>
 	</div>
@@ -361,7 +359,7 @@
 	<div class="form-control flex w-full flex-col p-4">
 		<div class="divider flex flex-row pb-6">
 			<p>SIDE EFFECTS ({sideEffects.length} / {MAX_SIDE_EFFECT})</p>
-			<div class="dropdown-right dropdown-hover dropdown">
+			<div class="dropdown-hover dropdown-right dropdown">
 				<label
 					for=""
 					tabindex="0"

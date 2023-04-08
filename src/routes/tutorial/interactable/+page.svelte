@@ -39,7 +39,7 @@
 			},
 			veilHeight: 0,
 		},
-		// STATIC
+		// TODO: Change this to controllable
 		{
 			header: 'Interactable',
 			description:
@@ -179,6 +179,7 @@
 				SIZE: 4,
 			},
 		},
+		// SIDE EFFECTS
 		{
 			header: 'Interactable',
 			description:
@@ -281,73 +282,73 @@
 			},
 		},
 		// EVENT SEQUENCE (the level from equippable)
-		{
-			header: 'Interactable',
-			description:
-				"In the previous levels, interacting with the banana would end the game, why it doesn't right now? Let's fix that by adding a function to the Event Sequence!",
-			veilHeight: 0,
-			props: {
-				id: 'sequence',
-				sequence: [{ type: 'completeLevel' }],
-				emoji: 'banana',
-				isControllable: false,
-				sideEffects: [['any', -1]],
-				evolve: new Evolve(false, '', 2),
-				devolve: new Devolve(false, ''),
-				hp: 1,
-			},
-			gameProps: {
-				map: new EditableMap(
-					new Map<string, string>([
-						['0_0', 'monkey'],
-						['0_2', 'door'],
-						['0_6', 'brick'],
-						['0_10', 'brick'],
-						['0_12', 'key'],
-						['0_14', 'brick'],
-						['0_15', 'banana'],
-					])
-				),
-				equippables: new Map<number, Equippable>([
-					[69, new Equippable('key', 1)],
-				]),
-				// @ts-expect-error
-				interactables: new Map<number, TInteractable>([
-					[
-						'sequence',
-						new TInteractable(
-							'banana',
-							// @ts-expect-error
-							[{ type: 'completeLevel' }],
-							1,
-							1,
-							[['any', -1]],
-							true,
-							new Evolve(false, '', 2),
-							new Devolve(false, '')
-						),
-					],
-					[
-						'sideEffects',
-						new TInteractable(
-							'door',
-							[],
-							1,
-							1,
-							[
-								['any', 0],
-								[69, -1],
-							],
-							true,
-							new Evolve(false, '', 2),
-							new Devolve(false, '')
-						),
-					],
-				]),
-				mapClass: 'simulation',
-				SIZE: 4,
-			},
-		},
+		// {
+		// 	header: 'Interactable',
+		// 	description:
+		// 		"In the previous levels, interacting with the banana would end the game, why it doesn't right now? Let's fix that by adding a function to the Event Sequence!",
+		// 	veilHeight: 0,
+		// 	props: {
+		// 		id: 'sequence',
+		// 		sequence: [{ type: 'completeLevel' }],
+		// 		emoji: 'banana',
+		// 		isControllable: false,
+		// 		sideEffects: [['any', -1]],
+		// 		evolve: new Evolve(false, '', 2),
+		// 		devolve: new Devolve(false, ''),
+		// 		hp: 1,
+		// 	},
+		// 	gameProps: {
+		// 		map: new EditableMap(
+		// 			new Map<string, string>([
+		// 				['0_0', 'monkey'],
+		// 				['0_2', 'door'],
+		// 				['0_6', 'brick'],
+		// 				['0_10', 'brick'],
+		// 				['0_12', 'key'],
+		// 				['0_14', 'brick'],
+		// 				['0_15', 'banana'],
+		// 			])
+		// 		),
+		// 		equippables: new Map<number, Equippable>([
+		// 			[69, new Equippable('key', 1)],
+		// 		]),
+		// 		// @ts-expect-error
+		// 		interactables: new Map<number, TInteractable>([
+		// 			[
+		// 				'sequence',
+		// 				new TInteractable(
+		// 					'banana',
+		// 					// @ts-expect-error
+		// 					[{ type: 'completeLevel' }],
+		// 					1,
+		// 					1,
+		// 					[['any', -1]],
+		// 					true,
+		// 					new Evolve(false, '', 2),
+		// 					new Devolve(false, '')
+		// 				),
+		// 			],
+		// 			[
+		// 				'sideEffects',
+		// 				new TInteractable(
+		// 					'door',
+		// 					[],
+		// 					1,
+		// 					1,
+		// 					[
+		// 						['any', 0],
+		// 						[69, -1],
+		// 					],
+		// 					true,
+		// 					new Evolve(false, '', 2),
+		// 					new Devolve(false, '')
+		// 				),
+		// 			],
+		// 		]),
+		// 		mapClass: 'simulation',
+		// 		SIZE: 4,
+		// 	},
+		// },
 	];
 	let props = tutorialProps[index];
 	$: props = tutorialProps[index];
