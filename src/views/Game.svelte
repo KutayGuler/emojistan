@@ -56,6 +56,7 @@
 	let directionKey: Wasd = 'KeyD';
 	let currentInventoryIndex = 0;
 	let items = new Map<string, Item | Equippable | Consumable>();
+	let colors = new Map(map.colors);
 	let backgrounds = new Map(map.backgrounds);
 	let _interactables: _Interactables = {};
 	let _consumables: _Consumables = {};
@@ -317,11 +318,11 @@
 	// MUTATIONS
 	const m: Mutations = {
 		paint({ index, background }) {
-			backgrounds.set(currentSection + '_' + index, background);
-			backgrounds = backgrounds;
+			colors.set(currentSection + '_' + index, background);
+			colors = colors;
 		},
 		erase({ index }) {
-			backgrounds.delete(currentSection + '_' + index);
+			colors.delete(currentSection + '_' + index);
 		},
 		spawn({ index, emoji }) {
 			items.set(currentSection + '_' + index, new Item(emoji));
@@ -345,7 +346,7 @@
 		},
 		resetLevel: () => {
 			items.clear();
-			backgrounds = new Map(map.backgrounds);
+			colors = new Map(map.colors);
 			ac = -2;
 			initItems();
 			items = items;
@@ -532,7 +533,6 @@
 							player.hp.current = player.hp.max;
 							progress.set(calcPlayerHpPercentage());
 							items.delete(currentSection + '_' + ic);
-
 							items = items;
 							return;
 						}
@@ -792,12 +792,13 @@
 		{#each { length: SIZE * SIZE } as _, i}
 			{@const active = ac == i}
 			{@const item = items.get(currentSection + '_' + i)}
+			{@const background = backgrounds.get(currentSection + '_' + i)}
 			{@const hand =
 				player?.inventory[currentInventoryIndex]?.emoji ||
 				keys[directionKey].emoji}
 			<div
 				class="cell"
-				style:background={backgrounds.get(currentSection + '_' + i) || map.dbg}
+				style:background={colors.get(currentSection + '_' + i) || map.dbg}
 			>
 				{#if active}
 					<div class="absolute z-[2] text-base {directionKey}">
@@ -810,6 +811,8 @@
 					<span class:equippable class:consumable>
 						<i class="twa twa-{item.emoji}" />
 					</span>
+				{:else}
+					<i class="twa scale-75 opacity-50 twa-{background}" />
 				{/if}
 			</div>
 		{/each}

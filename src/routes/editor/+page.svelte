@@ -78,9 +78,6 @@
 		}
 	});
 
-	// TODO: change to <i>
-	// TODO: add emojis that can be used as background decoration
-	// should be half the opacity and size
 	let currentCategory = '💩';
 	let filter = '';
 	let sectionIndex = 0;
@@ -110,6 +107,7 @@
 	};
 
 	let copyMode = copyModes[2];
+	let emojiMode: 'Foreground' | 'Background' = 'Foreground';
 
 	function fillMap() {
 		if ($currentEmoji == '') return;
@@ -125,7 +123,7 @@
 				map.clearItems();
 				break;
 			case 'Background':
-				map.clearBackgrounds();
+				map.clearColors();
 				break;
 			case 'Both':
 				map.clearAll();
@@ -184,7 +182,7 @@
 
 <div
 	style:background={$currentColor || 'none'}
-	class="absolute z-50 flex h-6 w-6 items-center justify-center rounded bg-red-500 text-lg"
+	class="absolute z-50 flex h-6 w-6 items-center justify-center text-lg"
 	style="transform: translate({x + 12}px, {y - 12}px);"
 >
 	<i class="twa twa-{$formattedEmoji}" />
@@ -261,6 +259,21 @@
 								<div class="form-control" />
 								<div class="flex flex-col gap-2">
 									<div class="form-control">
+										<label for="emoji-mode" class="label">
+											<span
+												class="label-text text-xs text-neutral-content 2xl:text-base"
+												>Emoji Mode
+											</span>
+										</label>
+										<select
+											id="emoji-mode"
+											class="select-bordered select 2xl:text-base"
+											bind:value={emojiMode}
+										>
+											{#each ['Foreground', 'Background'] as mode}
+												<option value={mode}>{mode}</option>
+											{/each}
+										</select>
 										<label for="copy-delete-mode" class="label">
 											<span
 												class="label-text text-xs text-neutral-content 2xl:text-base"
@@ -307,7 +320,7 @@
 												on:click={() => {
 													$currentColor = $currentColor == color ? '' : color;
 												}}
-												class="h-5 w-5 rounded duration-75 ease-out {disabled
+												class="h-5 w-5  duration-75 ease-out {disabled
 													? ''
 													: 'hover:scale-125'}  2xl:h-6 2xl:w-6"
 												style:background-color={color}
@@ -318,12 +331,12 @@
 										on:click={() => {
 											if ($currentColor == '') return;
 											if ($currentColor == $map.dbg) {
-												map.updateDbg(DEFAULT_BG);
+												map.updateDefaultColor(DEFAULT_BG);
 												return;
 											}
 
-											map.updateDbg($currentColor);
-											map.filterBackgrounds();
+											map.updateDefaultColor($currentColor);
+											map.filterColors();
 										}}
 										disabled={$currentColor == ''}
 										class="btn flex w-full flex-row items-center"
@@ -375,11 +388,11 @@
 							</div>
 						{/if}
 					</aside>
-					{#if viewKey == 'editor'}
+					{#if viewKey === 'editor'}
 						<div class="flex flex-col justify-center px-8">
-							<Editor {sectionIndex} {copyMode} />
+							<Editor {sectionIndex} {copyMode} {emojiMode} />
 						</div>
-					{:else if viewKey == 'rules'}
+					{:else if viewKey === 'rules'}
 						<div class="flex flex-col justify-center px-8">
 							<Svelvet />
 						</div>
@@ -397,7 +410,7 @@
 							<div class="my-4 grid grid-cols-4 grid-rows-2 gap-4">
 								{#each Object.keys(emojis) as category}
 									<button
-										class="{category == currentCategory
+										class="{category === currentCategory
 											? 'scale-125'
 											: 'opacity-50 hover:scale-125 hover:opacity-100'} duration-75 ease-out"
 										on:click={() => (currentCategory = category)}
@@ -412,7 +425,7 @@
 										class="h-6 w-6 rounded"
 										style:background={hexcode}
 										on:click={() => {
-											$currentSkin = $currentSkin == skinName ? '' : skinName;
+											$currentSkin = $currentSkin === skinName ? '' : skinName;
 										}}
 									/>
 								{/each}
@@ -420,7 +433,7 @@
 						</div>
 						<div id="flex flex-col">
 							{#each Object.keys(xd) as category}
-								{#if currentCategory == category}
+								{#if currentCategory === category}
 									<div class="emojis flex flex-wrap justify-center">
 										{#each xd[category] as name}
 											{@const title = name.replaceAll('-', ' ')}

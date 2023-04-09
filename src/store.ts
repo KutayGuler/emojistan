@@ -140,7 +140,7 @@ function createEditableMap() {
 			update((state) => {
 				state.startingSectionIndex = startingSectionIndex;
 				state.items = new Map(items) || new Map();
-				state.backgrounds = new Map(backgrounds) || new Map();
+				state.colors = new Map(backgrounds) || new Map();
 				state.dbg = dbg || '';
 				return state;
 			});
@@ -152,7 +152,7 @@ function createEditableMap() {
 				);
 				localStorage.setItem(
 					id + '_backgrounds',
-					JSON.stringify(Array.from(state.backgrounds.entries()))
+					JSON.stringify(Array.from(state.colors.entries()))
 				);
 				localStorage.setItem(id + '_dbg', state.dbg);
 			});
@@ -162,32 +162,41 @@ function createEditableMap() {
 				state.startingSectionIndex = index;
 				return state;
 			}),
-		updateDbg: (color: string) =>
+		updateDefaultColor: (color: string) =>
 			update((state) => {
 				state.dbg = color;
 				return state;
 			}),
-		updateBackground: (sectionIndex: number, index: number, color: string) =>
+		updateColorAt: (sectionIndex: number, index: number, color: string) =>
 			update((state) => {
-				state.backgrounds.set(sectionIndex + '_' + index, color);
+				state.colors.set(sectionIndex + '_' + index, color);
 				return state;
 			}),
-		deleteBackground: (sectionIndex: number, index: number) =>
+		deleteColorAt: (sectionIndex: number, index: number) =>
+			update((state) => {
+				state.colors.delete(sectionIndex + '_' + index);
+				return state;
+			}),
+		clearColors: () =>
+			update((state) => {
+				state.colors.clear();
+				return state;
+			}),
+		filterColors: () =>
+			update((state) => {
+				for (let [id, color] of state.colors) {
+					if (color == state.dbg) state.colors.delete(id);
+				}
+				return state;
+			}),
+		updateBackgroundAt: (sectionIndex: number, index: number, emoji: string) =>
+			update((state) => {
+				state.backgrounds.set(sectionIndex + '_' + index, emoji);
+				return state;
+			}),
+		deleteBackgroundAt: (sectionIndex: number, index: number) =>
 			update((state) => {
 				state.backgrounds.delete(sectionIndex + '_' + index);
-				return state;
-			}),
-		clearBackgrounds: () =>
-			update((state) => {
-				state.backgrounds.clear();
-				return state;
-			}),
-
-		filterBackgrounds: () =>
-			update((state) => {
-				for (let [id, color] of state.backgrounds) {
-					if (color == state.dbg) state.backgrounds.delete(id);
-				}
 				return state;
 			}),
 		addEmoji: (sectionIndex: number, index: number, emoji: string) =>
@@ -207,8 +216,9 @@ function createEditableMap() {
 			}),
 		clearAll: () =>
 			update((state) => {
-				state.backgrounds.clear();
 				state.items.clear();
+				state.colors.clear();
+				state.backgrounds.clear();
 				return state;
 			}),
 	};

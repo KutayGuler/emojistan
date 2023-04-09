@@ -5,7 +5,7 @@
 </script>
 
 <div
-	class="flex h-[620px] w-[972px] flex-col items-start justify-center 2xl:h-[716px] 2xl:w-[1068px]"
+	class="flex h-[624px] w-[972px] flex-col items-start justify-center 2xl:h-[716px] 2xl:w-[1068px]"
 >
 	<div class="flex flex-row items-center gap-2">
 		<select

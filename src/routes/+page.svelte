@@ -22,10 +22,13 @@
 		if ($saves.currentSaveID == '') saves.useStorage();
 		for (let [saveID, _] of $saves.saves) {
 			let items = JSON.parse(localStorage.getItem(saveID + '_items') as string);
-			emojiFreqs.set(
-				saveID,
-				new Set(items.map(([key, val]: [string, string]) => val))
+			let set = new Set<string>(
+				items.map(([key, val]: [string, string]) => val)
 			);
+			while (set.size > 8) {
+				set.delete(set.values().next().value);
+			}
+			emojiFreqs.set(saveID, set);
 		}
 	});
 
@@ -94,11 +97,24 @@
 		}
 		return array;
 	}
+
+	let showRename = false;
+	let newName = '';
+	let confirmDelete = false;
 </script>
 
 <svelte:head>
 	<title>Emojistan</title>
 </svelte:head>
+
+<svelte:window
+	on:keydown={(e) => {
+		if (e.code == 'Escape') {
+			showRename = false;
+			confirmDelete = false;
+		}
+	}}
+/>
 
 <main>
 	<div id="emojis" class="absolute top-0 h-full w-full" />
@@ -118,7 +134,7 @@
 		</ul>
 	</div> -->
 	<div
-		class="aside prose mt-16 flex h-[806px] w-96 flex-col gap-2 overflow-y-auto bg-neutral shadow-xl"
+		class="aside mt-16 flex h-[806px] w-96 flex-col gap-2 overflow-y-auto bg-neutral shadow-xl"
 	>
 		{#if showSaves}
 			<div class="flex flex-row gap-2">
@@ -138,38 +154,65 @@
 						/>
 					</svg>
 				</button>
-				<button on:click={createNewGame} class="btn-primary btn flex-grow"
-					>NEW GAME</button
-				>
 			</div>
+			<button on:click={createNewGame} class="btn-primary btn">NEW GAME</button>
 			{#each [...$saves.saves] as [id, name]}
-				<div
-					class="brutal relative flex flex-col rounded bg-slate-300 p-4 pt-0"
-				>
-					<button
-						on:click={() =>
-							modal.show({
-								header: 'Deleting ' + name,
-								content: 'Are you sure?',
-								confirmText: 'DELETE',
-								onConfirm: () => {
-									saves.delete(id);
-									location.reload();
-								},
-							})}
-						class="absolute top-2 right-4">{CROSS}</button
-					>
-					<h4>{name}</h4>
+				<div class="brutal relative flex flex-col rounded bg-slate-300 p-4">
+					{#if showRename}
+						<form
+							on:submit={() => {
+								saves.rename(id, newName);
+								showRename = false;
+							}}
+						>
+							<input
+								autofocus
+								class="input-bordered input "
+								type="text"
+								bind:value={newName}
+							/>
+						</form>
+					{:else}
+						<h4>{name}</h4>
+						{#if !showRename}
+							<button
+								on:click={() => {
+									newName = name;
+									showRename = true;
+								}}
+								class="w-fit pl-0 text-slate-500">RENAME</button
+							>
+						{/if}
+					{/if}
 					<p>
 						{#each [...(emojiFreqs.get(id) || [])] as e}
 							<i class="twa twa-{e}" />
 						{/each}
 					</p>
-					<div class="flex w-fit flex-row items-end gap-2 self-end">
-						<!-- TODO: rename functionality -->
-						<button on:click={() => {}} class="btn-ghost btn-sm btn"
-							>RENAME</button
-						>
+					<div class="flex w-fit flex-row items-end gap-2 self-end pt-12">
+						{#if confirmDelete}
+							<form
+								on:submit={() => {
+									saves.delete(id);
+									location.reload();
+								}}
+							>
+								<button class="btn-error btn-sm btn">CONFIRM</button>
+							</form>
+							<button
+								class="btn-sm btn"
+								on:click={() => {
+									confirmDelete = false;
+								}}>CANCEL</button
+							>
+						{:else}
+							<button
+								on:click={() => {
+									confirmDelete = true;
+								}}
+								class="btn-ghost btn-sm btn">DELETE</button
+							>
+						{/if}
 						<button on:click={() => openSave(id)} class="btn-sm btn"
 							>OPEN</button
 						>

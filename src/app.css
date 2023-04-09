@@ -52,7 +52,7 @@
 	}
 
 	.map {
-		@apply grid h-full w-auto grid-cols-12 grid-rows-12 gap-1 text-2xl;
+		@apply grid h-full w-auto grid-cols-12 grid-rows-12 text-2xl;
 	}
 
 	.simulation {
@@ -68,20 +68,19 @@
 	}
 
 	.aside {
-		@apply relative h-[620px] w-72 rounded bg-slate-500 p-8 2xl:h-[716px] 2xl:w-80;
+		@apply relative h-[624px] w-72 rounded bg-slate-500 p-8 2xl:h-[716px] 2xl:w-80;
 	}
 
 	.simulation > *,
 	.map > * {
 		position: relative;
 		display: flex;
-		width: 3rem; /* 48px */
-		height: 3rem; /* 48px */
-		font-size: 1.5rem; /* 24px */
+		width: 3.25rem; /* 48px */
+		height: 3.25rem; /* 48px */
+		font-size: 2.75rem; /* 24px */
 		line-height: 2rem; /* 32px */
 		align-items: center;
 		justify-content: center;
-		border-radius: 0.25rem;
 		background-color: #333c4d;
 		--tw-bg-opacity: 1;
 	}
@@ -110,10 +109,10 @@
 	@media screen and (min-width: 1536px) {
 		.simulation > *,
 		.map > * {
-			height: 3.5rem;
-			width: 3.5rem;
-			font-size: 1.5rem; /* 24px */
-			line-height: 2rem; /* 32px */
+			height: 1.75rem;
+			width: 1.75em;
+			font-size: 1.75rem; /* 24px */
+			line-height: 1.75rem; /* 32px */
 		}
 	}
 }

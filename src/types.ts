@@ -117,6 +117,7 @@ export interface Mutations {
 export interface EditableMap {
 	startingSectionIndex: number;
 	items: Map<string, string>;
+	colors: Map<string, string>;
 	backgrounds: Map<string, string>;
 	dbg: string;
 }
@@ -125,6 +126,7 @@ export class EditableMap {
 	constructor(items = new Map<string, string>()) {
 		this.startingSectionIndex = 0;
 		this.items = items;
+		this.colors = new Map<string, string>();
 		this.backgrounds = new Map<string, string>();
 		this.dbg = DEFAULT_BG;
 	}

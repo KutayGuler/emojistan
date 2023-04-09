@@ -4,27 +4,40 @@
 
 	export let sectionIndex = 0;
 	export let copyMode: 'Item' | 'Background' | 'Both';
+	export let emojiMode: 'Foreground' | 'Background';
 
 	function clickedCell(index: number) {
-		switch (copyMode) {
-			case 'Item':
-				if ($currentEmoji == '') map.removeEmoji(sectionIndex, index);
-				break;
-			case 'Background':
-				if ($currentColor == '') map.deleteBackground(sectionIndex, index);
-				break;
-			case 'Both':
-				if ($currentColor == '') map.deleteBackground(sectionIndex, index);
-				if ($currentEmoji == '') map.removeEmoji(sectionIndex, index);
-				break;
-		}
+		if (emojiMode[0] == 'F') {
+			switch (copyMode) {
+				case 'Item':
+					if ($currentEmoji == '') map.removeEmoji(sectionIndex, index);
+					break;
+				case 'Background':
+					if ($currentColor == '') map.deleteColorAt(sectionIndex, index);
+					break;
+				case 'Both':
+					if ($currentColor == '') map.deleteColorAt(sectionIndex, index);
+					if ($currentEmoji == '') map.removeEmoji(sectionIndex, index);
+					break;
+			}
 
-		if ($currentColor != '' && $currentColor != $map.dbg) {
-			map.updateBackground(sectionIndex, index, $currentColor);
-		}
+			if ($currentEmoji != '') {
+				map.addEmoji(sectionIndex, index, $formattedEmoji);
+			}
 
-		if ($currentEmoji != '') {
-			map.addEmoji(sectionIndex, index, $formattedEmoji);
+			if ($currentColor != '' && $currentColor != $map.dbg) {
+				map.updateColorAt(sectionIndex, index, $currentColor);
+			}
+		} else {
+			if ($currentEmoji == '') {
+				map.deleteBackgroundAt(sectionIndex, index);
+			} else {
+				map.updateBackgroundAt(sectionIndex, index, $currentEmoji);
+			}
+
+			if ($currentColor != '' && $currentColor != $map.dbg) {
+				map.updateColorAt(sectionIndex, index, $currentColor);
+			}
 		}
 	}
 
@@ -35,11 +48,11 @@
 				$currentEmoji = $map.items.get(key) || '';
 				break;
 			case 'Background':
-				$currentColor = $map.backgrounds.get(key) || '';
+				$currentColor = $map.colors.get(key) || '';
 				break;
 			case 'Both':
 				$currentEmoji = $map.items.get(key) || '';
-				$currentColor = $map.backgrounds.get(key) || '';
+				$currentColor = $map.colors.get(key) || '';
 				break;
 		}
 	}
@@ -60,15 +73,21 @@
 	{#each { length: DEFAULT_SIDE_LENGTH * DEFAULT_SIDE_LENGTH } as _, i}
 		{@const key = sectionIndex + '_' + i}
 		{@const mapItem = $map?.items.get(key)}
+		{@const background = $map?.backgrounds.get(key)}
 		<button
 			title="Cell #{i}"
-			style:background={$map.backgrounds.get(key) || $map.dbg}
+			style:background={$map.colors.get(key) || $map.dbg}
 			on:mouseenter={() => mouseEnter(i)}
 			on:click={() => clickedCell(i)}
 			on:contextmenu|preventDefault={() => rightClickedCell(i)}
 		>
 			{#if mapItem}
-				<i class="twa twa-{mapItem}" />
+				<i class="twa z-10 twa-{mapItem}" />
+			{:else if background}
+				<i
+					class="twa absolute scale-75
+					text-center opacity-50 twa-{background}"
+				/>
 			{/if}
 		</button>
 	{/each}

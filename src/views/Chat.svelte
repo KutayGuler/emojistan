@@ -30,7 +30,7 @@
 	});
 
 	function makeChoice() {
-    console.log(choices, choiceIndex);
+		console.log(choices, choiceIndex);
 		let { text, next, label } = choices[choiceIndex];
 		chatIndex = chatIndex - choices.length + 1;
 		choices = [];
@@ -57,8 +57,7 @@
 			choices = lastItem as Array<Choice>;
 		}
 
-    console.log(texts, choices);
-    
+		console.log(texts, choices);
 	}
 </script>
 
@@ -125,7 +124,7 @@
 	style="background-color: rgba(0, 0, 0.5, 0.8);"
 	class="absolute z-50 flex flex-col items-start justify-start {isTutorial
 		? 'h-[204px] w-[204px] 2xl:h-[236px] 2xl:w-[236px]'
-		: 'h-[620px] w-[620px] 2xl:h-[716px] 2xl:w-[716px]'} w-full"
+		: 'h-[624px] w-[624px] 2xl:h-[716px] 2xl:w-[716px]'} w-full"
 	transition:scale|local
 >
 	<h1 class="p-4 text-2xl"><i class="twa twa-{character}" /></h1>
