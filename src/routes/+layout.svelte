@@ -8,9 +8,10 @@
 	import { showLoading } from '$src/store';
 
 	supabase.auth.onAuthStateChange((event, session) => {});
+	$: console.log($navigating?.from);
 </script>
 
-{#if $showLoading || $navigating}
+{#if $showLoading || ($navigating && !$navigating.from?.route.id?.includes('tut'))}
 	<div
 		class="absolute z-20 flex h-full w-full items-center justify-center bg-white text-2xl"
 	>

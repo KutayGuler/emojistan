@@ -10,6 +10,8 @@
 	export let props: any;
 	export let gameProps: any;
 	export let veilHeight = 0;
+
+	// TODO: check all tutorials
 </script>
 
 <div
@@ -24,7 +26,7 @@
 				</span>
 			{/if}
 			<p class="h-32 pt-2">
-				{description}
+				{@html description}
 			</p>
 		</div>
 		<div

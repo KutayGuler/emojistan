@@ -106,9 +106,9 @@
 			if (rbx.type === 'interactable' && $dialogueTree.has(rbx.id.toString())) {
 				// TODO: warn the player if interactable has dialogue attached
 				modal.show({
-					header:
+					content:
 						'All dialogue content connected to this Interactable will be lost.',
-					content: 'Are you sure?',
+					header: 'Are you sure?',
 					confirmText: 'DELETE',
 					onConfirm: () => {
 						dialogueTree.remove(rbx.id.toString());

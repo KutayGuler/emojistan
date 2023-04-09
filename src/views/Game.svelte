@@ -902,10 +902,12 @@
 
 	.equippable {
 		animation: equippable 500ms linear infinite alternate;
+		scale: 0.618;
 	}
 
 	.consumable {
 		animation: consumable 1000ms linear infinite alternate;
+		scale: 0.618;
 	}
 
 	progress::-webkit-progress-value {

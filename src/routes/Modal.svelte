@@ -22,9 +22,12 @@
 	on:close={() => ($modal.visible = false)}
 	on:click|self={() => dialog.close()}
 >
-	<div on:click|stopPropagation>
+	<div
+		class="flex flex-col gap-8 text-neutral-content"
+		on:click|stopPropagation
+	>
 		<h3>{$modal.header}</h3>
-		<p>{$modal.content}</p>
+		<p class="text-neutral-300">{$modal.content}</p>
 		<!-- svelte-ignore a11y-autofocus -->
 		<button
 			class="absolute top-4 right-4"
@@ -35,7 +38,7 @@
 	{#if $modal.input}
 		<input type="text" class="input-bordered input" bind:value={inputValue} />
 	{/if}
-	<div class="flex flex-row justify-end gap-2">
+	<div class="mt-8 flex flex-row justify-end gap-2">
 		<button
 			class="btn"
 			on:click={() => {

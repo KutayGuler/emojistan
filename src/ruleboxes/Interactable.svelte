@@ -121,7 +121,6 @@
 	}
 
 	onDestroy(() => {
-		// TODO: disable all onDestroys
 		// if (emoji == '') {
 		// 	interactables.remove(id);
 		// 	rbxStore.remove(id);

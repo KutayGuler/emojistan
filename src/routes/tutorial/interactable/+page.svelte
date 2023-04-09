@@ -39,16 +39,15 @@
 			},
 			veilHeight: 0,
 		},
-		// TODO: Change this to controllable
 		{
 			header: 'Interactable',
 			description:
-				'Static [ 🗿 ] means this Interactable cannot be controlled by the player. Try switching players (Press E or Q) and you will see that the bricks cannot be controlled.',
+				'isControllable <i class="text-xl twa twa-joystick"></i> means this Interactable can be controlled by the player. Try switching players (Press E or Q) and you will see that the babies can be controlled but the bricks cannot.',
 			veilHeight: 476,
 			props: {
 				id: 'static',
-				emoji: 'brick',
-				isControllable: false,
+				emoji: 'baby',
+				isControllable: true,
 				evolve: new Evolve(false, '', 2),
 				devolve: new Devolve(false, ''),
 				hp: 1,
@@ -70,7 +69,7 @@
 					[
 						'static',
 						new TInteractable(
-							'brick',
+							'baby',
 							[],
 							1,
 							1,

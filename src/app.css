@@ -56,7 +56,7 @@
 	}
 
 	.simulation {
-		@apply grid h-full w-auto grid-cols-4 grid-rows-4 gap-1 py-4 text-2xl;
+		@apply grid h-full w-auto grid-cols-4 grid-rows-4 py-4 text-2xl;
 	}
 
 	.slot {
