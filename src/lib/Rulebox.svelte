@@ -14,6 +14,7 @@
 		equippables,
 		interactables,
 		mergers,
+		modal,
 		pushers,
 	} from '$src/store';
 
@@ -102,9 +103,22 @@
 		style="border-color: {rbx.borderColor}"
 		class="absolute top-0 right-0 flex h-6 w-6 cursor-pointer items-center justify-center rounded border-2 bg-white text-center text-xl"
 		on:click={() => {
-			if ($dialogueTree.has(rbx.id.toString())) {
+			if (rbx.type === 'interactable' && $dialogueTree.has(rbx.id.toString())) {
 				// TODO: warn the player if interactable has dialogue attached
-				dialogueTree.remove(rbx.id.toString());
+				modal.show({
+					header:
+						'All dialogue content connected to this Interactable will be lost.',
+					content: 'Are you sure?',
+					confirmText: 'DELETE',
+					onConfirm: () => {
+						dialogueTree.remove(rbx.id.toString());
+						rbxStore.remove(rbx.id);
+						interactables.remove(rbx.id);
+					},
+					input: false,
+					danger: true,
+				});
+				return;
 			}
 
 			rbxStore.remove(rbx.id);
@@ -123,10 +137,7 @@
 					equippables.remove(rbx.id);
 					break;
 				case 'interactable':
-					console.log($interactables.get(rbx.id));
 					interactables.remove(rbx.id);
-					console.log($interactables);
-					console.log($interactables.get(rbx.id));
 					break;
 				default:
 					break;

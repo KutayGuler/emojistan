@@ -10,7 +10,7 @@
 	supabase.auth.onAuthStateChange((event, session) => {});
 </script>
 
-{#if $showLoading || ($navigating?.from?.route.id == '/' && $navigating?.to?.route.id == '/editor')}
+{#if $showLoading || $navigating}
 	<div
 		class="absolute z-20 flex h-full w-full items-center justify-center bg-white text-2xl"
 	>

@@ -3,11 +3,10 @@
 	import { currentEmoji, currentColor, map, formattedEmoji } from '../store';
 
 	export let sectionIndex = 0;
-	export let deleteMode: 'Item' | 'Background' | 'Both';
 	export let copyMode: 'Item' | 'Background' | 'Both';
 
 	function clickedCell(index: number) {
-		switch (deleteMode) {
+		switch (copyMode) {
 			case 'Item':
 				if ($currentEmoji == '') map.removeEmoji(sectionIndex, index);
 				break;

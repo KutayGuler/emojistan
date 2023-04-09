@@ -1,8 +1,6 @@
 export const DEFAULT_SIDE_LENGTH = 12;
 export const DEFAULT_MAP_CLASS = 'map';
 
-// TODO: how to cache css background urls?
-
 export const MIN_INDEX = 0;
 export const MAX_INDEX = DEFAULT_SIDE_LENGTH * DEFAULT_SIDE_LENGTH;
 export const MIN_DURATION = 50;
@@ -18,7 +16,6 @@ export const GRAPH_SIZE_MD = 620;
 
 /* ICONS */
 export const CROSS = '🞫';
-export const GUIDE = '🧙‍♂️';
 
 /* CONTEXT MENU */
 export const CTX_MENU_W = 108;

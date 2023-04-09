@@ -12,7 +12,6 @@
 		consumables,
 		dialogueTree,
 		modal,
-		showLoading,
 	} from '../store';
 	import { rbxStore } from '$lib/stores/store';
 	import { CROSS } from '$src/constants';
@@ -32,25 +31,13 @@
 
 	let showSaves = true;
 
-	let gameName = '';
-
-	function newGamePopup() {
-		modal.show({
-			header: 'Creating a new game',
-			content: 'What will you name it?',
-			confirmText: 'Create',
-			input: true,
-			danger: false,
-			// @ts-expect-error
-			onConfirm: (name: string) => {
-				createNewGame(name);
-			},
-		});
-	}
-
-	function createNewGame(name: string) {
-		$showLoading = true;
-		saves.add(name);
+	function createNewGame() {
+		saves.add(
+			new Intl.DateTimeFormat('en-GB', {
+				dateStyle: 'full',
+				timeStyle: 'short',
+			}).format(new Date())
+		);
 		goto('/editor');
 	}
 
@@ -151,7 +138,7 @@
 						/>
 					</svg>
 				</button>
-				<button on:click={newGamePopup} class="btn-primary btn flex-grow"
+				<button on:click={createNewGame} class="btn-primary btn flex-grow"
 					>NEW GAME</button
 				>
 			</div>
@@ -178,9 +165,15 @@
 							<i class="twa twa-{e}" />
 						{/each}
 					</p>
-					<button on:click={() => openSave(id)} class="btn-sm btn self-end"
-						>OPEN</button
-					>
+					<div class="flex w-fit flex-row items-end gap-2 self-end">
+						<!-- TODO: rename functionality -->
+						<button on:click={() => {}} class="btn-ghost btn-sm btn"
+							>RENAME</button
+						>
+						<button on:click={() => openSave(id)} class="btn-sm btn"
+							>OPEN</button
+						>
+					</div>
 				</div>
 			{/each}
 		{:else}

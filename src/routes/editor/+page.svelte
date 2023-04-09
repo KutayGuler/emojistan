@@ -30,7 +30,6 @@
 		CROSS,
 		DEFAULT_BG,
 		DEFAULT_SIDE_LENGTH,
-		GUIDE,
 		palette,
 	} from '$src/constants';
 	import { notifications } from '../notifications';
@@ -79,11 +78,12 @@
 		}
 	});
 
-	const flipParams = { duration: 300 };
+	// TODO: change to <i>
+	// TODO: add emojis that can be used as background decoration
+	// should be half the opacity and size
 	let currentCategory = '💩';
 	let filter = '';
 	let sectionIndex = 0;
-	let startingSectionIndex = 0;
 
 	function handleKeydown(e: KeyboardEvent) {
 		if (e.code == 'Escape') {
@@ -100,17 +100,16 @@
 	let innerHeight: number;
 	let hintsEnabled = false;
 
-	type DeleteMode = 'Item' | 'Background' | 'Both';
+	type CopyMode = 'Item' | 'Background' | 'Both';
 
-	const deleteModes: Array<DeleteMode> = ['Item', 'Background', 'Both'];
-	const deleteTexts: { [key in DeleteMode]: string } = {
+	const copyModes: Array<CopyMode> = ['Item', 'Background', 'Both'];
+	const deleteTexts: { [key in CopyMode]: string } = {
 		Item: 'ITEMS',
 		Background: 'BGS',
 		Both: 'ALL',
 	};
 
-	let deleteMode = deleteModes[2];
-	let copyMode = deleteModes[2];
+	let copyMode = copyModes[2];
 
 	function fillMap() {
 		if ($currentEmoji == '') return;
@@ -121,7 +120,7 @@
 	}
 
 	function clearMap() {
-		switch (deleteMode) {
+		switch (copyMode) {
 			case 'Item':
 				map.clearItems();
 				break;
@@ -165,6 +164,8 @@
 		['#8e562e', '-medium-dark-skin-tone'],
 		['#613d30', '-dark-skin-tone'],
 	];
+
+	// FIXME: SAVE DUPLICATION
 </script>
 
 <svelte:head>
@@ -254,75 +255,24 @@
 						{#if viewKey == 'editor'}
 							<div class="flex flex-col">
 								<button
-									title="Enable/Disable Hints"
-									class:hintsEnabled
-									class="absolute top-0.5 left-1 opacity-50 hover:cursor-pointer"
-									on:click={() => (hintsEnabled = !hintsEnabled)}
-								>
-									{GUIDE}
-								</button>
-								<button
 									class="btn bg-primary text-lg text-primary-content 2xl:btn-md hover:bg-primary-focus"
 									on:click={toggleTest}>TEST</button
 								>
 								<div class="form-control" />
 								<div class="flex flex-col gap-2">
 									<div class="form-control">
-										<label class="label">
+										<label for="copy-delete-mode" class="label">
 											<span
 												class="label-text text-xs text-neutral-content 2xl:text-base"
-												>Copy Mode {#if hintsEnabled}
-													<div class="dropdown">
-														<button>{GUIDE}</button>
-														<div
-															class="card dropdown-content card-compact w-64 bg-primary p-2 text-primary-content shadow"
-														>
-															<div class="card-body">
-																<p>
-																	Right click on any cell to copy the
-																	corresponding emoji or background.
-																</p>
-															</div>
-														</div>
-													</div>
-												{/if}
+												>Copy / Delete Mode
 											</span>
 										</label>
 										<select
+											id="copy-delete-mode"
 											class="select-bordered select 2xl:text-base"
 											bind:value={copyMode}
 										>
-											{#each deleteModes as mode}
-												<option value={mode}>{mode}</option>
-											{/each}
-										</select>
-									</div>
-									<div class="form-control">
-										<label class="label">
-											<span
-												class="label-text text-xs text-neutral-content 2xl:text-base"
-												>Delete Mode {#if hintsEnabled}
-													<div class="dropdown">
-														<button>{GUIDE}</button>
-														<div
-															class="card dropdown-content card-compact w-64 bg-primary p-2 text-primary-content shadow"
-														>
-															<div class="card-body">
-																<p>
-																	Left click on any cell to delete the
-																	corresponding emoji or background.
-																</p>
-															</div>
-														</div>
-													</div>
-												{/if}</span
-											>
-										</label>
-										<select
-											class="select-bordered select 2xl:text-base"
-											bind:value={deleteMode}
-										>
-											{#each deleteModes as mode}
+											{#each copyModes as mode}
 												<option value={mode}>{mode}</option>
 											{/each}
 										</select>
@@ -330,7 +280,7 @@
 									<button
 										class="btn bg-accent text-lg text-accent-content 2xl:btn-md hover:bg-accent-focus"
 										on:click={clearMap}
-										>CLEAR {deleteTexts[deleteMode]}
+										>CLEAR {deleteTexts[copyMode]}
 									</button>
 									<button
 										id="filler"
@@ -427,7 +377,7 @@
 					</aside>
 					{#if viewKey == 'editor'}
 						<div class="flex flex-col justify-center px-8">
-							<Editor {sectionIndex} {deleteMode} {copyMode} />
+							<Editor {sectionIndex} {copyMode} />
 						</div>
 					{:else if viewKey == 'rules'}
 						<div class="flex flex-col justify-center px-8">
