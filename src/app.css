@@ -99,6 +99,8 @@
 		transform: scale(1.5);
 	}
 
+	/* TODO: change media queries */
+
 	@media screen and (min-width: 1536px) {
 		.emojis > * {
 			font-size: 1.25rem;

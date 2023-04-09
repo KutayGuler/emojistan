@@ -456,7 +456,6 @@
 			return;
 		if (e.code.includes('Arrow')) {
 			let operation = calcOperation(e.code as ArrowKey, ac);
-			// || statics.has(player.emoji) // TODO: check how it affects logic
 			if (
 				!player ||
 				operation == 0 ||
@@ -542,7 +541,6 @@
 
 						for (let [id, { emoji, hp }] of items) {
 							if (typeof hp == 'number') continue; // consumables and equippables' hp types are numbers
-							// !statics.has(emoji) && // TODO: Check how it affects logic
 							if (
 								hp.current > 0 &&
 								!_equippables[emoji] &&
