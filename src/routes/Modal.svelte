@@ -14,7 +14,6 @@
 	}
 </script>
 
-<!-- TODO: Change text color -->
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <dialog
 	class="brutal h-fit w-96 bg-neutral"

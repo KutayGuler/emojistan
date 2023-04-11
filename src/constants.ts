@@ -11,7 +11,7 @@ export const MAX_SIDE_EFFECT = 9;
 export const DURATIONS = [50, 100, 200, 500, 1000, 2000, 5000, 10000];
 
 export const DEFAULT_BG = '#64748b';
-export const GRAPH_SIZE_2XL = 716;
+export const GRAPH_SIZE_2XL = 720;
 export const GRAPH_SIZE_MD = 624;
 
 /* ICONS */
