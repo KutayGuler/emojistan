@@ -1,12 +1,17 @@
 <script lang="ts">
 	import type { Branch, Choice } from '$src/types';
-	import { createEventDispatcher, onMount } from 'svelte';
+	import {
+		afterUpdate,
+		beforeUpdate,
+		createEventDispatcher,
+		onMount,
+	} from 'svelte';
 	import { fly, scale } from 'svelte/transition';
 	import { dialogueTree as dt } from '$src/store';
 	const dispatch = createEventDispatcher();
 
 	export let isTutorial = false;
-	export let character = '🐸';
+	export let character: string;
 	export let dialogueID: string;
 	export let dialogueTree = new Map<string, Branch>();
 	let choicesForm: HTMLFormElement;
@@ -40,6 +45,8 @@
 		// branchChanged();
 	}
 
+	// TODO: change styling
+
 	function branchChanged() {
 		currentDialogue = dialogueTree.get(currentBranch) || [];
 		if (!currentDialogue) return;
@@ -59,6 +66,23 @@
 
 		console.log(texts, choices);
 	}
+
+	// TODO: change choice rendering
+
+	let container: HTMLElement;
+	let autoscroll = false;
+
+	beforeUpdate(() => {
+		autoscroll =
+			container &&
+			container.offsetHeight + container.scrollTop >
+				container.scrollHeight - container.offsetHeight * 0.1;
+	});
+	afterUpdate(() => {
+		if (autoscroll) {
+			container.scrollTo(0, container.scrollHeight);
+		}
+	});
 </script>
 
 <svelte:window
@@ -121,18 +145,19 @@
 />
 
 <div
+	bind:this={container}
 	style="background-color: rgba(0, 0, 0.5, 0.8);"
 	class="absolute z-50 flex flex-col items-start justify-start {isTutorial
 		? 'h-[204px] w-[204px] 2xl:h-[236px] 2xl:w-[236px]'
-		: 'h-[624px] w-[624px] 2xl:h-[720px] 2xl:w-[720px]'} w-full"
+		: 'h-[624px] w-[624px] 2xl:h-[720px] 2xl:w-[720px]'} w-full overflow-y-auto backdrop-blur"
 	transition:scale|local
 >
 	<h1 class="p-4 text-2xl"><i class="twa twa-{character}" /></h1>
-	<ul>
+	<ul class="flex flex-col gap-2">
 		{#each texts as text, i}
 			{#if i < chatIndex && !animating}
 				<li
-					class="rounded-xl bg-neutral p-2 text-lg text-neutral-content {answerIndexes.includes(
+					class="max-w-xs rounded-xl bg-neutral p-2 px-4 text-lg text-neutral-content {answerIndexes.includes(
 						i
 					)
 						? 'mr-2 self-end'

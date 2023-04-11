@@ -601,6 +601,7 @@
 
 			if (sideEffect[1] === 'talk') {
 				dialogueID = id.toString();
+				character = interactedItem.emoji;
 				chatting = true;
 				return;
 			}

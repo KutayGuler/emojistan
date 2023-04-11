@@ -66,7 +66,12 @@
 				{@const isString = typeof leaf === 'string'}
 				{#if isString}
 					<div class="flex flex-row items-start gap-2">
-						<button>{CROSS}</button>
+						<button
+							on:click={() => {
+								$dialogueTree.get(currentBranch)?.splice(i, 1);
+								$dialogueTree = $dialogueTree;
+							}}>{CROSS}</button
+						>
 						<button
 							class="h-6"
 							on:click={() => {
