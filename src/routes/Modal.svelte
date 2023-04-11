@@ -27,11 +27,8 @@
 	>
 		<h3>{$modal.header}</h3>
 		<p class="text-neutral-300">{$modal.content}</p>
-		<!-- svelte-ignore a11y-autofocus -->
-		<button
-			class="absolute top-4 right-4"
-			autofocus
-			on:click={() => dialog.close()}>{CROSS}</button
+		<button class="absolute top-4 right-4" on:click={() => dialog.close()}
+			>{CROSS}</button
 		>
 	</div>
 	{#if $modal.input}

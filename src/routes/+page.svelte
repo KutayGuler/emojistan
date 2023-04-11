@@ -14,8 +14,6 @@
 		modal,
 	} from '../store';
 	import { rbxStore } from '$lib/stores/store';
-	import { CROSS } from '$src/constants';
-
 	let emojiFreqs = new Map<string, Set<string>>();
 
 	onMount(() => {
@@ -98,9 +96,47 @@
 		return array;
 	}
 
-	let showRename = false;
+	let renameIndex = -1;
 	let newName = '';
-	let confirmDelete = false;
+	let deleteIndex = -1;
+	let files: FileList;
+
+	function downloadSave(saveID: string) {
+		const data = {
+			map: {
+				items: Object.fromEntries($map.items),
+				backgrounds: Object.fromEntries($map.backgrounds),
+			},
+			rbxs: Array.from($rbxStore),
+			pushers: Object.fromEntries($pushers),
+			mergers: Object.fromEntries($mergers),
+			equippables: Object.fromEntries($equippables),
+			consumables: Object.fromEntries($consumables),
+			interactables: Object.fromEntries($interactables),
+			dialogueTree: Object.fromEntries($dialogueTree),
+		};
+
+		let dataStr =
+			'data:text/json;charset=utf-8,' +
+			encodeURIComponent(JSON.stringify(data));
+		let downloadAnchorNode = document.createElement('a');
+		downloadAnchorNode.setAttribute('href', dataStr);
+		downloadAnchorNode.setAttribute(
+			'download',
+			'emojistan-' + saveID + '.json'
+		);
+		document.body.appendChild(downloadAnchorNode); // required for firefox
+		downloadAnchorNode.click();
+		downloadAnchorNode.remove();
+	}
+
+	function openUploadedSave() {
+		// TODO:
+		// generate new key for the save
+		// generate new name for the save
+		// save all of them to localStorage with useStorage
+		// open the save
+	}
 </script>
 
 <svelte:head>
@@ -110,8 +146,8 @@
 <svelte:window
 	on:keydown={(e) => {
 		if (e.code == 'Escape') {
-			showRename = false;
-			confirmDelete = false;
+			renameIndex = -1;
+			deleteIndex = -1;
 		}
 	}}
 />
@@ -156,15 +192,41 @@
 				</button>
 			</div>
 			<button on:click={createNewGame} class="btn-primary btn">NEW GAME</button>
-			{#each [...$saves.saves] as [id, name]}
-				<div class="brutal relative flex flex-col rounded bg-slate-300 p-4">
-					{#if showRename}
+			<div class="flex flex-row gap-2">
+				<input class="file-input " type="file" name="save-file" bind:files />
+				{#if files}
+					<button class="btn" on:click={openUploadedSave}>OPEN</button>
+				{/if}
+			</div>
+			<!-- <div class="w-full rounded-lg border-2"> -->
+			<!-- <button class="btn w-full rounded-lg shadow-inner" on:click={() => {}}>
+					UPLOAD SAVE FILE &nbsp;
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke-width="1.5"
+						stroke="currentColor"
+						class="h-6 w-6"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"
+						/>
+					</svg>
+				</button> -->
+			<!-- </div> -->
+			{#each [...$saves.saves] as [id, name], i}
+				<div class="relative flex flex-col rounded-lg bg-slate-300 p-4">
+					{#if renameIndex == i}
 						<form
 							on:submit={() => {
 								saves.rename(id, newName);
-								showRename = false;
+								renameIndex = -1;
 							}}
 						>
+							<!-- svelte-ignore a11y-autofocus -->
 							<input
 								autofocus
 								class="input-bordered input "
@@ -174,11 +236,11 @@
 						</form>
 					{:else}
 						<h4>{name}</h4>
-						{#if !showRename}
+						{#if !renameIndex}
 							<button
 								on:click={() => {
 									newName = name;
-									showRename = true;
+									renameIndex = i;
 								}}
 								class="w-fit pl-0 text-slate-500">RENAME</button
 							>
@@ -189,8 +251,28 @@
 							<i class="twa twa-{e}" />
 						{/each}
 					</p>
-					<div class="flex w-fit flex-row items-end gap-2 self-end pt-12">
-						{#if confirmDelete}
+					<div class="flex w-full flex-row items-end gap-2 self-end pt-12">
+						<button
+							class="btn-ghost btn-sm btn"
+							on:click={() => downloadSave(id)}
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke-width="1.5"
+								stroke="currentColor"
+								class="h-6 w-6"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"
+								/>
+							</svg>
+						</button>
+						<div class="flex flex-grow" />
+						{#if deleteIndex == i}
 							<form
 								on:submit={() => {
 									saves.delete(id);
@@ -202,13 +284,13 @@
 							<button
 								class="btn-sm btn"
 								on:click={() => {
-									confirmDelete = false;
+									deleteIndex = -1;
 								}}>CANCEL</button
 							>
 						{:else}
 							<button
 								on:click={() => {
-									confirmDelete = true;
+									deleteIndex = i;
 								}}
 								class="btn-ghost btn-sm btn">DELETE</button
 							>

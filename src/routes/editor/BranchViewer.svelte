@@ -50,9 +50,6 @@
 
 <div class="flex w-full flex-col gap-2">
 	{#if $dialogueTree.get(currentBranch)}
-		current: {currentBranch}
-		<br />
-		next: {nextBranch}
 		{@const branch = $dialogueTree.get(currentBranch)}
 		<div class="mb-2 w-full rounded border-2 border-black p-4">
 			<div class="mb-4 flex flex-row gap-2">

@@ -14,8 +14,6 @@
 	export let character: string;
 	export let dialogueID: string;
 	export let dialogueTree = new Map<string, Branch>();
-	let choicesForm: HTMLFormElement;
-	let choiceIndex = 0;
 	let currentBranch = dialogueID;
 	let chatIndex = 0;
 	let animating = false;
@@ -34,18 +32,17 @@
 		chatIndex++;
 	});
 
-	function makeChoice() {
-		console.log(choices, choiceIndex);
-		let { text, next, label } = choices[choiceIndex];
-		chatIndex = chatIndex - choices.length + 1;
+	function makeChoice(e: SubmitEvent) {
+		let text = e.submitter?.dataset.text as string;
+		let next = e.submitter?.dataset.next as string;
 		choices = [];
-		texts = [...texts, text];
+		texts.push(text);
+		texts = texts;
 		answerIndexes.push(texts.length - 1);
 		currentBranch = next;
-		// branchChanged();
+		interacting = false;
+		branchChanged();
 	}
-
-	// TODO: change styling
 
 	function branchChanged() {
 		currentDialogue = dialogueTree.get(currentBranch) || [];
@@ -63,11 +60,7 @@
 		} else {
 			choices = lastItem as Array<Choice>;
 		}
-
-		console.log(texts, choices);
 	}
-
-	// TODO: change choice rendering
 
 	let container: HTMLElement;
 	let autoscroll = false;
@@ -78,68 +71,37 @@
 			container.offsetHeight + container.scrollTop >
 				container.scrollHeight - container.offsetHeight * 0.1;
 	});
+
 	afterUpdate(() => {
 		if (autoscroll) {
 			container.scrollTo(0, container.scrollHeight);
 		}
 	});
+
+	let interacting = false;
+
+	function choicesSpawned(node: Element) {
+		interacting = true;
+	}
 </script>
 
 <svelte:window
 	on:keydown={(e) => {
-		if (!currentDialogue) return;
 		if (e.code == 'Escape') {
 			dispatch('end');
 			return;
 		}
 
-		// choosing
-		if (chatIndex == currentDialogue.length) {
-			const children = choicesForm.children;
-			if (e.code == 'Space') {
-				if (children.length == 0) {
-					dispatch('end');
-					return;
-				}
-				children[choiceIndex]?.click();
-				return;
-			}
+		console.log(e.code);
 
-			if (e.code.includes('Arrow') && children.length != 0) {
-				if (e.code == 'ArrowRight') {
-					choiceIndex++;
-					if (choiceIndex == children.length) {
-						choiceIndex = 0;
-					}
-				} else if (e.code == 'ArrowLeft') {
-					choiceIndex--;
-					if (choiceIndex < 0) {
-						choiceIndex = children.length - 1;
-					}
-				}
-
-				children[choiceIndex % children.length].focus();
-			}
-			return;
-		}
+		if (interacting) return;
 
 		if (e.code == 'Space') {
-			if (
-				chatIndex == texts.length &&
-				choices.length == 0 &&
-				typeof texts.at(-1) == 'string'
-			) {
-				dispatch('end');
-				return;
-			}
-
-			// choosing
-			if (chatIndex == currentDialogue.length) return;
 			chatIndex++;
+		}
 
-			if (typeof currentDialogue[chatIndex - 1] == 'object') {
-				chatIndex = currentDialogue.length;
-			}
+		if (chatIndex == texts.length + choices.length + 1) {
+			dispatch('end');
 		}
 	}}
 />
@@ -149,41 +111,42 @@
 	style="background-color: rgba(0, 0, 0.5, 0.8);"
 	class="absolute z-50 flex flex-col items-start justify-start {isTutorial
 		? 'h-[204px] w-[204px] 2xl:h-[236px] 2xl:w-[236px]'
-		: 'h-[624px] w-[624px] 2xl:h-[720px] 2xl:w-[720px]'} w-full overflow-y-auto backdrop-blur"
+		: 'h-[624px] w-[624px] 2xl:h-[720px] 2xl:w-[720px]'} w-full overflow-y-auto overflow-x-hidden  backdrop-blur"
 	transition:scale|local
 >
 	<h1 class="p-4 text-2xl"><i class="twa twa-{character}" /></h1>
-	<ul class="flex flex-col gap-2">
+	<ul class="flex w-full flex-col gap-2">
 		{#each texts as text, i}
 			{#if i < chatIndex && !animating}
+				{@const isAnswer = answerIndexes.includes(i)}
 				<li
-					class="max-w-xs rounded-xl bg-neutral p-2 px-4 text-lg text-neutral-content {answerIndexes.includes(
-						i
-					)
+					class="max-w-xs rounded-xl bg-neutral p-2 px-4 text-lg text-neutral-content {isAnswer
 						? 'mr-2 self-end'
 						: 'ml-2 self-start'}"
-					transition:fly|local={{ x: -100 }}
+					transition:fly={{ x: isAnswer ? 100 : -100 }}
 				>
 					{text}
 				</li>
 			{/if}
 		{/each}
+	</ul>
+	{#if chatIndex == texts.length + 1}
 		<form
-			class="flex flex-row gap-2 px-4 pt-1"
-			bind:this={choicesForm}
+			use:choicesSpawned
+			class="flex flex-wrap gap-2 p-2"
 			on:submit|preventDefault={makeChoice}
 		>
 			{#each choices as choice, i}
-				{#if i + texts.length < chatIndex && !animating}
-					<button
-						class="btn flex-grow focus:bg-green-500 focus:text-primary-content"
-						type="submit"
-						tabindex="0"
-						transition:fly|local={{ x: 100 }}
-						>{choice.label}
-					</button>
-				{/if}
+				<button
+					data-text={choice.text}
+					data-next={choice.next}
+					class="btn-secondary btn flex-grow"
+					type="submit"
+					in:scale={{ delay: i * 100 }}
+				>
+					{choice.label}
+				</button>
 			{/each}
 		</form>
-	</ul>
+	{/if}
 </div>

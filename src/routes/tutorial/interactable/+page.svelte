@@ -363,8 +363,6 @@
 	{#if index < tutorialProps.length - 1}
 		<button class="btn-lg btn" on:click={() => index++}>⮞</button>
 	{:else if index == tutorialProps.length - 1}
-		<!-- The button to open modal -->
 		<a href="#tutorial-complete" class="btn-lg btn">FINISH</a>
-		<!-- Put this part before </body> tag -->
 	{/if}
 </div>

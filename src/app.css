@@ -7,46 +7,6 @@
 		border: none;
 	}
 
-	/* .brutal {
-		@apply border border-r-4 border-b-4 border-black;
-	}
-
-	.btn {
-		@apply brutal;
-	}
-
-	.btn:focus {
-		animation: click 200ms ease-out;
-	}
-
-	@keyframes click {
-		0% {
-			border-width: 1px;
-			border-right-width: 4px;
-			border-bottom-width: 4px;
-			border-color: #000000;
-		}
-
-		50% {
-			border: none;
-		}
-
-		100% {
-			border-width: 1px;
-			border-right-width: 4px;
-			border-bottom-width: 4px;
-			border-color: #000000;
-		}
-	}
-
-	.input-bordered {
-		@apply brutal;
-	}
-
-	.select-bordered {
-		@apply brutal;
-	} */
-
 	.info {
 		@apply cursor-help text-center text-lg duration-200 ease-out hover:scale-150;
 	}

@@ -253,10 +253,9 @@
 						{#if viewKey == 'editor'}
 							<div class="flex flex-col">
 								<button
-									class="btn bg-primary text-lg text-primary-content 2xl:btn-md hover:bg-primary-focus"
+									class="btn mb-8 bg-primary text-lg text-primary-content 2xl:btn-md hover:bg-primary-focus"
 									on:click={toggleTest}>TEST</button
 								>
-								<div class="form-control" />
 								<div class="flex flex-col gap-2">
 									<div class="form-control">
 										<label for="emoji-mode" class="label">
@@ -348,43 +347,6 @@
 										as default
 									</button>
 								</div>
-
-								<!-- <label class="label pt-8">
-									<span
-										class="label-text text-xs text-neutral-content 2xl:text-base"
-										>World Map
-									</span>
-								</label>
-								<div class="grid grid-cols-12 grid-rows-12 gap-1 self-center">
-									{#each { length: DEFAULT_SIDE_LENGTH * DEFAULT_SIDE_LENGTH } as _, i}
-										<button
-											on:click={() => (sectionIndex = i)}
-											title="Section #{i}"
-											class="h-4 w-4 rounded border border-black"
-											style:background={$map.dbg}
-										>
-											{#if i == sectionIndex}
-												<i class="twa twa-triangular-flag" />
-											{/if}
-										</button>
-									{/each}
-								</div> -->
-								<!-- <label class="label pt-8">
-									<span
-										class="label-text text-xs text-neutral-content 2xl:text-base"
-										>Starting Section
-									</span>
-								</label>
-								<select
-									class="select-bordered select"
-									bind:value={startingSectionIndex}
-									on:change={() =>
-										map.updateStartingSection(startingSectionIndex)}
-								>
-									{#each { length: 144 } as _, value}
-										<option {value}>{value}</option>
-									{/each}
-								</select> -->
 							</div>
 						{/if}
 					</aside>
