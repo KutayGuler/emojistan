@@ -16,7 +16,6 @@
 	export let dialogueTree = new Map<string, Branch>();
 	let currentBranch = dialogueID;
 	let chatIndex = 0;
-	let animating = false;
 	let answerIndexes: Array<number> = [];
 	let currentDialogue: Branch;
 	let texts: Array<string> = [];
@@ -83,8 +82,6 @@
 	function choicesSpawned(node: Element) {
 		interacting = true;
 	}
-
-	// TODO: fix crashing on empty arrays
 </script>
 
 <svelte:window
@@ -102,7 +99,7 @@
 			chatIndex++;
 		}
 
-		if (chatIndex == texts.length + choices.length + 1) {
+		if (chatIndex == texts.length + (choices?.length || 0) + 1) {
 			dispatch('end');
 		}
 	}}
@@ -117,22 +114,24 @@
 	transition:scale|local
 >
 	<h1 class="p-4 text-2xl"><i class="twa twa-{character}" /></h1>
-	<ul class="flex w-full flex-col gap-2">
-		{#each texts as text, i}
-			{#if i < chatIndex && !animating}
-				{@const isAnswer = answerIndexes.includes(i)}
-				<li
-					class="max-w-xs rounded-xl bg-neutral p-2 px-4 text-lg text-neutral-content {isAnswer
-						? 'mr-2 self-end'
-						: 'ml-2 self-start'}"
-					transition:fly={{ x: isAnswer ? 100 : -100 }}
-				>
-					{text}
-				</li>
-			{/if}
-		{/each}
-	</ul>
-	{#if chatIndex == texts.length + 1}
+	{#if texts}
+		<ul class="flex w-full flex-col gap-2">
+			{#each texts as text, i}
+				{#if i < chatIndex}
+					{@const isAnswer = answerIndexes.includes(i)}
+					<li
+						class="max-w-xs rounded-xl bg-neutral p-2 px-4 text-lg text-neutral-content {isAnswer
+							? 'mr-2 self-end'
+							: 'ml-2 self-start'}"
+						transition:fly={{ x: isAnswer ? 100 : -100 }}
+					>
+						{text}
+					</li>
+				{/if}
+			{/each}
+		</ul>
+	{/if}
+	{#if chatIndex == texts.length + 1 && choices}
 		<form
 			use:choicesSpawned
 			class="flex flex-wrap gap-2 p-2"

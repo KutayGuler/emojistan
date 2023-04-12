@@ -14,8 +14,6 @@ import {
 } from './types';
 import { generateID } from './routes/utils';
 
-// TODO: might switch key type to string
-
 function createMapStore<K, V>(name: string) {
 	const { set, subscribe, update } = writable(new Map<K, V>());
 
@@ -320,11 +318,15 @@ function createDialogueTree() {
 				state.set(id, []);
 				const choice = new Choice(text.slice(0, 4), text, id);
 
-				if (typeof branch?.at(-1) == 'string') {
+				if (typeof branch?.at(-1) === 'string') {
+					// @ts-expect-error
 					branch?.push([choice]);
 				} else {
 					(branch?.at(-1) as Array<Choice>)?.push(choice);
 				}
+
+				console.log(state);
+
 				return state;
 			}),
 	};

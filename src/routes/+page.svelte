@@ -11,11 +11,8 @@
 		equippables,
 		consumables,
 		dialogueTree as dialogue,
-		modal,
 	} from '../store';
 	import { rbxStore } from '$lib/stores/store';
-	import { generateID } from './utils';
-	import { EditableMap } from '$src/types';
 	let emojiFreqs = new Map<string, Set<string>>();
 
 	onMount(() => {
@@ -32,7 +29,7 @@
 		}
 	});
 
-	let showSaves = true;
+	let showSaves = false;
 
 	function createNewGame() {
 		saves.add(

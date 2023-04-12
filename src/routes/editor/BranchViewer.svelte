@@ -29,7 +29,8 @@
 
 	$: choiceDisabled =
 		$dialogueTree.get(currentBranch)?.length == 0 ||
-		$dialogueTree.get(currentBranch)?.at(-1)?.length == 4;
+		(typeof $dialogueTree.get(currentBranch)?.at(-1) !== 'string' &&
+			$dialogueTree.get(currentBranch)?.at(-1)?.length === 4);
 
 	let textEditIndex = -1;
 	let editValue = '';

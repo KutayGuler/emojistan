@@ -1,3 +1,5 @@
+export const EMOJI_COUNT = 1817;
+
 export const DEFAULT_SIDE_LENGTH = 12;
 export const DEFAULT_MAP_CLASS = 'map';
 

@@ -163,6 +163,7 @@
 	];
 
 	// FIXME: SAVE DUPLICATION
+	let svgCount = 0;
 </script>
 
 <svelte:head>
@@ -405,6 +406,9 @@
 													{title}
 												>
 													<i
+														on:load={() => {
+															console.log('loaded:', svgCount++);
+														}}
 														class="twa twa-{name.replace('_', $currentSkin)}"
 													/>
 												</button>
