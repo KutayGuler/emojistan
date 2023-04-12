@@ -1,7 +1,6 @@
 import { page } from '$app/stores';
 import { writable, get, type Writable, derived } from 'svelte/store';
 import { DEFAULT_BG, storeNames } from './constants';
-
 import {
 	Choice,
 	Consumable,
@@ -14,7 +13,8 @@ import {
 	type SkinTone,
 } from './types';
 import { generateID } from './routes/utils';
-import { root } from 'postcss';
+
+// TODO: might switch key type to string
 
 function createMapStore<K, V>(name: string) {
 	const { set, subscribe, update } = writable(new Map<K, V>());
@@ -133,6 +133,7 @@ function createEditableMap() {
 			);
 			const dbg = localStorage.getItem(id + '_dbg') || DEFAULT_BG;
 			const items = JSON.parse(localStorage.getItem(id + '_items') as string);
+			const colors = JSON.parse(localStorage.getItem(id + '_colors') as string);
 			const backgrounds = JSON.parse(
 				localStorage.getItem(id + '_backgrounds') as string
 			);
@@ -140,7 +141,8 @@ function createEditableMap() {
 			update((state) => {
 				state.startingSectionIndex = startingSectionIndex;
 				state.items = new Map(items) || new Map();
-				state.colors = new Map(backgrounds) || new Map();
+				state.colors = new Map(colors) || new Map();
+				state.backgrounds = new Map(backgrounds) || new Map();
 				state.dbg = dbg || '';
 				return state;
 			});
@@ -151,8 +153,12 @@ function createEditableMap() {
 					JSON.stringify(Array.from(state.items.entries()))
 				);
 				localStorage.setItem(
-					id + '_backgrounds',
+					id + '_colors',
 					JSON.stringify(Array.from(state.colors.entries()))
+				);
+				localStorage.setItem(
+					id + '_backgrounds',
+					JSON.stringify(Array.from(state.backgrounds.entries()))
 				);
 				localStorage.setItem(id + '_dbg', state.dbg);
 			});
@@ -219,38 +225,6 @@ function createEditableMap() {
 				state.items.clear();
 				state.colors.clear();
 				state.backgrounds.clear();
-				return state;
-			}),
-	};
-}
-
-function createSetStore(name: string) {
-	const { set, subscribe, update } = writable(new Set<string>());
-
-	return {
-		set,
-		subscribe,
-		useStorage: (id: string) => {
-			const val = JSON.parse(localStorage.getItem(id + '_' + name) as string);
-			set(new Set<string>(Array.from(val || [])));
-			subscribe((state) => {
-				localStorage.setItem(
-					id + '_' + name,
-					JSON.stringify(Array.from(state))
-				);
-			});
-		},
-		add: (value: string) =>
-			value != '' &&
-			update((state) => {
-				state.add(value);
-
-				return state;
-			}),
-		remove: (value: string) =>
-			value != '' &&
-			update((state) => {
-				state.delete(value);
 				return state;
 			}),
 	};

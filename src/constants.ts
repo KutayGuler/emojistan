@@ -61,6 +61,7 @@ export const storeNames = [
 	'interactables',
 	'items',
 	'backgrounds',
+	'colors',
 	'rbxs',
 	'dbg',
 	'dialogue',

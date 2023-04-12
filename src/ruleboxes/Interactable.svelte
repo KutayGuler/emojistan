@@ -26,7 +26,6 @@
 		interactables,
 		equippables,
 		consumables,
-		dialogueTree,
 	} from '../store';
 
 	let defaultBackground = $map.dbg;
@@ -87,6 +86,8 @@
 	let background = '';
 
 	onMount(() => {
+		console.log(id, $interactables);
+		
 		let obj = $interactables.get(id);
 		if (obj) {
 			({

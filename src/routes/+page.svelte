@@ -10,10 +10,12 @@
 		interactables,
 		equippables,
 		consumables,
-		dialogueTree,
+		dialogueTree as dialogue,
 		modal,
 	} from '../store';
 	import { rbxStore } from '$lib/stores/store';
+	import { generateID } from './utils';
+	import { EditableMap } from '$src/types';
 	let emojiFreqs = new Map<string, Set<string>>();
 
 	onMount(() => {
@@ -73,7 +75,7 @@
 					equippables: Object.fromEntries($equippables),
 					consumables: Object.fromEntries($consumables),
 					interactables: Object.fromEntries($interactables),
-					dialogueTree: Object.fromEntries($dialogueTree),
+					dialogueTree: Object.fromEntries($dialogue),
 				},
 				owner: owner.data.user.id,
 			},
@@ -106,6 +108,8 @@
 			map: {
 				items: Object.fromEntries($map.items),
 				backgrounds: Object.fromEntries($map.backgrounds),
+				colors: Object.fromEntries($map.colors),
+				dbg: $map.dbg,
 			},
 			rbxs: Array.from($rbxStore),
 			pushers: Object.fromEntries($pushers),
@@ -113,7 +117,7 @@
 			equippables: Object.fromEntries($equippables),
 			consumables: Object.fromEntries($consumables),
 			interactables: Object.fromEntries($interactables),
-			dialogueTree: Object.fromEntries($dialogueTree),
+			dialogue: Object.fromEntries($dialogue),
 		};
 
 		let dataStr =
@@ -130,12 +134,47 @@
 		downloadAnchorNode.remove();
 	}
 
-	function openUploadedSave() {
-		// TODO:
-		// generate new key for the save
-		// generate new name for the save
-		// save all of them to localStorage with useStorage
-		// open the save
+	async function openUploadedSave() {
+		let content = await files[0].text();
+		let obj = JSON.parse(content);
+		saves.add(
+			'Upload-' +
+				new Intl.DateTimeFormat('en-GB', {
+					dateStyle: 'full',
+					timeStyle: 'short',
+				}).format(new Date())
+		);
+
+		console.log(obj.rbxs);
+
+		const id = $saves.currentSaveID;
+
+		for (let key of Object.keys(obj)) {
+			if (key == 'map') {
+				for (let _key of Object.keys(obj.map)) {
+					if (_key === 'dbg') {
+						localStorage.setItem(id + '_dbg', obj.map.dbg);
+					} else {
+						localStorage.setItem(
+							id + '_' + _key,
+							JSON.stringify(Object.entries(obj.map[_key]))
+						);
+					}
+				}
+			} else if (key === 'rbxs') {
+				localStorage.setItem(
+					id + '_' + key,
+					JSON.stringify(Array.from(obj[key]))
+				);
+			} else {
+				localStorage.setItem(
+					id + '_' + key,
+					JSON.stringify(Object.entries(obj[key]))
+				);
+			}
+		}
+
+		goto('/editor');
 	}
 </script>
 

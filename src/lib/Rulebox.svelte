@@ -36,6 +36,7 @@
 	// moving local boolean specific to rulebox selected, to change position of individual rulebox once selected
 	let moving = false;
 	let moved = false;
+	console.log(rbx);
 </script>
 
 <svelte:window

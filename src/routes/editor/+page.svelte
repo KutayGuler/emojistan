@@ -95,7 +95,6 @@
 
 	let innerWidth: number;
 	let innerHeight: number;
-	let hintsEnabled = false;
 
 	type CopyMode = 'Item' | 'Background' | 'Both';
 

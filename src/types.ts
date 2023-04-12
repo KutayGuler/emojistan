@@ -123,12 +123,17 @@ export interface EditableMap {
 }
 
 export class EditableMap {
-	constructor(items = new Map<string, string>()) {
+	constructor(
+		items = new Map<string, string>(),
+		colors = new Map<string, string>(),
+		backgrounds = new Map<string, string>(),
+		dbg = DEFAULT_BG
+	) {
 		this.startingSectionIndex = 0;
 		this.items = items;
-		this.colors = new Map<string, string>();
-		this.backgrounds = new Map<string, string>();
-		this.dbg = DEFAULT_BG;
+		this.colors = colors;
+		this.backgrounds = backgrounds;
+		this.dbg = dbg;
 	}
 }
 

@@ -83,6 +83,8 @@
 	function choicesSpawned(node: Element) {
 		interacting = true;
 	}
+
+	// TODO: fix crashing on empty arrays
 </script>
 
 <svelte:window
