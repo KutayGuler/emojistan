@@ -9,7 +9,7 @@
   import { Consumable } from "$src/types";
   import { onDestroy, onMount } from "svelte";
 
-  export let id: number;
+  export let id: string;
   export let emoji = "";
   export let hp = 1;
   export let mutateConsumerTo = "";

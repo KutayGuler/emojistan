@@ -66,7 +66,7 @@
 	}
 
 	// COMPONENT RELATED
-	export let id: number;
+	export let id: string;
 	export let emoji = '';
 	export let sequence: Array<SequenceItem> = [];
 	export let hp = 1;

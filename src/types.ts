@@ -207,7 +207,7 @@ export class Interactable {
 		sequence: Array<SequenceItem>,
 		hp: number,
 		points: number,
-		sideEffects: Array<[number | 'any', number]>,
+		sideEffects: Array<[number | 'any', number | 'talk']>,
 		isControllable: boolean,
 		evolve: Evolve,
 		devolve: Devolve

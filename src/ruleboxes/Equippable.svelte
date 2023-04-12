@@ -9,7 +9,7 @@
   } from "$src/store";
   import { Equippable } from "$src/types";
 
-  export let id: number;
+  export let id: string;
   export let emoji = "";
   let hp = 1;
 

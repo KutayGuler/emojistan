@@ -348,11 +348,11 @@ export const saves = createSaves();
 export const map = createEditableMap();
 
 // MAPS
-export const pushers = createMapStore<number, Pusher>('pushers');
-export const mergers = createMapStore<number, Merger>('mergers');
-export const consumables = createMapStore<number, Consumable>('consumables');
-export const equippables = createMapStore<number, Equippable>('equippables');
-export const interactables = createMapStore<number, Interactable>(
+export const pushers = createMapStore<string, Pusher>('pushers');
+export const mergers = createMapStore<string, Merger>('mergers');
+export const consumables = createMapStore<string, Consumable>('consumables');
+export const equippables = createMapStore<string, Equippable>('equippables');
+export const interactables = createMapStore<string, Interactable>(
 	'interactables'
 );
 export const dialogueTree = createDialogueTree();

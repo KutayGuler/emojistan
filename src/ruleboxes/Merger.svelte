@@ -5,7 +5,7 @@
 	import { rbxStore } from '$src/lib/stores/store';
 	import type { Merger } from '$src/types';
 
-	export let id: number;
+	export let id: string;
 	export let slots: Merger = ['', '', ''];
 
 	onMount(() => {
