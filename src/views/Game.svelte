@@ -68,6 +68,7 @@
 	/* ## DIALOGUE ## */
 	let character = '';
 	let dialogueID = '';
+	let handDirection = '';
 
 	onMount(() => {
 		[$currentColor, $currentEmoji] = ['', ''];
@@ -283,7 +284,6 @@
 		}
 
 		console.log(matrix);
-		
 
 		let astar: {
 			aStarInstance: AStarFinder;
@@ -518,6 +518,7 @@
 
 	async function handle(e: KeyboardEvent) {
 		e.preventDefault();
+		handDirection = '';
 		if (
 			!items.has(currentSection + '_' + ac) ||
 			(player?.hp.current || -1) <= 0 ||
@@ -578,7 +579,8 @@
 
 		if (e.code == 'Space' && !chatting) {
 			// required so that items are not overflowing from the map
-			if (calcOperation(wasdToArrow[directionKey], ac) == 0) {
+			const operation = calcOperation(wasdToArrow[directionKey], ac);
+			if (operation == 0) {
 				return;
 			}
 			let interactedItem = items.get(currentSection + '_' + ic);
@@ -687,11 +689,39 @@
 			if (sideEffect[1] == 0) return;
 			interactedItem.hp.current += sideEffect[1];
 
+			// TOOD: get this out
+			function getHandDirection(operation: number) {
+				switch (operation) {
+					case -1:
+						return 'left';
+					case 1:
+						return 'right';
+					case SIZE:
+						return 'down';
+					case -SIZE:
+						return 'up';
+					default:
+						return '';
+				}
+			}
+
+			handDirection = getHandDirection(operation);
+			let timeout = setTimeout(() => {
+				handDirection = '';
+				clearTimeout(timeout);
+			}, 50);
+
+			// FIXME: Ctrl should only drop the currently equipped weapon
+			// FIXME: equippedItem.hp not reducing on interaction
+
 			// TODO: Equip consumable with space, hold E to consume
-			// TODO: Ctrl should only drop the currently equipped weapon
-			// TODO: equippedItem.hp not reducing on interaction
 			// TODO: add animations for interaction
 			// TODO: animation on taking damage
+			// TODO: stack for items
+
+			// TODO: AI field of view
+			// TODO: AI patrolling
+
 			if (
 				equippedItem instanceof Equippable &&
 				sideEffect[0] == equippedItem.emoji
@@ -885,7 +915,7 @@
 				style:background={colors.get(currentSection + '_' + i) || map.dbg}
 			>
 				{#if active}
-					<div class="absolute z-[2] text-base {directionKey}">
+					<div class="absolute z-[2] text-base {directionKey} {handDirection}">
 						<i class="twa twa-{hand}" />
 					</div>
 				{/if}
@@ -989,6 +1019,46 @@
 	.equippable {
 		animation: equippable 500ms linear infinite alternate;
 		scale: 0.618;
+	}
+
+	.up {
+		animation: up 100ms linear;
+	}
+
+	.down {
+		animation: down 100ms linear;
+	}
+
+	.right {
+		animation: right 100ms linear;
+	}
+
+	.left {
+		animation: left 100ms linear;
+	}
+
+	@keyframes up {
+		100% {
+			transform: translateY(-20px);
+		}
+	}
+
+	@keyframes down {
+		100% {
+			transform: translateY(20px);
+		}
+	}
+
+	@keyframes right {
+		100% {
+			transform: translateX(20px);
+		}
+	}
+
+	@keyframes left {
+		100% {
+			transform: translateX(-20px);
+		}
 	}
 
 	.consumable {
