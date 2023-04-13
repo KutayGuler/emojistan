@@ -70,7 +70,7 @@ export const storeNames = [
 ];
 
 /* INTERACTABLE */
-export const MAX_INVENTORY_SIZE = 4;
+export const MAX_INVENTORY_SIZE = 8;
 
 export const palette = [
 	// Gray:

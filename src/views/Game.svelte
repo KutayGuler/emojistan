@@ -30,6 +30,7 @@
 		Choice,
 		type Branch,
 	} from '$src/types';
+	import { AStarFinder } from 'astar-typescript';
 	import Chat from './Chat.svelte';
 
 	/* ## DATA ## */
@@ -83,6 +84,8 @@
 		}
 	});
 
+	let enemyIndexes = [135, 143];
+
 	const dispatch = createEventDispatcher();
 	const keys: {
 		[key in Wasd]: { emoji: string; operation: number };
@@ -119,10 +122,17 @@
 				if (code == 'ArrowUp' && index < SIZE) return 0;
 				if (code == 'ArrowRight' && (index + 1) % SIZE == 0) return 0;
 				if (code == 'ArrowDown' && index >= SIZE * SIZE - SIZE) return 0;
-				return (
-					(['ArrowUp', 'ArrowDown'].includes(code) ? SIZE : 1) *
-					(['ArrowRight', 'ArrowDown'].includes(code) ? 1 : -1)
-				);
+
+				switch (code) {
+					case 'ArrowUp':
+						return -SIZE;
+					case 'ArrowRight':
+						return 1;
+					case 'ArrowDown':
+						return SIZE;
+					case 'ArrowLeft':
+						return -1;
+				}
 		  }
 		: (code: ArrowKey, index: number) => {
 				if (code == 'ArrowLeft' && index % SIZE == 0) {
@@ -239,6 +249,68 @@
 		if (emoji == '') continue;
 		_equippables[emoji] = {} as Equippable;
 		Object.assign(_equippables[emoji], args);
+	}
+
+	function posObjToString({ x, y }: { x: number; y: number }) {
+		return SIZE * y + x;
+	}
+
+	function coordinateToPosObj(num: number) {
+		return { x: num % SIZE, y: Math.floor(num / SIZE) };
+	}
+
+	function followPlayer(
+		startPos: { x: number; y: number },
+		goalPos: { x: number; y: number },
+		relativeIndex: number
+	) {
+		let matrix: Array<Array<number>> = [];
+
+		for (let i = 0; i < SIZE; i++) {
+			matrix[i] = [];
+			for (let j = 0; j < SIZE; j++) {
+				let item = items.get(currentSection + '_' + (SIZE * i + j));
+				if (item) {
+					if (_interactables[item.emoji]) {
+						matrix[i].push(0);
+					} else {
+						matrix[i].push(1);
+					}
+				} else {
+					matrix[i].push(0);
+				}
+			}
+		}
+
+		console.log(matrix);
+		
+
+		let astar: {
+			aStarInstance: AStarFinder;
+		} = {
+			aStarInstance: new AStarFinder({
+				grid: {
+					matrix,
+				},
+				diagonalAllowed: false,
+			}),
+		};
+
+		console.log(startPos, goalPos);
+
+		let pathway = astar.aStarInstance.findPath(startPos, goalPos);
+		pathway.slice(0, 2);
+		console.log(pathway);
+
+		if (pathway?.length <= 1) return;
+
+		let from = pathway[0][1] * SIZE + pathway[0][0];
+		let to = pathway[1][1] * SIZE + pathway[1][0];
+
+		if (!items.has(currentSection + '_' + to)) {
+			transferItem(from, to);
+			enemyIndexes[relativeIndex] = to;
+		}
 	}
 
 	function initItems() {
@@ -381,8 +453,6 @@
 			);
 		}
 
-		console.log(collisionTypeSequence);
-
 		let finalIndex = ac + operation * (i - 1);
 		let code = '';
 
@@ -466,11 +536,19 @@
 
 			if (!facingItem) {
 				transferItem(ac, ac + operation);
+				for (let i = 0; i < enemyIndexes.length; i++) {
+					followPlayer(
+						coordinateToPosObj(enemyIndexes[i]),
+						coordinateToPosObj(ac),
+						i
+					);
+				}
+				console.log(enemyIndexes);
+
 				return;
 			}
 
 			let collisionType = getCollisionType(player.emoji, facingItem.emoji);
-			console.log(collisionType);
 
 			switch (collisionType) {
 				case 'push':
@@ -609,6 +687,11 @@
 			if (sideEffect[1] == 0) return;
 			interactedItem.hp.current += sideEffect[1];
 
+			// TODO: Equip consumable with space, hold E to consume
+			// TODO: Ctrl should only drop the currently equipped weapon
+			// TODO: equippedItem.hp not reducing on interaction
+			// TODO: add animations for interaction
+			// TODO: animation on taking damage
 			if (
 				equippedItem instanceof Equippable &&
 				sideEffect[0] == equippedItem.emoji
@@ -759,6 +842,8 @@
 	function noPlayer(rbx: any) {
 		if (ac == -2) dispatch('noPlayer');
 	}
+
+	$: console.log('$', ac);
 </script>
 
 <svelte:window on:keydown={handle} />

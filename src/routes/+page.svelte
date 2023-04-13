@@ -338,7 +338,6 @@
 				</div>
 			{/each}
 		{:else}
-			<h1 class="text-neutral-content">Emojistan</h1>
 			<button on:click={() => (showSaves = true)} class="btn-primary btn w-full"
 				>PLAY</button
 			>

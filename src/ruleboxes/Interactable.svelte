@@ -1,13 +1,11 @@
 <script lang="ts">
 	import {
-		DURATIONS,
 		INTERACTABLE_H,
 		MIN_DURATION,
 		MIN_INDEX,
 		DEFAULT_SIDE_LENGTH,
 		EQUIPPABLE_BORDER,
 		CROSS,
-		palette,
 		MAX_SIDE_EFFECT,
 	} from '$src/constants';
 	import { rbxStore } from '$src/lib/stores/store';
@@ -87,7 +85,7 @@
 
 	onMount(() => {
 		console.log(id, $interactables);
-		
+
 		let obj = $interactables.get(id);
 		if (obj) {
 			({
@@ -130,7 +128,7 @@
 		if (evolve.to == '') evolve.enabled = false;
 		if (devolve.to == '') devolve.enabled = false;
 		sideEffects = sideEffects.filter((m) => {
-			if (m[0] == 'any') return true;
+			if (m[0] === 'any') return true;
 			return $equippables.get(m[0])?.emoji != '';
 		});
 		sideEffects = sideEffects.filter((m, i) => {
