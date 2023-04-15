@@ -14,8 +14,8 @@
 
 	function checkCollision() {
 		for (let [_id, _slots] of $pushers.entries()) {
-			if (id == _id) continue;
-			if (_slots[0] == slots[0] && _slots[1] == slots[1]) {
+			if (id === _id) continue;
+			if (_slots[0] === slots[0] && _slots[1] === slots[1]) {
 				slots = ['', '', 'push'];
 				notifications.warning("Can't have duplicate pushers.");
 				break;

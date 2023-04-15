@@ -15,7 +15,7 @@ const createNotificationStore = () => {
 
 	const send = (message: string, type = 'default') => {
 		_notifications.update((state) => {
-			if (state.length && message == state[state.length - 1].message) {
+			if (state.length && message === state[state.length - 1].message) {
 				if (state[state.length - 1].shake) {
 					state[state.length - 1].shake = false;
 				} else {

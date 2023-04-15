@@ -11,6 +11,7 @@ import {
 	type Merger,
 	type Pusher,
 	type SkinTone,
+	Controllable,
 } from './types';
 import { generateID } from './routes/utils';
 
@@ -67,8 +68,8 @@ function createSaves() {
 			const saves = JSON.parse(localStorage.getItem('saves') as string);
 
 			if (
-				get(page).route.id == 'editor' &&
-				(currentSaveID == '' || currentSaveID == null)
+				get(page).route.id === 'editor' &&
+				(currentSaveID === '' || currentSaveID === null)
 			) {
 				return false;
 			}
@@ -189,7 +190,7 @@ function createEditableMap() {
 		filterColors: () =>
 			update((state) => {
 				for (let [id, color] of state.colors) {
-					if (color == state.dbg) state.colors.delete(id);
+					if (color === state.dbg) state.colors.delete(id);
 				}
 				return state;
 			}),
@@ -298,7 +299,8 @@ function createDialogueTree() {
 		addTextTo: (id: string, text: string) =>
 			update((state) => {
 				if (typeof state.get(id)?.at(-1) !== 'string') {
-					state.get(id)?.splice(state.get(id)?.length - 1, 0, text);
+					let _state = state.get(id);
+					_state?.splice(_state?.length - 1, 0, text);
 				} else {
 					state.get(id)?.push(text);
 				}
@@ -356,5 +358,8 @@ export const consumables = createMapStore<string, Consumable>('consumables');
 export const equippables = createMapStore<string, Equippable>('equippables');
 export const interactables = createMapStore<string, Interactable>(
 	'interactables'
+);
+export const controllables = createMapStore<string, Controllable>(
+	'controllables'
 );
 export const dialogueTree = createDialogueTree();

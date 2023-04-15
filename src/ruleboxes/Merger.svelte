@@ -14,7 +14,7 @@
 
 	function checkCollision() {
 		for (let [_id, _slots] of $pushers.entries()) {
-			if (_slots[0] == slots[0] && _slots[1] == slots[1]) {
+			if (_slots[0] === slots[0] && _slots[1] === slots[1]) {
 				slots = ['', '', ''];
 				notifications.warning('Cannot have conflicting behaviours.');
 				break;
@@ -22,12 +22,12 @@
 		}
 
 		for (let [_id, _slots] of $mergers.entries()) {
-			if (id == _id) continue;
+			if (id === _id) continue;
 			let _firstTwo = [_slots[0], _slots[1]];
 			let firstTwo = [slots[0], slots[1]];
 			if (
-				_firstTwo.toString() == firstTwo.toString() ||
-				_firstTwo.reverse().toString() == firstTwo.toString()
+				_firstTwo.toString() === firstTwo.toString() ||
+				_firstTwo.reverse().toString() === firstTwo.toString()
 			) {
 				slots = ['', '', ''];
 				notifications.warning(
@@ -43,7 +43,7 @@
 	function updateSlot(i: number) {
 		slots[i] = $formattedEmoji;
 		if (slots.includes('')) return;
-		if (slots[0] == slots[2] || slots[1] == slots[2]) {
+		if (slots[0] === slots[2] || slots[1] === slots[2]) {
 			slots = ['', '', ''];
 			notifications.warning('Inputs cannot be the same with output');
 			return;

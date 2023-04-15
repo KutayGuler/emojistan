@@ -5,6 +5,7 @@
 		interactables,
 		consumables,
 		equippables,
+		controllables,
 	} from '../store';
 	import type { RuleboxType } from '$lib/types';
 	import { rbxStore } from '$lib/stores/store';
@@ -12,6 +13,7 @@
 		Devolve,
 		Evolve,
 		Interactable,
+		Controllable,
 		Equippable,
 		Consumable,
 	} from '$src/types';
@@ -35,6 +37,9 @@
 				break;
 			case 'equippable':
 				equippables.add(id, value);
+				break;
+			case 'controllable':
+				controllables.add(id, value);
 				break;
 			case 'interactable':
 				interactables.add(id, value);
@@ -63,6 +68,20 @@
 			onClick: () => spawn('equippable', new Equippable('', 1)),
 		},
 		{
+			name: 'Controllable',
+			onClick: () =>
+				spawn(
+					'controllable',
+					new Controllable(
+						'',
+						1,
+						[],
+						new Evolve(false, '', 2),
+						new Devolve(false, '')
+					)
+				),
+		},
+		{
 			name: 'Interactable',
 			onClick: () =>
 				spawn(
@@ -73,7 +92,6 @@
 						1,
 						1,
 						[['any', 'talk']],
-						false,
 						new Evolve(false, '', 2),
 						new Devolve(false, '')
 					)

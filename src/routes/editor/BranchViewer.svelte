@@ -11,13 +11,13 @@
 	}
 
 	function addChoice() {
-		if (text == '') return;
+		if (text === '') return;
 		dialogueTree.addChoiceTo(currentBranch, text);
 		text = '';
 	}
 
 	function addText() {
-		if (text == '') return;
+		if (text === '') return;
 		dialogueTree.addTextTo(currentBranch, text);
 		text = '';
 	}
@@ -28,7 +28,7 @@
 	}
 
 	$: choiceDisabled =
-		$dialogueTree.get(currentBranch)?.length == 0 ||
+		$dialogueTree.get(currentBranch)?.length === 0 ||
 		(typeof $dialogueTree.get(currentBranch)?.at(-1) !== 'string' &&
 			$dialogueTree.get(currentBranch)?.at(-1)?.length === 4);
 
@@ -42,7 +42,7 @@
 
 <svelte:window
 	on:keypress={(e) => {
-		if (e.code == 'Escape') {
+		if (e.code === 'Escape') {
 			[textEditIndex, choiceEditIndex] = [-1, -1];
 			[editValue, choiceLabel, choiceText] = ['', '', ''];
 		}
@@ -75,7 +75,7 @@
 							on:click={() => {
 								// @ts-expect-error
 								editValue = leaf;
-								if (textEditIndex == i) {
+								if (textEditIndex === i) {
 									textEditIndex = -1;
 								} else {
 									textEditIndex = i;
@@ -96,7 +96,7 @@
 								/>
 							</svg>
 						</button>
-						{#if textEditIndex == i}
+						{#if textEditIndex === i}
 							<form
 								on:submit={() => {
 									textEditIndex = -1;
@@ -116,7 +116,7 @@
 				{:else}
 					<div class="mt-4 flex flex-row items-center gap-2">
 						{#each leaf as choice, i}
-							{@const chosen = choice.next == nextBranch}
+							{@const chosen = choice.next === nextBranch}
 							<div
 								class="relative flex w-1/4 flex-col gap-2 rounded-xl border-2 {chosen
 									? 'border-primary'
@@ -130,7 +130,7 @@
 								<p class="h-20 overflow-y-auto px-2">{choice.text}</p>
 								<button
 									on:click={() => {
-										if (choiceEditIndex == i) {
+										if (choiceEditIndex === i) {
 											choiceEditIndex = -1;
 											return;
 										}
@@ -139,7 +139,7 @@
 										choiceLabel = choice.label;
 										choiceText = choice.text;
 									}}
-									class="btn-ghost btn absolute right-0 bottom-0 h-fit w-fit"
+									class="btn btn-ghost absolute right-0 bottom-0 h-fit w-fit"
 								>
 									<svg
 										xmlns="http://www.w3.org/2000/svg"
@@ -175,7 +175,7 @@
 											type="text"
 											bind:value={choiceText}
 										/>
-										<button class="btn-primary btn" type="submit">SAVE</button>
+										<button class="btn btn-primary" type="submit">SAVE</button>
 									</form>
 								{/if}
 							</div>

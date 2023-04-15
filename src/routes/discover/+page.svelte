@@ -18,12 +18,12 @@
 						type="radio"
 						name="options"
 						data-title={value}
-						class={filterType == value ? 'btn-accent btn' : 'btn'}
+						class={filterType === value ? 'btn btn-accent' : 'btn'}
 						bind:group={filterType}
 					/>
 				{/each}
 			</div>
-			{#if filterType == 'top'}
+			{#if filterType === 'top'}
 				<select class="select-bordered select">
 					{#each filters as value}
 						<option {value}>{value}</option>

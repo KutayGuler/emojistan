@@ -43,7 +43,7 @@ function createRuleboxes() {
 		adjustHeight: (id: string, sequenceLength: number, defaultHeight: number) =>
 			update((state) => {
 				for (let rbx of state) {
-					if (rbx.id == id) {
+					if (rbx.id === id) {
 						rbx.height = defaultHeight + sequenceLength * 56;
 						break;
 					}

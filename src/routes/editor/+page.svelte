@@ -23,6 +23,7 @@
 		consumables,
 		dialogueTree,
 		showLoading,
+		controllables,
 	} from '../../store';
 
 	import { emojis } from './emojis';
@@ -37,7 +38,7 @@
 
 	import Svelvet from '$lib';
 	import DialogueEditor from './DialogueEditor.svelte';
-	import type { SkinTone } from '$src/types';
+	import type { CopyMode, SkinTone } from '$src/types';
 
 	// function getStatics() {
 	// 	let _statics = new Set<string>($statics);
@@ -52,7 +53,7 @@
 	// }
 
 	onMount(() => {
-		if ($saves.currentSaveID == '') {
+		if ($saves.currentSaveID === '') {
 			let saveExists = saves.useStorage();
 			if (!saveExists) {
 				goto('/', { replaceState: true });
@@ -71,6 +72,7 @@
 			equippables,
 			consumables,
 			interactables,
+			controllables,
 			rbxStore,
 			dialogueTree,
 		]) {
@@ -83,25 +85,23 @@
 	let sectionIndex = 0;
 
 	function handleKeydown(e: KeyboardEvent) {
-		if (e.code == 'Escape') {
+		if (e.code === 'Escape') {
 			$currentEmoji = '';
 			$currentColor = '';
 		}
 	}
 
 	function pickEmoji(emoji: string) {
-		$currentEmoji = emoji == $currentEmoji ? '' : emoji;
+		$currentEmoji = emoji === $currentEmoji ? '' : emoji;
 	}
 
 	let innerWidth: number;
 	let innerHeight: number;
 
-	type CopyMode = 'Item' | 'Background' | 'Both';
-
-	const copyModes: Array<CopyMode> = ['Item', 'Background', 'Both'];
+	const copyModes: Array<CopyMode> = ['Emoji', 'Color', 'Both'];
 	const deleteTexts: { [key in CopyMode]: string } = {
-		Item: 'ITEMS',
-		Background: 'BGS',
+		Emoji: 'EMOJIS',
+		Color: 'COLORS',
 		Both: 'ALL',
 	};
 
@@ -109,7 +109,7 @@
 	let emojiMode: 'Foreground' | 'Background' = 'Foreground';
 
 	function fillMap() {
-		if ($currentEmoji == '') return;
+		if ($currentEmoji === '') return;
 		for (let i = 0; i < DEFAULT_SIDE_LENGTH * DEFAULT_SIDE_LENGTH; i++) {
 			$map.items.set(sectionIndex + '_' + i, $currentEmoji);
 		}
@@ -118,10 +118,10 @@
 
 	function clearMap() {
 		switch (copyMode) {
-			case 'Item':
+			case 'Emoji':
 				map.clearItems();
 				break;
-			case 'Background':
+			case 'Color':
 				map.clearColors();
 				break;
 			case 'Both':
@@ -217,6 +217,7 @@
 				map={structuredClone($map)}
 				pushers={$pushers}
 				mergers={$mergers}
+				controllables={$controllables}
 				interactables={$interactables}
 				equippables={$equippables}
 				consumables={$consumables}
@@ -234,7 +235,7 @@
 			>
 				{#each Object.entries(views) as [key, icon]}
 					<button
-						class="{viewKey == key
+						class="{viewKey === key
 							? 'scale-150 opacity-100'
 							: 'opacity-50'} duration-200 ease-out hover:scale-150 hover:opacity-100"
 						on:click={() => changeViewTo(key)}
@@ -243,14 +244,14 @@
 					</button>
 				{/each}
 			</div>
-			{#if viewKey == 'dialogue'}
+			{#if viewKey === 'dialogue'}
 				<DialogueEditor />
 			{:else}
 				<div
 					class="relative box-border flex flex-row items-center justify-center"
 				>
 					<aside class="aside overflow-y-auto overflow-x-visible">
-						{#if viewKey == 'editor'}
+						{#if viewKey === 'editor'}
 							<div class="flex flex-col">
 								<button
 									class="btn mb-8 bg-primary text-lg text-primary-content 2xl:btn-md hover:bg-primary-focus"
@@ -296,7 +297,7 @@
 									</button>
 									<button
 										id="filler"
-										disabled={$currentEmoji == ''}
+										disabled={$currentEmoji === ''}
 										class="btn w-full text-lg 2xl:btn-md"
 										on:click={fillMap}
 										>Fill With &nbsp;<i
@@ -313,11 +314,11 @@
 										class="grid grid-cols-9 grid-rows-10 items-center justify-center gap-1"
 									>
 										{#each palette as color}
-											{@const disabled = color == $map.dbg}
+											{@const disabled = color === $map.dbg}
 											<button
 												{disabled}
 												on:click={() => {
-													$currentColor = $currentColor == color ? '' : color;
+													$currentColor = $currentColor === color ? '' : color;
 												}}
 												class="h-5 w-5  duration-75 ease-out {disabled
 													? ''
@@ -328,8 +329,8 @@
 									</div>
 									<button
 										on:click={() => {
-											if ($currentColor == '') return;
-											if ($currentColor == $map.dbg) {
+											if ($currentColor === '') return;
+											if ($currentColor === $map.dbg) {
 												map.updateDefaultColor(DEFAULT_BG);
 												return;
 											}
@@ -337,7 +338,7 @@
 											map.updateDefaultColor($currentColor);
 											map.filterColors();
 										}}
-										disabled={$currentColor == ''}
+										disabled={$currentColor === ''}
 										class="btn flex w-full flex-row items-center"
 									>
 										Set <div
@@ -401,7 +402,7 @@
 											{@const title = name.replaceAll('-', ' ')}
 											{#if title.includes(filter)}
 												<button
-													class:selected={$currentEmoji == name}
+													class:selected={$currentEmoji === name}
 													on:click={() => pickEmoji(name)}
 													{title}
 												>

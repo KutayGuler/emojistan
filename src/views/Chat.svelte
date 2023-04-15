@@ -22,7 +22,7 @@
 	let choices: Array<Choice> = [];
 
 	onMount(() => {
-		if (dialogueTree.size == 0) {
+		if (dialogueTree.size === 0) {
 			dialogueTree = new Map<string, Branch>($dt);
 		}
 
@@ -86,7 +86,7 @@
 
 <svelte:window
 	on:keydown={(e) => {
-		if (e.code == 'Escape') {
+		if (e.code === 'Escape') {
 			dispatch('end');
 			return;
 		}
@@ -95,11 +95,11 @@
 
 		if (interacting) return;
 
-		if (e.code == 'Space') {
+		if (e.code === 'Space') {
 			chatIndex++;
 		}
 
-		if (chatIndex == texts.length + (choices?.length || 0) + 1) {
+		if (chatIndex === texts.length + (choices?.length || 0) + 1) {
 			dispatch('end');
 		}
 	}}
@@ -131,7 +131,7 @@
 			{/each}
 		</ul>
 	{/if}
-	{#if chatIndex == texts.length + 1 && choices}
+	{#if chatIndex === texts.length + 1 && choices}
 		<form
 			use:choicesSpawned
 			class="flex flex-wrap gap-2 p-2"
@@ -141,7 +141,7 @@
 				<button
 					data-text={choice.text}
 					data-next={choice.next}
-					class="btn-secondary btn flex-grow"
+					class="btn btn-secondary flex-grow"
 					type="submit"
 					in:scale={{ delay: i * 100 }}
 				>

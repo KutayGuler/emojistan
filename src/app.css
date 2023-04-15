@@ -94,6 +94,7 @@
 	--pusher: #64748b;
 	--merger: #334155;
 	--interactable: #6366f1;
+	--controllable: #f43f5e;
 	--consumable: #22c55e;
 	--equippable: #f97316;
 
@@ -138,6 +139,7 @@ body {
 .Pusher:hover,
 .Merger:hover,
 .Interactable:hover,
+.Controllable:hover,
 .Equippable:hover,
 .Consumable:hover {
 	color: var(--primary);
@@ -151,6 +153,9 @@ body {
 }
 .Interactable:hover {
 	background-color: var(--interactable);
+}
+.Controllable:hover {
+	background-color: var(--controllable);
 }
 .Equippable:hover {
 	background-color: var(--equippable);

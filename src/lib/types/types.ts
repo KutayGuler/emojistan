@@ -20,6 +20,10 @@ import {
 	EQUIPPABLE_BORDER,
 	EQUIPPABLE_H,
 	EQUIPPABLE_W,
+	CONTROLLABLE_BG,
+	CONTROLLABLE_BORDER,
+	CONTROLLABLE_H,
+	CONTROLLABLE_W,
 } from '$src/constants';
 import type { XYPosition, Position } from './utils';
 
@@ -29,6 +33,7 @@ export type RuleboxType =
 	| 'consumable'
 	| 'equippable'
 	| 'interactable'
+	| 'controllable'
 	| 'ctxMenu';
 
 export interface Rulebox {
@@ -81,6 +86,12 @@ export class Rulebox {
 				this.height = INTERACTABLE_H;
 				this.borderColor = INTERACTABLE_BORDER;
 				this.bgColor = INTERACTABLE_BG;
+				return;
+			case 'controllable':
+				this.width = CONTROLLABLE_W;
+				this.height = CONTROLLABLE_H;
+				this.borderColor = CONTROLLABLE_BORDER;
+				this.bgColor = CONTROLLABLE_BG;
 				return;
 			case 'pusher':
 				this.width = PUSHER_W;

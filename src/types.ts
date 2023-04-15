@@ -1,3 +1,10 @@
+// EDITOR TYPES
+
+export type CopyMode = 'Emoji' | 'Color' | 'Both';
+export type EmojiMode = 'Foreground' | 'Background';
+
+// GAME TYPES
+
 import { DEFAULT_BG } from './constants';
 
 export type CollisionType = 'bump' | 'push' | string;
@@ -26,14 +33,17 @@ export class HP {
 
 export interface Item {
 	emoji: string;
-	inventory: Array<Equippable>;
+	inventory: Map<number, Equippable | Consumable>;
 	hp: HP;
 }
 
 export class Item {
 	constructor(
 		emoji: string,
-		inventory: Array<Equippable> | [] = [],
+		inventory: Map<number, Equippable | Consumable> = new Map<
+			number,
+			Equippable | Consumable
+		>(),
 		hpPoints: number = 1
 	) {
 		this.emoji = emoji;
@@ -77,11 +87,10 @@ export interface _Consumables {
 }
 
 export interface _Interactable {
-	id: number;
+	id: string;
 	sequence: Array<SequenceItem>;
 	points: number;
 	hp: number;
-	isControllable: boolean;
 	sideEffects: Array<[string, number | 'talk']>;
 	evolve: Evolve;
 	devolve: Devolve;
@@ -89,6 +98,19 @@ export interface _Interactable {
 
 export interface _Interactables {
 	[key: string]: _Interactable;
+}
+
+export interface _Controllable {
+	id: string;
+	emoji: string;
+	hp: number;
+	sideEffects: Array<[string, number]>;
+	evolve: Evolve;
+	devolve: Devolve;
+}
+
+export interface _Controllables {
+	[key: string]: _Controllable;
 }
 
 export interface _Collisions {
@@ -108,7 +130,6 @@ export interface Mutations {
 		_start?: number
 	): void;
 	destroy({ index }: { index: number }): void;
-	wait(duration: number): Promise<any>;
 	dropEquippable({ emoji }: { emoji: string }): void;
 	resetLevel: Function;
 	completeLevel: Function;
@@ -195,8 +216,7 @@ export interface Interactable {
 	sequence: Array<SequenceItem>;
 	points: number;
 	hp: number;
-	sideEffects: Array<[number | 'any', number | 'talk']>;
-	isControllable: boolean;
+	sideEffects: Array<[string | 'any', number | 'talk']>;
 	evolve: Evolve;
 	devolve: Devolve;
 }
@@ -207,17 +227,39 @@ export class Interactable {
 		sequence: Array<SequenceItem>,
 		hp: number,
 		points: number,
-		sideEffects: Array<[number | 'any', number | 'talk']>,
-		isControllable: boolean,
+		sideEffects: Array<[string | 'any', number | 'talk']>,
 		evolve: Evolve,
 		devolve: Devolve
 	) {
 		this.emoji = emoji;
 		this.sequence = sequence;
 		this.hp = hp;
-		this.points = points;
+		this.points = points; // TODO: figure out what the fuck is this
 		this.sideEffects = sideEffects;
-		this.isControllable = isControllable;
+		this.evolve = evolve;
+		this.devolve = devolve;
+	}
+}
+
+export interface Controllable {
+	emoji: string;
+	hp: number;
+	sideEffects: Array<[string, number]>;
+	evolve: Evolve;
+	devolve: Devolve;
+}
+
+export class Controllable {
+	constructor(
+		emoji: string,
+		hp: number,
+		sideEffects: Array<[string, number]>,
+		evolve: Evolve,
+		devolve: Devolve
+	) {
+		this.emoji = emoji;
+		this.hp = hp;
+		this.sideEffects = sideEffects;
 		this.evolve = evolve;
 		this.devolve = devolve;
 	}

@@ -40,6 +40,12 @@ export const INTERACTABLE_H = 600;
 export const INTERACTABLE_BG = '#eef2ff'; // indigo-50
 export const INTERACTABLE_BORDER = '#6366f1'; // indigo-500
 
+/* CONTROLLABLE */
+export const CONTROLLABLE_W = 450;
+export const CONTROLLABLE_H = 600;
+export const CONTROLLABLE_BG = '#fff1f2'; // rose-50
+export const CONTROLLABLE_BORDER = '#f43f5e'; // rose-500
+
 /* CONSUMABLE */
 export const CONSUMABLE_W = 240;
 export const CONSUMABLE_H = 90;
@@ -61,6 +67,7 @@ export const storeNames = [
 	'equippables',
 	'consumables',
 	'interactables',
+	'controllables',
 	'items',
 	'backgrounds',
 	'colors',

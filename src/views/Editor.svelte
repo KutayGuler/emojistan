@@ -1,23 +1,24 @@
 <script lang="ts">
 	import { DEFAULT_SIDE_LENGTH } from '$src/constants';
+	import type { CopyMode } from '$src/types';
 	import { currentEmoji, currentColor, map, formattedEmoji } from '../store';
 
 	export let sectionIndex = 0;
-	export let copyMode: 'Item' | 'Background' | 'Both';
+	export let copyMode: CopyMode;
 	export let emojiMode: 'Foreground' | 'Background';
 
 	function clickedCell(index: number) {
-		if (emojiMode[0] == 'F') {
+		if (emojiMode[0] === 'F') {
 			switch (copyMode) {
-				case 'Item':
-					if ($currentEmoji == '') map.removeEmoji(sectionIndex, index);
+				case 'Emoji':
+					if ($currentEmoji === '') map.removeEmoji(sectionIndex, index);
 					break;
-				case 'Background':
-					if ($currentColor == '') map.deleteColorAt(sectionIndex, index);
+				case 'Color':
+					if ($currentColor === '') map.deleteColorAt(sectionIndex, index);
 					break;
 				case 'Both':
-					if ($currentColor == '') map.deleteColorAt(sectionIndex, index);
-					if ($currentEmoji == '') map.removeEmoji(sectionIndex, index);
+					if ($currentColor === '') map.deleteColorAt(sectionIndex, index);
+					if ($currentEmoji === '') map.removeEmoji(sectionIndex, index);
 					break;
 			}
 
@@ -29,7 +30,7 @@
 				map.updateColorAt(sectionIndex, index, $currentColor);
 			}
 		} else {
-			if ($currentEmoji == '') {
+			if ($currentEmoji === '') {
 				map.deleteBackgroundAt(sectionIndex, index);
 			} else {
 				map.updateBackgroundAt(sectionIndex, index, $currentEmoji);
@@ -44,10 +45,10 @@
 	function rightClickedCell(index: number) {
 		let key = sectionIndex + '_' + index;
 		switch (copyMode) {
-			case 'Item':
+			case 'Emoji':
 				$currentEmoji = $map.items.get(key) || '';
 				break;
-			case 'Background':
+			case 'Color':
 				$currentColor = $map.colors.get(key) || '';
 				break;
 			case 'Both':

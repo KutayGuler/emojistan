@@ -11,12 +11,13 @@
 		equippables,
 		consumables,
 		dialogueTree as dialogue,
+		controllables,
 	} from '../store';
 	import { rbxStore } from '$lib/stores/store';
 	let emojiFreqs = new Map<string, Set<string>>();
 
 	onMount(() => {
-		if ($saves.currentSaveID == '') saves.useStorage();
+		if ($saves.currentSaveID === '') saves.useStorage();
 		for (let [saveID, _] of $saves.saves) {
 			let items = JSON.parse(localStorage.getItem(saveID + '_items') as string);
 			let set = new Set<string>(
@@ -72,6 +73,7 @@
 					equippables: Object.fromEntries($equippables),
 					consumables: Object.fromEntries($consumables),
 					interactables: Object.fromEntries($interactables),
+					controllables: Object.fromEntries($controllables),
 					dialogueTree: Object.fromEntries($dialogue),
 				},
 				owner: owner.data.user.id,
@@ -147,7 +149,7 @@
 		const id = $saves.currentSaveID;
 
 		for (let key of Object.keys(obj)) {
-			if (key == 'map') {
+			if (key === 'map') {
 				for (let _key of Object.keys(obj.map)) {
 					if (_key === 'dbg') {
 						localStorage.setItem(id + '_dbg', obj.map.dbg);
@@ -181,7 +183,7 @@
 
 <svelte:window
 	on:keydown={(e) => {
-		if (e.code == 'Escape') {
+		if (e.code === 'Escape') {
 			renameIndex = -1;
 			deleteIndex = -1;
 		}
@@ -227,7 +229,7 @@
 					</svg>
 				</button>
 			</div>
-			<button on:click={createNewGame} class="btn-primary btn">NEW GAME</button>
+			<button on:click={createNewGame} class="btn btn-primary">NEW GAME</button>
 			<div class="flex flex-row gap-2">
 				<input class="file-input " type="file" name="save-file" bind:files />
 				{#if files}
@@ -255,7 +257,7 @@
 			<!-- </div> -->
 			{#each [...$saves.saves] as [id, name], i}
 				<div class="relative flex flex-col rounded-lg bg-slate-300 p-4">
-					{#if renameIndex == i}
+					{#if renameIndex === i}
 						<form
 							on:submit={() => {
 								saves.rename(id, newName);
@@ -289,7 +291,7 @@
 					</p>
 					<div class="flex w-full flex-row items-end gap-2 self-end pt-12">
 						<button
-							class="btn-ghost btn-sm btn"
+							class="btn btn-ghost btn-sm"
 							on:click={() => downloadSave(id)}
 						>
 							<svg
@@ -308,17 +310,17 @@
 							</svg>
 						</button>
 						<div class="flex flex-grow" />
-						{#if deleteIndex == i}
+						{#if deleteIndex === i}
 							<form
 								on:submit={() => {
 									saves.delete(id);
 									location.reload();
 								}}
 							>
-								<button class="btn-error btn-sm btn">CONFIRM</button>
+								<button class="btn btn-error btn-sm">CONFIRM</button>
 							</form>
 							<button
-								class="btn-sm btn"
+								class="btn btn-sm"
 								on:click={() => {
 									deleteIndex = -1;
 								}}>CANCEL</button
@@ -328,20 +330,20 @@
 								on:click={() => {
 									deleteIndex = i;
 								}}
-								class="btn-ghost btn-sm btn">DELETE</button
+								class="btn btn-ghost btn-sm">DELETE</button
 							>
 						{/if}
-						<button on:click={() => openSave(id)} class="btn-sm btn"
+						<button on:click={() => openSave(id)} class="btn btn-sm"
 							>OPEN</button
 						>
 					</div>
 				</div>
 			{/each}
 		{:else}
-			<button on:click={() => (showSaves = true)} class="btn-primary btn w-full"
+			<button on:click={() => (showSaves = true)} class="btn btn-primary w-full"
 				>PLAY</button
 			>
-			<a href="/tutorial/controls" class="btn-secondary btn">TUTORIAL</a>
+			<a href="/tutorial/controls" class="btn btn-secondary">TUTORIAL</a>
 			<!-- <a href="/discover" class="btn-accent btn">DISCOVER</a>
 			<button class="btn w-full">OPTIONS</button> -->
 		{/if}

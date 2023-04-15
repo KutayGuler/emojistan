@@ -69,11 +69,10 @@
 	export let sequence: Array<SequenceItem> = [];
 	export let hp = 1;
 	export let points = 1;
-	export let sideEffects: Array<[number | 'any', number | 'talk']> = [
+	export let sideEffects: Array<[string | 'any', number | 'talk']> = [
 		['any', 'talk'],
 	];
 	export let pseudoSideEffects: Array<[string, number]> = [];
-	export let isControllable = false;
 	export let evolve = new Evolve(false, '', 2);
 	export let devolve = new Devolve(false, '');
 
@@ -88,16 +87,7 @@
 
 		let obj = $interactables.get(id);
 		if (obj) {
-			({
-				emoji,
-				sequence,
-				hp,
-				points,
-				sideEffects,
-				isControllable,
-				evolve,
-				devolve,
-			} = obj);
+			({ emoji, sequence, hp, points, sideEffects, evolve, devolve } = obj);
 		}
 	});
 
@@ -110,7 +100,6 @@
 				hp,
 				points,
 				sideEffects,
-				isControllable,
 				evolve,
 				devolve
 			)
@@ -120,31 +109,34 @@
 	}
 
 	onDestroy(() => {
-		// if (emoji == '') {
+		// if (emoji === '') {
 		// 	interactables.remove(id);
 		// 	rbxStore.remove(id);
 		// 	return;
 		// }
-		if (evolve.to == '') evolve.enabled = false;
-		if (devolve.to == '') devolve.enabled = false;
+		if (evolve.to === '') evolve.enabled = false;
+		if (devolve.to === '') devolve.enabled = false;
 		sideEffects = sideEffects.filter((m) => {
 			if (m[0] === 'any') return true;
 			return $equippables.get(m[0])?.emoji != '';
 		});
 		sideEffects = sideEffects.filter((m, i) => {
-			if (i == 0) return true;
+			if (i === 0) return true;
 			return m[1] != 0;
 		});
 		updateStore();
 	});
 
-	function addTosideEffects(equippableID: number) {
-		if (sideEffects.some(([id, val]) => id == equippableID)) return;
-		if (sideEffects.length == MAX_SIDE_EFFECT) {
-			notifications.warning('Cannot have more than 3 side effects');
+	function addTosideEffects(equippableID: string) {
+		if (sideEffects.some(([id, val]) => id === equippableID)) return;
+		if (sideEffects.length === MAX_SIDE_EFFECT) {
+			notifications.warning(
+				`Cannot have more than ${MAX_SIDE_EFFECT} side effects`
+			);
 			return;
 		}
-		sideEffects = [...sideEffects, [equippableID, 0]];
+		sideEffects.push([equippableID, 0]);
+		sideEffects = sideEffects;
 		updateStore();
 	}
 
@@ -187,9 +179,9 @@
 		}
 
 		for (let [_id, val] of $interactables.entries()) {
-			if (_id == id) continue;
+			if (_id === id) continue;
 
-			if ($formattedEmoji == val.emoji) {
+			if ($formattedEmoji === val.emoji) {
 				notifications.warning('Cannot have two interactables with same emoji');
 				return;
 			}
@@ -197,11 +189,11 @@
 
 		for (let val of [...$consumables.values(), ...$equippables.values()]) {
 			if (
-				(typeof val == 'string' && val != '' && $formattedEmoji == val) ||
-				(typeof val == 'object' && $formattedEmoji == val.emoji)
+				(typeof val === 'string' && val != '' && $formattedEmoji === val) ||
+				(typeof val === 'object' && $formattedEmoji === val.emoji)
 			) {
 				notifications.warning(
-					'An emoji can only have one assigned type. Interactable, Consumable or Equippable'
+					'An emoji can only have one assigned type. Interactable, Controllable, Consumable or Equippable'
 				);
 				return;
 			}
@@ -212,7 +204,7 @@
 	}
 
 	function updateEvolveEmoji() {
-		if (emoji == $formattedEmoji) {
+		if (emoji === $formattedEmoji) {
 			notifications.warning('An interactable cannot evolve to itself');
 			return;
 		}
@@ -246,7 +238,7 @@
 	}
 
 	function updateDevolveEmoji() {
-		if (emoji == $formattedEmoji) {
+		if (emoji === $formattedEmoji) {
 			notifications.warning('An interactable cannot devolve to itself');
 			return;
 		}
@@ -338,13 +330,6 @@
 				<i class="twa twa-dna" />
 			</button>
 			<button
-				class:enabled={isControllable}
-				class="opacity-50 hover:cursor-pointer"
-				on:click={() => (isControllable = !isControllable)}
-			>
-				<i class="twa twa-joystick" />
-			</button>
-			<button
 				class:enabled={evolve.enabled}
 				class="opacity-50 hover:cursor-pointer"
 				on:click={() => (evolve.enabled = !evolve.enabled)}
@@ -392,7 +377,7 @@
 				{#each sideEffects as [equippableID, value], i}
 					{@const modifierEmoji = $equippables.get(equippableID)?.emoji}
 					<div class="relative flex flex-col items-center">
-						{#if equippableID == 'any'}
+						{#if equippableID === 'any'}
 							<div class="slot-lg scale-75">
 								{equippableID}
 							</div>
@@ -463,7 +448,7 @@
 						</optgroup>
 					{/each}
 				</select>
-				{#if s.type == 'spawn'}
+				{#if s.type === 'spawn'}
 					<button class="slot" on:click={() => updateSlot(i)}>
 						<i class="twa twa-{s.emoji}" />
 					</button>
@@ -479,11 +464,11 @@
 							<option value={j}>{j}</option>
 						{/each}
 					</select>
-				{:else if s.type == 'dropEquippable'}
+				{:else if s.type === 'dropEquippable'}
 					<button class="slot" on:click={() => updateSlot(i)}>
 						<i class="twa twa-{s.emoji}" />
 					</button>
-				{:else if s.type == 'destroy' || s.type == 'erase'}
+				{:else if s.type === 'destroy' || s.type === 'erase'}
 					<select
 						class="select-bordered select"
 						title="index"
@@ -495,7 +480,7 @@
 							<option value={j}>{j}</option>
 						{/each}
 					</select>
-				{:else if s.type == 'wait'}
+				{:else if s.type === 'wait'}
 					<select
 						class="select-bordered select"
 						title="duration"
@@ -507,7 +492,7 @@
 							<option value={d}>{d}</option>
 						{/each}
 					</select>
-				{:else if s.type == 'paint'}
+				{:else if s.type === 'paint'}
 					<select
 						class="select-bordered select"
 						title="index"

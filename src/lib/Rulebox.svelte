@@ -10,6 +10,7 @@
 	} from '$lib/stores/store';
 	import {
 		consumables,
+		controllables,
 		dialogueTree,
 		equippables,
 		interactables,
@@ -25,6 +26,7 @@
 	import Merger from '$rbx/Merger.svelte';
 	import Consumable from '$rbx/Consumable.svelte';
 	import Equippable from '$rbx/Equippable.svelte';
+	import Controllable from '$rbx/Controllable.svelte';
 	import { CROSS } from '$src/constants';
 
 	export let rbx: Rulebox;
@@ -41,7 +43,7 @@
 
 <svelte:window
 	on:keydown={(e) => {
-		if (e.code == 'KeyR') {
+		if (e.code === 'KeyR') {
 			$rbxSelected = false;
 			moving = false;
 			moved = false;
@@ -67,7 +69,7 @@
 >
 	<nav
 		class="min-h-6 w-full cursor-move"
-		style:display={rbx.type == 'ctxMenu' ? 'none' : 'block'}
+		style:display={rbx.type === 'ctxMenu' ? 'none' : 'block'}
 		style:background-color={rbx.borderColor}
 		on:touchmove={(e) => {
 			if (shouldMove) {
@@ -92,7 +94,7 @@
 		on:mouseup={(e) => {
 			moving = false;
 			$rbxSelected = false;
-			if (!moved && rbx.id == $rbxIdSelected) {
+			if (!moved && rbx.id === $rbxIdSelected) {
 				onRuleboxClick(e, rbx.id);
 			}
 			moved = false;
@@ -100,7 +102,7 @@
 	/>
 	<!-- CF #3 -->
 	<button
-		style:display={rbx.type == 'ctxMenu' ? 'none' : 'flex'}
+		style:display={rbx.type === 'ctxMenu' ? 'none' : 'flex'}
 		style="border-color: {rbx.borderColor}"
 		class="absolute top-0 right-0 flex h-6 w-6 cursor-pointer items-center justify-center rounded border-2 bg-white text-center text-xl"
 		on:click={() => {
@@ -136,6 +138,9 @@
 				case 'equippable':
 					equippables.remove(rbx.id);
 					break;
+				case 'controllable':
+					controllables.remove(rbx.id);
+					break;
 				case 'interactable':
 					interactables.remove(rbx.id);
 					break;
@@ -147,17 +152,19 @@
 		{CROSS}
 	</button>
 	<!-- CF #2 -->
-	{#if rbx.type == 'ctxMenu'}
+	{#if rbx.type === 'ctxMenu'}
 		<ContextMenu position={rbx.position} {...props} />
-	{:else if rbx.type == 'interactable'}
+	{:else if rbx.type === 'interactable'}
 		<Interactable id={rbx.id} {...props} />
-	{:else if rbx.type == 'equippable'}
+	{:else if rbx.type === 'controllable'}
+		<Controllable id={rbx.id} {...props} />
+	{:else if rbx.type === 'equippable'}
 		<Equippable id={rbx.id} {...props} />
-	{:else if rbx.type == 'consumable'}
+	{:else if rbx.type === 'consumable'}
 		<Consumable id={rbx.id} {...props} />
-	{:else if rbx.type == 'pusher'}
+	{:else if rbx.type === 'pusher'}
 		<Pusher id={rbx.id} {...props} />
-	{:else if rbx.type == 'merger'}
+	{:else if rbx.type === 'merger'}
 		<Merger id={rbx.id} {...props} />
 	{/if}
 </div>

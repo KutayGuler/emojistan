@@ -358,11 +358,11 @@
 <div class="absolute bottom-4 right-4 flex items-center justify-center gap-2">
 	<p class="absolute -top-8 w-full">{index + 1} / {tutorialProps.length}</p>
 	{#if index > 0}
-		<button class="btn-lg btn" on:click={() => index--}>⮜</button>
+		<button class="btn btn-lg" on:click={() => index--}>⮜</button>
 	{/if}
 	{#if index < tutorialProps.length - 1}
-		<button class="btn-lg btn" on:click={() => index++}>⮞</button>
-	{:else if index == tutorialProps.length - 1}
-		<a href="#tutorial-complete" class="btn-lg btn">FINISH</a>
+		<button class="btn btn-lg" on:click={() => index++}>⮞</button>
+	{:else if index === tutorialProps.length - 1}
+		<a href="#tutorial-complete" class="btn btn-lg">FINISH</a>
 	{/if}
 </div>

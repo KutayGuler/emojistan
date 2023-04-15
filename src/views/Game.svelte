@@ -2,8 +2,8 @@
 	import { scale } from 'svelte/transition';
 	import { tweened } from 'svelte/motion';
 	import { cubicOut } from 'svelte/easing';
-	import { createEventDispatcher, onDestroy, onMount } from 'svelte/internal';
-	import { currentColor, currentEmoji, dialogueTree, saves } from '../store';
+	import { createEventDispatcher, onMount } from 'svelte/internal';
+	import { currentColor, currentEmoji, dialogueTree } from '../store';
 	import {
 		DEFAULT_MAP_CLASS,
 		DEFAULT_SIDE_LENGTH,
@@ -24,11 +24,12 @@
 		type _Interactables,
 		type _Consumables,
 		type _Equippables,
-		HP,
 		type Pusher,
 		type Merger,
-		Choice,
 		type Branch,
+		type _Controllable,
+		type _Controllables,
+		Controllable,
 	} from '$src/types';
 	import { AStarFinder } from 'astar-typescript';
 	import Chat from './Chat.svelte';
@@ -36,11 +37,12 @@
 	/* ## DATA ## */
 	export let dt = new Map<string, Branch>(); // dialogue tree
 	export let map: EditableMap;
-	export let pushers = new Map<number, Pusher>();
-	export let mergers = new Map<number, Merger>();
-	export let equippables = new Map<number, Equippable>();
-	export let interactables = new Map<number, Interactable>();
-	export let consumables = new Map<number, Consumable>();
+	export let pushers = new Map<string, Pusher>();
+	export let mergers = new Map<string, Merger>();
+	export let equippables = new Map<string, Equippable>();
+	export let interactables = new Map<string, Interactable>();
+	export let controllables = new Map<string, Controllable>();
+	export let consumables = new Map<string, Consumable>();
 	export let mapClass = DEFAULT_MAP_CLASS;
 	export let SIZE = DEFAULT_SIDE_LENGTH;
 	export let showHP = true;
@@ -60,10 +62,9 @@
 	let colors = new Map(map.colors);
 	let backgrounds = new Map(map.backgrounds);
 	let _interactables: _Interactables = {};
+	let _controllables: _Controllables = {};
 	let _consumables: _Consumables = {};
 	let _equippables: _Equippables = {};
-	let timeouts: Array<NodeJS.Timeout> = [];
-	let intervals: Array<NodeJS.Timer> = [];
 
 	/* ## DIALOGUE ## */
 	let character = '';
@@ -75,17 +76,7 @@
 		dt = $dialogueTree;
 	});
 
-	onDestroy(() => {
-		for (let timer of timeouts) {
-			clearTimeout(timer);
-		}
-
-		for (let interval of intervals) {
-			clearInterval(interval);
-		}
-	});
-
-	let enemyIndexes = [135, 143];
+	let enemyIndexes: Array<number> = [];
 
 	const dispatch = createEventDispatcher();
 	const keys: {
@@ -119,10 +110,10 @@
 
 	const calcOperation = true
 		? (code: ArrowKey, index: number) => {
-				if (code == 'ArrowLeft' && index % SIZE == 0) return 0;
-				if (code == 'ArrowUp' && index < SIZE) return 0;
-				if (code == 'ArrowRight' && (index + 1) % SIZE == 0) return 0;
-				if (code == 'ArrowDown' && index >= SIZE * SIZE - SIZE) return 0;
+				if (code === 'ArrowLeft' && index % SIZE === 0) return 0;
+				if (code === 'ArrowUp' && index < SIZE) return 0;
+				if (code === 'ArrowRight' && (index + 1) % SIZE === 0) return 0;
+				if (code === 'ArrowDown' && index >= SIZE * SIZE - SIZE) return 0;
 
 				switch (code) {
 					case 'ArrowUp':
@@ -136,7 +127,7 @@
 				}
 		  }
 		: (code: ArrowKey, index: number) => {
-				if (code == 'ArrowLeft' && index % SIZE == 0) {
+				if (code === 'ArrowLeft' && index % SIZE === 0) {
 					if (
 						currentSection % SIZE != 0 &&
 						!items.has(currentSection - 1 + '_' + (ac + SIZE - 1))
@@ -145,7 +136,7 @@
 					}
 					return 0;
 				}
-				if (code == 'ArrowUp' && index < SIZE) {
+				if (code === 'ArrowUp' && index < SIZE) {
 					if (
 						currentSection >= SIZE &&
 						!items.has(currentSection - SIZE + '_' + (ac + SIZE * (SIZE - 1)))
@@ -154,7 +145,7 @@
 					}
 					return 0;
 				}
-				if (code == 'ArrowRight' && (index + 1) % SIZE == 0) {
+				if (code === 'ArrowRight' && (index + 1) % SIZE === 0) {
 					if (
 						(currentSection + 1) % SIZE != 0 &&
 						!items.has(currentSection + 1 + '_' + (ac - SIZE + 1))
@@ -163,7 +154,7 @@
 					}
 					return 0;
 				}
-				if (code == 'ArrowDown' && index >= SIZE * SIZE - SIZE) {
+				if (code === 'ArrowDown' && index >= SIZE * SIZE - SIZE) {
 					if (
 						currentSection < SIZE * SIZE - SIZE &&
 						!items.has(currentSection + SIZE + '_' + (ac - SIZE * (SIZE - 1)))
@@ -189,7 +180,7 @@
 		items.delete(_from);
 		items = items; // MAGIC UPDATE, NECESSARY FOR REACTIVITY
 
-		if (ac == from) {
+		if (ac === from) {
 			ac = to;
 			ic = ac + keys[directionKey].operation;
 		}
@@ -204,13 +195,14 @@
 		let _toID = currentSection + '_' + toID;
 
 		let from = items.get(_fromID) as Item;
-		let fromInventory: Array<Equippable> = from?.inventory || [];
+		let fromInventory: Map<number, Equippable> =
+			from?.inventory || new Map<number, Equippable>();
 		let fromHP = from?.hp.current || 1;
-		// @ts-expect-error
-		let toInventory: Array<Equippable> = items.get(toID)?.inventory || [];
-		let mergedInventory = [...fromInventory, ...toInventory];
-		while (mergedInventory.length > MAX_INVENTORY_SIZE) {
-			mergedInventory.pop();
+		let toInventory: Map<number, Equippable> =
+			(items.get(_toID) as Item)?.inventory || new Map<number, Equippable>();
+		let mergedInventory = new Map([...fromInventory, ...toInventory]);
+		while (mergedInventory.size > MAX_INVENTORY_SIZE) {
+			mergedInventory.delete(mergedInventory.keys().next().value);
 		}
 
 		items.set(
@@ -224,7 +216,7 @@
 		items.delete(_fromID);
 		items = items; // MAGIC UPDATE, NECESSARY FOR REACTIVITY
 
-		if (ac == fromID) {
+		if (ac === fromID) {
 			ac = toID;
 			ic = ac + keys[directionKey].operation;
 		}
@@ -232,28 +224,32 @@
 
 	for (let [id, interactable] of interactables) {
 		const { emoji, ...args } = interactable;
-		if (emoji == '') continue;
+		if (emoji === '') continue;
 		_interactables[emoji] = {} as _Interactable;
 		Object.assign(_interactables[emoji], args);
 		_interactables[emoji].id = id;
 	}
 
+	for (let [id, controllable] of controllables) {
+		const { emoji, ...args } = controllable;
+		if (emoji === '') continue;
+		_controllables[emoji] = {} as _Controllable;
+		Object.assign(_controllables[emoji], args);
+		_controllables[emoji].id = id;
+	}
+
 	for (let [id, consumable] of consumables) {
 		const { emoji, ...args } = consumable;
-		if (emoji == '') continue;
+		if (emoji === '') continue;
 		_consumables[emoji] = {} as Consumable;
 		Object.assign(_consumables[emoji], args);
 	}
 
 	for (let [id, equippable] of equippables) {
 		const { emoji, ...args } = equippable;
-		if (emoji == '') continue;
+		if (emoji === '') continue;
 		_equippables[emoji] = {} as Equippable;
 		Object.assign(_equippables[emoji], args);
-	}
-
-	function posObjToString({ x, y }: { x: number; y: number }) {
-		return SIZE * y + x;
 	}
 
 	function coordinateToPosObj(num: number) {
@@ -325,12 +321,14 @@
 			}
 		}
 
+		console.log(_controllables);
+
 		for (let [id, { emoji, hp }] of items) {
-			if (typeof hp == 'number') continue; // consumable and equippables' hp types are numbers
+			if (typeof hp === 'number') continue; // consumable and equippables' hp types are numbers
 			if (
-				ac == -2 &&
-				+id.split('_')[0] == currentSection &&
-				_interactables[emoji]?.isControllable
+				ac === -2 &&
+				+id.split('_')[0] === currentSection &&
+				_controllables[emoji]
 			) {
 				ac = +id.split('_')[1];
 				ic = ac + 1;
@@ -370,7 +368,7 @@
 
 	for (let [id, _slots] of [...mergers, ...pushers]) {
 		let [key1, key2, val] = _slots;
-		if (key1 == '') continue;
+		if (key1 === '') continue;
 		if (!_collisions[key1]) {
 			_collisions[key1] = {};
 		}
@@ -403,14 +401,8 @@
 		destroy({ index }) {
 			items.delete(currentSection + '_' + index);
 		},
-		wait: async (duration) => {
-			return new Promise((resolve) => {
-				let timer = setTimeout(resolve, duration);
-				timeouts.push(timer);
-			});
-		},
 		dropEquippable({ emoji }) {
-			if (emoji && player?.inventory.length != MAX_INVENTORY_SIZE) {
+			if (emoji && player?.inventory.size != MAX_INVENTORY_SIZE) {
 				// @ts-expect-error
 				player?.inventory.push(emoji);
 				items = items;
@@ -471,9 +463,9 @@
 				break;
 		}
 
-		if (calcOperation(code as ArrowKey, finalIndex) == 0) return;
+		if (calcOperation(code as ArrowKey, finalIndex) === 0) return;
 
-		if (collisionTypeSequence.every((str) => str == 'push')) {
+		if (collisionTypeSequence.every((str) => str === 'push')) {
 			let length = collisionChain.length;
 			collisionChain.reverse();
 
@@ -486,7 +478,7 @@
 			if (collisionTypeSequence.includes('bump')) {
 				collisionTypeSequence = collisionTypeSequence.slice(
 					0,
-					collisionTypeSequence.findIndex((str) => str == 'bump')
+					collisionTypeSequence.findIndex((str) => str === 'bump')
 				);
 			} else {
 				collisionTypeSequence = collisionTypeSequence.slice(
@@ -496,8 +488,8 @@
 			}
 
 			if (
-				collisionTypeSequence.length == 0 ||
-				collisionTypeSequence.at(-1) == 'push'
+				collisionTypeSequence.length === 0 ||
+				collisionTypeSequence.at(-1) === 'push'
 			)
 				return;
 
@@ -516,6 +508,21 @@
 
 	let chatting = false;
 
+	function getHandDirection(operation: number) {
+		switch (operation) {
+			case -1:
+				return 'left';
+			case 1:
+				return 'right';
+			case SIZE:
+				return 'down';
+			case -SIZE:
+				return 'up';
+			default:
+				return '';
+		}
+	}
+
 	async function handle(e: KeyboardEvent) {
 		e.preventDefault();
 		handDirection = '';
@@ -527,12 +534,7 @@
 			return;
 		if (e.code.includes('Arrow')) {
 			let operation = calcOperation(e.code as ArrowKey, ac);
-			if (
-				!player ||
-				operation == 0 ||
-				!_interactables[player.emoji]?.isControllable
-			)
-				return;
+			if (!player || operation === 0 || !_controllables[player.emoji]) return;
 			let facingItem = items.get(currentSection + '_' + (ac + operation));
 
 			if (!facingItem) {
@@ -567,7 +569,7 @@
 		if (e.code.includes('Digit')) {
 			let digit = +e.code.replace('Digit', '');
 			currentInventoryIndex =
-				digit - 1 == currentInventoryIndex ? -1 : digit - 1;
+				digit - 1 === currentInventoryIndex ? -1 : digit - 1;
 			return;
 		}
 
@@ -577,84 +579,30 @@
 			return;
 		}
 
-		if (e.code == 'Space' && !chatting) {
+		if (e.code === 'Space' && !chatting) {
 			// required so that items are not overflowing from the map
 			const operation = calcOperation(wasdToArrow[directionKey], ac);
-			if (operation == 0) {
+			if (operation === 0) {
 				return;
 			}
 			let interactedItem = items.get(currentSection + '_' + ic);
 
-			if (interactedItem == undefined) return;
-			if (interactedItem instanceof Equippable) {
-				if (player.inventory.length != MAX_INVENTORY_SIZE) {
-					player.inventory.push(interactedItem);
+			if (interactedItem === undefined) return;
+			if (
+				interactedItem instanceof Equippable ||
+				interactedItem instanceof Consumable
+			) {
+				if (player.inventory.size != MAX_INVENTORY_SIZE) {
+					for (let i = 0; i < MAX_INVENTORY_SIZE; i++) {
+						if (!player.inventory.get(i)) {
+							player.inventory.set(i, interactedItem);
+							player.inventory = player.inventory;
+							break;
+						}
+					}
 					items.delete(currentSection + '_' + ic);
 					items = items;
 				}
-				return;
-			} else if (interactedItem instanceof Consumable) {
-				let { hp, mutateConsumerTo } = interactedItem;
-
-				if (!player) return;
-
-				if (mutateConsumerTo != '') {
-					player.emoji = mutateConsumerTo;
-				} else {
-					player.hp.add(hp);
-
-					if (player.hp.current <= 0) {
-						let playerDevolve = _interactables[player?.emoji || '']?.devolve;
-
-						if (playerDevolve.enabled) {
-							player.emoji = playerDevolve.to;
-							player.hp.max = _interactables[playerDevolve.to]?.hp || 1;
-							player.hp.current = player.hp.max;
-							progress.set(calcPlayerHpPercentage());
-							items.delete(currentSection + '_' + ic);
-							items = items;
-							return;
-						}
-
-						items.delete(currentSection + '_' + ac);
-						items = items;
-
-						for (let [id, { emoji, hp }] of items) {
-							if (typeof hp == 'number') continue; // consumables and equippables' hp types are numbers
-							if (
-								hp.current > 0 &&
-								!_equippables[emoji] &&
-								_interactables[emoji]?.isControllable
-							) {
-								player = items.get(id) as Item;
-								ac = +id.split('_')[1];
-								progress = tweened(calcPlayerHpPercentage(), {
-									duration: 200,
-									easing: cubicOut,
-								});
-
-								return;
-							}
-						}
-
-						completionMessage = 'Game Over. No players left.';
-						levelCompleted = true;
-						return;
-					}
-
-					let playerEvolve = _interactables[player?.emoji || '']?.evolve;
-
-					if (playerEvolve?.enabled && player.hp.current == playerEvolve?.at) {
-						player.emoji = playerEvolve.to;
-						player.hp.max = _interactables[playerEvolve.to]?.hp || 1;
-						player.hp.current = player.hp.max;
-					}
-
-					progress.set(calcPlayerHpPercentage());
-				}
-
-				items.delete(currentSection + '_' + ic);
-				items = items;
 				return;
 			}
 
@@ -664,19 +612,20 @@
 			let { id, sideEffects, evolve, devolve } = interactable;
 
 			// for (let { type } of sequence) {
-			// 	if (type == 'dropEquippable') {
-			// 		if (player?.inventory.length == MAX_INVENTORY_SIZE) {
+			// 	if (type === 'dropEquippable') {
+			// 		if (player?.inventory.length === MAX_INVENTORY_SIZE) {
 			// 			return;
 			// 		}
 			// 	}
 			// }
 
-			let equippedItem = player?.inventory[currentInventoryIndex] || 'any';
+			let equippedItem = player?.inventory.get(currentInventoryIndex) || 'any';
 
 			let sideEffect =
 				sideEffects.find(
 					([effect, value]) =>
-						equippables.get(effect)?.emoji == equippedItem.emoji
+						equippables.get(effect)?.emoji ===
+						(equippedItem as Equippable).emoji
 				) || sideEffects[0];
 
 			if (sideEffect[1] === 'talk') {
@@ -686,24 +635,8 @@
 				return;
 			}
 
-			if (sideEffect[1] == 0) return;
+			if (sideEffect[1] === 0) return;
 			interactedItem.hp.current += sideEffect[1];
-
-			// TOOD: get this out
-			function getHandDirection(operation: number) {
-				switch (operation) {
-					case -1:
-						return 'left';
-					case 1:
-						return 'right';
-					case SIZE:
-						return 'down';
-					case -SIZE:
-						return 'up';
-					default:
-						return '';
-				}
-			}
 
 			handDirection = getHandDirection(operation);
 			let timeout = setTimeout(() => {
@@ -711,34 +644,27 @@
 				clearTimeout(timeout);
 			}, 50);
 
-			// FIXME: Ctrl should only drop the currently equipped weapon
 			// FIXME: equippedItem.hp not reducing on interaction
-
-			// TODO: Equip consumable with space, hold E to consume
-			// TODO: add animations for interaction
-			// TODO: animation on taking damage
-			// TODO: stack for items
-
-			// TODO: AI field of view
-			// TODO: AI patrolling
 
 			if (
 				equippedItem instanceof Equippable &&
-				sideEffect[0] == equippedItem.emoji
+				sideEffect[0] === equippedItem.emoji
 			) {
 				equippedItem.hp -= 1;
 			}
 
-			if (equippedItem.hp == 0) {
-				player.inventory.splice(currentInventoryIndex, 1);
+			// if it's not "ANY"
+			if (typeof equippedItem !== 'string' && equippedItem.hp === 0) {
+				player.inventory.delete(currentInventoryIndex);
+				player.inventory = player.inventory;
 			}
 
 			// for (let { type, ...args } of sequence) {
-			// 	if (type == 'wait') {
+			// 	if (type === 'wait') {
 			// 		await m.wait(args.duration);
 			// 	} else {
 			// 		let res = m[type](args);
-			// 		if (res == 'cancelLoop') {
+			// 		if (res === 'cancelLoop') {
 			// 			break;
 			// 		}
 			// 	}
@@ -756,7 +682,7 @@
 				}
 			} else if (
 				playerEvolve?.enabled &&
-				playerEvolve.at == player?.hp.current
+				playerEvolve.at === player?.hp.current
 			) {
 				player.emoji = playerEvolve.to;
 			}
@@ -768,7 +694,7 @@
 				} else {
 					items.delete(currentSection + '_' + ic);
 				}
-			} else if (evolve?.enabled && evolve.at == interactedItem.hp.current) {
+			} else if (evolve?.enabled && evolve.at === interactedItem.hp.current) {
 				interactedItem.emoji = evolve.to;
 			}
 
@@ -776,24 +702,95 @@
 			return;
 		}
 
+		console.log(e.code);
+
+		if (e.code === 'KeyF') {
+			let equippedItem = player.inventory.get(currentInventoryIndex);
+			if (!(equippedItem instanceof Consumable)) return;
+			let { hp, mutateConsumerTo } = equippedItem;
+
+			if (mutateConsumerTo != '') {
+				player.emoji = mutateConsumerTo;
+			} else {
+				player.hp.add(hp);
+
+				if (player.hp.current <= 0) {
+					let playerDevolve = _interactables[player?.emoji || '']?.devolve;
+
+					if (playerDevolve.enabled) {
+						player.emoji = playerDevolve.to;
+						player.hp.max = _interactables[playerDevolve.to]?.hp || 1;
+						player.hp.current = player.hp.max;
+						progress.set(calcPlayerHpPercentage());
+						player.inventory.delete(currentInventoryIndex);
+						player.inventory = player.inventory;
+						return;
+					}
+
+					player.inventory.delete(currentInventoryIndex);
+					player.inventory = player.inventory;
+
+					for (let [id, { emoji, hp }] of items) {
+						if (typeof hp === 'number') continue; // consumables and equippables' hp types are numbers
+						if (
+							hp.current > 0 &&
+							!_equippables[emoji] &&
+							_controllables[emoji]
+						) {
+							player = items.get(id) as Item;
+							ac = +id.split('_')[1];
+							progress = tweened(calcPlayerHpPercentage(), {
+								duration: 200,
+								easing: cubicOut,
+							});
+
+							return;
+						}
+					}
+
+					completionMessage = 'Game Over. No players left.';
+					levelCompleted = true;
+					return;
+				}
+
+				let playerEvolve = _interactables[player?.emoji || '']?.evolve;
+
+				if (playerEvolve?.enabled && player.hp.current === playerEvolve?.at) {
+					player.emoji = playerEvolve.to;
+					player.hp.max = _interactables[playerEvolve.to]?.hp || 1;
+					player.hp.current = player.hp.max;
+				}
+
+				progress.set(calcPlayerHpPercentage());
+			}
+
+			player.inventory.delete(currentInventoryIndex);
+			player.inventory = player.inventory;
+			return;
+		}
+
 		if (e.code.includes('Control')) {
 			if (
-				calcOperation(wasdToArrow[directionKey], ac) == 0 ||
-				!player?.inventory ||
+				calcOperation(wasdToArrow[directionKey], ac) === 0 ||
+				!player?.inventory.get(currentInventoryIndex) ||
 				items.has(currentSection + '_' + ic)
 			) {
 				return;
 			}
-			items.set(
-				currentSection + '_' + ic,
-				player?.inventory[currentInventoryIndex]
-			);
-			player.inventory.splice(currentInventoryIndex, 1);
+			console.log(currentInventoryIndex);
+
+			let droppedItem = player?.inventory.get(currentInventoryIndex);
+			if (!droppedItem) return;
+			items.set(currentSection + '_' + ic, droppedItem);
+			player.inventory.delete(currentInventoryIndex);
+			player.inventory = player.inventory;
 			items = items;
+			console.log(items);
+
 			return;
 		}
 
-		if (e.code == 'Escape') {
+		if (e.code === 'Escape') {
 			dispatch('quit');
 			return;
 		}
@@ -806,17 +803,17 @@
 		// 	([id, { emoji }]) => !_equippables[emoji]
 		// );
 
-		// if (e.code == 'KeyE') {
+		// if (e.code === 'KeyE') {
 		// 	for (let [id, _] of _items) {
 		// 		let _id = +id.split('_')[1];
-		// 		if (_id == ac) continue;
+		// 		if (_id === ac) continue;
 		// 		if (_id > ac && _id - ac < closestDistance) {
 		// 			closestDistance = _id - ac;
 		// 			closestID = _id;
 		// 		}
 		// 	}
 
-		// 	if (closestDistance == 300) {
+		// 	if (closestDistance === 300) {
 		// 		let smallest = 300;
 		// 		for (let [id, _] of _items) {
 		// 			let _id = +id.split('_')[1];
@@ -837,17 +834,17 @@
 		// 	return;
 		// }
 
-		// if (e.code == 'KeyQ') {
+		// if (e.code === 'KeyQ') {
 		// 	for (let [id, _] of _items) {
 		// 		let _id = +id.split('_')[1];
-		// 		if (_id == ac) continue;
+		// 		if (_id === ac) continue;
 		// 		if (ac > _id && ac - _id < closestDistance) {
 		// 			closestDistance = ac - _id;
 		// 			closestID = _id;
 		// 		}
 		// 	}
 
-		// 	if (closestDistance == 300) {
+		// 	if (closestDistance === 300) {
 		// 		let biggest = 0;
 		// 		for (let [id, _] of _items) {
 		// 			let _id = +id.split('_')[1];
@@ -870,10 +867,8 @@
 	}
 
 	function noPlayer(rbx: any) {
-		if (ac == -2) dispatch('noPlayer');
+		if (ac === -2) dispatch('noPlayer');
 	}
-
-	$: console.log('$', ac);
 </script>
 
 <svelte:window on:keydown={handle} />
@@ -896,7 +891,7 @@
 	<div class={mapClass} use:noPlayer>
 		{#if chatting}
 			<Chat
-				isTutorial={SIZE == 4}
+				isTutorial={SIZE === 4}
 				{character}
 				{dialogueID}
 				dialogueTree={dt}
@@ -904,11 +899,11 @@
 			/>
 		{/if}
 		{#each { length: SIZE * SIZE } as _, i}
-			{@const active = ac == i}
+			{@const active = ac === i}
 			{@const item = items.get(currentSection + '_' + i)}
 			{@const background = backgrounds.get(currentSection + '_' + i)}
 			{@const hand =
-				player?.inventory[currentInventoryIndex]?.emoji ||
+				player?.inventory.get(currentInventoryIndex)?.emoji ||
 				keys[directionKey].emoji}
 			<div
 				class="cell"
@@ -955,11 +950,11 @@
 		{#if ac != -2 && showInventory}
 			<div
 				title="Inventory"
-				class="flex h-full w-full flex-row items-center justify-center gap-2"
+				class="relative flex h-full w-full flex-row items-center justify-center gap-2"
 			>
 				{#each { length: MAX_INVENTORY_SIZE } as _, i}
-					{@const item = player?.inventory[i]}
-					{@const equipped = i == currentInventoryIndex}
+					{@const item = player?.inventory.get(i)}
+					{@const equipped = i === currentInventoryIndex}
 					<div
 						class:equipped
 						class="relative flex h-10 w-10 flex-col items-center justify-center rounded bg-base-300 p-2 2xl:h-12 2xl:w-12"
@@ -971,6 +966,11 @@
 							</div>
 						{/if}
 					</div>
+					{#if item && item instanceof Consumable && currentInventoryIndex === i}
+						<div class="absolute bottom-4">
+							Press F to consume <i class="twa twa-{item.emoji}" />
+						</div>
+					{/if}
 				{/each}
 			</div>
 		{/if}
