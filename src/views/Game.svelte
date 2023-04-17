@@ -186,6 +186,11 @@
 		}
 	}
 
+	function deleteFromInventory(index: number) {
+		player.inventory.delete(index);
+		player.inventory = player.inventory;
+	}
+
 	/**
 	 * function mutates ac if it is equal to "from" parameter
 	 * Transfers an item from "from" to "to" and applies mergeResult
@@ -644,19 +649,23 @@
 				clearTimeout(timeout);
 			}, 50);
 
-			// FIXME: equippedItem.hp not reducing on interaction
+			const isEquippable = equippedItem instanceof Equippable;
 
 			if (
-				equippedItem instanceof Equippable &&
-				sideEffect[0] === equippedItem.emoji
+				isEquippable &&
+				sideEffect[0] === (equippedItem as Equippable).emoji
 			) {
-				equippedItem.hp -= 1;
+				// FIXME: equippedItem.hp not reducing on interaction
+				(equippedItem as Equippable).hp -= 1;
 			}
 
 			// if it's not "ANY"
-			if (typeof equippedItem !== 'string' && equippedItem.hp === 0) {
-				player.inventory.delete(currentInventoryIndex);
-				player.inventory = player.inventory;
+			if (typeof equippedItem !== 'string') {
+				if (isEquippable && (equippedItem as Equippable).hp === 0) {
+					deleteFromInventory(currentInventoryIndex);
+				} else if (equippedItem instanceof Consumable) {
+					deleteFromInventory(currentInventoryIndex);
+				}
 			}
 
 			// for (let { type, ...args } of sequence) {
@@ -705,14 +714,14 @@
 		console.log(e.code);
 
 		if (e.code === 'KeyF') {
-			let equippedItem = player.inventory.get(currentInventoryIndex);
-			if (!(equippedItem instanceof Consumable)) return;
-			let { hp, mutateConsumerTo } = equippedItem;
+			let consumableItem = player.inventory.get(currentInventoryIndex);
+			if (!(consumableItem instanceof Consumable)) return;
+			let { sideEffect, mutateConsumerTo } = consumableItem;
 
 			if (mutateConsumerTo != '') {
 				player.emoji = mutateConsumerTo;
 			} else {
-				player.hp.add(hp);
+				player.hp.add(sideEffect);
 
 				if (player.hp.current <= 0) {
 					let playerDevolve = _interactables[player?.emoji || '']?.devolve;
@@ -722,13 +731,11 @@
 						player.hp.max = _interactables[playerDevolve.to]?.hp || 1;
 						player.hp.current = player.hp.max;
 						progress.set(calcPlayerHpPercentage());
-						player.inventory.delete(currentInventoryIndex);
-						player.inventory = player.inventory;
+						deleteFromInventory(currentInventoryIndex);
 						return;
 					}
 
-					player.inventory.delete(currentInventoryIndex);
-					player.inventory = player.inventory;
+					deleteFromInventory(currentInventoryIndex);
 
 					for (let [id, { emoji, hp }] of items) {
 						if (typeof hp === 'number') continue; // consumables and equippables' hp types are numbers
@@ -764,8 +771,7 @@
 				progress.set(calcPlayerHpPercentage());
 			}
 
-			player.inventory.delete(currentInventoryIndex);
-			player.inventory = player.inventory;
+			deleteFromInventory(currentInventoryIndex);
 			return;
 		}
 
@@ -782,11 +788,8 @@
 			let droppedItem = player?.inventory.get(currentInventoryIndex);
 			if (!droppedItem) return;
 			items.set(currentSection + '_' + ic, droppedItem);
-			player.inventory.delete(currentInventoryIndex);
-			player.inventory = player.inventory;
+			deleteFromInventory(currentInventoryIndex);
 			items = items;
-			console.log(items);
-
 			return;
 		}
 
@@ -795,44 +798,43 @@
 			return;
 		}
 
-		// let closestDistance = 300;
-		// let closestID = ac;
+		let closestDistance = 300;
+		let closestID = ac;
 
-		// let _items = Array.from(items).filter(
-		// 	// !statics.has(emoji) && TODO: check how it affects the logic
-		// 	([id, { emoji }]) => !_equippables[emoji]
-		// );
+		let _items = Array.from(items).filter(
+			([id, { emoji }]) => !_equippables[emoji]
+		);
 
-		// if (e.code === 'KeyE') {
-		// 	for (let [id, _] of _items) {
-		// 		let _id = +id.split('_')[1];
-		// 		if (_id === ac) continue;
-		// 		if (_id > ac && _id - ac < closestDistance) {
-		// 			closestDistance = _id - ac;
-		// 			closestID = _id;
-		// 		}
-		// 	}
+		if (e.code === 'KeyR') {
+			for (let [id, _] of _items) {
+				let _id = +id.split('_')[1];
+				if (_id === ac) continue;
+				if (_id > ac && _id - ac < closestDistance) {
+					closestDistance = _id - ac;
+					closestID = _id;
+				}
+			}
 
-		// 	if (closestDistance === 300) {
-		// 		let smallest = 300;
-		// 		for (let [id, _] of _items) {
-		// 			let _id = +id.split('_')[1];
-		// 			if (_id < smallest) smallest = _id;
-		// 		}
-		// 		ac = smallest;
-		// 		ic = ac + keys[directionKey].operation;
-		// 	} else {
-		// 		ac = closestID;
-		// 		ic = ac + keys[directionKey].operation;
-		// 	}
+			if (closestDistance === 300) {
+				let smallest = 300;
+				for (let [id, _] of _items) {
+					let _id = +id.split('_')[1];
+					if (_id < smallest) smallest = _id;
+				}
+				ac = smallest;
+				ic = ac + keys[directionKey].operation;
+			} else {
+				ac = closestID;
+				ic = ac + keys[directionKey].operation;
+			}
 
-		// 	player = items.get(currentSection + '_' + ac) as Item;
-		// 	progress = tweened(calcPlayerHpPercentage(), {
-		// 		duration: 200,
-		// 		easing: cubicOut,
-		// 	});
-		// 	return;
-		// }
+			player = items.get(currentSection + '_' + ac) as Item;
+			progress = tweened(calcPlayerHpPercentage(), {
+				duration: 200,
+				easing: cubicOut,
+			});
+			return;
+		}
 
 		// if (e.code === 'KeyQ') {
 		// 	for (let [id, _] of _items) {

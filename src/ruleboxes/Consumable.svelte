@@ -11,7 +11,7 @@
 
 	export let id: string;
 	export let emoji = '';
-	export let hp = 1;
+	export let sideEffect = 1;
 	export let mutateConsumerTo = '';
 	export let mutateConsumer = false;
 
@@ -30,7 +30,7 @@
 	onMount(() => {
 		let obj = $consumables.get(id);
 		if (obj) {
-			({ emoji, hp, mutateConsumerTo } = obj);
+			({ emoji, sideEffect, mutateConsumerTo } = obj);
 		}
 	});
 
@@ -47,7 +47,7 @@
 	});
 
 	function updateStore() {
-		consumables.update(id, new Consumable(emoji, hp, mutateConsumerTo));
+		consumables.update(id, new Consumable(emoji, sideEffect, mutateConsumerTo));
 	}
 
 	function updateEmoji() {
@@ -98,8 +98,8 @@
 			<div class="absolute -bottom-4">
 				<select
 					class="select-bordered select select-sm text-xl"
-					title="HP"
-					bind:value={hp}
+					title="sideEffect"
+					bind:value={sideEffect}
 					on:change={updateStore}
 				>
 					{#each modifierPoints as point}

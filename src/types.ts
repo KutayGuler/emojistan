@@ -70,14 +70,14 @@ export interface _Equippables {
 
 export interface Consumable {
 	emoji: string;
-	hp: number; // side effect
+	sideEffect: number; // side effect
 	mutateConsumerTo: string;
 }
 
 export class Consumable {
-	constructor(emoji: string, hp: number, mutateConsumerTo = '') {
+	constructor(emoji: string, sideEffect: number, mutateConsumerTo = '') {
 		this.emoji = emoji;
-		this.hp = hp;
+		this.sideEffect = sideEffect;
 		this.mutateConsumerTo = mutateConsumerTo;
 	}
 }

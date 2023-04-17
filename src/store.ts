@@ -6,12 +6,12 @@ import {
 	Consumable,
 	EditableMap,
 	Equippable,
+	Controllable,
 	type Branch,
 	type Interactable,
 	type Merger,
 	type Pusher,
 	type SkinTone,
-	Controllable,
 } from './types';
 import { generateID } from './routes/utils';
 
