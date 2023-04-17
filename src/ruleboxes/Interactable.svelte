@@ -26,6 +26,9 @@
 		consumables,
 	} from '../store';
 
+	// TODO: Drops:
+	// ["emoji", number]
+
 	let defaultBackground = $map.dbg;
 
 	// Add Inventory: ["drop"]

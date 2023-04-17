@@ -5,7 +5,8 @@
 		Interactable,
 		Devolve,
 		Evolve,
-		SequenceItem,
+		Controllable,
+		Consumable,
 	} from '$src/types';
 	import {
 		EQUIPPABLE_BG,
@@ -44,11 +45,25 @@
 					['0_12', 'key'],
 					['0_14', 'brick'],
 					['0_15', 'banana'],
-				]),
-				-2
+				])
 			),
+			controllables: new Map<number, Controllable>([
+				[
+					0,
+					new Controllable(
+						'monkey',
+						1,
+						[['any', 0]],
+						new Evolve(false, '', 0),
+						new Devolve(false, '')
+					),
+				],
+			]),
 			equippables: new Map<number, TEquippable>([
-				[-69, new TEquippable('key', 1)],
+				[1, new TEquippable('key', 1)],
+			]),
+			consumables: new Map<number, Consumable>([
+				[-3, { emoji: 'banana', sideEffect: 1, mutateConsumerTo: '' }],
 			]),
 			interactables: new Map<number, Interactable>([
 				[
@@ -60,23 +75,8 @@
 						1,
 						[
 							['any', 0],
-							[-69, -1],
+							['1', -1],
 						],
-						true,
-						new Evolve(false, '', 2),
-						new Devolve(false, '')
-					),
-				],
-				[
-					-2,
-					new Interactable(
-						'banana',
-						// @ts-expect-error
-						[new SequenceItem('completeLevel')],
-						1,
-						1,
-						[['any', -1]],
-						true,
 						new Evolve(false, '', 2),
 						new Devolve(false, '')
 					),

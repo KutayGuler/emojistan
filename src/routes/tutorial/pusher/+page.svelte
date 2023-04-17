@@ -1,5 +1,11 @@
 <script lang="ts">
-	import { type Pusher as TPusher, EditableMap } from '$src/types';
+	import {
+		type Pusher as TPusher,
+		EditableMap,
+		Controllable,
+		Evolve,
+		Devolve,
+	} from '$src/types';
 	import { PUSHER_BG, PUSHER_BORDER, PUSHER_H, PUSHER_W } from '$src/constants';
 	import Tutorial from '../Tutorial.svelte';
 	import Pusher from '$rbx/Pusher.svelte';
@@ -27,9 +33,20 @@
 				new Map<string, string>([
 					['0_5', 'wind-face'],
 					['0_6', 'leaf-fluttering-in-wind'],
-				]),
-				-2
+				])
 			),
+			controllables: new Map<number, Controllable>([
+				[
+					0,
+					new Controllable(
+						'wind-face',
+						1,
+						[['any', 0]],
+						new Evolve(false, '', 0),
+						new Devolve(false, '')
+					),
+				],
+			]),
 			pushers: new Map<number, TPusher>([
 				[0, ['wind-face', 'leaf-fluttering-in-wind', 'push']],
 			]),

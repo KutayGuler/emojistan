@@ -1,5 +1,11 @@
 <script lang="ts">
-	import { type Consumable as TConsumable, EditableMap } from '$src/types';
+	import {
+		type Consumable as TConsumable,
+		EditableMap,
+		Controllable,
+		Devolve,
+		Evolve,
+	} from '$src/types';
 	import {
 		CONSUMABLE_BG,
 		CONSUMABLE_BORDER,
@@ -32,11 +38,22 @@
 				new Map<string, string>([
 					['0_5', 'monkey'],
 					['0_6', 'banana'],
-				]),
-				155
+				])
 			),
+			controllables: new Map<number, Controllable>([
+				[
+					0,
+					new Controllable(
+						'monkey',
+						1,
+						[['any', 0]],
+						new Evolve(false, '', 0),
+						new Devolve(false, '')
+					),
+				],
+			]),
 			consumables: new Map<number, TConsumable>([
-				[-1, { emoji: 'banana', hp: 1, mutateConsumerTo: '' }],
+				[-1, { emoji: 'banana', sideEffect: 1, mutateConsumerTo: '' }],
 			]),
 			mapClass: 'simulation',
 			SIZE: 4,
@@ -67,11 +84,22 @@
 				new Map<string, string>([
 					['0_5', 'monkey'],
 					['0_6', 'test-tube'],
-				]),
-				-2
+				])
 			),
+			controllables: new Map<number, Controllable>([
+				[
+					0,
+					new Controllable(
+						'monkey',
+						1,
+						[['any', 0]],
+						new Evolve(false, '', 0),
+						new Devolve(false, '')
+					),
+				],
+			]),
 			consumables: new Map<number, TConsumable>([
-				[-2, { emoji: 'test-tube', hp: 1, mutateConsumerTo: 'pig' }],
+				[-2, { emoji: 'test-tube', sideEffect: 1, mutateConsumerTo: 'pig' }],
 			]),
 			mapClass: 'simulation',
 			SIZE: 4,

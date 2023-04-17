@@ -11,6 +11,8 @@ export type CollisionType = 'bump' | 'push' | string;
 export type Pusher = [string, string, CollisionType];
 export type Merger = [string, string, CollisionType];
 
+export type Inventory = Map<number, Equippable | Consumable>;
+
 export interface HP {
 	current: number;
 	max: number;
@@ -33,17 +35,14 @@ export class HP {
 
 export interface Item {
 	emoji: string;
-	inventory: Map<number, Equippable | Consumable>;
+	inventory: Inventory;
 	hp: HP;
 }
 
 export class Item {
 	constructor(
 		emoji: string,
-		inventory: Map<number, Equippable | Consumable> = new Map<
-			number,
-			Equippable | Consumable
-		>(),
+		inventory: Inventory = new Map<number, Equippable | Consumable>(),
 		hpPoints: number = 1
 	) {
 		this.emoji = emoji;

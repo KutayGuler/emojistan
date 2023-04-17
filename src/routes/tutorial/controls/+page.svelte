@@ -2,20 +2,19 @@
 	import { dialogueTree } from '$src/store';
 	import {
 		Choice,
+		Controllable,
 		Devolve,
 		EditableMap,
-		Equippable,
+		Consumable,
 		Evolve,
 		Interactable,
 	} from '$src/types';
 	import Game from '$src/views/Game.svelte';
 	import { onDestroy } from 'svelte';
 
-	// hello fellow itch.io wanderer,
-	// what brings you here?
-	//
-	// in fact this is a game made with emojistan's editor!
 	$dialogueTree.set('dog', ['woof']);
+
+	// TODO: change example
 
 	const gameProps = {
 		map: new EditableMap(
@@ -25,6 +24,18 @@
 				['0_11', 'bone'],
 			])
 		),
+		controllables: new Map<number, Controllable>([
+			[
+				0,
+				new Controllable(
+					'woman-walking',
+					1,
+					[['any', 0]],
+					new Evolve(false, '', 0),
+					new Devolve(false, '')
+				),
+			],
+		]),
 		interactables: new Map<number, Interactable>([
 			[
 				0,
@@ -34,10 +45,8 @@
 					1,
 					1,
 					[['any', 1]],
-					false,
 					new Evolve(false, '', 0),
-					new Devolve(false, ''),
-					'dog'
+					new Devolve(false, '')
 				),
 			],
 		]),
@@ -45,7 +54,7 @@
 			['dog', ['woof']],
 			['woman-walking', ['lololo']],
 		]),
-		equippables: new Map<number, Equippable>([[1, new Equippable('bone', 1)]]),
+		consumables: new Map<number, Consumable>([[1, new Consumable('bone', 1)]]),
 		mapClass: 'simulation',
 		SIZE: 4,
 	};
@@ -85,10 +94,9 @@
 			</div>
 		</div>
 		<div class="flex flex-col items-center justify-center">
-			<p>Change Player</p>
+			<p>Switch Player</p>
 			<div class="flex w-full justify-center gap-2">
-				<kbd class="kbd">Q</kbd>
-				<kbd class="kbd">E</kbd>
+				<kbd class="kbd">R</kbd>
 			</div>
 		</div>
 		<div class="flex flex-col items-center justify-center">
@@ -100,7 +108,7 @@
 			<kbd class="kbd">Ctrl</kbd>
 		</div>
 		<div class="flex flex-col items-center justify-center">
-			<p>Change Item</p>
+			<p>Change Equipped Item</p>
 			<div class="flex w-full justify-center gap-2">
 				<kbd class="kbd">1</kbd>
 				<kbd class="kbd">2</kbd>

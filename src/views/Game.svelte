@@ -30,6 +30,7 @@
 		type _Controllable,
 		type _Controllables,
 		Controllable,
+		type Inventory,
 	} from '$src/types';
 	import { AStarFinder } from 'astar-typescript';
 	import Chat from './Chat.svelte';
@@ -191,6 +192,8 @@
 		player.inventory = player.inventory;
 	}
 
+	// TODO: merged Controllable is not moving
+
 	/**
 	 * function mutates ac if it is equal to "from" parameter
 	 * Transfers an item from "from" to "to" and applies mergeResult
@@ -200,11 +203,12 @@
 		let _toID = currentSection + '_' + toID;
 
 		let from = items.get(_fromID) as Item;
-		let fromInventory: Map<number, Equippable> =
-			from?.inventory || new Map<number, Equippable>();
+		let fromInventory: Inventory =
+			from?.inventory || new Map<number, Equippable | Consumable>();
 		let fromHP = from?.hp.current || 1;
-		let toInventory: Map<number, Equippable> =
-			(items.get(_toID) as Item)?.inventory || new Map<number, Equippable>();
+		let toInventory: Inventory =
+			(items.get(_toID) as Item)?.inventory ||
+			new Map<number, Equippable | Consumable>();
 		let mergedInventory = new Map([...fromInventory, ...toInventory]);
 		while (mergedInventory.size > MAX_INVENTORY_SIZE) {
 			mergedInventory.delete(mergedInventory.keys().next().value);
@@ -319,8 +323,8 @@
 			if (_equippables[_emoji]) {
 				items.set(id, new Equippable(_emoji, _equippables[_emoji].hp));
 			} else if (_consumables[_emoji]) {
-				let { hp, mutateConsumerTo } = _consumables[_emoji];
-				items.set(id, new Consumable(_emoji, hp, mutateConsumerTo));
+				let { sideEffect, mutateConsumerTo } = _consumables[_emoji];
+				items.set(id, new Consumable(_emoji, sideEffect, mutateConsumerTo));
 			} else {
 				items.set(id, new Item(_emoji));
 			}
@@ -328,20 +332,20 @@
 
 		console.log(_controllables);
 
-		for (let [id, { emoji, hp }] of items) {
-			if (typeof hp === 'number') continue; // consumable and equippables' hp types are numbers
+		for (let [id, item] of items) {
+			if (item instanceof Equippable || item instanceof Consumable) continue;
 			if (
 				ac === -2 &&
 				+id.split('_')[0] === currentSection &&
-				_controllables[emoji]
+				_controllables[item.emoji]
 			) {
 				ac = +id.split('_')[1];
 				ic = ac + 1;
 				directionKey = 'KeyD';
 			}
 
-			hp.max = _interactables[emoji]?.hp || 1;
-			hp.current = _interactables[emoji]?.hp || 1;
+			item.hp.max = _interactables[item.emoji]?.hp || 1;
+			item.hp.current = _interactables[item.emoji]?.hp || 1;
 		}
 	}
 
@@ -737,12 +741,13 @@
 
 					deleteFromInventory(currentInventoryIndex);
 
-					for (let [id, { emoji, hp }] of items) {
-						if (typeof hp === 'number') continue; // consumables and equippables' hp types are numbers
+					for (let [id, item] of items) {
+						if (item instanceof Equippable || item instanceof Consumable)
+							continue;
 						if (
-							hp.current > 0 &&
-							!_equippables[emoji] &&
-							_controllables[emoji]
+							item.hp.current > 0 &&
+							!_equippables[item.emoji] &&
+							_controllables[item.emoji]
 						) {
 							player = items.get(id) as Item;
 							ac = +id.split('_')[1];
@@ -798,14 +803,14 @@
 			return;
 		}
 
-		let closestDistance = 300;
-		let closestID = ac;
-
-		let _items = Array.from(items).filter(
-			([id, { emoji }]) => !_equippables[emoji]
-		);
-
 		if (e.code === 'KeyR') {
+			let closestDistance = 300;
+			let closestID = ac;
+
+			let _items = Array.from(items).filter(
+				([id, { emoji }]) => !_equippables[emoji]
+			);
+
 			for (let [id, _] of _items) {
 				let _id = +id.split('_')[1];
 				if (_id === ac) continue;
@@ -835,37 +840,6 @@
 			});
 			return;
 		}
-
-		// if (e.code === 'KeyQ') {
-		// 	for (let [id, _] of _items) {
-		// 		let _id = +id.split('_')[1];
-		// 		if (_id === ac) continue;
-		// 		if (ac > _id && ac - _id < closestDistance) {
-		// 			closestDistance = ac - _id;
-		// 			closestID = _id;
-		// 		}
-		// 	}
-
-		// 	if (closestDistance === 300) {
-		// 		let biggest = 0;
-		// 		for (let [id, _] of _items) {
-		// 			let _id = +id.split('_')[1];
-		// 			if (_id > biggest) biggest = _id;
-		// 		}
-		// 		ac = biggest;
-		// 		ic = ac + keys[directionKey].operation;
-		// 	} else {
-		// 		ac = closestID;
-		// 		ic = ac + keys[directionKey].operation;
-		// 	}
-
-		// 	player = items.get(currentSection + '_' + ac) as Item;
-		// 	progress = tweened(calcPlayerHpPercentage(), {
-		// 		duration: 200,
-		// 		easing: cubicOut,
-		// 	});
-		// 	return;
-		// }
 	}
 
 	function noPlayer(rbx: any) {
@@ -963,9 +937,11 @@
 					>
 						{#if item}
 							<i class="twa twa-{item.emoji || ''}" />
-							<div class="absolute -top-0.5 right-0.5 text-sm">
-								{item.hp > 1 ? item.hp : ''}
-							</div>
+							{#if item instanceof Equippable}
+								<div class="absolute -top-0.5 right-0.5 text-sm">
+									{item.hp > 1 ? item.hp : ''}
+								</div>
+							{/if}
 						{/if}
 					</div>
 					{#if item && item instanceof Consumable && currentInventoryIndex === i}

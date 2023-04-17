@@ -1,5 +1,11 @@
 <script lang="ts">
-	import { type Merger as TMerger, EditableMap } from '$src/types';
+	import {
+		type Merger as TMerger,
+		EditableMap,
+		Controllable,
+		Devolve,
+		Evolve,
+	} from '$src/types';
 	import { MERGER_BG, MERGER_BORDER, MERGER_H, MERGER_W } from '$src/constants';
 	import Tutorial from '../Tutorial.svelte';
 	import Merger from '$rbx/Merger.svelte';
@@ -27,9 +33,40 @@
 				new Map<string, string>([
 					['0_5', 'cloud'],
 					['0_6', 'snowflake'],
-				]),
-				-2
+				])
 			),
+			controllables: new Map<number, Controllable>([
+				[
+					0,
+					new Controllable(
+						'cloud',
+						1,
+						[['any', 0]],
+						new Evolve(false, '', 0),
+						new Devolve(false, '')
+					),
+				],
+				[
+					1,
+					new Controllable(
+						'snowflake',
+						1,
+						[['any', 0]],
+						new Evolve(false, '', 0),
+						new Devolve(false, '')
+					),
+				],
+				[
+					1,
+					new Controllable(
+						'cloud-cloud-with-snow',
+						1,
+						[['any', 0]],
+						new Evolve(false, '', 0),
+						new Devolve(false, '')
+					),
+				],
+			]),
 			mergers: new Map<number, TMerger>([
 				[0, ['cloud', 'snowflake', 'cloud-with-snow']],
 			]),
