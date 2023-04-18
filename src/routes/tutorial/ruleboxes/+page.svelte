@@ -35,7 +35,7 @@
 		{
 			component: Pusher,
 			rbx: {
-				id: 0,
+				id: '0',
 				type: 'pusher',
 				position: { x: 0, y: 0 },
 				width: PUSHER_W,
@@ -47,7 +47,7 @@
 		{
 			component: Merger,
 			rbx: {
-				id: 0,
+				id: '0',
 				type: 'merger',
 				position: { x: 0, y: 0 },
 				width: MERGER_W,
@@ -59,7 +59,7 @@
 		{
 			component: Equippable,
 			rbx: {
-				id: 0,
+				id: '0',
 				type: 'equippable',
 				position: { x: 0, y: 0 },
 				width: EQUIPPABLE_W,
@@ -71,7 +71,7 @@
 		{
 			component: Consumable,
 			rbx: {
-				id: 0,
+				id: '0',
 				type: 'consumable',
 				position: { x: 0, y: 0 },
 				width: CONSUMABLE_W,
@@ -83,7 +83,7 @@
 		{
 			component: Interactable,
 			rbx: {
-				id: 0,
+				id: '0',
 				type: 'interactable',
 				position: { x: 0, y: 0 },
 				width: INTERACTABLE_W,

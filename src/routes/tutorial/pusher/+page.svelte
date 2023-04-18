@@ -9,14 +9,16 @@
 	import { PUSHER_BG, PUSHER_BORDER, PUSHER_H, PUSHER_W } from '$src/constants';
 	import Tutorial from '../Tutorial.svelte';
 	import Pusher from '$rbx/Pusher.svelte';
+	import type { TutorialProps } from '../types';
+	import type { StringedNumber } from '$src/store';
 
-	const tutorialProps = {
+	const tutorialProps: TutorialProps = {
 		header: 'Pusher',
 		description:
 			'Pusher takes two emoji inputs and makes leaf-fluttering-in-wind pushable by wind-face',
 		component: Pusher,
 		rbx: {
-			id: 0,
+			id: '0',
 			type: 'pusher',
 			position: { x: 0, y: 0 },
 			width: PUSHER_W,
@@ -25,7 +27,7 @@
 			borderColor: PUSHER_BORDER,
 		},
 		props: {
-			id: -1,
+			id: '-1',
 			slots: ['wind-face', 'leaf-fluttering-in-wind', 'push'],
 		},
 		gameProps: {
@@ -35,20 +37,20 @@
 					['0_6', 'leaf-fluttering-in-wind'],
 				])
 			),
-			controllables: new Map<number, Controllable>([
+			controllables: new Map<StringedNumber, Controllable>([
 				[
-					0,
+					'0',
 					new Controllable(
 						'wind-face',
 						1,
 						[['any', 0]],
-						new Evolve(false, '', 0),
-						new Devolve(false, '')
+						new Evolve('', 0),
+						new Devolve('')
 					),
 				],
 			]),
-			pushers: new Map<number, TPusher>([
-				[0, ['wind-face', 'leaf-fluttering-in-wind', 'push']],
+			pushers: new Map<StringedNumber, TPusher>([
+				['0', ['wind-face', 'leaf-fluttering-in-wind', 'push']],
 			]),
 			mapClass: 'simulation',
 			SIZE: 4,

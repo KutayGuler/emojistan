@@ -16,6 +16,7 @@
 		Controllable,
 		Equippable,
 		Consumable,
+		type Drops,
 	} from '$src/types';
 
 	export let position: { x: number; y: number };
@@ -72,13 +73,7 @@
 			onClick: () =>
 				spawn(
 					'controllable',
-					new Controllable(
-						'',
-						1,
-						[],
-						new Evolve(false, '', 2),
-						new Devolve(false, '')
-					)
+					new Controllable('', 1, [], new Evolve('', 2), new Devolve(''))
 				),
 		},
 		{
@@ -90,10 +85,10 @@
 						'',
 						[],
 						1,
-						1,
 						[['any', 'talk']],
-						new Evolve(false, '', 2),
-						new Devolve(false, '')
+						new Evolve('', 2),
+						new Devolve(''),
+						['', 0]
 					)
 				),
 		},

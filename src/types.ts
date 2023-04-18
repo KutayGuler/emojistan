@@ -93,6 +93,7 @@ export interface _Interactable {
 	sideEffects: Array<[string, number | 'talk']>;
 	evolve: Evolve;
 	devolve: Devolve;
+	drops: Drops;
 }
 
 export interface _Interactables {
@@ -185,39 +186,37 @@ export class SequenceItem {
 }
 
 export interface Evolve {
-	enabled: boolean;
 	to: string;
 	at: number;
 }
 
 export class Evolve {
-	constructor(enabled: boolean, to: string, at: number) {
-		this.enabled = enabled;
+	constructor(to: string, at: number) {
 		this.to = to;
 		this.at = at;
 	}
 }
 
 export interface Devolve {
-	enabled: boolean;
 	to: string;
 }
 
 export class Devolve {
-	constructor(enabled: boolean, to: string) {
-		this.enabled = enabled;
+	constructor(to: string) {
 		this.to = to;
 	}
 }
 
+export type Drops = [id: string, amount: number];
+
 export interface Interactable {
 	emoji: string;
 	sequence: Array<SequenceItem>;
-	points: number;
 	hp: number;
 	sideEffects: Array<[string | 'any', number | 'talk']>;
 	evolve: Evolve;
 	devolve: Devolve;
+	drops: Drops;
 }
 
 export class Interactable {
@@ -225,18 +224,18 @@ export class Interactable {
 		emoji: string,
 		sequence: Array<SequenceItem>,
 		hp: number,
-		points: number,
 		sideEffects: Array<[string | 'any', number | 'talk']>,
 		evolve: Evolve,
-		devolve: Devolve
+		devolve: Devolve,
+		drops: Drops
 	) {
 		this.emoji = emoji;
 		this.sequence = sequence;
 		this.hp = hp;
-		this.points = points; // TODO: figure out what the fuck is this
 		this.sideEffects = sideEffects;
 		this.evolve = evolve;
 		this.devolve = devolve;
+		this.drops = drops;
 	}
 }
 

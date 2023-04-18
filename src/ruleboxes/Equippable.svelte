@@ -6,10 +6,11 @@
 		formattedEmoji,
 		equippables,
 		interactables,
+		type StringedNumber,
 	} from '$src/store';
 	import { Equippable } from '$src/types';
 
-	export let id: string;
+	export let id: StringedNumber;
 	export let emoji = '';
 	let hp = 1;
 

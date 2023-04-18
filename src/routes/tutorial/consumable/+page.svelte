@@ -14,14 +14,18 @@
 	} from '$src/constants';
 	import Tutorial from '../Tutorial.svelte';
 	import Consumable from '$rbx/Consumable.svelte';
+	import type { TutorialProps } from '../types';
+	import type { StringedNumber } from '$src/store';
 
-	const firstTutorialProps = {
+	// FIXME: Pig not moving after mutation
+
+	const firstTutorialProps: TutorialProps = {
 		header: 'Consumable',
 		description:
 			'Consumable takes an emoji and a number input. Emoji is the consumable itself and the number below it is the HP side effect consumer will be subjected to.',
 		component: Consumable,
 		rbx: {
-			id: 0,
+			id: '0',
 			type: 'consumable',
 			position: { x: 0, y: 0 },
 			width: CONSUMABLE_W,
@@ -40,32 +44,32 @@
 					['0_6', 'banana'],
 				])
 			),
-			controllables: new Map<number, Controllable>([
+			controllables: new Map<StringedNumber, Controllable>([
 				[
-					0,
+					'0',
 					new Controllable(
 						'monkey',
 						1,
 						[['any', 0]],
-						new Evolve(false, '', 0),
-						new Devolve(false, '')
+						new Evolve('', 0),
+						new Devolve('')
 					),
 				],
 			]),
-			consumables: new Map<number, TConsumable>([
-				[-1, { emoji: 'banana', sideEffect: 1, mutateConsumerTo: '' }],
+			consumables: new Map<StringedNumber, TConsumable>([
+				['-1', { emoji: 'banana', sideEffect: 1, mutateConsumerTo: '' }],
 			]),
 			mapClass: 'simulation',
 			SIZE: 4,
 		},
 	};
 
-	const secondTutorialProps = {
+	const secondTutorialProps: TutorialProps = {
 		description:
 			'On the top left corner, the 🧬 icon enables mutation and disables the HP side effect. If mutation is enabled, another slot opens up to determine what the consumer will mutate into.',
 		component: Consumable,
 		rbx: {
-			id: 0,
+			id: '0',
 			type: 'consumable',
 			position: { x: 0, y: 0 },
 			width: CONSUMABLE_W,
@@ -86,20 +90,20 @@
 					['0_6', 'test-tube'],
 				])
 			),
-			controllables: new Map<number, Controllable>([
+			controllables: new Map<StringedNumber, Controllable>([
 				[
-					0,
+					'0',
 					new Controllable(
 						'monkey',
 						1,
 						[['any', 0]],
-						new Evolve(false, '', 0),
-						new Devolve(false, '')
+						new Evolve('', 0),
+						new Devolve('')
 					),
 				],
 			]),
-			consumables: new Map<number, TConsumable>([
-				[-2, { emoji: 'test-tube', sideEffect: 1, mutateConsumerTo: 'pig' }],
+			consumables: new Map<StringedNumber, TConsumable>([
+				['-2', { emoji: 'test-tube', sideEffect: 1, mutateConsumerTo: 'pig' }],
 			]),
 			mapClass: 'simulation',
 			SIZE: 4,
@@ -109,5 +113,3 @@
 
 <Tutorial {...firstTutorialProps} --header={CONSUMABLE_BORDER} />
 <Tutorial {...secondTutorialProps} />
-
-<p class="self-start p-4">Consumables cannot be equipped.</p>

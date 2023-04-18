@@ -1,5 +1,6 @@
 import { writable, get } from 'svelte/store';
 import { Rulebox, type RuleboxType } from '../types/types';
+import type { StringedNumber } from '$src/store';
 
 function createRuleboxes() {
 	const arr: Array<Rulebox> = [];
@@ -18,12 +19,15 @@ function createRuleboxes() {
 			});
 		},
 
-		spawn(component: RuleboxType, position: { x: number; y: number }): string {
-			let id = '';
+		spawn(
+			component: RuleboxType,
+			position: { x: number; y: number }
+		): StringedNumber {
+			let id: StringedNumber = '-1';
 
 			update((state) => {
 				state = state.filter((rbx) => rbx.type != 'ctxMenu');
-				id = (Math.max(...state.map((rbx) => +rbx.id), 0) + 1).toString();
+				id = `${Math.max(...state.map((rbx) => +rbx.id), 0) + 1}`;
 				state.push(new Rulebox(id, component, position));
 				return state;
 			});

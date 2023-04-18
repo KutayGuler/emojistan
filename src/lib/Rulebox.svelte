@@ -17,6 +17,7 @@
 		mergers,
 		modal,
 		pushers,
+		type StringedNumber,
 	} from '$src/store';
 
 	import type { Rulebox } from '$lib/types/types';
@@ -38,7 +39,50 @@
 	// moving local boolean specific to rulebox selected, to change position of individual rulebox once selected
 	let moving = false;
 	let moved = false;
-	console.log(rbx);
+
+	function remove() {
+		if (rbx.type === 'interactable' && $dialogueTree.has(rbx.id.toString())) {
+			modal.show({
+				content:
+					'All dialogue content connected to this Interactable will be lost.',
+				header: 'Are you sure?',
+				confirmText: 'DELETE',
+				onConfirm: () => {
+					dialogueTree.remove(rbx.id.toString());
+					rbxStore.remove(rbx.id);
+					interactables.remove(rbx.id);
+				},
+				input: false,
+				danger: true,
+			});
+			return;
+		}
+
+		rbxStore.remove(rbx.id);
+
+		switch (rbx.type) {
+			case 'pusher':
+				pushers.remove(rbx.id);
+				break;
+			case 'merger':
+				mergers.remove(rbx.id);
+				break;
+			case 'consumable':
+				consumables.remove(rbx.id);
+				break;
+			case 'equippable':
+				equippables.remove(rbx.id);
+				break;
+			case 'controllable':
+				controllables.remove(rbx.id);
+				break;
+			case 'interactable':
+				interactables.remove(rbx.id);
+				break;
+			default:
+				break;
+		}
+	}
 </script>
 
 <svelte:window
@@ -105,49 +149,7 @@
 		style:display={rbx.type === 'ctxMenu' ? 'none' : 'flex'}
 		style="border-color: {rbx.borderColor}"
 		class="absolute top-0 right-0 flex h-6 w-6 cursor-pointer items-center justify-center rounded border-2 bg-white text-center text-xl"
-		on:click={() => {
-			if (rbx.type === 'interactable' && $dialogueTree.has(rbx.id.toString())) {
-				modal.show({
-					content:
-						'All dialogue content connected to this Interactable will be lost.',
-					header: 'Are you sure?',
-					confirmText: 'DELETE',
-					onConfirm: () => {
-						dialogueTree.remove(rbx.id.toString());
-						rbxStore.remove(rbx.id);
-						interactables.remove(rbx.id);
-					},
-					input: false,
-					danger: true,
-				});
-				return;
-			}
-
-			rbxStore.remove(rbx.id);
-
-			switch (rbx.type) {
-				case 'pusher':
-					pushers.remove(rbx.id);
-					break;
-				case 'merger':
-					mergers.remove(rbx.id);
-					break;
-				case 'consumable':
-					consumables.remove(rbx.id);
-					break;
-				case 'equippable':
-					equippables.remove(rbx.id);
-					break;
-				case 'controllable':
-					controllables.remove(rbx.id);
-					break;
-				case 'interactable':
-					interactables.remove(rbx.id);
-					break;
-				default:
-					break;
-			}
-		}}
+		on:click={remove}
 	>
 		{CROSS}
 	</button>

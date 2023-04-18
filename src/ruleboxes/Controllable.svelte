@@ -13,6 +13,7 @@
 		controllables,
 		equippables,
 		consumables,
+		type StringedNumber,
 	} from '../store';
 
 	let indexes: Array<number> = [];
@@ -35,13 +36,13 @@
 	}
 
 	// COMPONENT RELATED
-	export let id: string;
+	export let id: StringedNumber;
 	export let emoji = '';
 	export let hp = 1;
 	export let sideEffects: Array<[string, number]> = [];
 	export let pseudoSideEffects: Array<[string, number]> = [];
-	export let evolve = new Evolve(false, '', 2);
-	export let devolve = new Devolve(false, '');
+	export let evolve = new Evolve('', 2);
+	export let devolve = new Devolve('');
 
 	onMount(() => {
 		console.log(id, $controllables);
@@ -65,8 +66,7 @@
 		// 	rbxStore.remove(id);
 		// 	return;
 		// }
-		if (evolve.to === '') evolve.enabled = false;
-		if (devolve.to === '') devolve.enabled = false;
+
 		sideEffects = sideEffects.filter((m) => {
 			if (m[0] === 'any') return true;
 			return $equippables.get(m[0])?.emoji != '';
@@ -152,7 +152,7 @@
 
 	// this function deals with two-way binded variable
 	function updateHP() {
-		if (evolve.enabled && hp >= evolve.at) {
+		if (evolve.to && hp >= evolve.at) {
 			notifications.warning(
 				'Default HP cannot be bigger than or equal to evolve HP'
 			);
@@ -190,26 +190,24 @@
 		}
 	}
 
-	$: eqs = [...$equippables].filter(([id, e]) => e.emoji != '');
+	$: droppables = [...$equippables].filter(([id, e]) => e.emoji != '');
 </script>
 
 <div class="absolute -top-8 flex flex-row items-center justify-center gap-2">
-	{#if devolve.enabled}
-		<div class="flex scale-75 flex-col items-center justify-center">
-			<button class="slot-lg" on:click={updateDevolveEmoji}>
-				<i class="twa twa-{devolve.to}" />
-			</button>
-			<div class="absolute -bottom-4">
-				<select
-					disabled
-					class="select-bordered select select-sm text-xl"
-					title="HP"
-				>
-					<option value={0}>0</option>
-				</select>
-			</div>
+	<div class="flex scale-75 flex-col items-center justify-center">
+		<button class="slot-lg" on:click={updateDevolveEmoji}>
+			<i class="twa twa-{devolve.to}" />
+		</button>
+		<div class="absolute -bottom-4">
+			<select
+				disabled
+				class="select-bordered select select-sm text-xl"
+				title="HP"
+			>
+				<option value={0}>0</option>
+			</select>
 		</div>
-	{/if}
+	</div>
 	<div class="flex flex-col items-center justify-center">
 		<button class="slot-lg" on:click={updateEmoji}>
 			<i class="twa twa-{emoji}" />
@@ -227,53 +225,32 @@
 			</select>
 		</div>
 	</div>
-	{#if evolve.enabled}
-		<div
-			use:checkEvolve
-			class="flex scale-75 flex-col  items-center justify-center"
-		>
-			<button class="slot-lg" on:click={updateEvolveEmoji}>
-				<i class="twa twa-{evolve.to}" />
-			</button>
-			<div class="absolute -bottom-4">
-				<select
-					class="select-bordered select select-sm text-xl"
-					title="HP"
-					bind:value={evolve.at}
-					on:change={updateEvolveHP}
-				>
-					{#each hps as _hp}
-						<option value={_hp}>{_hp}</option>
-					{/each}
-				</select>
-			</div>
-		</div>
-	{/if}
-</div>
-<main class="flex w-full flex-col items-center justify-center gap-4 pt-16">
-	<div class="flex flex-col items-center justify-center">
-		<div class="flex flex-row gap-4 text-xl">
-			<button
-				class:enabled={devolve.enabled}
-				class="rotate-90 opacity-50 hover:cursor-pointer"
-				on:click={() => (devolve.enabled = !devolve.enabled)}
+	<div
+		use:checkEvolve
+		class="flex scale-75 flex-col  items-center justify-center"
+	>
+		<button class="slot-lg" on:click={updateEvolveEmoji}>
+			<i class="twa twa-{evolve.to}" />
+		</button>
+		<div class="absolute -bottom-4">
+			<select
+				class="select-bordered select select-sm text-xl"
+				title="HP"
+				bind:value={evolve.at}
+				on:change={updateEvolveHP}
 			>
-				<i class="twa twa-dna" />
-			</button>
-			<button
-				class:enabled={evolve.enabled}
-				class="opacity-50 hover:cursor-pointer"
-				on:click={() => (evolve.enabled = !evolve.enabled)}
-			>
-				<i class="twa twa-dna" />
-			</button>
+				{#each hps as _hp}
+					<option value={_hp}>{_hp}</option>
+				{/each}
+			</select>
 		</div>
 	</div>
-
+</div>
+<main class="flex w-full flex-col items-center justify-center gap-4 pt-16">
 	<div class="form-control flex w-full flex-col p-4">
 		<div class="divider flex flex-row pb-6">
 			<p>SIDE EFFECTS ({sideEffects.length} / {MAX_SIDE_EFFECT})</p>
-			<div class="dropdown-hover dropdown-right dropdown">
+			<div class="dropdown-right dropdown">
 				<label
 					for=""
 					tabindex="0"
@@ -284,7 +261,7 @@
 					tabindex="0"
 					class="dropdown-content menu rounded-box bg-base-100 p-2 shadow "
 				>
-					{#each eqs as [id, { emoji }]}
+					{#each droppables as [id, { emoji }]}
 						<button
 							class="rounded-md p-1 hover:bg-base-200"
 							on:click={() => addTosideEffects(id)}

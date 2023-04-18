@@ -351,15 +351,17 @@ export const formattedEmoji = derived(
 export const saves = createSaves();
 export const map = createEditableMap();
 
+export type StringedNumber = `${number}`;
+
 // MAPS
-export const pushers = createMapStore<string, Pusher>('pushers');
-export const mergers = createMapStore<string, Merger>('mergers');
-export const consumables = createMapStore<string, Consumable>('consumables');
-export const equippables = createMapStore<string, Equippable>('equippables');
-export const interactables = createMapStore<string, Interactable>(
+export const pushers = createMapStore<StringedNumber, Pusher>('pushers');
+export const mergers = createMapStore<StringedNumber, Merger>('mergers');
+export const consumables = createMapStore<StringedNumber, Consumable>('consumables');
+export const equippables = createMapStore<StringedNumber, Equippable>('equippables');
+export const interactables = createMapStore<StringedNumber, Interactable>(
 	'interactables'
 );
-export const controllables = createMapStore<string, Controllable>(
+export const controllables = createMapStore<StringedNumber, Controllable>(
 	'controllables'
 );
 export const dialogueTree = createDialogueTree();

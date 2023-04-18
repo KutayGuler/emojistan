@@ -5,11 +5,12 @@
 		formattedEmoji,
 		equippables,
 		interactables,
+		type StringedNumber,
 	} from '$src/store';
 	import { Consumable } from '$src/types';
 	import { onDestroy, onMount } from 'svelte';
 
-	export let id: string;
+	export let id: StringedNumber;
 	export let emoji = '';
 	export let sideEffect = 1;
 	export let mutateConsumerTo = '';

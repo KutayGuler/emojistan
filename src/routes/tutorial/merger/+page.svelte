@@ -9,14 +9,18 @@
 	import { MERGER_BG, MERGER_BORDER, MERGER_H, MERGER_W } from '$src/constants';
 	import Tutorial from '../Tutorial.svelte';
 	import Merger from '$rbx/Merger.svelte';
+	import type { TutorialProps } from '../types';
+	import type { StringedNumber } from '$src/store';
 
-	const tutorialProps = {
+	// FIXME: cloud-with-snow not moving after merge
+
+	const tutorialProps: TutorialProps = {
 		header: 'Merger',
 		description:
 			'Merger takes three emoji inputs. To put it simply, cloud + snowflake = cloud-with-snow. Alternatively, snowflake + cloud = cloud-with-snow',
 		component: Merger,
 		rbx: {
-			id: 0,
+			id: '-1',
 			type: 'merger',
 			position: { x: 0, y: 0 },
 			width: MERGER_W,
@@ -25,7 +29,7 @@
 			borderColor: MERGER_BORDER,
 		},
 		props: {
-			id: -1,
+			id: '-1',
 			slots: ['cloud', 'snowflake', 'cloud-with-snow'],
 		},
 		gameProps: {
@@ -35,40 +39,40 @@
 					['0_6', 'snowflake'],
 				])
 			),
-			controllables: new Map<number, Controllable>([
+			controllables: new Map<StringedNumber, Controllable>([
 				[
-					0,
+					'0',
 					new Controllable(
 						'cloud',
 						1,
 						[['any', 0]],
-						new Evolve(false, '', 0),
-						new Devolve(false, '')
+						new Evolve('', 0),
+						new Devolve('')
 					),
 				],
 				[
-					1,
+					'1',
 					new Controllable(
 						'snowflake',
 						1,
 						[['any', 0]],
-						new Evolve(false, '', 0),
-						new Devolve(false, '')
+						new Evolve('', 0),
+						new Devolve('')
 					),
 				],
 				[
-					1,
+					'2',
 					new Controllable(
 						'cloud-cloud-with-snow',
 						1,
 						[['any', 0]],
-						new Evolve(false, '', 0),
-						new Devolve(false, '')
+						new Evolve('', 0),
+						new Devolve('')
 					),
 				],
 			]),
-			mergers: new Map<number, TMerger>([
-				[0, ['cloud', 'snowflake', 'cloud-with-snow']],
+			mergers: new Map<StringedNumber, TMerger>([
+				['4', ['cloud', 'snowflake', 'cloud-with-snow']],
 			]),
 			mapClass: 'simulation',
 			SIZE: 4,

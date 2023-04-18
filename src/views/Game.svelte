@@ -14,6 +14,7 @@
 		Equippable,
 		Interactable,
 		Item,
+		Controllable,
 		type ArrowKey,
 		type CollisionType,
 		type EditableMap,
@@ -29,7 +30,6 @@
 		type Branch,
 		type _Controllable,
 		type _Controllables,
-		Controllable,
 		type Inventory,
 	} from '$src/types';
 	import { AStarFinder } from 'astar-typescript';
@@ -192,7 +192,25 @@
 		player.inventory = player.inventory;
 	}
 
-	// TODO: merged Controllable is not moving
+	function addToInventory(items: Array<Equippable | Consumable>) {
+		let emptyIndexes = [];
+		console.log(items);
+
+		for (let i = 0; i < MAX_INVENTORY_SIZE; i++) {
+			if (!player.inventory.get(i)) {
+				emptyIndexes.push(i);
+			}
+		}
+
+		for (let i = 0; i < emptyIndexes.length; i++) {
+			if (items[i]) {
+				player.inventory.set(emptyIndexes[i], items[i]);
+			}
+		}
+
+		player.inventory = player.inventory;
+		console.log(player.inventory);
+	}
 
 	/**
 	 * function mutates ac if it is equal to "from" parameter
@@ -231,14 +249,6 @@
 		}
 	}
 
-	for (let [id, interactable] of interactables) {
-		const { emoji, ...args } = interactable;
-		if (emoji === '') continue;
-		_interactables[emoji] = {} as _Interactable;
-		Object.assign(_interactables[emoji], args);
-		_interactables[emoji].id = id;
-	}
-
 	for (let [id, controllable] of controllables) {
 		const { emoji, ...args } = controllable;
 		if (emoji === '') continue;
@@ -255,10 +265,31 @@
 	}
 
 	for (let [id, equippable] of equippables) {
-		const { emoji, ...args } = equippable;
+		const { emoji, ...args } = structuredClone(equippable);
 		if (emoji === '') continue;
 		_equippables[emoji] = {} as Equippable;
 		Object.assign(_equippables[emoji], args);
+	}
+
+	for (let [id, interactable] of interactables) {
+		const { emoji, ...args } = structuredClone(interactable);
+		if (emoji === '') continue;
+		_interactables[emoji] = {} as _Interactable;
+		Object.assign(_interactables[emoji], args);
+		_interactables[emoji].id = id;
+		const dropsID = _interactables[emoji].drops[0];
+		const sideEffects = _interactables[emoji].sideEffects;
+
+		for (let [id, effect] of sideEffects) {
+			sideEffects[0][0] = structuredClone(equippables.get(id)?.emoji) || '';
+		}
+
+		if (dropsID) {
+			_interactables[emoji].drops[0] =
+				equippables.get(dropsID)?.emoji ||
+				consumables.get(dropsID)?.emoji ||
+				'';
+		}
 	}
 
 	function coordinateToPosObj(num: number) {
@@ -539,8 +570,10 @@
 			!items.has(currentSection + '_' + ac) ||
 			(player?.hp.current || -1) <= 0 ||
 			chatting
-		)
+		) {
 			return;
+		}
+
 		if (e.code.includes('Arrow')) {
 			let operation = calcOperation(e.code as ArrowKey, ac);
 			if (!player || operation === 0 || !_controllables[player.emoji]) return;
@@ -596,7 +629,7 @@
 			}
 			let interactedItem = items.get(currentSection + '_' + ic);
 
-			if (interactedItem === undefined) return;
+			if (!interactedItem) return;
 			if (
 				interactedItem instanceof Equippable ||
 				interactedItem instanceof Consumable
@@ -615,26 +648,13 @@
 				return;
 			}
 
-			let interactable: _Interactable = _interactables[interactedItem.emoji];
+			let _interactable: _Interactable = _interactables[interactedItem.emoji];
 
-			if (!interactable) return;
-			let { id, sideEffects, evolve, devolve } = interactable;
-
-			// for (let { type } of sequence) {
-			// 	if (type === 'dropEquippable') {
-			// 		if (player?.inventory.length === MAX_INVENTORY_SIZE) {
-			// 			return;
-			// 		}
-			// 	}
-			// }
-
-			let equippedItem = player?.inventory.get(currentInventoryIndex) || 'any';
-
+			if (!_interactable) return;
+			let { id, sideEffects, evolve, devolve } = _interactable;
 			let sideEffect =
 				sideEffects.find(
-					([effect, value]) =>
-						equippables.get(effect)?.emoji ===
-						(equippedItem as Equippable).emoji
+					([emoji, effect]) => emoji === interactedItem?.emoji
 				) || sideEffects[0];
 
 			if (sideEffect[1] === 'talk') {
@@ -653,13 +673,13 @@
 				clearTimeout(timeout);
 			}, 50);
 
+			let equippedItem = player?.inventory.get(currentInventoryIndex) || 'any';
 			const isEquippable = equippedItem instanceof Equippable;
 
 			if (
 				isEquippable &&
 				sideEffect[0] === (equippedItem as Equippable).emoji
 			) {
-				// FIXME: equippedItem.hp not reducing on interaction
 				(equippedItem as Equippable).hp -= 1;
 			}
 
@@ -688,26 +708,42 @@
 
 			// EVOLVE & DEVOLVE PLAYER
 			if (player && player?.hp.current <= 0) {
-				if (playerDevolve?.enabled && playerDevolve.to != '') {
+				if (playerDevolve?.to) {
 					player.emoji = playerDevolve.to;
 				} else {
 					items.delete(currentSection + '_' + ac);
 				}
-			} else if (
-				playerEvolve?.enabled &&
-				playerEvolve.at === player?.hp.current
-			) {
+			} else if (playerEvolve?.to && playerEvolve?.at === player?.hp.current) {
 				player.emoji = playerEvolve.to;
 			}
 
 			// EVOLVE & DEVOLVE INTERACTED ITEM
 			if (interactedItem.hp.current <= 0) {
-				if (devolve?.enabled && devolve.to != '') {
+				const _drops = _interactables[interactedItem.emoji].drops;
+				console.log(_drops);
+
+				if (_drops[0]) {
+					let item;
+					console.log(_drops[0]);
+					if (_consumables[_drops[0]]) {
+						item = new Consumable(
+							_drops[0],
+							_consumables[_drops[0]].sideEffect,
+							_consumables[_drops[0]].mutateConsumerTo
+						);
+					} else if (_equippables[_drops[0]]) {
+						item = new Equippable(_drops[0], _equippables[_drops[0]].hp);
+					}
+
+					addToInventory(new Array(_drops[1]).fill(item));
+				}
+
+				if (devolve.to !== '') {
 					interactedItem.emoji = devolve.to;
 				} else {
 					items.delete(currentSection + '_' + ic);
 				}
-			} else if (evolve?.enabled && evolve.at === interactedItem.hp.current) {
+			} else if (evolve?.to !== '' && evolve.at === interactedItem.hp.current) {
 				interactedItem.emoji = evolve.to;
 			}
 
@@ -730,7 +766,7 @@
 				if (player.hp.current <= 0) {
 					let playerDevolve = _interactables[player?.emoji || '']?.devolve;
 
-					if (playerDevolve.enabled) {
+					if (playerDevolve.to !== '') {
 						player.emoji = playerDevolve.to;
 						player.hp.max = _interactables[playerDevolve.to]?.hp || 1;
 						player.hp.current = player.hp.max;
@@ -767,7 +803,7 @@
 
 				let playerEvolve = _interactables[player?.emoji || '']?.evolve;
 
-				if (playerEvolve?.enabled && player.hp.current === playerEvolve?.at) {
+				if (playerEvolve?.to !== '' && player.hp.current === playerEvolve?.at) {
 					player.emoji = playerEvolve.to;
 					player.hp.max = _interactables[playerEvolve.to]?.hp || 1;
 					player.hp.current = player.hp.max;
@@ -807,11 +843,14 @@
 			let closestDistance = 300;
 			let closestID = ac;
 
-			let _items = Array.from(items).filter(
-				([id, { emoji }]) => !_equippables[emoji]
+			let _controllables = Array.from(items).filter(
+				([id, { emoji }]) => !_equippables[emoji] && !_consumables[emoji]
 			);
 
-			for (let [id, _] of _items) {
+			console.log(_controllables);
+			
+
+			for (let [id, _] of _controllables) {
 				let _id = +id.split('_')[1];
 				if (_id === ac) continue;
 				if (_id > ac && _id - ac < closestDistance) {
@@ -822,7 +861,7 @@
 
 			if (closestDistance === 300) {
 				let smallest = 300;
-				for (let [id, _] of _items) {
+				for (let [id, _] of _controllables) {
 					let _id = +id.split('_')[1];
 					if (_id < smallest) smallest = _id;
 				}
@@ -852,7 +891,7 @@
 <div class="relative flex h-full flex-col items-center justify-center">
 	{#key ac}
 		{#if ac != -2 && showHP}
-			{@const playerHP = $progress * (player?.hp.max || 1)}
+			{@const playerHP = $progress * (player?.hp?.max || 1)}
 			<div
 				class=" flex h-full w-64 flex-grow flex-row items-center justify-center"
 			>
@@ -879,7 +918,7 @@
 			{@const item = items.get(currentSection + '_' + i)}
 			{@const background = backgrounds.get(currentSection + '_' + i)}
 			{@const hand =
-				player?.inventory.get(currentInventoryIndex)?.emoji ||
+				player?.inventory?.get(currentInventoryIndex)?.emoji ||
 				keys[directionKey].emoji}
 			<div
 				class="cell"
@@ -990,7 +1029,7 @@
 
 	@keyframes consumable {
 		100% {
-			transform: scale(0.85);
+			transform: scale(0.618);
 		}
 	}
 

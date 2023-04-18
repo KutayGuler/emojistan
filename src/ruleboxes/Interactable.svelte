@@ -15,6 +15,7 @@
 		Interactable,
 		SequenceItem,
 		type Mutations,
+		type Drops,
 	} from '$src/types';
 	import { onDestroy, onMount } from 'svelte';
 	import { notifications } from '../routes/notifications';
@@ -24,10 +25,8 @@
 		interactables,
 		equippables,
 		consumables,
+		type StringedNumber,
 	} from '../store';
-
-	// TODO: Drops:
-	// ["emoji", number]
 
 	let defaultBackground = $map.dbg;
 
@@ -67,17 +66,17 @@
 	}
 
 	// COMPONENT RELATED
-	export let id: string;
+	export let id: StringedNumber;
 	export let emoji = '';
 	export let sequence: Array<SequenceItem> = [];
 	export let hp = 1;
-	export let points = 1;
 	export let sideEffects: Array<[string | 'any', number | 'talk']> = [
 		['any', 'talk'],
 	];
 	export let pseudoSideEffects: Array<[string, number]> = [];
-	export let evolve = new Evolve(false, '', 2);
-	export let devolve = new Devolve(false, '');
+	export let evolve = new Evolve('', 2);
+	export let devolve = new Devolve('');
+	export let drops: Drops = ['', 1];
 
 	// SEQUENCE RELATED
 	let type = types.Map[0];
@@ -90,22 +89,16 @@
 
 		let obj = $interactables.get(id);
 		if (obj) {
-			({ emoji, sequence, hp, points, sideEffects, evolve, devolve } = obj);
+			({ emoji, sequence, hp, sideEffects, evolve, devolve, drops } = obj);
 		}
+
+		console.log(obj, sideEffects);
 	});
 
 	function updateStore() {
 		interactables.update(
 			id,
-			new Interactable(
-				emoji,
-				sequence,
-				hp,
-				points,
-				sideEffects,
-				evolve,
-				devolve
-			)
+			new Interactable(emoji, sequence, hp, sideEffects, evolve, devolve, drops)
 		);
 
 		rbxStore.adjustHeight(id, sequence.length, INTERACTABLE_H);
@@ -117,8 +110,7 @@
 		// 	rbxStore.remove(id);
 		// 	return;
 		// }
-		if (evolve.to === '') evolve.enabled = false;
-		if (devolve.to === '') devolve.enabled = false;
+
 		sideEffects = sideEffects.filter((m) => {
 			if (m[0] === 'any') return true;
 			return $equippables.get(m[0])?.emoji != '';
@@ -206,6 +198,11 @@
 		updateStore();
 	}
 
+	function updateDrops() {
+		drops[0] = $formattedEmoji;
+		updateStore();
+	}
+
 	function updateEvolveEmoji() {
 		if (emoji === $formattedEmoji) {
 			notifications.warning('An interactable cannot evolve to itself');
@@ -261,27 +258,31 @@
 		}
 	}
 
+	// TODO: main health cannot be higher than evolve's hp
+
+	let hasInteraction = true;
 	$: hasInteraction = sideEffects.some((m) => m[1] != 0);
 	$: eqs = [...$equippables].filter(([id, e]) => e.emoji != '');
+	$: droppables = [...$equippables, ...$consumables].filter(
+		([id, e]) => e.emoji != ''
+	);
 </script>
 
 <div class="absolute -top-8 flex flex-row items-center justify-center gap-2">
-	{#if devolve.enabled}
-		<div class="flex scale-75 flex-col items-center justify-center">
-			<button class="slot-lg" on:click={updateDevolveEmoji}>
-				<i class="twa twa-{devolve.to}" />
-			</button>
-			<div class="absolute -bottom-4">
-				<select
-					disabled
-					class="select-bordered select select-sm text-xl"
-					title="HP"
-				>
-					<option value={0}>0</option>
-				</select>
-			</div>
+	<div class="flex scale-75 flex-col items-center justify-center">
+		<button class="slot-lg" on:click={updateDevolveEmoji}>
+			<i class="twa twa-{devolve.to}" />
+		</button>
+		<div class="absolute -bottom-4">
+			<select
+				disabled
+				class="select-bordered select select-sm text-xl"
+				title="HP"
+			>
+				<option value={0}>0</option>
+			</select>
 		</div>
-	{/if}
+	</div>
 	<div class="flex flex-col items-center justify-center">
 		<button class="slot-lg" on:click={updateEmoji}>
 			<i class="twa twa-{emoji}" />
@@ -299,53 +300,79 @@
 			</select>
 		</div>
 	</div>
-	{#if evolve.enabled}
-		<div
-			use:checkEvolve
-			class="flex scale-75 flex-col  items-center justify-center"
-		>
-			<button class="slot-lg" on:click={updateEvolveEmoji}>
-				<i class="twa twa-{evolve.to}" />
-			</button>
+	<div
+		use:checkEvolve
+		class="flex scale-75 flex-col  items-center justify-center"
+	>
+		<button class="slot-lg" on:click={updateEvolveEmoji}>
+			<i class="twa twa-{evolve.to}" />
+		</button>
+		<div class="absolute -bottom-4">
+			<select
+				class="select-bordered select select-sm text-xl"
+				title="HP"
+				bind:value={evolve.at}
+				on:change={updateEvolveHP}
+			>
+				{#each hps as _hp}
+					<option value={_hp}>{_hp}</option>
+				{/each}
+			</select>
+		</div>
+	</div>
+</div>
+<main class="flex w-full flex-col items-center justify-center gap-4 pt-16">
+	<div class="flex w-full flex-col items-center justify-center p-4">
+		<div class="divider w-full">DROPS</div>
+		<div class="relative flex flex-col items-center justify-center">
+			<div class="dropdown-right dropdown cursor-pointer">
+				<label tabindex="0" class="slot-lg m-1"
+					><i
+						class="twa twa-{$equippables.get(drops[0])?.emoji ||
+							$consumables.get(drops[0])?.emoji}"
+					/></label
+				>
+				<ul
+					tabindex="0"
+					class="dropdown-content menu rounded-box w-fit bg-base-100 p-2 shadow"
+				>
+					{#each droppables as [id, { emoji }]}
+						<button
+							class="w-fit rounded-md p-1 hover:bg-base-200"
+							on:click={() => {
+								drops[0] = id;
+								updateStore();
+							}}
+						>
+							<i class="twa twa-{emoji}" />
+						</button>
+					{:else}
+						<div class="rounded-md p-1">
+							No equippable or consumable defined.
+						</div>
+					{/each}
+				</ul>
+			</div>
 			<div class="absolute -bottom-4">
 				<select
 					class="select-bordered select select-sm text-xl"
 					title="HP"
-					bind:value={evolve.at}
-					on:change={updateEvolveHP}
+					bind:value={drops[1]}
+					on:change={() => {
+						updateStore();
+					}}
 				>
-					{#each hps as _hp}
+					{#each [0, ...hps] as _hp}
 						<option value={_hp}>{_hp}</option>
 					{/each}
 				</select>
 			</div>
 		</div>
-	{/if}
-</div>
-<main class="flex w-full flex-col items-center justify-center gap-4 pt-16">
-	<div class="flex flex-col items-center justify-center">
-		<div class="flex flex-row gap-4 text-xl">
-			<button
-				class:enabled={devolve.enabled}
-				class="rotate-90 opacity-50 hover:cursor-pointer"
-				on:click={() => (devolve.enabled = !devolve.enabled)}
-			>
-				<i class="twa twa-dna" />
-			</button>
-			<button
-				class:enabled={evolve.enabled}
-				class="opacity-50 hover:cursor-pointer"
-				on:click={() => (evolve.enabled = !evolve.enabled)}
-			>
-				<i class="twa twa-dna" />
-			</button>
-		</div>
 	</div>
-
 	<div class="form-control flex w-full flex-col p-4">
 		<div class="divider flex flex-row pb-6">
 			<p>SIDE EFFECTS ({sideEffects.length} / {MAX_SIDE_EFFECT})</p>
-			<div class="dropdown-hover dropdown-right dropdown">
+			<div class="dropdown-right dropdown">
 				<label
 					for=""
 					tabindex="0"

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { dialogueTree } from '$src/store';
+	import { dialogueTree, type StringedNumber } from '$src/store';
 	import {
 		Choice,
 		Controllable,
@@ -11,12 +11,13 @@
 	} from '$src/types';
 	import Game from '$src/views/Game.svelte';
 	import { onDestroy } from 'svelte';
+	import type { GameProps } from '../types';
 
 	$dialogueTree.set('dog', ['woof']);
 
 	// TODO: change example
 
-	const gameProps = {
+	const gameProps: GameProps = {
 		map: new EditableMap(
 			new Map<string, string>([
 				['0_5', 'woman-walking'],
@@ -24,37 +25,35 @@
 				['0_11', 'bone'],
 			])
 		),
-		controllables: new Map<number, Controllable>([
+		controllables: new Map<StringedNumber, Controllable>([
 			[
-				0,
+				'0',
 				new Controllable(
 					'woman-walking',
 					1,
 					[['any', 0]],
-					new Evolve(false, '', 0),
-					new Devolve(false, '')
+					new Evolve('', 0),
+					new Devolve('')
 				),
 			],
 		]),
-		interactables: new Map<number, Interactable>([
+		interactables: new Map<StringedNumber, Interactable>([
 			[
-				0,
+				'1',
 				new Interactable(
 					'dog',
 					[],
 					1,
-					1,
 					[['any', 1]],
-					new Evolve(false, '', 0),
-					new Devolve(false, '')
+					new Evolve('', 0),
+					new Devolve(''),
+					['', 0]
 				),
 			],
 		]),
-		dt: new Map<string, Array<string | Choice>>([
-			['dog', ['woof']],
-			['woman-walking', ['lololo']],
+		consumables: new Map<StringedNumber, Consumable>([
+			['2', new Consumable('bone', 1)],
 		]),
-		consumables: new Map<number, Consumable>([[1, new Consumable('bone', 1)]]),
 		mapClass: 'simulation',
 		SIZE: 4,
 	};

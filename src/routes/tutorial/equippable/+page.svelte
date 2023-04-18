@@ -16,14 +16,16 @@
 	} from '$src/constants';
 	import Tutorial from '../Tutorial.svelte';
 	import Equippable from '$rbx/Equippable.svelte';
+	import type { StringedNumber } from '$src/store';
+	import type { TutorialProps } from '../types';
 
-	const tutorialProps = {
+	const tutorialProps: TutorialProps = {
 		header: 'Equippable',
 		description:
 			'Just like Consumables, Equippables also take an emoji and a number input. Emoji is the equippable itself and the number is the amount of times it can be used before it disappears.',
 		component: Equippable,
 		rbx: {
-			id: 0,
+			id: '0',
 			type: 'equippable',
 			position: { x: 0, y: 0 },
 			width: EQUIPPABLE_W,
@@ -47,38 +49,38 @@
 					['0_15', 'banana'],
 				])
 			),
-			controllables: new Map<number, Controllable>([
+			controllables: new Map<StringedNumber, Controllable>([
 				[
-					0,
+					'0',
 					new Controllable(
 						'monkey',
 						1,
 						[['any', 0]],
-						new Evolve(false, '', 0),
-						new Devolve(false, '')
+						new Evolve('', 0),
+						new Devolve('')
 					),
 				],
 			]),
-			equippables: new Map<number, TEquippable>([
-				[1, new TEquippable('key', 1)],
+			equippables: new Map<StringedNumber, TEquippable>([
+				['1', new TEquippable('key', 1)],
 			]),
-			consumables: new Map<number, Consumable>([
-				[-3, { emoji: 'banana', sideEffect: 1, mutateConsumerTo: '' }],
+			consumables: new Map<StringedNumber, Consumable>([
+				['-3', { emoji: 'banana', sideEffect: 1, mutateConsumerTo: '' }],
 			]),
-			interactables: new Map<number, Interactable>([
+			interactables: new Map<StringedNumber, Interactable>([
 				[
-					-1,
+					'-1',
 					new Interactable(
 						'door',
 						[],
-						1,
 						1,
 						[
 							['any', 0],
 							['1', -1],
 						],
-						new Evolve(false, '', 2),
-						new Devolve(false, '')
+						new Evolve('', 2),
+						new Devolve(''),
+						['', 0]
 					),
 				],
 			]),

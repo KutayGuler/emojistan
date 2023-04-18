@@ -25,6 +25,7 @@ import {
 	CONTROLLABLE_H,
 	CONTROLLABLE_W,
 } from '$src/constants';
+import type { StringedNumber } from '$src/store';
 import type { XYPosition, Position } from './utils';
 
 export type RuleboxType =
@@ -37,7 +38,7 @@ export type RuleboxType =
 	| 'ctxMenu';
 
 export interface Rulebox {
-	id: string;
+	id: StringedNumber;
 	type: RuleboxType;
 	position: XYPosition;
 	width: number;
@@ -57,7 +58,7 @@ export interface Rulebox {
 // #CF 1
 export class Rulebox {
 	constructor(
-		id: string,
+		id: StringedNumber,
 		type: RuleboxType,
 		position: { x: number; y: number }
 	) {

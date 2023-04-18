@@ -14,6 +14,7 @@
 		INTERACTABLE_W,
 	} from '$src/constants';
 	import Tutorial from '../Tutorial.svelte';
+	import type { TutorialProps } from '../types';
 
 	let index = 0;
 
@@ -27,7 +28,7 @@
 		borderColor: INTERACTABLE_BORDER,
 	};
 
-	const tutorialProps = [
+	const tutorialProps: TutorialProps = [
 		{
 			header: 'Interactable',
 			description:
@@ -48,8 +49,8 @@
 				id: 'static',
 				emoji: 'baby',
 				isControllable: true,
-				evolve: new Evolve(false, '', 2),
-				devolve: new Devolve(false, ''),
+				evolve: new Evolve('', 2),
+				devolve: new Devolve(''),
 				hp: 1,
 			},
 			gameProps: {
@@ -62,7 +63,6 @@
 						['0_12', 'brick'],
 						['0_7', 'baby'],
 					]),
-					-2
 				),
 				// @ts-expect-error
 				interactables: new Map<number, TInteractable>([
@@ -72,11 +72,10 @@
 							'baby',
 							[],
 							1,
-							1,
 							[['any', 0]],
-							true,
-							new Evolve(false, '', 2),
-							new Devolve(false, '')
+							new Evolve( '', 2),
+							new Devolve( ''),
+							["", 0]
 						),
 					],
 				]),
