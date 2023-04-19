@@ -1,4 +1,4 @@
-export const xd = {
+export const emojis = {
 	'🍇': [
 		'grapes',
 		'melon',

@@ -2,7 +2,7 @@
 	// SVELTEKIT
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { xd } from './xd';
+	import { emojis } from './emojis';
 
 	// VIEWS
 	import Game from '../../views/Game.svelte';
@@ -380,10 +380,10 @@
 							</div>
 						</div>
 						<div id="flex flex-col">
-							{#each Object.keys(xd) as category}
+							{#each Object.keys(emojis) as category}
 								{#if currentCategory === category}
 									<div class="emojis flex flex-wrap justify-center">
-										{#each xd[category] as name}
+										{#each emojis[category] as name}
 											{@const title = name.replaceAll('-', ' ')}
 											{#if title.includes(filter)}
 												<button

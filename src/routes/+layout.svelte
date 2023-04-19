@@ -6,7 +6,7 @@
 	import supabase from '../supabase';
 	import Modal from './Modal.svelte';
 	import { currentSkin, showLoading } from '$src/store';
-	import { xd } from './editor/xd';
+	import { emojis } from './editor/emojis';
 	import Loading from './Loading.svelte';
 
 	supabase.auth.onAuthStateChange((event, session) => {});
@@ -33,9 +33,9 @@
 </script>
 
 <!-- <div class="hidden">
-	{#each Object.keys(xd) as category}
+	{#each Object.keys(emojis) as category}
 		<div use:waitForEmojisLoad>
-			{#each xd[category] as name}
+			{#each emojis[category] as name}
 				<i
 					on:load={() => {
 						console.log('loaded:', svgCount++);
