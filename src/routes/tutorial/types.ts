@@ -34,4 +34,5 @@ export interface TutorialProps {
 	rbx: Rulebox;
 	props: object;
 	gameProps: GameProps;
+	veilHeight?: number;
 }

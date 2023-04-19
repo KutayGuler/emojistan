@@ -270,7 +270,7 @@
 
 <div class="absolute -top-8 flex flex-row items-center justify-center gap-2">
 	<div class="flex scale-75 flex-col items-center justify-center">
-		<button class="slot-lg" on:click={updateDevolveEmoji}>
+		<button title="Devolve Emoji" class="slot-lg" on:click={updateDevolveEmoji}>
 			<i class="twa twa-{devolve.to}" />
 		</button>
 		<div class="absolute -bottom-4">
@@ -284,7 +284,7 @@
 		</div>
 	</div>
 	<div class="flex flex-col items-center justify-center">
-		<button class="slot-lg" on:click={updateEmoji}>
+		<button title="Interactable Emoji" class="slot-lg" on:click={updateEmoji}>
 			<i class="twa twa-{emoji}" />
 		</button>
 		<div class="absolute -bottom-4">
@@ -304,7 +304,7 @@
 		use:checkEvolve
 		class="flex scale-75 flex-col  items-center justify-center"
 	>
-		<button class="slot-lg" on:click={updateEvolveEmoji}>
+		<button title="Evolve Emoji" class="slot-lg" on:click={updateEvolveEmoji}>
 			<i class="twa twa-{evolve.to}" />
 		</button>
 		<div class="absolute -bottom-4">

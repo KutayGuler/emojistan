@@ -37,26 +37,26 @@ export const MERGER_BORDER = '#334155'; // slate-700
 /* INTERACTABLE */
 export const INTERACTABLE_W = 450;
 export const INTERACTABLE_H = 600;
-export const INTERACTABLE_BG = '#eef2ff'; // indigo-50
-export const INTERACTABLE_BORDER = '#6366f1'; // indigo-500
+export const INTERACTABLE_BG = '#fff1f2'; // rose-50
+export const INTERACTABLE_BORDER = '#f43f5e'; // rose-500
 
 /* CONTROLLABLE */
 export const CONTROLLABLE_W = 450;
 export const CONTROLLABLE_H = 600;
-export const CONTROLLABLE_BG = '#fff1f2'; // rose-50
-export const CONTROLLABLE_BORDER = '#f43f5e'; // rose-500
+export const CONTROLLABLE_BG = '#f0fdf4'; // green-50
+export const CONTROLLABLE_BORDER = '#22c55e'; // green-500
 
 /* CONSUMABLE */
 export const CONSUMABLE_W = 240;
 export const CONSUMABLE_H = 90;
-export const CONSUMABLE_BG = '#f0fdf4'; // bg-green-50
-export const CONSUMABLE_BORDER = '#22c55e'; // bg-green-500
+export const CONSUMABLE_BG = '#faf5ff'; // purple-50
+export const CONSUMABLE_BORDER = '#a855f7'; // purple-500
 
 /* CONSUMABLE */
 export const EQUIPPABLE_W = 180;
 export const EQUIPPABLE_H = 90;
-export const EQUIPPABLE_BG = '#fff7ed'; // orange-50
-export const EQUIPPABLE_BORDER = '#f97316'; // orange-500
+export const EQUIPPABLE_BG = '#fffbeb'; // amber-50
+export const EQUIPPABLE_BORDER = '#f59e0b'; // amber-500
 
 // DATA
 // STORE NAMES

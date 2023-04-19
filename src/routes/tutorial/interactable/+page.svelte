@@ -28,7 +28,8 @@
 		borderColor: INTERACTABLE_BORDER,
 	};
 
-	const tutorialProps: TutorialProps = [
+	const tutorialProps: Array<TutorialProps> = [
+		// @ts-expect-error
 		{
 			header: 'Interactable',
 			description:
@@ -40,61 +41,18 @@
 			},
 			veilHeight: 0,
 		},
-		{
-			header: 'Interactable',
-			description:
-				'isControllable <i class="text-xl twa twa-joystick"></i> means this Interactable can be controlled by the player. Try switching players (Press E or Q) and you will see that the babies can be controlled but the bricks cannot.',
-			veilHeight: 476,
-			props: {
-				id: 'static',
-				emoji: 'baby',
-				isControllable: true,
-				evolve: new Evolve('', 2),
-				devolve: new Devolve(''),
-				hp: 1,
-			},
-			gameProps: {
-				map: new EditableMap(
-					new Map<string, string>([
-						['0_5', 'baby'],
-						['0_3', 'brick'],
-						['0_6', 'brick'],
-						['0_9', 'brick'],
-						['0_12', 'brick'],
-						['0_7', 'baby'],
-					]),
-				),
-				// @ts-expect-error
-				interactables: new Map<number, TInteractable>([
-					[
-						'static',
-						new TInteractable(
-							'baby',
-							[],
-							1,
-							[['any', 0]],
-							new Evolve( '', 2),
-							new Devolve( ''),
-							["", 0]
-						),
-					],
-				]),
-				mapClass: 'simulation',
-				SIZE: 4,
-			},
-		},
 		// EVOLUTION (monkey with banana, eats 4 bananas, evolves to human)
 		{
 			header: 'Interactable',
 			description:
-				"Evolve [ 🧬 ], as the name suggests, makes the Interactable evolvable. When Interactable's HP reaches to evolve limit, the emoji transforms and HP resets to evolved version's [ man-walking ] HP. Which in this case is 1.",
+				'Evolve [ <i class="twa twa-dna"></i> ], as the name suggests, makes the Interactable evolvable. When Interactable\'s HP reaches to evolve limit, the emoji transforms and HP resets to evolved version\'s [ <i class="twa twa-man-walking"></i> ] HP. Which in this case is 1.',
 			veilHeight: 476,
 			props: {
 				id: 'evolution',
 				emoji: 'baby',
 				isControllable: true,
-				evolve: new Evolve(true, 'man-walking', 5),
-				devolve: new Devolve(false, ''),
+				evolve: new Evolve('man-walking', 5),
+				devolve: new Devolve(''),
 				hp: 1,
 			},
 			gameProps: {
@@ -118,11 +76,10 @@
 							'baby',
 							[],
 							1,
-							1,
-							[],
-							true,
-							new Evolve(true, 'man-walking', 5),
-							new Devolve(false, '')
+							[['any', 'talk']],
+							new Evolve('man-walking', 5),
+							new Devolve(''),
+							['', 0]
 						),
 					],
 				]),
@@ -140,8 +97,8 @@
 			props: {
 				id: 'devolution',
 				emoji: 'monkey',
-				evolve: new Evolve(false, '', 2),
-				devolve: new Devolve(true, 'rat'),
+				evolve: new Evolve('', 2),
+				devolve: new Devolve('rat'),
 				hp: 4,
 			},
 			gameProps: {
@@ -165,11 +122,10 @@
 							'monkey',
 							[],
 							4,
-							1,
 							[],
-							true,
-							new Evolve(false, '', 2),
-							new Devolve(true, 'rat')
+							new Evolve('', 2),
+							new Devolve('rat'),
+							['', 0]
 						),
 					],
 				]),
@@ -235,9 +191,8 @@
 			props: {
 				id: 'sideEffects',
 				emoji: 'door',
-				isControllable: false,
-				evolve: new Evolve(false, '', 2),
-				devolve: new Devolve(false, ''),
+				evolve: new Evolve('', 2),
+				devolve: new Devolve(''),
 				hp: 1,
 				pseudoSideEffects: [['key', -1]],
 			},
@@ -264,14 +219,13 @@
 							'door',
 							[],
 							1,
-							1,
 							[
 								['any', 0],
 								[69, -1],
 							],
-							true,
-							new Evolve(false, '', 2),
-							new Devolve(false, '')
+							new Evolve('', 2),
+							new Devolve(''),
+							['', 0]
 						),
 					],
 				]),
@@ -355,13 +309,15 @@
 <Tutorial {...props} {rbx} --header={INTERACTABLE_BORDER} />
 
 <div class="absolute bottom-4 right-4 flex items-center justify-center gap-2">
-	<p class="absolute -top-8 w-full">{index + 1} / {tutorialProps.length}</p>
+	<p class="absolute -top-8 w-full">
+		{index + 1} / {tutorialProps.length}
+	</p>
 	{#if index > 0}
-		<button class="btn btn-lg" on:click={() => index--}>⮜</button>
+		<button class="btn-lg btn" on:click={() => index--}>⮜</button>
 	{/if}
 	{#if index < tutorialProps.length - 1}
-		<button class="btn btn-lg" on:click={() => index++}>⮞</button>
+		<button class="btn-lg btn" on:click={() => index++}>⮞</button>
 	{:else if index === tutorialProps.length - 1}
-		<a href="#tutorial-complete" class="btn btn-lg">FINISH</a>
+		<a href="#tutorial-complete" class="btn-lg btn">FINISH</a>
 	{/if}
 </div>

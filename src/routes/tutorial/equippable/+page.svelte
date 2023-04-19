@@ -34,8 +34,8 @@
 			borderColor: EQUIPPABLE_BORDER,
 		},
 		props: {
-			id: -69,
-			emoji: '🗝️',
+			id: '0',
+			emoji: 'key',
 		},
 		gameProps: {
 			map: new EditableMap(
@@ -51,7 +51,7 @@
 			),
 			controllables: new Map<StringedNumber, Controllable>([
 				[
-					'0',
+					'1',
 					new Controllable(
 						'monkey',
 						1,
@@ -62,21 +62,21 @@
 				],
 			]),
 			equippables: new Map<StringedNumber, TEquippable>([
-				['1', new TEquippable('key', 1)],
+				['0', new TEquippable('key', 1)],
 			]),
 			consumables: new Map<StringedNumber, Consumable>([
-				['-3', { emoji: 'banana', sideEffect: 1, mutateConsumerTo: '' }],
+				['2', { emoji: 'banana', sideEffect: 1, mutateConsumerTo: '' }],
 			]),
 			interactables: new Map<StringedNumber, Interactable>([
 				[
-					'-1',
+					'3',
 					new Interactable(
 						'door',
 						[],
 						1,
 						[
 							['any', 0],
-							['1', -1],
+							['0', -1],
 						],
 						new Evolve('', 2),
 						new Devolve(''),

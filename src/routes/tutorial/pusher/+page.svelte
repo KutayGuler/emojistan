@@ -15,7 +15,7 @@
 	const tutorialProps: TutorialProps = {
 		header: 'Pusher',
 		description:
-			'Pusher takes two emoji inputs and makes leaf-fluttering-in-wind pushable by wind-face',
+			'Pusher takes two emoji inputs and makes <i class="twa twa-leaf-fluttering-in-wind text-2xl"></i> pushable by <i class="twa twa-wind-face text-2xl"></i> ',
 		component: Pusher,
 		rbx: {
 			id: '0',

@@ -17,8 +17,6 @@
 	import type { TutorialProps } from '../types';
 	import type { StringedNumber } from '$src/store';
 
-	// FIXME: Pig not moving after mutation
-
 	const firstTutorialProps: TutorialProps = {
 		header: 'Consumable',
 		description:
@@ -66,7 +64,7 @@
 
 	const secondTutorialProps: TutorialProps = {
 		description:
-			'On the top left corner, the 🧬 icon enables mutation and disables the HP side effect. If mutation is enabled, another slot opens up to determine what the consumer will mutate into.',
+			'On the top left corner, the <i class="twa twa-dna text-2xl"></i> icon enables mutation and disables the HP side effect. If mutation is enabled, another slot opens up to determine what the consumer will mutate into.',
 		component: Consumable,
 		rbx: {
 			id: '0',
@@ -79,7 +77,7 @@
 		},
 		props: {
 			id: -2,
-			emoji: '🧪',
+			emoji: 'test-tube',
 			mutateConsumer: true,
 			mutateConsumerTo: 'pig',
 		},
@@ -95,6 +93,16 @@
 					'0',
 					new Controllable(
 						'monkey',
+						1,
+						[['any', 0]],
+						new Evolve('', 0),
+						new Devolve('')
+					),
+				],
+				[
+					'1',
+					new Controllable(
+						'pig',
 						1,
 						[['any', 0]],
 						new Evolve('', 0),

@@ -5,6 +5,7 @@
 		EQUIPPABLE_BORDER,
 		CONSUMABLE_BORDER,
 		INTERACTABLE_BORDER,
+		CONTROLLABLE_BORDER,
 	} from '../../constants';
 	import { page } from '$app/stores';
 
@@ -41,7 +42,12 @@
 		equippable: {
 			link: 'equippable',
 			color: EQUIPPABLE_BORDER,
-			next: 'interactable',
+			next: 'controllable',
+		},
+		controllable: {
+			link: 'controllable',
+			color: CONTROLLABLE_BORDER,
+			next: 'interactable'
 		},
 		interactable: {
 			link: 'interactable',

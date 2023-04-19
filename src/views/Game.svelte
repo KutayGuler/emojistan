@@ -13,11 +13,12 @@
 		Consumable,
 		Equippable,
 		Interactable,
-		Item,
+		Entity,
 		Controllable,
+		HP,
+		EditableMap,
 		type ArrowKey,
 		type CollisionType,
-		type EditableMap,
 		type Mutations,
 		type Wasd,
 		type _Collisions,
@@ -31,13 +32,14 @@
 		type _Controllable,
 		type _Controllables,
 		type Inventory,
+		type MapLocation,
 	} from '$src/types';
 	import { AStarFinder } from 'astar-typescript';
 	import Chat from './Chat.svelte';
 
 	/* ## DATA ## */
 	export let dt = new Map<string, Branch>(); // dialogue tree
-	export let map: EditableMap;
+	export let map = new EditableMap(new Map<MapLocation, string>());
 	export let pushers = new Map<string, Pusher>();
 	export let mergers = new Map<string, Merger>();
 	export let equippables = new Map<string, Equippable>();
@@ -59,7 +61,7 @@
 	let currentSection = map.startingSectionIndex;
 	let directionKey: Wasd = 'KeyD';
 	let currentInventoryIndex = 0;
-	let items = new Map<string, Item | Equippable | Consumable>();
+	let items = new Map<string, Entity | Equippable | Consumable>();
 	let colors = new Map(map.colors);
 	let backgrounds = new Map(map.backgrounds);
 	let _interactables: _Interactables = {};
@@ -100,7 +102,7 @@
 
 	function changeSection(acSideEffect: number, sectionSideEffect: number) {
 		let _id = currentSection + '_' + ac;
-		let playerData = items.get(_id) as Item;
+		let playerData = items.get(_id) as Entity;
 		items.delete(_id);
 		currentSection += sectionSideEffect;
 		ic += acSideEffect;
@@ -177,7 +179,7 @@
 	function transferItem(from: number, to: number) {
 		let _to = currentSection + '_' + to;
 		let _from = currentSection + '_' + from;
-		items.set(_to, items.get(_from) as Equippable | Consumable | Item);
+		items.set(_to, items.get(_from) as Equippable | Consumable | Entity);
 		items.delete(_from);
 		items = items; // MAGIC UPDATE, NECESSARY FOR REACTIVITY
 
@@ -194,7 +196,6 @@
 
 	function addToInventory(items: Array<Equippable | Consumable>) {
 		let emptyIndexes = [];
-		console.log(items);
 
 		for (let i = 0; i < MAX_INVENTORY_SIZE; i++) {
 			if (!player.inventory.get(i)) {
@@ -209,7 +210,6 @@
 		}
 
 		player.inventory = player.inventory;
-		console.log(player.inventory);
 	}
 
 	/**
@@ -220,12 +220,12 @@
 		let _fromID = currentSection + '_' + fromID;
 		let _toID = currentSection + '_' + toID;
 
-		let from = items.get(_fromID) as Item;
+		let from = items.get(_fromID) as Entity;
 		let fromInventory: Inventory =
 			from?.inventory || new Map<number, Equippable | Consumable>();
-		let fromHP = from?.hp.current || 1;
+		let fromHP = from?.hp?.current || 1;
 		let toInventory: Inventory =
-			(items.get(_toID) as Item)?.inventory ||
+			(items.get(_toID) as Entity)?.inventory ||
 			new Map<number, Equippable | Consumable>();
 		let mergedInventory = new Map([...fromInventory, ...toInventory]);
 		while (mergedInventory.size > MAX_INVENTORY_SIZE) {
@@ -234,7 +234,7 @@
 
 		items.set(
 			_toID,
-			new Item(
+			new Entity(
 				mergeResult,
 				mergedInventory,
 				_interactables[mergeResult]?.hp || fromHP
@@ -280,9 +280,14 @@
 		const dropsID = _interactables[emoji].drops[0];
 		const sideEffects = _interactables[emoji].sideEffects;
 
+		console.log(sideEffects);
 		for (let [id, effect] of sideEffects) {
-			sideEffects[0][0] = structuredClone(equippables.get(id)?.emoji) || '';
+			console.log(id, effect);
+
+			sideEffects[0][0] = structuredClone(equippables.get(id)?.emoji) || 'any';
 		}
+
+		console.log(sideEffects);
 
 		if (dropsID) {
 			_interactables[emoji].drops[0] =
@@ -291,6 +296,8 @@
 				'';
 		}
 	}
+
+	console.log(_interactables);
 
 	function coordinateToPosObj(num: number) {
 		return { x: num % SIZE, y: Math.floor(num / SIZE) };
@@ -319,8 +326,6 @@
 			}
 		}
 
-		console.log(matrix);
-
 		let astar: {
 			aStarInstance: AStarFinder;
 		} = {
@@ -332,11 +337,8 @@
 			}),
 		};
 
-		console.log(startPos, goalPos);
-
 		let pathway = astar.aStarInstance.findPath(startPos, goalPos);
 		pathway.slice(0, 2);
-		console.log(pathway);
 
 		if (pathway?.length <= 1) return;
 
@@ -349,19 +351,22 @@
 		}
 	}
 
-	function initItems() {
+	function initEntities() {
 		for (let [id, _emoji] of map.items) {
 			if (_equippables[_emoji]) {
 				items.set(id, new Equippable(_emoji, _equippables[_emoji].hp));
 			} else if (_consumables[_emoji]) {
 				let { sideEffect, mutateConsumerTo } = _consumables[_emoji];
 				items.set(id, new Consumable(_emoji, sideEffect, mutateConsumerTo));
+			} else if (_controllables[_emoji] || _interactables[_emoji]) {
+				items.set(
+					id,
+					new Entity(_emoji, new Map<number, Equippable | Consumable>(), 1)
+				);
 			} else {
-				items.set(id, new Item(_emoji));
+				items.set(id, new Entity(_emoji));
 			}
 		}
-
-		console.log(_controllables);
 
 		for (let [id, item] of items) {
 			if (item instanceof Equippable || item instanceof Consumable) continue;
@@ -375,15 +380,22 @@
 				directionKey = 'KeyD';
 			}
 
-			item.hp.max = _interactables[item.emoji]?.hp || 1;
-			item.hp.current = _interactables[item.emoji]?.hp || 1;
+			if (item.hp) {
+				item.hp.max = _interactables[item.emoji]?.hp || 1;
+				item.hp.current = _interactables[item.emoji]?.hp || 1;
+			}
 		}
 	}
 
-	initItems();
+	initEntities();
 
-	let player = items.get(currentSection + '_' + ac) as Item;
-	$: player = items.get(currentSection + '_' + ac) as Item;
+	interface ControllableEntity extends Entity {
+		inventory: Inventory;
+		hp: HP;
+	}
+
+	let player = items.get(currentSection + '_' + ac) as ControllableEntity;
+	$: player = items.get(currentSection + '_' + ac) as ControllableEntity;
 
 	let numbers = new Map<number, number>();
 
@@ -435,7 +447,7 @@
 			colors.delete(currentSection + '_' + index);
 		},
 		spawn({ index, emoji }) {
-			items.set(currentSection + '_' + index, new Item(emoji));
+			items.set(currentSection + '_' + index, new Entity(emoji));
 			items = items;
 		},
 		destroy({ index }) {
@@ -452,7 +464,7 @@
 			items.clear();
 			colors = new Map(map.colors);
 			ac = -2;
-			initItems();
+			initEntities();
 			items = items;
 			levelCompleted = false;
 		},
@@ -568,7 +580,7 @@
 		handDirection = '';
 		if (
 			!items.has(currentSection + '_' + ac) ||
-			(player?.hp.current || -1) <= 0 ||
+			(player?.hp?.current || -1) <= 0 ||
 			chatting
 		) {
 			return;
@@ -588,7 +600,6 @@
 						i
 					);
 				}
-				console.log(enemyIndexes);
 
 				return;
 			}
@@ -629,7 +640,6 @@
 			}
 			let interactedItem = items.get(currentSection + '_' + ic);
 
-			if (!interactedItem) return;
 			if (
 				interactedItem instanceof Equippable ||
 				interactedItem instanceof Consumable
@@ -647,6 +657,8 @@
 				}
 				return;
 			}
+			if (!interactedItem || !interactedItem.hp || !interactedItem.inventory)
+				return;
 
 			let _interactable: _Interactable = _interactables[interactedItem.emoji];
 
@@ -720,11 +732,9 @@
 			// EVOLVE & DEVOLVE INTERACTED ITEM
 			if (interactedItem.hp.current <= 0) {
 				const _drops = _interactables[interactedItem.emoji].drops;
-				console.log(_drops);
 
 				if (_drops[0]) {
 					let item;
-					console.log(_drops[0]);
 					if (_consumables[_drops[0]]) {
 						item = new Consumable(
 							_drops[0],
@@ -751,8 +761,6 @@
 			return;
 		}
 
-		console.log(e.code);
-
 		if (e.code === 'KeyF') {
 			let consumableItem = player.inventory.get(currentInventoryIndex);
 			if (!(consumableItem instanceof Consumable)) return;
@@ -778,14 +786,20 @@
 					deleteFromInventory(currentInventoryIndex);
 
 					for (let [id, item] of items) {
-						if (item instanceof Equippable || item instanceof Consumable)
+						if (
+							item instanceof Equippable ||
+							item instanceof Consumable ||
+							!item ||
+							!item.hp ||
+							!item.inventory
+						)
 							continue;
 						if (
 							item.hp.current > 0 &&
 							!_equippables[item.emoji] &&
 							_controllables[item.emoji]
 						) {
-							player = items.get(id) as Item;
+							player = items.get(id) as ControllableEntity;
 							ac = +id.split('_')[1];
 							progress = tweened(calcPlayerHpPercentage(), {
 								duration: 200,
@@ -824,7 +838,6 @@
 			) {
 				return;
 			}
-			console.log(currentInventoryIndex);
 
 			let droppedItem = player?.inventory.get(currentInventoryIndex);
 			if (!droppedItem) return;
@@ -846,9 +859,6 @@
 			let _controllables = Array.from(items).filter(
 				([id, { emoji }]) => !_equippables[emoji] && !_consumables[emoji]
 			);
-
-			console.log(_controllables);
-			
 
 			for (let [id, _] of _controllables) {
 				let _id = +id.split('_')[1];
@@ -872,7 +882,7 @@
 				ic = ac + keys[directionKey].operation;
 			}
 
-			player = items.get(currentSection + '_' + ac) as Item;
+			player = items.get(currentSection + '_' + ac) as ControllableEntity;
 			progress = tweened(calcPlayerHpPercentage(), {
 				duration: 200,
 				easing: cubicOut,
@@ -970,21 +980,31 @@
 				{#each { length: MAX_INVENTORY_SIZE } as _, i}
 					{@const item = player?.inventory.get(i)}
 					{@const equipped = i === currentInventoryIndex}
+					{@const isEquippable = item instanceof Equippable}
+					{@const isConsumable = item instanceof Consumable}
 					<div
 						class:equipped
-						class="relative flex h-10 w-10 flex-col items-center justify-center rounded bg-base-300 p-2 2xl:h-12 2xl:w-12"
+						class="relative flex h-10 w-10 flex-col items-center justify-center rounded border {isConsumable
+							? 'border-purple-500 bg-purple-50'
+							: isEquippable
+							? 'border-amber-500 bg-amber-50'
+							: 'border-black bg-base-300'} p-2 2xl:h-12 2xl:w-12"
 					>
 						{#if item}
 							<i class="twa twa-{item.emoji || ''}" />
-							{#if item instanceof Equippable}
+							{#if isEquippable}
 								<div class="absolute -top-0.5 right-0.5 text-sm">
 									{item.hp > 1 ? item.hp : ''}
 								</div>
 							{/if}
 						{/if}
 					</div>
-					{#if item && item instanceof Consumable && currentInventoryIndex === i}
-						<div class="absolute bottom-4">
+					{#if isConsumable && equipped}
+						<div
+							class="absolute {SIZE == DEFAULT_SIDE_LENGTH
+								? 'bottom-4'
+								: '-bottom-8'}"
+						>
 							Press F to consume <i class="twa twa-{item.emoji}" />
 						</div>
 					{/if}
@@ -1018,7 +1038,7 @@
 
 	.equipped {
 		scale: 120%;
-		border: 2px solid black;
+		border-width: 2px;
 	}
 
 	@keyframes equippable {
@@ -1084,6 +1104,6 @@
 	}
 
 	progress::-webkit-progress-value {
-		background: var(--consumable);
+		background: var(--controllable);
 	}
 </style>

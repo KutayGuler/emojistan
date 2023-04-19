@@ -7,10 +7,10 @@ export type EmojiMode = 'Foreground' | 'Background';
 
 import { DEFAULT_BG } from './constants';
 
+export type MapLocation = `${number}_${number}`;
 export type CollisionType = 'bump' | 'push' | string;
 export type Pusher = [string, string, CollisionType];
 export type Merger = [string, string, CollisionType];
-
 export type Inventory = Map<number, Equippable | Consumable>;
 
 export interface HP {
@@ -33,21 +33,22 @@ export class HP {
 	}
 }
 
-export interface Item {
+export interface Entity {
 	emoji: string;
-	inventory: Inventory;
-	hp: HP;
+	inventory?: Inventory;
+	hp?: HP;
 }
 
-export class Item {
-	constructor(
-		emoji: string,
-		inventory: Inventory = new Map<number, Equippable | Consumable>(),
-		hpPoints: number = 1
-	) {
+export class Entity {
+	constructor(emoji: string, inventory?: Inventory, hpPoints?: number) {
 		this.emoji = emoji;
-		this.inventory = inventory;
-		this.hp = new HP(hpPoints);
+		if (inventory) {
+			this.inventory = inventory;
+		}
+
+		if (hpPoints) {
+			this.hp = new HP(hpPoints);
+		}
 	}
 }
 

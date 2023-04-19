@@ -1,7 +1,6 @@
 <script lang="ts">
-	import { dialogueTree, type StringedNumber } from '$src/store';
+	import type { StringedNumber } from '$src/store';
 	import {
-		Choice,
 		Controllable,
 		Devolve,
 		EditableMap,
@@ -10,10 +9,7 @@
 		Interactable,
 	} from '$src/types';
 	import Game from '$src/views/Game.svelte';
-	import { onDestroy } from 'svelte';
 	import type { GameProps } from '../types';
-
-	$dialogueTree.set('dog', ['woof']);
 
 	// TODO: change example
 
@@ -57,12 +53,6 @@
 		mapClass: 'simulation',
 		SIZE: 4,
 	};
-
-	console.log($dialogueTree);
-
-	onDestroy(() => {
-		$dialogueTree.delete('dog');
-	});
 </script>
 
 <div
@@ -107,12 +97,18 @@
 			<kbd class="kbd">Ctrl</kbd>
 		</div>
 		<div class="flex flex-col items-center justify-center">
-			<p>Change Equipped Item</p>
+			<p>Change Item</p>
 			<div class="flex w-full justify-center gap-2">
 				<kbd class="kbd">1</kbd>
 				<kbd class="kbd">2</kbd>
 				<kbd class="kbd">3</kbd>
 				<kbd class="kbd">4</kbd>
+			</div>
+		</div>
+		<div class="flex flex-col items-center justify-center">
+			<p>Consume Item</p>
+			<div class="flex w-full justify-center">
+				<kbd class="kbd">F</kbd>
 			</div>
 		</div>
 	</div>

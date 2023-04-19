@@ -3,15 +3,13 @@
 	import Rulebox from '$lib/Rulebox.svelte';
 	import Game from '$src/views/Game.svelte';
 
-	export let header: string;
+	export let header: string | undefined = '';
 	export let subheader = '';
 	export let description: string;
 	export let rbx: TRulebox;
 	export let props: any;
 	export let gameProps: any;
 	export let veilHeight = 0;
-
-	// TODO: check all tutorials
 </script>
 
 <div
@@ -25,9 +23,11 @@
 					<h3 class="pl-2 text-xl">{subheader}</h3>
 				</span>
 			{/if}
-			<p class="h-32 pt-2">
-				{@html description}
-			</p>
+			<slot name="description">
+				<p class="h-32 pt-2">
+					{@html description}
+				</p></slot
+			>
 		</div>
 		<div
 			style="width: {rbx.width}px; height: {rbx.height}px;"
