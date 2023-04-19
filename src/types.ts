@@ -77,7 +77,7 @@ export interface _Interactable {
 	sideEffects: Array<[string, number | 'talk']>;
 	evolve: Evolve;
 	devolve: Devolve;
-	drops: Drops;
+	drops: _Drops;
 }
 
 export interface _Interactables {
@@ -191,6 +191,7 @@ export class Devolve {
 }
 
 export type Drops = [id: StringedNumber | '', amount: number];
+export type _Drops = [id: string, amount: number];
 
 export interface Interactable {
 	emoji: string;
