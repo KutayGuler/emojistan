@@ -433,13 +433,6 @@
 		destroy({ index }) {
 			items.delete(currentSection + '_' + index);
 		},
-		dropEquippable({ emoji }) {
-			if (emoji && player?.inventory.size != MAX_INVENTORY_SIZE) {
-				// @ts-expect-error
-				player?.inventory.push(emoji);
-				items = items;
-			}
-		},
 		resetLevel: () => {
 			items.clear();
 			colors = new Map(map.colors);

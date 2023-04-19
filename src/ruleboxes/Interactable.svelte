@@ -180,13 +180,13 @@
 			}
 		}
 
-		for (let val of [...$effectors.values(), ...$equippables.values()]) {
+		for (let val of [...$effectors.values()]) {
 			if (
 				(typeof val === 'string' && val != '' && $formattedEmoji === val) ||
 				(typeof val === 'object' && $formattedEmoji === val.emoji)
 			) {
 				notifications.warning(
-					'An emoji can only have one assigned type. Interactable, Controllable, Effector or Equippable'
+					'An emoji can only have one assigned type. Interactable, Controllable or Effector'
 				);
 				return;
 			}
@@ -492,10 +492,6 @@
 							<option value={j}>{j}</option>
 						{/each}
 					</select>
-				{:else if s.type === 'dropEquippable'}
-					<button class="slot" on:click={() => updateSlot(i)}>
-						<i class="twa twa-{s.emoji}" />
-					</button>
 				{:else if s.type === 'destroy' || s.type === 'erase'}
 					<select
 						class="select-bordered select"

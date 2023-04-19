@@ -134,7 +134,6 @@ body {
 .Merger:hover,
 .Interactable:hover,
 .Controllable:hover,
-.Equippable:hover,
 .Effector:hover {
 	color: var(--primary);
 }

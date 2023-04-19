@@ -1,6 +1,5 @@
 <script lang="ts">
 	import Effector from '$rbx/Effector.svelte';
-	import Equippable from '$rbx/Equippable.svelte';
 	import Interactable from '$rbx/Interactable.svelte';
 	import Merger from '$rbx/Merger.svelte';
 	import Pusher from '$rbx/Pusher.svelte';

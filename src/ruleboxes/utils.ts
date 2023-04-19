@@ -19,7 +19,7 @@
 // 			(typeof val === 'object' && $formattedEmoji === val.emoji)
 // 		) {
 // 			notifications.warning(
-// 				'An emoji can only have one assigned type. Controllable, Interactable, Effector, or Equippable'
+// 				'An emoji can only have one assigned type. Controllable, Interactable or Effector'
 // 			);
 // 			return;
 // 		}

@@ -1,7 +1,6 @@
 <script lang="ts">
 	import {
 		Interactable as TInteractable,
-		Equippable,
 		EditableMap,
 		Evolve,
 		Devolve,
@@ -15,6 +14,7 @@
 	} from '$src/constants';
 	import Tutorial from '../Tutorial.svelte';
 	import type { TutorialProps } from '../types';
+	import type { StringedNumber } from '$src/store';
 
 	let index = 0;
 
@@ -159,8 +159,8 @@
 						['0_15', 'banana'],
 					])
 				),
-				equippables: new Map<number, Equippable>([
-					[69, new Equippable('key', 1)],
+				effectors: new Map<StringedNumber, Effector>([
+					["69", new Effector('key', 1)],
 				]),
 				// @ts-expect-error
 				interactables: new Map<number, TInteractable>([
@@ -170,11 +170,10 @@
 							'door',
 							[],
 							1,
-							1,
 							[['any', 0]],
-							true,
 							new Evolve('', 2),
-							new Devolve('')
+							new Devolve(''),
+							["", 0]
 						),
 					],
 				]),
@@ -208,8 +207,8 @@
 						['0_15', 'banana'],
 					])
 				),
-				equippables: new Map<number, Equippable>([
-					[69, new Equippable('key', 1)],
+				effectors: new Map<StringedNumber, Effector>([
+					["69", new Effector('key', 1)],
 				]),
 				// @ts-expect-error
 				interactables: new Map<number, TInteractable>([
@@ -221,7 +220,7 @@
 							1,
 							[
 								['any', 0],
-								[69, -1],
+								["69", -1],
 							],
 							new Evolve('', 2),
 							new Devolve(''),

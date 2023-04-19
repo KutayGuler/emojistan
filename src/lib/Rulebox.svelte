@@ -25,7 +25,6 @@
 	import Pusher from '$rbx/Pusher.svelte';
 	import Merger from '$rbx/Merger.svelte';
 	import Effector from '$rbx/Effector.svelte';
-	import Equippable from '$rbx/Equippable.svelte';
 	import Controllable from '$rbx/Controllable.svelte';
 	import { CROSS } from '$src/constants';
 

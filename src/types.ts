@@ -113,7 +113,6 @@ export interface Mutations {
 		_start?: number
 	): void;
 	destroy({ index }: { index: number }): void;
-	dropEquippable({ emoji }: { emoji: string }): void;
 	resetLevel: Function;
 	completeLevel: Function;
 }

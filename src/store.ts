@@ -5,7 +5,6 @@ import {
 	Choice,
 	Effector,
 	EditableMap,
-	Equippable,
 	Controllable,
 	type Branch,
 	type Interactable,
