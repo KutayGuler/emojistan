@@ -12,14 +12,10 @@ import {
 	PUSHER_H,
 	PUSHER_W,
 	CTX_MENU_W,
-	CONSUMABLE_BG,
-	CONSUMABLE_BORDER,
-	CONSUMABLE_H,
-	CONSUMABLE_W,
-	EQUIPPABLE_BG,
-	EQUIPPABLE_BORDER,
-	EQUIPPABLE_H,
-	EQUIPPABLE_W,
+	EFFECTOR_BG,
+	EFFECTOR_BORDER,
+	EFFECTOR_H,
+	EFFECTOR_W,
 	CONTROLLABLE_BG,
 	CONTROLLABLE_BORDER,
 	CONTROLLABLE_H,
@@ -31,8 +27,7 @@ import type { XYPosition, Position } from './utils';
 export type RuleboxType =
 	| 'pusher'
 	| 'merger'
-	| 'consumable'
-	| 'equippable'
+	| 'effector'
 	| 'interactable'
 	| 'controllable'
 	| 'ctxMenu';
@@ -70,17 +65,11 @@ export class Rulebox {
 			case 'ctxMenu':
 				this.width = CTX_MENU_W;
 				return;
-			case 'consumable':
-				this.width = CONSUMABLE_W;
-				this.height = CONSUMABLE_H;
-				this.borderColor = CONSUMABLE_BORDER;
-				this.bgColor = CONSUMABLE_BG;
-				return;
-			case 'equippable':
-				this.width = EQUIPPABLE_W;
-				this.height = EQUIPPABLE_H;
-				this.borderColor = EQUIPPABLE_BORDER;
-				this.bgColor = EQUIPPABLE_BG;
+			case 'effector':
+				this.width = EFFECTOR_W;
+				this.height = EFFECTOR_H;
+				this.borderColor = EFFECTOR_BORDER;
+				this.bgColor = EFFECTOR_BG;
 				return;
 			case 'interactable':
 				this.width = INTERACTABLE_W;

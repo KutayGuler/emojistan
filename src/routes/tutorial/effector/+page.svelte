@@ -1,35 +1,35 @@
 <script lang="ts">
 	import {
-		type Consumable as TConsumable,
+		type Effector as TEffector,
 		EditableMap,
 		Controllable,
 		Devolve,
 		Evolve,
 	} from '$src/types';
 	import {
-		CONSUMABLE_BG,
-		CONSUMABLE_BORDER,
-		CONSUMABLE_H,
-		CONSUMABLE_W,
+		EFFECTOR_BG,
+		EFFECTOR_BORDER,
+		EFFECTOR_H,
+		EFFECTOR_W,
 	} from '$src/constants';
 	import Tutorial from '../Tutorial.svelte';
-	import Consumable from '$rbx/Consumable.svelte';
+	import Effector from '$rbx/Effector.svelte';
 	import type { TutorialProps } from '../types';
 	import type { StringedNumber } from '$src/store';
 
 	const firstTutorialProps: TutorialProps = {
-		header: 'Consumable',
+		header: 'Effector',
 		description:
-			'Consumable takes an emoji and a number input. Emoji is the consumable itself and the number below it is the HP side effect consumer will be subjected to.',
-		component: Consumable,
+			'Effector takes an emoji and a number input. Emoji is the effector itself and the number below it is the HP side effect consumer will be subjected to.',
+		component: Effector,
 		rbx: {
 			id: '0',
-			type: 'consumable',
+			type: 'effector',
 			position: { x: 0, y: 0 },
-			width: CONSUMABLE_W,
-			height: CONSUMABLE_H,
-			bgColor: CONSUMABLE_BG,
-			borderColor: CONSUMABLE_BORDER,
+			width: EFFECTOR_W,
+			height: EFFECTOR_H,
+			bgColor: EFFECTOR_BG,
+			borderColor: EFFECTOR_BORDER,
 		},
 		props: {
 			id: -1,
@@ -54,7 +54,7 @@
 					),
 				],
 			]),
-			consumables: new Map<StringedNumber, TConsumable>([
+			effectors: new Map<StringedNumber, TEffector>([
 				['-1', { emoji: 'banana', sideEffect: 1, mutateConsumerTo: '' }],
 			]),
 			mapClass: 'simulation',
@@ -65,15 +65,15 @@
 	const secondTutorialProps: TutorialProps = {
 		description:
 			'On the top left corner, the <i class="twa twa-dna text-2xl"></i> icon enables mutation and disables the HP side effect. If mutation is enabled, another slot opens up to determine what the consumer will mutate into.',
-		component: Consumable,
+		component: Effector,
 		rbx: {
 			id: '0',
-			type: 'consumable',
+			type: 'effector',
 			position: { x: 0, y: 0 },
-			width: CONSUMABLE_W,
-			height: CONSUMABLE_H,
-			bgColor: CONSUMABLE_BG,
-			borderColor: CONSUMABLE_BORDER,
+			width: EFFECTOR_W,
+			height: EFFECTOR_H,
+			bgColor: EFFECTOR_BG,
+			borderColor: EFFECTOR_BORDER,
 		},
 		props: {
 			id: -2,
@@ -110,7 +110,7 @@
 					),
 				],
 			]),
-			consumables: new Map<StringedNumber, TConsumable>([
+			effectors: new Map<StringedNumber, TEffector>([
 				['-2', { emoji: 'test-tube', sideEffect: 1, mutateConsumerTo: 'pig' }],
 			]),
 			mapClass: 'simulation',
@@ -119,5 +119,5 @@
 	};
 </script>
 
-<Tutorial {...firstTutorialProps} --header={CONSUMABLE_BORDER} />
+<Tutorial {...firstTutorialProps} --header={EFFECTOR_BORDER} />
 <Tutorial {...secondTutorialProps} />

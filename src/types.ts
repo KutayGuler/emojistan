@@ -11,7 +11,7 @@ export type MapLocation = `${number}_${number}`;
 export type CollisionType = 'bump' | 'push' | string;
 export type Pusher = [string, string, CollisionType];
 export type Merger = [string, string, CollisionType];
-export type Inventory = Map<number, Equippable | Consumable>;
+export type Inventory = Map<number, Effector>;
 
 export interface HP {
 	current: number;
@@ -52,38 +52,20 @@ export class Entity {
 	}
 }
 
-export interface Equippable {
+export interface Effector {
 	emoji: string;
-	hp: number;
+	hp: number | 'Infinite';
 }
 
-export class Equippable {
-	constructor(emoji: string, hp: number) {
+export class Effector {
+	constructor(emoji: string, hp: number | 'Infinite') {
 		this.emoji = emoji;
-		this.hp = hp; // hp of item itself
+		this.hp = hp;
 	}
 }
 
-export interface _Equippables {
-	[key: string]: Equippable;
-}
-
-export interface Consumable {
-	emoji: string;
-	sideEffect: number; // side effect
-	mutateConsumerTo: string;
-}
-
-export class Consumable {
-	constructor(emoji: string, sideEffect: number, mutateConsumerTo = '') {
-		this.emoji = emoji;
-		this.sideEffect = sideEffect;
-		this.mutateConsumerTo = mutateConsumerTo;
-	}
-}
-
-export interface _Consumables {
-	[key: string]: Consumable;
+export interface _Effectors {
+	[key: string]: Effector;
 }
 
 export interface _Interactable {

@@ -4,7 +4,7 @@
 		Controllable,
 		Devolve,
 		EditableMap,
-		Consumable,
+		Effector,
 		Evolve,
 		Interactable,
 	} from '$src/types';
@@ -47,8 +47,8 @@
 				),
 			],
 		]),
-		consumables: new Map<StringedNumber, Consumable>([
-			['2', new Consumable('bone', 1)],
+		effectors: new Map<StringedNumber, Effector>([
+			['2', new Effector('bone', 1)],
 		]),
 		mapClass: 'simulation',
 		SIZE: 4,
@@ -82,12 +82,12 @@
 				<kbd class="kbd">D</kbd>
 			</div>
 		</div>
-		<div class="flex flex-col items-center justify-center">
+		<!-- <div class="flex flex-col items-center justify-center">
 			<p>Switch Player</p>
 			<div class="flex w-full justify-center gap-2">
 				<kbd class="kbd">R</kbd>
 			</div>
-		</div>
+		</div> -->
 		<div class="flex flex-col items-center justify-center">
 			<p>Interact</p>
 			<kbd class="kbd px-12">Space</kbd>

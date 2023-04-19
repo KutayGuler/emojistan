@@ -8,8 +8,7 @@
 		pushers,
 		mergers,
 		interactables,
-		equippables,
-		consumables,
+		effectors,
 		dialogueTree as dialogue,
 		controllables,
 	} from '../store';
@@ -70,8 +69,7 @@
 					rbxs: Array.from($rbxStore),
 					pushers: Object.fromEntries($pushers),
 					mergers: Object.fromEntries($mergers),
-					equippables: Object.fromEntries($equippables),
-					consumables: Object.fromEntries($consumables),
+					effectors: Object.fromEntries($effectors),
 					interactables: Object.fromEntries($interactables),
 					controllables: Object.fromEntries($controllables),
 					dialogueTree: Object.fromEntries($dialogue),
@@ -113,8 +111,7 @@
 			rbxs: Array.from($rbxStore),
 			pushers: Object.fromEntries($pushers),
 			mergers: Object.fromEntries($mergers),
-			equippables: Object.fromEntries($equippables),
-			consumables: Object.fromEntries($consumables),
+			effectors: Object.fromEntries($effectors),
 			interactables: Object.fromEntries($interactables),
 			dialogue: Object.fromEntries($dialogue),
 		};
@@ -229,7 +226,7 @@
 					</svg>
 				</button>
 			</div>
-			<button on:click={createNewGame} class="btn btn-primary">NEW GAME</button>
+			<button on:click={createNewGame} class="btn-primary btn">NEW GAME</button>
 			<div class="flex flex-row gap-2">
 				<input class="file-input " type="file" name="save-file" bind:files />
 				{#if files}
@@ -291,7 +288,7 @@
 					</p>
 					<div class="flex w-full flex-row items-end gap-2 self-end pt-12">
 						<button
-							class="btn btn-ghost btn-sm"
+							class="btn-ghost btn-sm btn"
 							on:click={() => downloadSave(id)}
 						>
 							<svg
@@ -317,10 +314,10 @@
 									location.reload();
 								}}
 							>
-								<button class="btn btn-error btn-sm">CONFIRM</button>
+								<button class="btn-error btn-sm btn">CONFIRM</button>
 							</form>
 							<button
-								class="btn btn-sm"
+								class="btn-sm btn"
 								on:click={() => {
 									deleteIndex = -1;
 								}}>CANCEL</button
@@ -330,20 +327,20 @@
 								on:click={() => {
 									deleteIndex = i;
 								}}
-								class="btn btn-ghost btn-sm">DELETE</button
+								class="btn-ghost btn-sm btn">DELETE</button
 							>
 						{/if}
-						<button on:click={() => openSave(id)} class="btn btn-sm"
+						<button on:click={() => openSave(id)} class="btn-sm btn"
 							>OPEN</button
 						>
 					</div>
 				</div>
 			{/each}
 		{:else}
-			<button on:click={() => (showSaves = true)} class="btn btn-primary w-full"
+			<button on:click={() => (showSaves = true)} class="btn-primary btn w-full"
 				>PLAY</button
 			>
-			<a href="/tutorial/controls" class="btn btn-secondary">TUTORIAL</a>
+			<a href="/tutorial/controls" class="btn-secondary btn">TUTORIAL</a>
 			<!-- <a href="/discover" class="btn-accent btn">DISCOVER</a>
 			<button class="btn w-full">OPTIONS</button> -->
 		{/if}

@@ -10,8 +10,7 @@
 		MAX_INVENTORY_SIZE,
 	} from '$src/constants';
 	import {
-		Consumable,
-		Equippable,
+		Effector,
 		Interactable,
 		Entity,
 		Controllable,
@@ -24,8 +23,7 @@
 		type _Collisions,
 		type _Interactable,
 		type _Interactables,
-		type _Consumables,
-		type _Equippables,
+		type _Effectors,
 		type Pusher,
 		type Merger,
 		type Branch,
@@ -42,10 +40,9 @@
 	export let map = new EditableMap(new Map<MapLocation, string>());
 	export let pushers = new Map<string, Pusher>();
 	export let mergers = new Map<string, Merger>();
-	export let equippables = new Map<string, Equippable>();
 	export let interactables = new Map<string, Interactable>();
 	export let controllables = new Map<string, Controllable>();
-	export let consumables = new Map<string, Consumable>();
+	export let effectors = new Map<string, Effector>();
 	export let mapClass = DEFAULT_MAP_CLASS;
 	export let SIZE = DEFAULT_SIDE_LENGTH;
 	export let showHP = true;
@@ -61,13 +58,12 @@
 	let currentSection = map.startingSectionIndex;
 	let directionKey: Wasd = 'KeyD';
 	let currentInventoryIndex = 0;
-	let items = new Map<string, Entity | Equippable | Consumable>();
+	let items = new Map<string, Entity | Effector>();
 	let colors = new Map(map.colors);
 	let backgrounds = new Map(map.backgrounds);
 	let _interactables: _Interactables = {};
 	let _controllables: _Controllables = {};
-	let _consumables: _Consumables = {};
-	let _equippables: _Equippables = {};
+	let _effectors: _Effectors = {};
 
 	/* ## DIALOGUE ## */
 	let character = '';
@@ -179,7 +175,7 @@
 	function transferItem(from: number, to: number) {
 		let _to = currentSection + '_' + to;
 		let _from = currentSection + '_' + from;
-		items.set(_to, items.get(_from) as Equippable | Consumable | Entity);
+		items.set(_to, items.get(_from) as Effector | Entity);
 		items.delete(_from);
 		items = items; // MAGIC UPDATE, NECESSARY FOR REACTIVITY
 
@@ -194,7 +190,7 @@
 		player.inventory = player.inventory;
 	}
 
-	function addToInventory(items: Array<Equippable | Consumable>) {
+	function addToInventory(items: Array<Effector>) {
 		let emptyIndexes = [];
 
 		for (let i = 0; i < MAX_INVENTORY_SIZE; i++) {
@@ -222,11 +218,10 @@
 
 		let from = items.get(_fromID) as Entity;
 		let fromInventory: Inventory =
-			from?.inventory || new Map<number, Equippable | Consumable>();
+			from?.inventory || new Map<number, Effector>();
 		let fromHP = from?.hp?.current || 1;
 		let toInventory: Inventory =
-			(items.get(_toID) as Entity)?.inventory ||
-			new Map<number, Equippable | Consumable>();
+			(items.get(_toID) as Entity)?.inventory || new Map<number, Effector>();
 		let mergedInventory = new Map([...fromInventory, ...toInventory]);
 		while (mergedInventory.size > MAX_INVENTORY_SIZE) {
 			mergedInventory.delete(mergedInventory.keys().next().value);
@@ -257,18 +252,11 @@
 		_controllables[emoji].id = id;
 	}
 
-	for (let [id, consumable] of consumables) {
-		const { emoji, ...args } = consumable;
+	for (let [id, effector] of effectors) {
+		const { emoji, ...args } = effector;
 		if (emoji === '') continue;
-		_consumables[emoji] = {} as Consumable;
-		Object.assign(_consumables[emoji], args);
-	}
-
-	for (let [id, equippable] of equippables) {
-		const { emoji, ...args } = structuredClone(equippable);
-		if (emoji === '') continue;
-		_equippables[emoji] = {} as Equippable;
-		Object.assign(_equippables[emoji], args);
+		_effectors[emoji] = {} as Effector;
+		Object.assign(_effectors[emoji], args);
 	}
 
 	for (let [id, interactable] of interactables) {
@@ -284,16 +272,13 @@
 		for (let [id, effect] of sideEffects) {
 			console.log(id, effect);
 
-			sideEffects[0][0] = structuredClone(equippables.get(id)?.emoji) || 'any';
+			sideEffects[0][0] = structuredClone(effectors.get(id)?.emoji) || 'any';
 		}
 
 		console.log(sideEffects);
 
 		if (dropsID) {
-			_interactables[emoji].drops[0] =
-				equippables.get(dropsID)?.emoji ||
-				consumables.get(dropsID)?.emoji ||
-				'';
+			_interactables[emoji].drops[0] = effectors.get(dropsID)?.emoji || '';
 		}
 	}
 
@@ -353,23 +338,18 @@
 
 	function initEntities() {
 		for (let [id, _emoji] of map.items) {
-			if (_equippables[_emoji]) {
-				items.set(id, new Equippable(_emoji, _equippables[_emoji].hp));
-			} else if (_consumables[_emoji]) {
-				let { sideEffect, mutateConsumerTo } = _consumables[_emoji];
-				items.set(id, new Consumable(_emoji, sideEffect, mutateConsumerTo));
+			if (_effectors[_emoji]) {
+				let { hp } = _effectors[_emoji];
+				items.set(id, new Effector(_emoji, hp));
 			} else if (_controllables[_emoji] || _interactables[_emoji]) {
-				items.set(
-					id,
-					new Entity(_emoji, new Map<number, Equippable | Consumable>(), 1)
-				);
+				items.set(id, new Entity(_emoji, new Map<number, Effector>(), 1));
 			} else {
 				items.set(id, new Entity(_emoji));
 			}
 		}
 
 		for (let [id, item] of items) {
-			if (item instanceof Equippable || item instanceof Consumable) continue;
+			if (item instanceof Effector) continue;
 			if (
 				ac === -2 &&
 				+id.split('_')[0] === currentSection &&
@@ -640,10 +620,7 @@
 			}
 			let interactedItem = items.get(currentSection + '_' + ic);
 
-			if (
-				interactedItem instanceof Equippable ||
-				interactedItem instanceof Consumable
-			) {
+			if (interactedItem instanceof Effector) {
 				if (player.inventory.size != MAX_INVENTORY_SIZE) {
 					for (let i = 0; i < MAX_INVENTORY_SIZE; i++) {
 						if (!player.inventory.get(i)) {
@@ -686,22 +663,20 @@
 			}, 50);
 
 			let equippedItem = player?.inventory.get(currentInventoryIndex) || 'any';
-			const isEquippable = equippedItem instanceof Equippable;
+			const isEffector = equippedItem instanceof Effector;
 
 			if (
-				isEquippable &&
-				sideEffect[0] === (equippedItem as Equippable).emoji
+				isEffector &&
+				sideEffect[0] === (equippedItem as Effector).emoji &&
+				(equippedItem as Effector).hp !== 'Infinite'
 			) {
-				(equippedItem as Equippable).hp -= 1;
+				// @ts-expect-error
+				(equippedItem as Effector).hp -= 1;
 			}
 
 			// if it's not "ANY"
-			if (typeof equippedItem !== 'string') {
-				if (isEquippable && (equippedItem as Equippable).hp === 0) {
-					deleteFromInventory(currentInventoryIndex);
-				} else if (equippedItem instanceof Consumable) {
-					deleteFromInventory(currentInventoryIndex);
-				}
+			if (typeof equippedItem !== 'string' && isEffector && (equippedItem as Effector).hp === 0) {
+				deleteFromInventory(currentInventoryIndex);
 			}
 
 			// for (let { type, ...args } of sequence) {
@@ -734,18 +709,11 @@
 				const _drops = _interactables[interactedItem.emoji].drops;
 
 				if (_drops[0]) {
-					let item;
-					if (_consumables[_drops[0]]) {
-						item = new Consumable(
-							_drops[0],
-							_consumables[_drops[0]].sideEffect,
-							_consumables[_drops[0]].mutateConsumerTo
-						);
-					} else if (_equippables[_drops[0]]) {
-						item = new Equippable(_drops[0], _equippables[_drops[0]].hp);
-					}
-
-					addToInventory(new Array(_drops[1]).fill(item));
+					addToInventory(
+						new Array(_drops[1]).fill(
+							new Effector(_drops[0], _effectors[_drops[0]].hp)
+						)
+					);
 				}
 
 				if (devolve.to !== '') {
@@ -762,69 +730,61 @@
 		}
 
 		if (e.code === 'KeyF') {
-			let consumableItem = player.inventory.get(currentInventoryIndex);
-			if (!(consumableItem instanceof Consumable)) return;
-			let { sideEffect, mutateConsumerTo } = consumableItem;
+			let effectorItem = player.inventory.get(currentInventoryIndex);
+			if (!(effectorItem instanceof Effector)) return;
+			let { hp } = effectorItem;
 
-			if (mutateConsumerTo != '') {
-				player.emoji = mutateConsumerTo;
-			} else {
-				player.hp.add(sideEffect);
+			// TODO: detect side effect, if no side effect, return;
+			let sideEffectOfEffector = 0;
+			player.hp.add(sideEffectOfEffector);
 
-				if (player.hp.current <= 0) {
-					let playerDevolve = _interactables[player?.emoji || '']?.devolve;
+			if (player.hp.current <= 0) {
+				let playerDevolve = _interactables[player?.emoji || '']?.devolve;
 
-					if (playerDevolve.to !== '') {
-						player.emoji = playerDevolve.to;
-						player.hp.max = _interactables[playerDevolve.to]?.hp || 1;
-						player.hp.current = player.hp.max;
-						progress.set(calcPlayerHpPercentage());
-						deleteFromInventory(currentInventoryIndex);
-						return;
-					}
-
+				if (playerDevolve.to !== '') {
+					player.emoji = playerDevolve.to;
+					player.hp.max = _interactables[playerDevolve.to]?.hp || 1;
+					player.hp.current = player.hp.max;
+					progress.set(calcPlayerHpPercentage());
 					deleteFromInventory(currentInventoryIndex);
-
-					for (let [id, item] of items) {
-						if (
-							item instanceof Equippable ||
-							item instanceof Consumable ||
-							!item ||
-							!item.hp ||
-							!item.inventory
-						)
-							continue;
-						if (
-							item.hp.current > 0 &&
-							!_equippables[item.emoji] &&
-							_controllables[item.emoji]
-						) {
-							player = items.get(id) as ControllableEntity;
-							ac = +id.split('_')[1];
-							progress = tweened(calcPlayerHpPercentage(), {
-								duration: 200,
-								easing: cubicOut,
-							});
-
-							return;
-						}
-					}
-
-					completionMessage = 'Game Over. No players left.';
-					levelCompleted = true;
 					return;
 				}
 
-				let playerEvolve = _interactables[player?.emoji || '']?.evolve;
+				deleteFromInventory(currentInventoryIndex);
 
-				if (playerEvolve?.to !== '' && player.hp.current === playerEvolve?.at) {
-					player.emoji = playerEvolve.to;
-					player.hp.max = _interactables[playerEvolve.to]?.hp || 1;
-					player.hp.current = player.hp.max;
+				for (let [id, item] of items) {
+					if (item instanceof Effector || !item || !item.hp || !item.inventory)
+						continue;
+					if (
+						item.hp.current > 0 &&
+						// !_equippables[item.emoji] && // TODO: should I just remove this?
+						_controllables[item.emoji]
+					) {
+						player = items.get(id) as ControllableEntity;
+						ac = +id.split('_')[1];
+						progress = tweened(calcPlayerHpPercentage(), {
+							duration: 200,
+							easing: cubicOut,
+						});
+
+						return;
+					}
 				}
 
-				progress.set(calcPlayerHpPercentage());
+				completionMessage = 'Game Over. No players left.';
+				levelCompleted = true;
+				return;
 			}
+
+			let playerEvolve = _interactables[player?.emoji || '']?.evolve;
+
+			if (playerEvolve?.to !== '' && player.hp.current === playerEvolve?.at) {
+				player.emoji = playerEvolve.to;
+				player.hp.max = _interactables[playerEvolve.to]?.hp || 1;
+				player.hp.current = player.hp.max;
+			}
+
+			progress.set(calcPlayerHpPercentage());
 
 			deleteFromInventory(currentInventoryIndex);
 			return;
@@ -852,43 +812,43 @@
 			return;
 		}
 
-		if (e.code === 'KeyR') {
-			let closestDistance = 300;
-			let closestID = ac;
+		// if (e.code === 'KeyR') {
+		// 	let closestDistance = 300;
+		// 	let closestID = ac;
 
-			let _controllables = Array.from(items).filter(
-				([id, { emoji }]) => !_equippables[emoji] && !_consumables[emoji]
-			);
+		// 	let _controllables = Array.from(items).filter(
+		// 		([id, { emoji }]) => !_effectors[emoji]
+		// 	);
 
-			for (let [id, _] of _controllables) {
-				let _id = +id.split('_')[1];
-				if (_id === ac) continue;
-				if (_id > ac && _id - ac < closestDistance) {
-					closestDistance = _id - ac;
-					closestID = _id;
-				}
-			}
+		// 	for (let [id, _] of _controllables) {
+		// 		let _id = +id.split('_')[1];
+		// 		if (_id === ac) continue;
+		// 		if (_id > ac && _id - ac < closestDistance) {
+		// 			closestDistance = _id - ac;
+		// 			closestID = _id;
+		// 		}
+		// 	}
 
-			if (closestDistance === 300) {
-				let smallest = 300;
-				for (let [id, _] of _controllables) {
-					let _id = +id.split('_')[1];
-					if (_id < smallest) smallest = _id;
-				}
-				ac = smallest;
-				ic = ac + keys[directionKey].operation;
-			} else {
-				ac = closestID;
-				ic = ac + keys[directionKey].operation;
-			}
+		// 	if (closestDistance === 300) {
+		// 		let smallest = 300;
+		// 		for (let [id, _] of _controllables) {
+		// 			let _id = +id.split('_')[1];
+		// 			if (_id < smallest) smallest = _id;
+		// 		}
+		// 		ac = smallest;
+		// 		ic = ac + keys[directionKey].operation;
+		// 	} else {
+		// 		ac = closestID;
+		// 		ic = ac + keys[directionKey].operation;
+		// 	}
 
-			player = items.get(currentSection + '_' + ac) as ControllableEntity;
-			progress = tweened(calcPlayerHpPercentage(), {
-				duration: 200,
-				easing: cubicOut,
-			});
-			return;
-		}
+		// 	player = items.get(currentSection + '_' + ac) as ControllableEntity;
+		// 	progress = tweened(calcPlayerHpPercentage(), {
+		// 		duration: 200,
+		// 		easing: cubicOut,
+		// 	});
+		// 	return;
+		// }
 	}
 
 	function noPlayer(rbx: any) {
@@ -940,9 +900,8 @@
 					</div>
 				{/if}
 				{#if item}
-					{@const equippable = item instanceof Equippable}
-					{@const consumable = item instanceof Consumable}
-					<span class:equippable class:consumable>
+					{@const effector = item instanceof Effector}
+					<span class:effector>
 						<i class="twa twa-{item.emoji}" />
 					</span>
 				{:else}
@@ -980,32 +939,27 @@
 				{#each { length: MAX_INVENTORY_SIZE } as _, i}
 					{@const item = player?.inventory.get(i)}
 					{@const equipped = i === currentInventoryIndex}
-					{@const isEquippable = item instanceof Equippable}
-					{@const isConsumable = item instanceof Consumable}
+					{@const isEffector = item instanceof Effector}
 					<div
 						class:equipped
-						class="relative flex h-10 w-10 flex-col items-center justify-center rounded border {isConsumable
+						class="relative flex h-10 w-10 flex-col items-center justify-center rounded border {isEffector
 							? 'border-purple-500 bg-purple-50'
-							: isEquippable
-							? 'border-amber-500 bg-amber-50'
 							: 'border-black bg-base-300'} p-2 2xl:h-12 2xl:w-12"
 					>
-						{#if item}
+						{#if item && item.hp !== "Infinite"}
 							<i class="twa twa-{item.emoji || ''}" />
-							{#if isEquippable}
-								<div class="absolute -top-0.5 right-0.5 text-sm">
-									{item.hp > 1 ? item.hp : ''}
-								</div>
-							{/if}
+							<div class="{isEffector ? "" : "hidden"} absolute -top-0.5 right-0.5 text-sm">
+								{item.hp > 1 ? item.hp : ''}
+							</div>
 						{/if}
 					</div>
-					{#if isConsumable && equipped}
+					{#if isEffector && equipped}
 						<div
 							class="absolute {SIZE == DEFAULT_SIDE_LENGTH
 								? 'bottom-4'
 								: '-bottom-8'}"
 						>
-							Press F to consume <i class="twa twa-{item.emoji}" />
+							Press F to apply <i class="twa twa-{item.emoji}" /> on self.
 						</div>
 					{/if}
 				{/each}
@@ -1041,21 +995,10 @@
 		border-width: 2px;
 	}
 
-	@keyframes equippable {
-		100% {
-			transform: translateY(-2px);
-		}
-	}
-
-	@keyframes consumable {
+	@keyframes effector {
 		100% {
 			transform: scale(0.618);
 		}
-	}
-
-	.equippable {
-		animation: equippable 500ms linear infinite alternate;
-		scale: 0.618;
 	}
 
 	.up {
@@ -1098,8 +1041,8 @@
 		}
 	}
 
-	.consumable {
-		animation: consumable 1000ms linear infinite alternate;
+	.effector {
+		animation: effector 1000ms linear infinite alternate;
 		scale: 0.618;
 	}
 

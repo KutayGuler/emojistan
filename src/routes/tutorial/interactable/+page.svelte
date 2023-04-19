@@ -5,7 +5,7 @@
 		EditableMap,
 		Evolve,
 		Devolve,
-		Consumable,
+		Effector,
 	} from '$src/types';
 	import {
 		INTERACTABLE_BG,
@@ -65,7 +65,7 @@
 						['0_15', 'baby-bottle'],
 					])
 				),
-				consumables: new Map<number, Consumable>([
+				effectors: new Map<number, Effector>([
 					[-1, { emoji: 'baby-bottle', hp: 1, mutateConsumerTo: '' }],
 				]),
 				// @ts-expect-error
@@ -111,7 +111,7 @@
 						['0_15', 'test-tube'],
 					])
 				),
-				consumables: new Map<number, Consumable>([
+				effectors: new Map<number, Effector>([
 					[-2, { emoji: 'test-tube', hp: -1, mutateConsumerTo: '' }],
 				]),
 				// @ts-expect-error
@@ -143,8 +143,8 @@
 				id: 'sideEffects',
 				emoji: 'door',
 				isControllable: false,
-				evolve: new Evolve(false, '', 2),
-				devolve: new Devolve(false, ''),
+				evolve: new Evolve('', 2),
+				devolve: new Devolve(''),
 				hp: 1,
 			},
 			gameProps: {
@@ -173,8 +173,8 @@
 							1,
 							[['any', 0]],
 							true,
-							new Evolve(false, '', 2),
-							new Devolve(false, '')
+							new Evolve('', 2),
+							new Devolve('')
 						),
 					],
 				]),

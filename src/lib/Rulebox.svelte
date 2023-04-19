@@ -9,10 +9,9 @@
 		movementStore,
 	} from '$lib/stores/store';
 	import {
-		consumables,
+		effectors,
 		controllables,
 		dialogueTree,
-		equippables,
 		interactables,
 		mergers,
 		modal,
@@ -25,7 +24,7 @@
 	import Interactable from '$rbx/Interactable.svelte';
 	import Pusher from '$rbx/Pusher.svelte';
 	import Merger from '$rbx/Merger.svelte';
-	import Consumable from '$rbx/Consumable.svelte';
+	import Effector from '$rbx/Effector.svelte';
 	import Equippable from '$rbx/Equippable.svelte';
 	import Controllable from '$rbx/Controllable.svelte';
 	import { CROSS } from '$src/constants';
@@ -67,11 +66,8 @@
 			case 'merger':
 				mergers.remove(rbx.id);
 				break;
-			case 'consumable':
-				consumables.remove(rbx.id);
-				break;
-			case 'equippable':
-				equippables.remove(rbx.id);
+			case 'effector':
+				effectors.remove(rbx.id);
 				break;
 			case 'controllable':
 				controllables.remove(rbx.id);
@@ -160,10 +156,8 @@
 		<Interactable id={rbx.id} {...props} />
 	{:else if rbx.type === 'controllable'}
 		<Controllable id={rbx.id} {...props} />
-	{:else if rbx.type === 'equippable'}
-		<Equippable id={rbx.id} {...props} />
-	{:else if rbx.type === 'consumable'}
-		<Consumable id={rbx.id} {...props} />
+	{:else if rbx.type === 'effector'}
+		<Effector id={rbx.id} {...props} />
 	{:else if rbx.type === 'pusher'}
 		<Pusher id={rbx.id} {...props} />
 	{:else if rbx.type === 'merger'}

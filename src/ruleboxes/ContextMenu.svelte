@@ -3,8 +3,7 @@
 		mergers,
 		pushers,
 		interactables,
-		consumables,
-		equippables,
+		effectors,
 		controllables,
 	} from '../store';
 	import type { RuleboxType } from '$lib/types';
@@ -14,9 +13,7 @@
 		Evolve,
 		Interactable,
 		Controllable,
-		Equippable,
-		Consumable,
-		type Drops,
+		Effector,
 	} from '$src/types';
 
 	export let position: { x: number; y: number };
@@ -33,11 +30,8 @@
 			case 'merger':
 				mergers.add(id, value);
 				break;
-			case 'consumable':
-				consumables.add(id, value);
-				break;
-			case 'equippable':
-				equippables.add(id, value);
+			case 'effector':
+				effectors.add(id, value);
 				break;
 			case 'controllable':
 				controllables.add(id, value);
@@ -61,12 +55,8 @@
 			onClick: () => spawn('merger', ['', '', '']),
 		},
 		{
-			name: 'Consumable',
-			onClick: () => spawn('consumable', new Consumable('', 1)),
-		},
-		{
-			name: 'Equippable',
-			onClick: () => spawn('equippable', new Equippable('', 1)),
+			name: 'Effector',
+			onClick: () => spawn('effector', new Effector('', 1)),
 		},
 		{
 			name: 'Controllable',

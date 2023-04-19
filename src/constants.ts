@@ -46,17 +46,11 @@ export const CONTROLLABLE_H = 600;
 export const CONTROLLABLE_BG = '#f0fdf4'; // green-50
 export const CONTROLLABLE_BORDER = '#22c55e'; // green-500
 
-/* CONSUMABLE */
-export const CONSUMABLE_W = 240;
-export const CONSUMABLE_H = 90;
-export const CONSUMABLE_BG = '#faf5ff'; // purple-50
-export const CONSUMABLE_BORDER = '#a855f7'; // purple-500
-
-/* CONSUMABLE */
-export const EQUIPPABLE_W = 180;
-export const EQUIPPABLE_H = 90;
-export const EQUIPPABLE_BG = '#fffbeb'; // amber-50
-export const EQUIPPABLE_BORDER = '#f59e0b'; // amber-500
+/* EFFECTOR */
+export const EFFECTOR_W = 180;
+export const EFFECTOR_H = 90;
+export const EFFECTOR_BG = '#faf5ff'; // purple-50
+export const EFFECTOR_BORDER = '#a855f7'; // purple-500
 
 // DATA
 // STORE NAMES
@@ -64,8 +58,7 @@ export const EQUIPPABLE_BORDER = '#f59e0b'; // amber-500
 export const storeNames = [
 	'pushers',
 	'mergers',
-	'equippables',
-	'consumables',
+	'effectors',
 	'interactables',
 	'controllables',
 	'items',

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Consumable from '$rbx/Consumable.svelte';
+	import Effector from '$rbx/Effector.svelte';
 	import Equippable from '$rbx/Equippable.svelte';
 	import Interactable from '$rbx/Interactable.svelte';
 	import Merger from '$rbx/Merger.svelte';
@@ -15,14 +15,10 @@
 		PUSHER_H,
 		PUSHER_W,
 		PUSHER_BORDER,
-		EQUIPPABLE_W,
-		EQUIPPABLE_H,
-		EQUIPPABLE_BG,
-		EQUIPPABLE_BORDER,
-		CONSUMABLE_W,
-		CONSUMABLE_H,
-		CONSUMABLE_BG,
-		CONSUMABLE_BORDER,
+		EFFECTOR_W,
+		EFFECTOR_H,
+		EFFECTOR_BG,
+		EFFECTOR_BORDER,
 		INTERACTABLE_W,
 		INTERACTABLE_H,
 		INTERACTABLE_BG,
@@ -57,27 +53,15 @@
 			},
 		},
 		{
-			component: Equippable,
+			component: Effector,
 			rbx: {
 				id: '0',
-				type: 'equippable',
+				type: 'effector',
 				position: { x: 0, y: 0 },
-				width: EQUIPPABLE_W,
-				height: EQUIPPABLE_H,
-				bgColor: EQUIPPABLE_BG,
-				borderColor: EQUIPPABLE_BORDER,
-			},
-		},
-		{
-			component: Consumable,
-			rbx: {
-				id: '0',
-				type: 'consumable',
-				position: { x: 0, y: 0 },
-				width: CONSUMABLE_W,
-				height: CONSUMABLE_H,
-				bgColor: CONSUMABLE_BG,
-				borderColor: CONSUMABLE_BORDER,
+				width: EFFECTOR_W,
+				height: EFFECTOR_H,
+				bgColor: EFFECTOR_BG,
+				borderColor: EFFECTOR_BORDER,
 			},
 		},
 		{

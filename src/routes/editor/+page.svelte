@@ -19,8 +19,7 @@
 		pushers,
 		mergers,
 		interactables,
-		equippables,
-		consumables,
+		effectors,
 		dialogueTree,
 		showLoading,
 		controllables,
@@ -40,18 +39,6 @@
 	import DialogueEditor from './DialogueEditor.svelte';
 	import type { CopyMode, SkinTone } from '$src/types';
 
-	// function getStatics() {
-	// 	let _statics = new Set<string>($statics);
-	// 	$interactables.forEach(({ emoji, isStatic }) => {
-	// 		isStatic && _statics.add(emoji);
-	// 	});
-	// 	for (let [id, { emoji }] of [...$equippables, ...$consumables]) {
-	// 		_statics.add(emoji);
-	// 	}
-
-	// 	return _statics;
-	// }
-
 	onMount(() => {
 		if ($saves.currentSaveID === '') {
 			let saveExists = saves.useStorage();
@@ -69,8 +56,7 @@
 			map,
 			pushers,
 			mergers,
-			equippables,
-			consumables,
+			effectors,
 			interactables,
 			controllables,
 			rbxStore,
@@ -219,8 +205,7 @@
 				mergers={$mergers}
 				controllables={$controllables}
 				interactables={$interactables}
-				equippables={$equippables}
-				consumables={$consumables}
+				effectors={$effectors}
 				on:noPlayer={() => {
 					test = false;
 					notifications.warning('No controllable player in the map.');

@@ -5,10 +5,9 @@ import type {
 	EditableMap,
 	Pusher,
 	Merger,
-	Equippable,
 	Interactable,
 	Controllable,
-	Consumable,
+	Effector,
 } from '$src/types';
 import type { ComponentType } from 'svelte';
 
@@ -17,10 +16,9 @@ export interface GameProps {
 	map?: EditableMap;
 	pushers?: Map<StringedNumber, Pusher>;
 	mergers?: Map<StringedNumber, Merger>;
-	equippables?: Map<StringedNumber, Equippable>;
 	interactables?: Map<StringedNumber, Interactable>;
 	controllables?: Map<StringedNumber, Controllable>;
-	consumables?: Map<StringedNumber, Consumable>;
+	effectors?: Map<StringedNumber, Effector>;
 	mapClass?: string;
 	SIZE?: number;
 	showHP?: boolean;

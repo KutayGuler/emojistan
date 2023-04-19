@@ -4,7 +4,6 @@
 		MIN_DURATION,
 		MIN_INDEX,
 		DEFAULT_SIDE_LENGTH,
-		EQUIPPABLE_BORDER,
 		CROSS,
 		MAX_SIDE_EFFECT,
 	} from '$src/constants';
@@ -23,8 +22,7 @@
 		map,
 		formattedEmoji,
 		interactables,
-		equippables,
-		consumables,
+		effectors,
 		type StringedNumber,
 	} from '../store';
 
@@ -113,7 +111,7 @@
 
 		sideEffects = sideEffects.filter((m) => {
 			if (m[0] === 'any') return true;
-			return $equippables.get(m[0])?.emoji != '';
+			return $effectors.get(m[0])?.emoji != '';
 		});
 		sideEffects = sideEffects.filter((m, i) => {
 			if (i === 0) return true;
@@ -182,13 +180,13 @@
 			}
 		}
 
-		for (let val of [...$consumables.values(), ...$equippables.values()]) {
+		for (let val of [...$effectors.values(), ...$equippables.values()]) {
 			if (
 				(typeof val === 'string' && val != '' && $formattedEmoji === val) ||
 				(typeof val === 'object' && $formattedEmoji === val.emoji)
 			) {
 				notifications.warning(
-					'An emoji can only have one assigned type. Interactable, Controllable, Consumable or Equippable'
+					'An emoji can only have one assigned type. Interactable, Controllable, Effector or Equippable'
 				);
 				return;
 			}
@@ -263,7 +261,7 @@
 	let hasInteraction = true;
 	$: hasInteraction = sideEffects.some((m) => m[1] != 0);
 	$: eqs = [...$equippables].filter(([id, e]) => e.emoji != '');
-	$: droppables = [...$equippables, ...$consumables].filter(
+	$: droppables = [...$equippables, ...$effectors].filter(
 		([id, e]) => e.emoji != ''
 	);
 </script>
@@ -282,6 +280,7 @@
 				<option value={0}>0</option>
 			</select>
 		</div>
+		<div class="absolute -bottom-12">Devolve</div>
 	</div>
 	<div class="flex flex-col items-center justify-center">
 		<button title="Interactable Emoji" class="slot-lg" on:click={updateEmoji}>
@@ -319,6 +318,7 @@
 				{/each}
 			</select>
 		</div>
+		<div class="absolute -bottom-12">Evolve</div>
 	</div>
 </div>
 <main class="flex w-full flex-col items-center justify-center gap-4 pt-16">
@@ -329,7 +329,7 @@
 				<label tabindex="0" class="slot-lg m-1"
 					><i
 						class="twa twa-{$equippables.get(drops[0])?.emoji ||
-							$consumables.get(drops[0])?.emoji}"
+							$effectors.get(drops[0])?.emoji}"
 					/></label
 				>
 				<ul
@@ -347,9 +347,7 @@
 							<i class="twa twa-{emoji}" />
 						</button>
 					{:else}
-						<div class="rounded-md p-1">
-							No equippable or consumable defined.
-						</div>
+						<div class="rounded-md p-1">No equippable or effector defined.</div>
 					{/each}
 				</ul>
 			</div>
@@ -377,7 +375,7 @@
 					for=""
 					tabindex="0"
 					class="btn text-2xl"
-					style:background={EQUIPPABLE_BORDER}>+</label
+					style:background={EFFECTOR_BORDER}>+</label
 				>
 				<ul
 					tabindex="0"

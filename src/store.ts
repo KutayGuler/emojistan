@@ -3,7 +3,7 @@ import { writable, get, type Writable, derived } from 'svelte/store';
 import { DEFAULT_BG, storeNames } from './constants';
 import {
 	Choice,
-	Consumable,
+	Effector,
 	EditableMap,
 	Equippable,
 	Controllable,
@@ -356,8 +356,7 @@ export type StringedNumber = `${number}`;
 // MAPS
 export const pushers = createMapStore<StringedNumber, Pusher>('pushers');
 export const mergers = createMapStore<StringedNumber, Merger>('mergers');
-export const consumables = createMapStore<StringedNumber, Consumable>('consumables');
-export const equippables = createMapStore<StringedNumber, Equippable>('equippables');
+export const effectors = createMapStore<StringedNumber, Effector>('effectors');
 export const interactables = createMapStore<StringedNumber, Interactable>(
 	'interactables'
 );

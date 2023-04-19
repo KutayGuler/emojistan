@@ -2,8 +2,7 @@
 	import {
 		PUSHER_BORDER,
 		MERGER_BORDER,
-		EQUIPPABLE_BORDER,
-		CONSUMABLE_BORDER,
+		EFFECTOR_BORDER,
 		INTERACTABLE_BORDER,
 		CONTROLLABLE_BORDER,
 	} from '../../constants';
@@ -32,16 +31,11 @@
 		merger: {
 			link: 'merger',
 			color: MERGER_BORDER,
-			next: 'consumable',
+			next: 'effector',
 		},
-		consumable: {
-			link: 'consumable',
-			color: CONSUMABLE_BORDER,
-			next: 'equippable',
-		},
-		equippable: {
-			link: 'equippable',
-			color: EQUIPPABLE_BORDER,
+		effector: {
+			link: 'effector',
+			color: EFFECTOR_BORDER,
 			next: 'controllable',
 		},
 		controllable: {

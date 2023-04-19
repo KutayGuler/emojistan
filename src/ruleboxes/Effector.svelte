@@ -1,53 +1,59 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import { notifications } from '$src/routes/notifications';
 	import {
-		consumables,
+		effectors,
 		formattedEmoji,
-		equippables,
 		interactables,
 		type StringedNumber,
 	} from '$src/store';
-	import { Equippable } from '$src/types';
+	import { Effector } from '$src/types';
+	import { onDestroy, onMount } from 'svelte';
 
 	export let id: StringedNumber;
 	export let emoji = '';
-	let hp = 1;
+	export let hp: number | 'Infinite' = 1;
 
-	let hps: Array<number | 'Infinite'> = ['Infinite'];
+	let modifierPoints: Array<number | 'Infinite'> = ['Infinite'];
 
-	for (let i = 0; i < 100; i++) {
-		hps[i] = i + 1;
+	for (let i = 1; i <= 100; i++) {
+		modifierPoints[i] = i;
 	}
 
 	onMount(() => {
-		let obj = $equippables.get(id);
+		let obj = $effectors.get(id);
 		if (obj) {
 			({ emoji, hp } = obj);
 		}
 	});
 
+	onDestroy(() => {
+		if (emoji === '') {
+			effectors.remove(id);
+			return;
+		}
+	});
+
 	function updateStore() {
-		equippables.update(id, new Equippable(emoji, hp));
+		effectors.update(id, new Effector(emoji, hp));
 	}
 
 	function updateEmoji() {
-		for (let [_id, val] of $equippables.entries()) {
+		for (let [_id, val] of $effectors.entries()) {
 			if (_id === id) continue;
 
 			if ($formattedEmoji === val.emoji) {
-				notifications.warning('Cannot have two consumables with same emoji');
+				notifications.warning('Cannot have two effectors with same emoji');
 				return;
 			}
 		}
 
-		for (let val of [...$interactables.values(), ...$consumables.values()]) {
+		for (let val of [...$interactables.values()]) {
 			if (
 				(typeof val === 'string' && val != '' && $formattedEmoji === val) ||
 				(typeof val === 'object' && $formattedEmoji === val.emoji)
 			) {
 				notifications.warning(
-					'An emoji can only have one assigned type. Interactable, Consumable or Equippable'
+					'An emoji can only have one assigned type. Interactable, Effector or Equippable'
 				);
 				return;
 			}
@@ -66,12 +72,12 @@
 		<div class="absolute -bottom-4">
 			<select
 				class="select-bordered select select-sm text-xl"
-				title="HP"
+				title="sideEffect"
 				bind:value={hp}
 				on:change={updateStore}
 			>
-				{#each hps as _hp}
-					<option value={_hp}>{_hp}</option>
+				{#each modifierPoints as point}
+					<option value={point}>{point}</option>
 				{/each}
 			</select>
 		</div>

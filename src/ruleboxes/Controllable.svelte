@@ -1,7 +1,6 @@
 <script lang="ts">
 	import {
 		DEFAULT_SIDE_LENGTH,
-		EQUIPPABLE_BORDER,
 		CROSS,
 		MAX_SIDE_EFFECT,
 	} from '$src/constants';
@@ -11,8 +10,7 @@
 	import {
 		formattedEmoji,
 		controllables,
-		equippables,
-		consumables,
+		effectors,
 		type StringedNumber,
 	} from '../store';
 
@@ -124,13 +122,13 @@
 		}
 
 		// TODO: need a global checker for this
-		for (let val of [...$consumables.values(), ...$equippables.values()]) {
+		for (let val of [...$effectors.values(), ...$equippables.values()]) {
 			if (
 				(typeof val === 'string' && val != '' && $formattedEmoji === val) ||
 				(typeof val === 'object' && $formattedEmoji === val.emoji)
 			) {
 				notifications.warning(
-					'An emoji can only have one assigned type. Controllable, Interactable, Consumable, or Equippable'
+					'An emoji can only have one assigned type. Controllable, Interactable, Effector, or Equippable'
 				);
 				return;
 			}
@@ -207,6 +205,7 @@
 				<option value={0}>0</option>
 			</select>
 		</div>
+		<div class="absolute -bottom-12">Devolve</div>
 	</div>
 	<div class="flex flex-col items-center justify-center">
 		<button title="Controllable Emoji" class="slot-lg" on:click={updateEmoji}>
@@ -244,6 +243,7 @@
 				{/each}
 			</select>
 		</div>
+		<div class="absolute -bottom-12">Evolve</div>
 	</div>
 </div>
 <main class="flex w-full flex-col items-center justify-center gap-4 pt-16">
@@ -255,7 +255,7 @@
 					for=""
 					tabindex="0"
 					class="btn text-2xl"
-					style:background={EQUIPPABLE_BORDER}>+</label
+					style:background={EFFECTOR_BORDER}>+</label
 				>
 				<ul
 					tabindex="0"
