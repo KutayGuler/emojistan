@@ -87,11 +87,11 @@
 
 <ul class="w-full bg-white">
 	{#each menuItems as { name, onClick }}
-		<li
-			class="{name} box-border h-8 w-full cursor-pointer p-1 text-start"
+		<button
+			class="{name} box-border h-8 w-full p-1 text-start"
 			on:click={onClick}
 		>
 			{name}
-		</li>
+		</button>
 	{/each}
 </ul>

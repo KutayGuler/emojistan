@@ -3,6 +3,7 @@
 		DEFAULT_SIDE_LENGTH,
 		CROSS,
 		MAX_SIDE_EFFECT,
+		EFFECTOR_BORDER,
 	} from '$src/constants';
 	import { Devolve, Evolve, Controllable } from '$src/types';
 	import { onDestroy, onMount } from 'svelte';
@@ -16,14 +17,12 @@
 
 	let indexes: Array<number> = [];
 	let hps: Array<number> = [];
-	let modifierPoints: Array<number | 'talk'> = [];
+	let modifierPoints: Array<number> = [];
 
 	for (let i = 0; i < 100; i++) {
 		hps[i] = i + 1;
 		modifierPoints[i] = i + 1;
 	}
-
-	modifierPoints.unshift('talk');
 
 	for (let i = 0; i >= -100; i--) {
 		modifierPoints.unshift(i);
@@ -37,8 +36,8 @@
 	export let id: StringedNumber;
 	export let emoji = '';
 	export let hp = 1;
-	export let sideEffects: Array<[string, number]> = [];
-	export let pseudoSideEffects: Array<[string, number]> = [];
+	export let sideEffects: Array<['any' | StringedNumber, number]> = [];
+	export let pseudoSideEffects: Array<['any' | StringedNumber, number]> = [];
 	export let evolve = new Evolve('', 2);
 	export let devolve = new Devolve('');
 
@@ -65,9 +64,9 @@
 		// 	return;
 		// }
 
-		sideEffects = sideEffects.filter((m) => {
-			if (m[0] === 'any') return true;
-			return $equippables.get(m[0])?.emoji != '';
+		sideEffects = sideEffects.filter((sideEffect) => {
+			if (sideEffect[0] === 'any') return true;
+			return $effectors.get(sideEffect[0])?.emoji != '';
 		});
 		sideEffects = sideEffects.filter((m, i) => {
 			if (i === 0) return true;
@@ -76,7 +75,7 @@
 		updateStore();
 	});
 
-	function addTosideEffects(equippableID: string) {
+	function addTosideEffects(equippableID: 'any' | StringedNumber) {
 		if (sideEffects.some(([id, val]) => id === equippableID)) return;
 		if (sideEffects.length === MAX_SIDE_EFFECT) {
 			notifications.warning(
@@ -122,7 +121,7 @@
 		}
 
 		// TODO: need a global checker for this
-		for (let val of [...$effectors.values(), ...$equippables.values()]) {
+		for (let val of [...$effectors.values()]) {
 			if (
 				(typeof val === 'string' && val != '' && $formattedEmoji === val) ||
 				(typeof val === 'object' && $formattedEmoji === val.emoji)
@@ -188,7 +187,7 @@
 		}
 	}
 
-	$: droppables = [...$equippables].filter(([id, e]) => e.emoji != '');
+	$: droppables = [...$effectors].filter(([id, e]) => e.emoji != '');
 </script>
 
 <div class="absolute -top-8 flex flex-row items-center justify-center gap-2">
@@ -276,12 +275,12 @@
 		</div>
 		<div class="flex items-center justify-center px-12">
 			<div class="flex w-fit flex-wrap items-start justify-start gap-8">
-				{#each sideEffects as [equippableID, value], i}
-					{@const modifierEmoji = $equippables.get(equippableID)?.emoji}
+				{#each sideEffects as [effectorID, value], i}
+					{@const modifierEmoji = $effectors.get(effectorID)?.emoji}
 					<div class="relative flex flex-col items-center">
-						{#if equippableID === 'any'}
+						{#if effectorID === 'any'}
 							<div class="slot-lg scale-75">
-								{equippableID}
+								{effectorID}
 							</div>
 							<select
 								class="select-bordered select select-sm absolute -bottom-4"

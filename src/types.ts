@@ -6,6 +6,7 @@ export type EmojiMode = 'Foreground' | 'Background';
 // GAME TYPES
 
 import { DEFAULT_BG } from './constants';
+import type { StringedNumber } from './store';
 
 export type MapLocation = `${number}_${number}`;
 export type CollisionType = 'bump' | 'push' | string;
@@ -189,13 +190,13 @@ export class Devolve {
 	}
 }
 
-export type Drops = [id: string, amount: number];
+export type Drops = [id: StringedNumber | '', amount: number];
 
 export interface Interactable {
 	emoji: string;
 	sequence: Array<SequenceItem>;
 	hp: number;
-	sideEffects: Array<[string | 'any', number | 'talk']>;
+	sideEffects: Array<[StringedNumber | 'any', number | 'talk']>;
 	evolve: Evolve;
 	devolve: Devolve;
 	drops: Drops;
@@ -206,7 +207,7 @@ export class Interactable {
 		emoji: string,
 		sequence: Array<SequenceItem>,
 		hp: number,
-		sideEffects: Array<[string | 'any', number | 'talk']>,
+		sideEffects: Array<[StringedNumber | 'any', number | 'talk']>,
 		evolve: Evolve,
 		devolve: Devolve,
 		drops: Drops
@@ -224,7 +225,7 @@ export class Interactable {
 export interface Controllable {
 	emoji: string;
 	hp: number;
-	sideEffects: Array<[string, number]>;
+	sideEffects: Array<['any' | StringedNumber, number]>;
 	evolve: Evolve;
 	devolve: Devolve;
 }
@@ -233,7 +234,7 @@ export class Controllable {
 	constructor(
 		emoji: string,
 		hp: number,
-		sideEffects: Array<[string, number]>,
+		sideEffects: Array<['any' | StringedNumber, number]>,
 		evolve: Evolve,
 		devolve: Devolve
 	) {

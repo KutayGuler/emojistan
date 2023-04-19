@@ -6,6 +6,7 @@
 		DEFAULT_SIDE_LENGTH,
 		CROSS,
 		MAX_SIDE_EFFECT,
+		EFFECTOR_BORDER,
 	} from '$src/constants';
 	import { rbxStore } from '$src/lib/stores/store';
 	import {
@@ -68,10 +69,10 @@
 	export let emoji = '';
 	export let sequence: Array<SequenceItem> = [];
 	export let hp = 1;
-	export let sideEffects: Array<[string | 'any', number | 'talk']> = [
+	export let sideEffects: Array<[StringedNumber | 'any', number | 'talk']> = [
 		['any', 'talk'],
 	];
-	export let pseudoSideEffects: Array<[string, number]> = [];
+	export let pseudoSideEffects: Array<[StringedNumber | 'any', number]> = [];
 	export let evolve = new Evolve('', 2);
 	export let devolve = new Devolve('');
 	export let drops: Drops = ['', 1];
@@ -120,15 +121,15 @@
 		updateStore();
 	});
 
-	function addTosideEffects(equippableID: string) {
-		if (sideEffects.some(([id, val]) => id === equippableID)) return;
+	function addTosideEffects(effectorID: StringedNumber | 'any') {
+		if (sideEffects.some(([id, val]) => id === effectorID)) return;
 		if (sideEffects.length === MAX_SIDE_EFFECT) {
 			notifications.warning(
 				`Cannot have more than ${MAX_SIDE_EFFECT} side effects`
 			);
 			return;
 		}
-		sideEffects.push([equippableID, 0]);
+		sideEffects.push([effectorID, 0]);
 		sideEffects = sideEffects;
 		updateStore();
 	}
@@ -196,11 +197,6 @@
 		updateStore();
 	}
 
-	function updateDrops() {
-		drops[0] = $formattedEmoji;
-		updateStore();
-	}
-
 	function updateEvolveEmoji() {
 		if (emoji === $formattedEmoji) {
 			notifications.warning('An interactable cannot evolve to itself');
@@ -260,10 +256,7 @@
 
 	let hasInteraction = true;
 	$: hasInteraction = sideEffects.some((m) => m[1] != 0);
-	$: eqs = [...$equippables].filter(([id, e]) => e.emoji != '');
-	$: droppables = [...$equippables, ...$effectors].filter(
-		([id, e]) => e.emoji != ''
-	);
+	$: droppables = [...$effectors].filter(([id, e]) => e.emoji != '');
 </script>
 
 <div class="absolute -top-8 flex flex-row items-center justify-center gap-2">
@@ -328,7 +321,7 @@
 			<div class="dropdown-right dropdown cursor-pointer">
 				<label tabindex="0" class="slot-lg m-1"
 					><i
-						class="twa twa-{$equippables.get(drops[0])?.emoji ||
+						class="twa twa-{$effectors.get(drops[0])?.emoji ||
 							$effectors.get(drops[0])?.emoji}"
 					/></label
 				>
@@ -347,7 +340,7 @@
 							<i class="twa twa-{emoji}" />
 						</button>
 					{:else}
-						<div class="rounded-md p-1">No equippable or effector defined.</div>
+						<div class="rounded-md p-1">No effectors defined.</div>
 					{/each}
 				</ul>
 			</div>
@@ -381,7 +374,7 @@
 					tabindex="0"
 					class="dropdown-content menu rounded-box bg-base-100 p-2 shadow "
 				>
-					{#each eqs as [id, { emoji }]}
+					{#each droppables as [id, { emoji }]}
 						<button
 							class="rounded-md p-1 hover:bg-base-200"
 							on:click={() => addTosideEffects(id)}
@@ -389,7 +382,7 @@
 							<i class="twa twa-{emoji}" />
 						</button>
 					{:else}
-						<div class="rounded-md p-1">No equippables defined.</div>
+						<div class="rounded-md p-1">No effectors defined.</div>
 					{/each}
 				</ul>
 			</div>
@@ -402,12 +395,12 @@
 		{/if}
 		<div class="flex items-center justify-center px-12">
 			<div class="flex w-fit flex-wrap items-start justify-start gap-8">
-				{#each sideEffects as [equippableID, value], i}
-					{@const modifierEmoji = $equippables.get(equippableID)?.emoji}
+				{#each sideEffects as [effectorID, value], i}
+					{@const modifierEmoji = $effectors.get(effectorID)?.emoji}
 					<div class="relative flex flex-col items-center">
-						{#if equippableID === 'any'}
+						{#if effectorID === 'any'}
 							<div class="slot-lg scale-75">
-								{equippableID}
+								{effectorID}
 							</div>
 							<select
 								class="select-bordered select select-sm absolute -bottom-4"
@@ -416,7 +409,9 @@
 							>
 								{#each modifierPoints as point}
 									<option value={point}
-										>{point > 0 ? `+${point}` : point}</option
+										>{typeof point === 'number' && point > 0
+											? `+${point}`
+											: point}</option
 									>
 								{/each}
 							</select>
@@ -435,7 +430,9 @@
 							>
 								{#each modifierPoints as point}
 									<option value={point}
-										>{point > 0 ? `+${point}` : point}</option
+										>{typeof point === 'number' && point > 0
+											? `+${point}`
+											: point}</option
 									>
 								{/each}
 							</select>
@@ -570,13 +567,6 @@
 </main>
 
 <style>
-	span {
-		display: flex;
-		flex-direction: row;
-		justify-content: flex-start;
-		align-items: center;
-	}
-
 	.enabled {
 		opacity: 1;
 	}

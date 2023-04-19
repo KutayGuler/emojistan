@@ -55,7 +55,7 @@
 				],
 			]),
 			effectors: new Map<StringedNumber, TEffector>([
-				['-1', { emoji: 'banana', sideEffect: 1, mutateConsumerTo: '' }],
+				['-1', { emoji: 'banana', hp: 1 }],
 			]),
 			mapClass: 'simulation',
 			SIZE: 4,
@@ -111,7 +111,7 @@
 				],
 			]),
 			effectors: new Map<StringedNumber, TEffector>([
-				['-2', { emoji: 'test-tube', sideEffect: 1, mutateConsumerTo: 'pig' }],
+				['-2', { emoji: 'test-tube', hp: 1 }],
 			]),
 			mapClass: 'simulation',
 			SIZE: 4,
