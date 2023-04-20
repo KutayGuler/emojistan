@@ -20,7 +20,7 @@
 	const firstTutorialProps: TutorialProps = {
 		header: 'Effector',
 		description:
-			'Effector takes an emoji and a number input. Emoji is the effector itself and the number below it is the HP side effect consumer will be subjected to.',
+			'Effector takes an emoji and a number input. Emoji is the effector itself and the number below it is the number of times it can be used before it disappears. It can be a number between 1 and 100 or "Infinite"',
 		component: Effector,
 		rbx: {
 			id: '0',
@@ -33,29 +33,32 @@
 		},
 		props: {
 			id: -1,
-			emoji: 'banana',
+			emoji: 'test-tube',
 		},
 		gameProps: {
 			map: new EditableMap(
 				new Map<string, string>([
-					['0_5', 'monkey'],
-					['0_6', 'banana'],
+					['0_5', 'woman-walking'],
+					['0_6', 'test-tube'],
 				])
 			),
 			controllables: new Map<StringedNumber, Controllable>([
 				[
 					'0',
 					new Controllable(
-						'monkey',
+						'woman-walking',
 						1,
-						[['any', 0]],
+						[
+							['any', 0],
+							['-1', -1],
+						],
 						new Evolve('', 0),
-						new Devolve('')
+						new Devolve('skull')
 					),
 				],
 			]),
 			effectors: new Map<StringedNumber, TEffector>([
-				['-1', { emoji: 'banana', hp: 1 }],
+				['-1', { emoji: 'test-tube', hp: 1 }],
 			]),
 			mapClass: 'simulation',
 			SIZE: 4,
@@ -64,7 +67,7 @@
 
 	const secondTutorialProps: TutorialProps = {
 		description:
-			'On the top left corner, the <i class="twa twa-dna text-2xl"></i> icon enables mutation and disables the HP side effect. If mutation is enabled, another slot opens up to determine what the consumer will mutate into.',
+			'Just like in real life, the effect of the Effector depends on the entity Effector has been applied on.',
 		component: Effector,
 		rbx: {
 			id: '0',
@@ -117,6 +120,8 @@
 			SIZE: 4,
 		},
 	};
+
+	// TODO: make two tutorials, one for consumption, one for using an item on another entity
 </script>
 
 <Tutorial {...firstTutorialProps} --header={EFFECTOR_BORDER} />

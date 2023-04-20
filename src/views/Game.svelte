@@ -668,7 +668,11 @@
 			}
 
 			// if it's not "ANY"
-			if (typeof equippedItem !== 'string' && isEffector && (equippedItem as Effector).hp === 0) {
+			if (
+				typeof equippedItem !== 'string' &&
+				isEffector &&
+				(equippedItem as Effector).hp === 0
+			) {
 				deleteFromInventory(currentInventoryIndex);
 			}
 
@@ -724,12 +728,28 @@
 
 		if (e.code === 'KeyF') {
 			let effectorItem = player.inventory.get(currentInventoryIndex);
-			if (!(effectorItem instanceof Effector)) return;
-			let { hp } = effectorItem;
+			console.log(effectorItem, effectorItem instanceof Effector);
 
-			// TODO: detect side effect, if no side effect, return;
-			let sideEffectOfEffector = 0;
-			player.hp.add(sideEffectOfEffector);
+			if (!(effectorItem instanceof Effector)) return;
+
+			// IMPROVEMENT: might key side effects by emojis, that would
+			// get rid of the need for using array.find function
+			// TODO: turn StringedNumber id's of sideEffects into keyed emojis;
+			const sideEffects = _controllables[player.emoji].sideEffects;
+			console.log(sideEffects);
+
+			const sideEffect = sideEffects.find(
+				([emoji, effect]) => emoji === effectorItem?.emoji
+			) || ['', 0];
+			if (sideEffect[1] === 0) return;
+			player.hp.add(sideEffect[1]);
+
+			if (effectorItem.hp !== 'Infinite') {
+				effectorItem.hp -= 1;
+				if (effectorItem.hp <= 0) {
+					deleteFromInventory(currentInventoryIndex);
+				}
+			}
 
 			if (player.hp.current <= 0) {
 				let playerDevolve = _interactables[player?.emoji || '']?.devolve;
@@ -739,11 +759,8 @@
 					player.hp.max = _interactables[playerDevolve.to]?.hp || 1;
 					player.hp.current = player.hp.max;
 					progress.set(calcPlayerHpPercentage());
-					deleteFromInventory(currentInventoryIndex);
 					return;
 				}
-
-				deleteFromInventory(currentInventoryIndex);
 
 				for (let [id, item] of items) {
 					if (item instanceof Effector || !item || !item.hp || !item.inventory)
@@ -778,8 +795,6 @@
 			}
 
 			progress.set(calcPlayerHpPercentage());
-
-			deleteFromInventory(currentInventoryIndex);
 			return;
 		}
 
@@ -939,9 +954,13 @@
 							? 'border-purple-500 bg-purple-50'
 							: 'border-black bg-base-300'} p-2 2xl:h-12 2xl:w-12"
 					>
-						{#if item && item.hp !== "Infinite"}
+						{#if item && item.hp !== 'Infinite'}
 							<i class="twa twa-{item.emoji || ''}" />
-							<div class="{isEffector ? "" : "hidden"} absolute -top-0.5 right-0.5 text-sm">
+							<div
+								class="{isEffector
+									? ''
+									: 'hidden'} absolute -top-0.5 right-0.5 text-sm"
+							>
 								{item.hp > 1 ? item.hp : ''}
 							</div>
 						{/if}
@@ -950,9 +969,10 @@
 						<div
 							class="absolute {SIZE == DEFAULT_SIDE_LENGTH
 								? 'bottom-4'
-								: '-bottom-8'}"
+								: '-bottom-12'}"
 						>
-							Press F to apply <i class="twa twa-{item.emoji}" /> on self.
+							<kbd class="kbd">F</kbd> to apply
+							<i class="twa twa-{item.emoji}" /> on self.
 						</div>
 					{/if}
 				{/each}

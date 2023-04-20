@@ -24,8 +24,6 @@
 		showLoading,
 		controllables,
 	} from '../../store';
-
-	import { emojis } from './emojis';
 	import {
 		CROSS,
 		DEFAULT_BG,

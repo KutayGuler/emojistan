@@ -315,51 +315,6 @@
 	</div>
 </div>
 <main class="flex w-full flex-col items-center justify-center gap-4 pt-16">
-	<div class="flex w-full flex-col items-center justify-center p-4">
-		<div class="divider w-full">DROPS</div>
-		<div class="relative flex flex-col items-center justify-center">
-			<div class="dropdown-right dropdown cursor-pointer">
-				<label tabindex="0" class="slot-lg m-1"
-					><i
-						class="twa twa-{$effectors.get(drops[0])?.emoji ||
-							$effectors.get(drops[0])?.emoji}"
-					/></label
-				>
-				<ul
-					tabindex="0"
-					class="dropdown-content menu rounded-box w-fit bg-base-100 p-2 shadow"
-				>
-					{#each droppables as [id, { emoji }]}
-						<button
-							class="w-fit rounded-md p-1 hover:bg-base-200"
-							on:click={() => {
-								drops[0] = id;
-								updateStore();
-							}}
-						>
-							<i class="twa twa-{emoji}" />
-						</button>
-					{:else}
-						<div class="rounded-md p-1">No effectors defined.</div>
-					{/each}
-				</ul>
-			</div>
-			<div class="absolute -bottom-4">
-				<select
-					class="select-bordered select select-sm text-xl"
-					title="HP"
-					bind:value={drops[1]}
-					on:change={() => {
-						updateStore();
-					}}
-				>
-					{#each [0, ...hps] as _hp}
-						<option value={_hp}>{_hp}</option>
-					{/each}
-				</select>
-			</div>
-		</div>
-	</div>
 	<div class="form-control flex w-full flex-col p-4">
 		<div class="divider flex flex-row pb-6">
 			<p>SIDE EFFECTS ({sideEffects.length} / {MAX_SIDE_EFFECT})</p>
@@ -453,6 +408,51 @@
 						</select>
 					</div>
 				{/each}
+			</div>
+		</div>
+	</div>
+	<div class="flex w-full flex-col items-center justify-center p-4">
+		<div class="divider w-full">DROPS</div>
+		<div class="relative flex flex-col items-center justify-center">
+			<div class="dropdown-right dropdown cursor-pointer">
+				<label tabindex="0" class="slot-lg m-1"
+					><i
+						class="twa twa-{$effectors.get(drops[0])?.emoji ||
+							$effectors.get(drops[0])?.emoji}"
+					/></label
+				>
+				<ul
+					tabindex="0"
+					class="dropdown-content menu rounded-box w-fit bg-base-100 p-2 shadow"
+				>
+					{#each droppables as [id, { emoji }]}
+						<button
+							class="w-fit rounded-md p-1 hover:bg-base-200"
+							on:click={() => {
+								drops[0] = id;
+								updateStore();
+							}}
+						>
+							<i class="twa twa-{emoji}" />
+						</button>
+					{:else}
+						<div class="rounded-md p-1">No effectors defined.</div>
+					{/each}
+				</ul>
+			</div>
+			<div class="absolute -bottom-4">
+				<select
+					class="select-bordered select select-sm text-xl"
+					title="HP"
+					bind:value={drops[1]}
+					on:change={() => {
+						updateStore();
+					}}
+				>
+					{#each [0, ...hps] as _hp}
+						<option value={_hp}>{_hp}</option>
+					{/each}
+				</select>
 			</div>
 		</div>
 	</div>

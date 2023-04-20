@@ -65,8 +65,8 @@
 						['0_15', 'baby-bottle'],
 					])
 				),
-				effectors: new Map<number, Effector>([
-					[-1, { emoji: 'baby-bottle', hp: 1, mutateConsumerTo: '' }],
+				effectors: new Map<StringedNumber, Effector>([
+					['-1', { emoji: 'baby-bottle', hp: 1 }],
 				]),
 				// @ts-expect-error
 				interactables: new Map<number, TInteractable>([
@@ -111,8 +111,8 @@
 						['0_15', 'test-tube'],
 					])
 				),
-				effectors: new Map<number, Effector>([
-					[-2, { emoji: 'test-tube', hp: -1, mutateConsumerTo: '' }],
+				effectors: new Map<StringedNumber, Effector>([
+					['-2', { emoji: 'test-tube', hp: 1 }],
 				]),
 				// @ts-expect-error
 				interactables: new Map<number, TInteractable>([
@@ -160,7 +160,7 @@
 					])
 				),
 				effectors: new Map<StringedNumber, Effector>([
-					["69", new Effector('key', 1)],
+					['69', new Effector('key', 1)],
 				]),
 				// @ts-expect-error
 				interactables: new Map<number, TInteractable>([
@@ -173,7 +173,7 @@
 							[['any', 0]],
 							new Evolve('', 2),
 							new Devolve(''),
-							["", 0]
+							['', 0]
 						),
 					],
 				]),
@@ -208,7 +208,7 @@
 					])
 				),
 				effectors: new Map<StringedNumber, Effector>([
-					["69", new Effector('key', 1)],
+					['69', new Effector('key', 1)],
 				]),
 				// @ts-expect-error
 				interactables: new Map<number, TInteractable>([
@@ -220,7 +220,7 @@
 							1,
 							[
 								['any', 0],
-								["69", -1],
+								['69', -1],
 							],
 							new Evolve('', 2),
 							new Devolve(''),

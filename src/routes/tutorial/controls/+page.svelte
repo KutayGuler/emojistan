@@ -106,7 +106,7 @@
 			</div>
 		</div>
 		<div class="flex flex-col items-center justify-center">
-			<p>Consume Item</p>
+			<p>Apply On Self</p>
 			<div class="flex w-full justify-center">
 				<kbd class="kbd">F</kbd>
 			</div>
