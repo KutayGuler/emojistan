@@ -26,8 +26,8 @@
 			<slot name="description">
 				<p class="h-32 pt-2">
 					{@html description}
-				</p></slot
-			>
+				</p>
+			</slot>
 		</div>
 		<div
 			style="width: {rbx.width}px; height: {rbx.height}px;"
