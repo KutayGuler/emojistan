@@ -8,6 +8,7 @@
 	} from '$src/store';
 	import { Effector } from '$src/types';
 	import { onDestroy, onMount } from 'svelte';
+	import { hasDuplicateIn, hasDuplicate } from './utils';
 
 	export let id: StringedNumber;
 	export let emoji = '';
@@ -38,25 +39,8 @@
 	}
 
 	function updateEmoji() {
-		for (let [_id, val] of $effectors.entries()) {
-			if (_id === id) continue;
-
-			if ($formattedEmoji === val.emoji) {
-				notifications.warning('Cannot have two effectors with same emoji');
-				return;
-			}
-		}
-
-		for (let val of [...$interactables.values()]) {
-			if (
-				(typeof val === 'string' && val != '' && $formattedEmoji === val) ||
-				(typeof val === 'object' && $formattedEmoji === val.emoji)
-			) {
-				notifications.warning(
-					'An emoji can only have one assigned type. Interactable, Effector or Equippable'
-				);
-				return;
-			}
+		if (hasDuplicateIn<Effector>(id, effectors, 'effector') || hasDuplicate()) {
+			return;
 		}
 
 		emoji = $formattedEmoji;

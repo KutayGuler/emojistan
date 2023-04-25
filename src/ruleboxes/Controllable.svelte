@@ -14,7 +14,7 @@
 		effectors,
 		type StringedNumber,
 	} from '../store';
-	import { checkDuplicate, checkDuplicateFor } from './utils';
+	import { hasDuplicate, hasDuplicateIn } from './utils';
 
 	let indexes: Array<number> = [];
 	let hps: Array<number> = [];
@@ -111,32 +111,12 @@
 			return;
 		}
 
-		// TODO: test this
-		// for (let [_id, val] of $controllables.entries()) {
-		// 	if (_id === id) continue;
-
-		// 	if ($formattedEmoji === val.emoji) {
-		// 		notifications.warning('Cannot have two controllables with same emoji');
-		// 		return;
-		// 	}
-		// }
-
-		checkDuplicateFor<Controllable>(id, controllables, 'controllable');
-
-		for (let val of [...$effectors.values()]) {
-			if (
-				(typeof val === 'string' && val != '' && $formattedEmoji === val) ||
-				(typeof val === 'object' && $formattedEmoji === val.emoji)
-			) {
-				notifications.warning(
-					'An emoji can only have one assigned type. Controllable, Interactable or Effector'
-				);
-				return;
-			}
+		if (
+			hasDuplicateIn<Controllable>(id, controllables, 'controllable') ||
+			hasDuplicate()
+		) {
+			return;
 		}
-
-		// TODO: test this
-		checkDuplicate();
 
 		emoji = $formattedEmoji;
 		updateStore();

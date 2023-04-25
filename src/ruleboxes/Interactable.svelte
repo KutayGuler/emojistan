@@ -26,6 +26,7 @@
 		effectors,
 		type StringedNumber,
 	} from '../store';
+	import { hasDuplicateIn, hasDuplicate } from './utils';
 
 	let defaultBackground = $map.dbg;
 
@@ -75,7 +76,7 @@
 	export let pseudoSideEffects: Array<[StringedNumber | 'any', number]> = [];
 	export let evolve = new Evolve('', 2);
 	export let devolve = new Devolve('');
-	export let drops: Drops = ['', 1];
+	export let drops: Drops = ['-1', 1];
 
 	// SEQUENCE RELATED
 	let type = types.Map[0];
@@ -172,25 +173,11 @@
 			return;
 		}
 
-		for (let [_id, val] of $interactables.entries()) {
-			if (_id === id) continue;
-
-			if ($formattedEmoji === val.emoji) {
-				notifications.warning('Cannot have two interactables with same emoji');
-				return;
-			}
-		}
-
-		for (let val of [...$effectors.values()]) {
-			if (
-				(typeof val === 'string' && val != '' && $formattedEmoji === val) ||
-				(typeof val === 'object' && $formattedEmoji === val.emoji)
-			) {
-				notifications.warning(
-					'An emoji can only have one assigned type. Interactable, Controllable or Effector'
-				);
-				return;
-			}
+		if (
+			hasDuplicateIn<Interactable>(id, interactables, 'interactable') ||
+			hasDuplicate()
+		) {
+			return;
 		}
 
 		emoji = $formattedEmoji;
@@ -209,7 +196,7 @@
 
 	// this function deals with two-way binded variable
 	function updateHP() {
-		if (evolve.enabled && hp >= evolve.at) {
+		if (hp >= evolve.at) {
 			notifications.warning(
 				'Default HP cannot be bigger than or equal to evolve HP'
 			);
@@ -251,8 +238,6 @@
 			evolve.at = hp + 1;
 		}
 	}
-
-	// TODO: main health cannot be higher than evolve's hp
 
 	let hasInteraction = true;
 	$: hasInteraction = sideEffects.some((m) => m[1] != 0);
@@ -319,12 +304,14 @@
 		<div class="divider flex flex-row pb-6">
 			<p>SIDE EFFECTS ({sideEffects.length} / {MAX_SIDE_EFFECT})</p>
 			<div class="dropdown-right dropdown">
+				<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
 				<label
 					for=""
 					tabindex="0"
 					class="btn text-2xl"
 					style:background={EFFECTOR_BORDER}>+</label
 				>
+				<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
 				<ul
 					tabindex="0"
 					class="dropdown-content menu rounded-box bg-base-100 p-2 shadow "
@@ -415,12 +402,15 @@
 		<div class="divider w-full">DROPS</div>
 		<div class="relative flex flex-col items-center justify-center">
 			<div class="dropdown-right dropdown cursor-pointer">
+				<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
+				<!-- svelte-ignore a11y-label-has-associated-control -->
 				<label tabindex="0" class="slot-lg m-1"
 					><i
 						class="twa twa-{$effectors.get(drops[0])?.emoji ||
 							$effectors.get(drops[0])?.emoji}"
 					/></label
 				>
+				<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
 				<ul
 					tabindex="0"
 					class="dropdown-content menu rounded-box w-fit bg-base-100 p-2 shadow"

@@ -205,7 +205,7 @@
 		</ul>
 	</div> -->
 	<div
-		class="aside mt-16 flex h-[806px] w-96 flex-col gap-2 overflow-y-auto bg-neutral shadow-xl"
+		class="aside mt-16 flex w-96 flex-col gap-2 overflow-y-auto bg-neutral shadow-xl"
 	>
 		{#if showSaves}
 			<div class="flex flex-row gap-2">
@@ -270,7 +270,7 @@
 							/>
 						</form>
 					{:else}
-						<h4>{name}</h4>
+						<h3>{name}</h3>
 						{#if !renameIndex}
 							<button
 								on:click={() => {

@@ -91,7 +91,7 @@
 </script>
 
 <div class="self-start p-4">
-	<h1 class="text-4xl">Ruleboxes</h1>
+	<h1>Ruleboxes</h1>
 	<p class="w-1/2 pt-2">
 		Ruleboxes are the fundamental elements that build the game logic. In the
 		following tutorials, you will learn about each of those Ruleboxes.

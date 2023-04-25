@@ -2,9 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
-/* TODO: responsive header tags */
-
 @layer components {
+	h1 {
+		@apply text-4xl md:text-2xl;
+	}
+
+	h2 {
+		@apply text-3xl md:text-xl;
+	}
+
+	h3 {
+		@apply text-2xl md:text-lg;
+	}
+
 	.btn {
 		border: none;
 	}

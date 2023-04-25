@@ -409,7 +409,9 @@
 			<div
 				class="relative flex h-full w-full flex-col items-center justify-center"
 			>
-				<div class="absolute bottom-8 left-8 flex flex-row items-center">
+				<div
+					class="absolute bottom-8 left-8 flex flex-row items-center md:bottom-4 md:left-4"
+				>
 					<kbd class="kbd kbd-sm mr-2 2xl:kbd-md">Esc</kbd>
 					<p class="2xl:text-md text-sm">untoggle emoji / color</p>
 				</div>

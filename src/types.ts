@@ -194,7 +194,7 @@ export class Devolve {
 	}
 }
 
-export type Drops = [id: StringedNumber | '', amount: number];
+export type Drops = [id: StringedNumber, amount: number];
 export type _Drops = [id: string, amount: number];
 
 export interface Interactable {

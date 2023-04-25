@@ -113,7 +113,7 @@
 		: 'h-[624px] w-[624px] 2xl:h-[720px] 2xl:w-[720px]'} w-full overflow-y-auto overflow-x-hidden  backdrop-blur"
 	transition:scale|local
 >
-	<h1 class="p-4 text-2xl"><i class="twa twa-{character}" /></h1>
+	<h1 class="p-4"><i class="twa twa-{character}" /></h1>
 	{#if texts}
 		<ul class="flex w-full flex-col gap-2">
 			{#each texts as text, i}
@@ -141,7 +141,7 @@
 				<button
 					data-text={choice.text}
 					data-next={choice.next}
-					class="btn btn-secondary flex-grow"
+					class="btn-secondary btn flex-grow"
 					type="submit"
 					in:scale={{ delay: i * 100 }}
 				>

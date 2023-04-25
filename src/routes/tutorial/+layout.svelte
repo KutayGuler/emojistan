@@ -98,7 +98,7 @@
 
 <div class="modal" id="tutorial-complete">
 	<div class="modal-box">
-		<h3 class="text-lg font-bold">Congratulations!</h3>
+		<h3 class="font-bold">Congratulations!</h3>
 		<p class="py-4">
 			You have completed the tutorial! Now it's time to create your own games!
 		</p>

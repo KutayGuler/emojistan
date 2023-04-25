@@ -19,8 +19,8 @@
 		<div class="w-full self-start p-4">
 			{#if header}
 				<span class="flex-inline flex items-center">
-					<h1 class="text-4xl">{header}</h1>
-					<h3 class="pl-2 text-xl">{subheader}</h3>
+					<h1>{header}</h1>
+					<h3 class="pl-2">{subheader}</h3>
 				</span>
 			{/if}
 			<slot name="description">

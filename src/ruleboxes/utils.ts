@@ -5,7 +5,7 @@ import type { Controllable, Effector, Interactable } from '$src/types';
 import { controllables, effectors, interactables } from '$src/store';
 import type { RuleboxType } from '$src/lib';
 
-export function checkDuplicateFor<
+export function hasDuplicateIn<
 	R extends Controllable | Effector | Interactable
 >(
 	id: StringedNumber,
@@ -19,12 +19,14 @@ export function checkDuplicateFor<
 			notifications.warning(
 				`Cannot have two ${storeName}s with the same emoji.`
 			);
-			return;
+			return true;
 		}
 	}
+
+	return false;
 }
 
-export function checkDuplicate() {
+export function hasDuplicate() {
 	for (let val of [
 		...get(controllables).values(),
 		...get(effectors).values(),
@@ -37,7 +39,9 @@ export function checkDuplicate() {
 			notifications.warning(
 				'An emoji can only have one assigned type. Controllable, Interactable or Effector.'
 			);
-			return;
+			return true;
 		}
 	}
+
+	return false;
 }
