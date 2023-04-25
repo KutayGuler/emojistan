@@ -14,6 +14,7 @@
 		effectors,
 		type StringedNumber,
 	} from '../store';
+	import { checkDuplicate, checkDuplicateFor } from './utils';
 
 	let indexes: Array<number> = [];
 	let hps: Array<number> = [];
@@ -110,17 +111,18 @@
 			return;
 		}
 
-		// TODO: global checker also for this
-		for (let [_id, val] of $controllables.entries()) {
-			if (_id === id) continue;
+		// TODO: test this
+		// for (let [_id, val] of $controllables.entries()) {
+		// 	if (_id === id) continue;
 
-			if ($formattedEmoji === val.emoji) {
-				notifications.warning('Cannot have two controllables with same emoji');
-				return;
-			}
-		}
+		// 	if ($formattedEmoji === val.emoji) {
+		// 		notifications.warning('Cannot have two controllables with same emoji');
+		// 		return;
+		// 	}
+		// }
 
-		// TODO: need a global checker for this
+		checkDuplicateFor<Controllable>(id, controllables, 'controllable');
+
 		for (let val of [...$effectors.values()]) {
 			if (
 				(typeof val === 'string' && val != '' && $formattedEmoji === val) ||
@@ -132,6 +134,9 @@
 				return;
 			}
 		}
+
+		// TODO: test this
+		checkDuplicate();
 
 		emoji = $formattedEmoji;
 		updateStore();

@@ -84,11 +84,15 @@ export interface _Interactables {
 	[key: string]: _Interactable;
 }
 
+interface _SideEffects {
+	[emoji: string]: number | 'Infinite';
+}
+
 export interface _Controllable {
 	id: string;
 	emoji: string;
 	hp: number;
-	sideEffects: Array<[string, number]>;
+	sideEffects: _SideEffects;
 	evolve: Evolve;
 	devolve: Devolve;
 }

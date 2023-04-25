@@ -65,6 +65,47 @@
 	let _controllables: _Controllables = {};
 	let _effectors: _Effectors = {};
 
+	for (let [id, controllable] of controllables) {
+		const { emoji, sideEffects, ...args } = structuredClone(controllable);
+		if (emoji === '') continue;
+		_controllables[emoji] = {} as _Controllable;
+		Object.assign(_controllables[emoji], args);
+		_controllables[emoji].id = id;
+		_controllables[emoji].sideEffects = {};
+
+		for (let [id, effect] of sideEffects) {
+			let effector = structuredClone(effectors.get(id));
+			if (!effector) continue;
+			_controllables[emoji].sideEffects[effector.emoji] = effector.hp;
+		}
+	}
+
+	for (let [id, effector] of effectors) {
+		const { emoji, ...args } = effector;
+		if (emoji === '') continue;
+		_effectors[emoji] = {} as Effector;
+		Object.assign(_effectors[emoji], args);
+	}
+
+	for (let [id, interactable] of interactables) {
+		const { emoji, ...args } = structuredClone(interactable);
+		if (emoji === '') continue;
+		_interactables[emoji] = {} as _Interactable;
+		Object.assign(_interactables[emoji], args);
+		_interactables[emoji].id = id;
+		const sideEffects = _interactables[emoji].sideEffects;
+		for (let [id, effect] of sideEffects) {
+			sideEffects[0][0] = structuredClone(effectors.get(id)?.emoji) || 'any';
+		}
+
+		const dropsID = _interactables[emoji].drops[0];
+		if (dropsID) {
+			_interactables[emoji].drops[0] = effectors.get(dropsID)?.emoji || '';
+		}
+	}
+
+	console.log(_interactables);
+
 	/* ## DIALOGUE ## */
 	let character = '';
 	let dialogueID = '';
@@ -244,46 +285,6 @@
 		}
 	}
 
-	for (let [id, controllable] of controllables) {
-		const { emoji, ...args } = controllable;
-		if (emoji === '') continue;
-		_controllables[emoji] = {} as _Controllable;
-		Object.assign(_controllables[emoji], args);
-		_controllables[emoji].id = id;
-	}
-
-	for (let [id, effector] of effectors) {
-		const { emoji, ...args } = effector;
-		if (emoji === '') continue;
-		_effectors[emoji] = {} as Effector;
-		Object.assign(_effectors[emoji], args);
-	}
-
-	for (let [id, interactable] of interactables) {
-		const { emoji, ...args } = structuredClone(interactable);
-		if (emoji === '') continue;
-		_interactables[emoji] = {} as _Interactable;
-		Object.assign(_interactables[emoji], args);
-		_interactables[emoji].id = id;
-		const dropsID = _interactables[emoji].drops[0];
-		const sideEffects = _interactables[emoji].sideEffects;
-
-		console.log(sideEffects);
-		for (let [id, effect] of sideEffects) {
-			console.log(id, effect);
-
-			sideEffects[0][0] = structuredClone(effectors.get(id)?.emoji) || 'any';
-		}
-
-		console.log(sideEffects);
-
-		if (dropsID) {
-			_interactables[emoji].drops[0] = effectors.get(dropsID)?.emoji || '';
-		}
-	}
-
-	console.log(_interactables);
-
 	function coordinateToPosObj(num: number) {
 		return { x: num % SIZE, y: Math.floor(num / SIZE) };
 	}
@@ -370,6 +371,7 @@
 	initEntities();
 
 	interface ControllableEntity extends Entity {
+		emoji: string;
 		inventory: Inventory;
 		hp: HP;
 	}
@@ -728,21 +730,12 @@
 
 		if (e.code === 'KeyF') {
 			let effectorItem = player.inventory.get(currentInventoryIndex);
-			console.log(effectorItem, effectorItem instanceof Effector);
-
 			if (!(effectorItem instanceof Effector)) return;
 
-			// IMPROVEMENT: might key side effects by emojis, that would
-			// get rid of the need for using array.find function
-			// TODO: turn StringedNumber id's of sideEffects into keyed emojis;
-			const sideEffects = _controllables[player.emoji].sideEffects;
-			console.log(sideEffects);
-
-			const sideEffect = sideEffects.find(
-				([emoji, effect]) => emoji === effectorItem?.emoji
-			) || ['', 0];
-			if (sideEffect[1] === 0) return;
-			player.hp.add(sideEffect[1]);
+			const sideEffect =
+				_controllables[player.emoji].sideEffects[effectorItem.emoji];
+			if (sideEffect === 0 || sideEffect === 'Infinite') return;
+			player.hp.add(sideEffect);
 
 			if (effectorItem.hp !== 'Infinite') {
 				effectorItem.hp -= 1;
@@ -765,11 +758,7 @@
 				for (let [id, item] of items) {
 					if (item instanceof Effector || !item || !item.hp || !item.inventory)
 						continue;
-					if (
-						item.hp.current > 0 &&
-						// !_equippables[item.emoji] && // TODO: should I just remove this?
-						_controllables[item.emoji]
-					) {
+					if (item.hp.current > 0 && _controllables[item.emoji]) {
 						player = items.get(id) as ControllableEntity;
 						ac = +id.split('_')[1];
 						progress = tweened(calcPlayerHpPercentage(), {
