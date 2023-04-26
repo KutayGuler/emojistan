@@ -69,12 +69,16 @@ export interface _Effectors {
 	[key: string]: Effector;
 }
 
+interface _InteractableSideEffects {
+	[emoji: string]: number | 'talk';
+}
+
 export interface _Interactable {
 	id: string;
 	sequence: Array<SequenceItem>;
 	points: number;
 	hp: number;
-	sideEffects: Array<[string, number | 'talk']>;
+	sideEffects: _InteractableSideEffects;
 	evolve: Evolve;
 	devolve: Devolve;
 	drops: _Drops;
@@ -84,7 +88,7 @@ export interface _Interactables {
 	[key: string]: _Interactable;
 }
 
-interface _SideEffects {
+interface _ControllableSideEffects {
 	[emoji: string]: number | 'Infinite';
 }
 
@@ -92,7 +96,7 @@ export interface _Controllable {
 	id: string;
 	emoji: string;
 	hp: number;
-	sideEffects: _SideEffects;
+	sideEffects: _ControllableSideEffects;
 	evolve: Evolve;
 	devolve: Devolve;
 }

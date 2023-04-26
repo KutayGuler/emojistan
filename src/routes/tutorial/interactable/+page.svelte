@@ -79,7 +79,7 @@
 							[['any', 'talk']],
 							new Evolve('man-walking', 5),
 							new Devolve(''),
-							['', 0]
+							['-1', 0]
 						),
 					],
 				]),

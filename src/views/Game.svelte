@@ -65,8 +65,8 @@
 	let _controllables: _Controllables = {};
 	let _effectors: _Effectors = {};
 
-	for (let [id, controllable] of controllables) {
-		const { emoji, sideEffects, ...args } = structuredClone(controllable);
+	for (let [id, controllable] of structuredClone(controllables)) {
+		const { emoji, sideEffects, ...args } = controllable;
 		if (emoji === '') continue;
 		_controllables[emoji] = {} as _Controllable;
 		Object.assign(_controllables[emoji], args);
@@ -76,9 +76,11 @@
 		for (let [id, effect] of sideEffects) {
 			let effector = structuredClone(effectors.get(id));
 			if (!effector) continue;
-			_controllables[emoji].sideEffects[effector.emoji] = effector.hp;
+			_controllables[emoji].sideEffects[effector.emoji] = effect;
 		}
 	}
+
+	console.log(_controllables);
 
 	for (let [id, effector] of effectors) {
 		const { emoji, ...args } = effector;
@@ -87,15 +89,18 @@
 		Object.assign(_effectors[emoji], args);
 	}
 
-	for (let [id, interactable] of interactables) {
-		const { emoji, ...args } = structuredClone(interactable);
+	for (let [id, interactable] of structuredClone(interactables)) {
+		const { emoji, sideEffects, ...args } = interactable;
 		if (emoji === '') continue;
 		_interactables[emoji] = {} as _Interactable;
 		Object.assign(_interactables[emoji], args);
 		_interactables[emoji].id = id;
-		const sideEffects = _interactables[emoji].sideEffects;
+		_interactables[emoji].sideEffects = {};
+
 		for (let [id, effect] of sideEffects) {
-			sideEffects[0][0] = structuredClone(effectors.get(id)?.emoji) || 'any';
+			let effector = structuredClone(effectors.get(id));
+			if (!effector) continue;
+			_interactables[emoji].sideEffects[effector.emoji] = effect;
 		}
 
 		const dropsID = _interactables[emoji].drops[0];
@@ -551,7 +556,7 @@
 	}
 
 	async function handle(e: KeyboardEvent) {
-		e.preventDefault();
+		// e.preventDefault();
 		handDirection = '';
 		if (
 			!items.has(currentSection + '_' + ac) ||
@@ -609,6 +614,7 @@
 
 		if (e.code === 'Space' && !chatting) {
 			// required so that items are not overflowing from the map
+
 			const operation = calcOperation(wasdToArrow[directionKey], ac);
 			if (operation === 0) {
 				return;
@@ -635,21 +641,25 @@
 			let _interactable: _Interactable = _interactables[interactedItem.emoji];
 
 			if (!_interactable) return;
-			let { id, sideEffects, evolve, devolve } = _interactable;
-			let sideEffect =
-				sideEffects.find(
-					([emoji, effect]) => emoji === interactedItem?.emoji
-				) || sideEffects[0];
 
-			if (sideEffect[1] === 'talk') {
+			let effectorItem =
+				player.inventory?.get(currentInventoryIndex)?.emoji || 'any';
+
+			let { id, evolve, sideEffects, devolve } = _interactable;
+			console.log();
+			
+			const sideEffect = sideEffects[effectorItem];
+			if (sideEffect === 0) return;
+
+			if (sideEffect === 'talk') {
 				dialogueID = id.toString();
 				character = interactedItem.emoji;
 				chatting = true;
 				return;
 			}
 
-			if (sideEffect[1] === 0) return;
-			interactedItem.hp.current += sideEffect[1];
+			if (sideEffect === 0) return;
+			interactedItem.hp.current += sideEffect;
 
 			handDirection = getHandDirection(operation);
 			let timeout = setTimeout(() => {
@@ -658,22 +668,16 @@
 			}, 50);
 
 			let equippedItem = player?.inventory.get(currentInventoryIndex) || 'any';
-			const isEffector = equippedItem instanceof Effector;
 
-			if (
-				isEffector &&
-				sideEffect[0] === (equippedItem as Effector).emoji &&
-				(equippedItem as Effector).hp !== 'Infinite'
-			) {
-				// @ts-expect-error
-				(equippedItem as Effector).hp -= 1;
+			if (equippedItem instanceof Effector && equippedItem.hp !== 'Infinite') {
+				equippedItem.hp -= 1;
 			}
 
 			// if it's not "ANY"
 			if (
 				typeof equippedItem !== 'string' &&
-				isEffector &&
-				(equippedItem as Effector).hp === 0
+				equippedItem instanceof Effector &&
+				equippedItem.hp === 0
 			) {
 				deleteFromInventory(currentInventoryIndex);
 			}
@@ -688,20 +692,6 @@
 			// 		}
 			// 	}
 			// }
-
-			let playerEvolve = _interactables[player?.emoji || '']?.evolve;
-			let playerDevolve = _interactables[player?.emoji || '']?.devolve;
-
-			// EVOLVE & DEVOLVE PLAYER
-			if (player && player?.hp.current <= 0) {
-				if (playerDevolve?.to) {
-					player.emoji = playerDevolve.to;
-				} else {
-					items.delete(currentSection + '_' + ac);
-				}
-			} else if (playerEvolve?.to && playerEvolve?.at === player?.hp.current) {
-				player.emoji = playerEvolve.to;
-			}
 
 			// EVOLVE & DEVOLVE INTERACTED ITEM
 			if (interactedItem.hp.current <= 0) {
@@ -734,7 +724,8 @@
 
 			const sideEffect =
 				_controllables[player.emoji].sideEffects[effectorItem.emoji];
-			if (sideEffect === 0 || sideEffect === 'Infinite') return;
+			if (!sideEffect || sideEffect === 0 || sideEffect === 'Infinite') return;
+
 			player.hp.add(sideEffect);
 
 			if (effectorItem.hp !== 'Infinite') {
@@ -745,11 +736,11 @@
 			}
 
 			if (player.hp.current <= 0) {
-				let playerDevolve = _interactables[player?.emoji || '']?.devolve;
+				let playerDevolve = _controllables[player?.emoji || '']?.devolve;
 
 				if (playerDevolve.to !== '') {
 					player.emoji = playerDevolve.to;
-					player.hp.max = _interactables[playerDevolve.to]?.hp || 1;
+					player.hp.max = _controllables[playerDevolve.to]?.hp || 1;
 					player.hp.current = player.hp.max;
 					progress.set(calcPlayerHpPercentage());
 					return;
@@ -775,11 +766,11 @@
 				return;
 			}
 
-			let playerEvolve = _interactables[player?.emoji || '']?.evolve;
+			let playerEvolve = _controllables[player?.emoji || '']?.evolve;
 
 			if (playerEvolve?.to !== '' && player.hp.current === playerEvolve?.at) {
 				player.emoji = playerEvolve.to;
-				player.hp.max = _interactables[playerEvolve.to]?.hp || 1;
+				player.hp.max = _controllables[playerEvolve.to]?.hp || 1;
 				player.hp.current = player.hp.max;
 			}
 

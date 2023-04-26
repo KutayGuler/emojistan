@@ -34,4 +34,5 @@ export interface TutorialProps<T extends SvelteComponent> {
 	props: ComponentProps<T>;
 	gameProps: GameProps;
 	veilHeight?: number;
+	veilColor?: string;
 }

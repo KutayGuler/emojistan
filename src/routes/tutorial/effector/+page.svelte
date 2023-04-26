@@ -5,6 +5,7 @@
 		Controllable,
 		Devolve,
 		Evolve,
+		Interactable,
 	} from '$src/types';
 	import {
 		EFFECTOR_BG,
@@ -33,7 +34,7 @@
 				borderColor: EFFECTOR_BORDER,
 			},
 			props: {
-				id: '-1',
+				id: '0',
 				emoji: 'test-tube',
 			},
 			gameProps: {
@@ -45,21 +46,18 @@
 				),
 				controllables: new Map<StringedNumber, Controllable>([
 					[
-						'0',
+						'1',
 						new Controllable(
 							'woman-walking',
 							1,
-							[
-								['any', 0],
-								['-1', -1],
-							],
+							[['0', -1]],
 							new Evolve('', 0),
 							new Devolve('skull')
 						),
 					],
 				]),
 				effectors: new Map<StringedNumber, TEffector>([
-					['-1', { emoji: 'test-tube', hp: 1 }],
+					['0', { emoji: 'test-tube', hp: 1 }],
 				]),
 				mapClass: 'simulation',
 				SIZE: 4,
@@ -67,10 +65,10 @@
 		},
 		{
 			description:
-				'Just like in real life, the effect of the Effector depends on the entity Effector has been applied on.',
+				'Just like in real life, the effect of the Effector depends on who used it.',
 			component: Effector,
 			rbx: {
-				id: '0',
+				id: '2',
 				type: 'effector',
 				position: { x: 0, y: 0 },
 				width: EFFECTOR_W,
@@ -79,7 +77,7 @@
 				borderColor: EFFECTOR_BORDER,
 			},
 			props: {
-				id: '-2',
+				id: '2',
 				emoji: 'test-tube',
 			},
 			gameProps: {
@@ -91,17 +89,17 @@
 				),
 				controllables: new Map<StringedNumber, Controllable>([
 					[
-						'0',
+						'1',
 						new Controllable(
 							'monkey',
 							1,
-							[['any', 0]],
-							new Evolve('pig', 0),
+							[['2', 1]],
+							new Evolve('pig', 2),
 							new Devolve('')
 						),
 					],
 					[
-						'1',
+						'3',
 						new Controllable(
 							'pig',
 							1,
@@ -112,7 +110,68 @@
 					],
 				]),
 				effectors: new Map<StringedNumber, TEffector>([
-					['-2', { emoji: 'test-tube', hp: 1 }],
+					['2', { emoji: 'test-tube', hp: 1 }],
+				]),
+				mapClass: 'simulation',
+				SIZE: 4,
+			},
+		},
+		{
+			description:
+				'Effectors can also be used on the entities other than the player.',
+			component: Effector,
+			rbx: {
+				id: '2',
+				type: 'effector',
+				position: { x: 0, y: 0 },
+				width: EFFECTOR_W,
+				height: EFFECTOR_H,
+				bgColor: EFFECTOR_BG,
+				borderColor: EFFECTOR_BORDER,
+			},
+			props: {
+				id: '2',
+				emoji: 'axe',
+			},
+			gameProps: {
+				map: new EditableMap(
+					new Map<string, string>([
+						['0_5', 'woman-walking'],
+						['0_6', 'axe'],
+						['0_11', 'evergreen-tree'],
+						['0_14', 'evergreen-tree'],
+						['0_15', 'evergreen-tree'],
+					])
+				),
+				controllables: new Map<StringedNumber, Controllable>([
+					[
+						'1',
+						new Controllable(
+							'woman-walking',
+							1,
+							[],
+							new Evolve('', 0),
+							new Devolve('')
+						),
+					],
+				]),
+				interactables: new Map<StringedNumber, Interactable>([
+					[
+						'-1',
+						new Interactable(
+							'evergreen-tree',
+							[],
+							3,
+							[['2', -1]],
+							new Evolve('', 0),
+							new Devolve(''),
+							['3', 2]
+						),
+					],
+				]),
+				effectors: new Map<StringedNumber, TEffector>([
+					['2', { emoji: 'axe', hp: 9 }],
+					['3', { emoji: 'wood', hp: 1 }],
 				]),
 				mapClass: 'simulation',
 				SIZE: 4,
@@ -123,8 +182,6 @@
 	let index = 0;
 	let props = tutorialProps[index];
 	$: props = tutorialProps[index];
-
-	// TODO: make two tutorials, one for consumption, one for using an item on another entity
 </script>
 
 <Tutorial {...props} --header={EFFECTOR_BORDER} />

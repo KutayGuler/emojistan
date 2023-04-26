@@ -41,7 +41,7 @@
 		controllable: {
 			link: 'controllable',
 			color: CONTROLLABLE_BORDER,
-			next: 'interactable',
+			next: '',
 		},
 		interactable: {
 			link: 'interactable',

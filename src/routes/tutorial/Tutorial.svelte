@@ -10,6 +10,7 @@
 	export let props: any;
 	export let gameProps: any;
 	export let veilHeight = 0;
+	export let veilColor = 'bg-indigo-50';
 </script>
 
 <div
@@ -38,7 +39,7 @@
 			{/key}
 			<div
 				style:height={veilHeight + 'px'}
-				class="absolute bottom-0 z-10 w-full bg-indigo-50"
+				class="absolute bottom-0 z-10 w-full {veilColor}"
 			/>
 		</div>
 	</div>
