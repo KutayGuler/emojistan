@@ -34,7 +34,7 @@
 
 <style>
 	main {
-		background-image: url('emojis.png');
+		background-image: url('/images/emojis.png');
 		background-size: cover;
 	}
 
