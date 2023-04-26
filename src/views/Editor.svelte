@@ -1,58 +1,95 @@
 <script lang="ts">
-  import { DEFAULT_SIDE_LENGTH } from "$src/constants";
-  import { currentEmoji, currentColor, map } from "../store";
+	import { DEFAULT_SIDE_LENGTH } from '$src/constants';
+	import type { CopyMode } from '$src/types';
+	import { currentEmoji, currentColor, map, formattedEmoji } from '../store';
 
-  export let showIndex = false;
-  export let deleteMode: "Item" | "Background" | "Both";
-  export let copyMode: "Item" | "Background" | "Both";
+	export let sectionIndex = 0;
+	export let copyMode: CopyMode;
+	export let emojiMode: 'Foreground' | 'Background';
 
-  function clickedCell(index: number) {
-    switch (deleteMode) {
-      case "Item":
-        if ($currentEmoji == "") map.removeEmoji(index);
-        break;
-      case "Background":
-        if ($currentColor == "") map.deleteBackground(index);
-        break;
-      case "Both":
-        if ($currentColor == "") map.deleteBackground(index);
-        if ($currentEmoji == "") map.removeEmoji(index);
-        break;
-    }
+	function clickedCell(index: number) {
+		if (emojiMode[0] === 'F') {
+			switch (copyMode) {
+				case 'Emoji':
+					if ($currentEmoji === '') map.removeEmoji(sectionIndex, index);
+					break;
+				case 'Color':
+					if ($currentColor === '') map.deleteColorAt(sectionIndex, index);
+					break;
+				case 'Both':
+					if ($currentColor === '') map.deleteColorAt(sectionIndex, index);
+					if ($currentEmoji === '') map.removeEmoji(sectionIndex, index);
+					break;
+			}
 
-    if ($currentColor != "" && $currentColor != $map.dbg) {
-      map.updateBackground(index, $currentColor);
-    }
+			if ($currentEmoji != '') {
+				map.addEmoji(sectionIndex, index, $formattedEmoji);
+			}
 
-    if ($currentEmoji != "") {
-      map.addEmoji(index, $currentEmoji);
-    }
-  }
+			if ($currentColor != '' && $currentColor != $map.dbg) {
+				map.updateColorAt(sectionIndex, index, $currentColor);
+			}
+		} else {
+			if ($currentEmoji === '') {
+				map.deleteBackgroundAt(sectionIndex, index);
+			} else {
+				map.updateBackgroundAt(sectionIndex, index, $currentEmoji);
+			}
 
-  function rightClickedCell(index: number) {
-    switch (copyMode) {
-      case "Item":
-        $currentEmoji = $map.items.get(index) || "";
-        break;
-      case "Background":
-        $currentColor = $map.backgrounds.get(index) || "";
-        break;
-      case "Both":
-        $currentEmoji = $map.items.get(index) || "";
-        $currentColor = $map.backgrounds.get(index) || "";
-        break;
-    }
-  }
+			if ($currentColor != '' && $currentColor != $map.dbg) {
+				map.updateColorAt(sectionIndex, index, $currentColor);
+			}
+		}
+	}
+
+	function rightClickedCell(index: number) {
+		let key = sectionIndex + '_' + index;
+		switch (copyMode) {
+			case 'Emoji':
+				$currentEmoji = $map.items.get(key) || '';
+				break;
+			case 'Color':
+				$currentColor = $map.colors.get(key) || '';
+				break;
+			case 'Both':
+				$currentEmoji = $map.items.get(key) || '';
+				$currentColor = $map.colors.get(key) || '';
+				break;
+		}
+	}
+
+	let holding = false;
+
+	function mouseEnter(index: number) {
+		if (holding) clickedCell(index);
+	}
 </script>
 
+<svelte:window
+	on:mousedown={() => (holding = true)}
+	on:mouseup={() => (holding = false)}
+/>
+
 <div class="map">
-  {#each { length: DEFAULT_SIDE_LENGTH * DEFAULT_SIDE_LENGTH } as _, i}
-    <div
-      style:background={$map.backgrounds.get(i) || $map.dbg}
-      on:click={() => clickedCell(i)}
-      on:contextmenu|preventDefault={() => rightClickedCell(i)}
-    >
-      {$map?.items.get(i) || (showIndex ? i : "")}
-    </div>
-  {/each}
+	{#each { length: DEFAULT_SIDE_LENGTH * DEFAULT_SIDE_LENGTH } as _, i}
+		{@const key = sectionIndex + '_' + i}
+		{@const mapItem = $map?.items.get(key)}
+		{@const background = $map?.backgrounds.get(key)}
+		<button
+			title="Cell #{i}"
+			style:background={$map.colors.get(key) || $map.dbg}
+			on:mouseenter={() => mouseEnter(i)}
+			on:click={() => clickedCell(i)}
+			on:contextmenu|preventDefault={() => rightClickedCell(i)}
+		>
+			{#if mapItem}
+				<i class="twa z-10 twa-{mapItem}" />
+			{:else if background}
+				<i
+					class="twa absolute scale-75
+					text-center opacity-50 twa-{background}"
+				/>
+			{/if}
+		</button>
+	{/each}
 </div>

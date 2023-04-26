@@ -35,9 +35,7 @@
     d3.select(`.Ruleboxes`).on("contextmenu", function (e: MouseEvent) {
       e.preventDefault();
       let { x, y, k } = d3.zoomTransform(ruleboxesDiv);
-      // @ts-expect-error
       y = (-y + e.layerY) / k; // e.layerX is experimental and not recommended
-      // @ts-expect-error
       x = (-x + e.layerX) / k; // e.layerY is experimental and not recommended
       rbxStore.spawn("ctxMenu", { x, y });
     });

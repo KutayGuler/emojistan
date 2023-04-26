@@ -1,221 +1,372 @@
 <script lang="ts">
-  import supabase from "../supabase";
-  import { goto } from "$app/navigation";
-  import { onMount } from "svelte";
-  import {
-    saves,
-    map,
-    palette,
-    pushers,
-    mergers,
-    interactables,
-    equippables,
-    consumables,
-  } from "../store";
-  import { navigating } from "$app/stores";
-  import { rbxStore } from "$lib/stores/store";
+	import supabase from '../supabase';
+	import { goto } from '$app/navigation';
+	import { onMount } from 'svelte';
+	import {
+		saves,
+		map,
+		pushers,
+		mergers,
+		interactables,
+		effectors,
+		dialogueTree as dialogue,
+		controllables,
+	} from '../store';
+	import { rbxStore } from '$lib/stores/store';
+	let emojiFreqs = new Map<string, Set<string>>();
 
-  onMount(() => {
-    if ($saves.currentSaveID == "") saves.useStorage();
-  });
+	onMount(() => {
+		if ($saves.currentSaveID === '') saves.useStorage();
+		for (let [saveID, _] of $saves.saves) {
+			let items = JSON.parse(localStorage.getItem(saveID + '_items') as string);
+			let set = new Set<string>(
+				items.map(([key, val]: [string, string]) => val)
+			);
+			while (set.size > 8) {
+				set.delete(set.values().next().value);
+			}
+			emojiFreqs.set(saveID, set);
+		}
+	});
 
-  let gameName = "";
-  let deletedGameName = "";
-  let deletedGameID = "";
-  let creating = false;
+	let showSaves = false;
 
-  function newGame() {
-    if (creating) return;
-    saves.add(gameName);
-    goto("/editor");
-    creating = true;
-  }
+	function createNewGame() {
+		saves.add(
+			new Intl.DateTimeFormat('en-GB', {
+				dateStyle: 'full',
+				timeStyle: 'short',
+			}).format(new Date())
+		);
+		goto('/editor');
+	}
 
-  function openSave(id: string) {
-    $saves.currentSaveID = id;
-    goto("/editor");
-  }
+	function openSave(id: string) {
+		$saves.currentSaveID = id;
+		goto('/editor');
+	}
 
-  async function signInWithGoogle() {
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-    });
-  }
+	async function signInWithGoogle() {
+		const { data, error } = await supabase.auth.signInWithOAuth({
+			provider: 'google',
+		});
+	}
 
-  async function addIsland() {
-    let owner = await supabase.auth.getUser();
-    if (!owner.data.user) {
-      return;
-    }
+	async function addIsland() {
+		let owner = await supabase.auth.getUser();
+		if (!owner.data.user) {
+			return;
+		}
 
-    // CF #8
-    const { data, error } = await supabase.from("islands").insert([
-      {
-        data: {
-          map: {
-            items: Object.fromEntries($map.items),
-            backgrounds: Object.fromEntries($map.backgrounds),
-            objective: $map.objective,
-          },
-          palette: Array.from($palette),
-          rbxs: Array.from($rbxStore),
-          pushers: Object.fromEntries($pushers),
-          mergers: Object.fromEntries($mergers),
-          equippables: Object.fromEntries($equippables),
-          consumables: Object.fromEntries($consumables),
-          interactables: Object.fromEntries($interactables),
-        },
-        owner: owner.data.user.id,
-      },
-    ]);
-  }
+		// CF #8
+		const { data, error } = await supabase.from('islands').insert([
+			{
+				data: {
+					map: {
+						items: Object.fromEntries($map.items),
+						backgrounds: Object.fromEntries($map.backgrounds),
+					},
+					rbxs: Array.from($rbxStore),
+					pushers: Object.fromEntries($pushers),
+					mergers: Object.fromEntries($mergers),
+					effectors: Object.fromEntries($effectors),
+					interactables: Object.fromEntries($interactables),
+					controllables: Object.fromEntries($controllables),
+					dialogueTree: Object.fromEntries($dialogue),
+				},
+				owner: owner.data.user.id,
+			},
+		]);
+	}
 
-  async function getIslands() {
-    let user = await supabase.auth.getUser();
-    let { data: islands, error } = await supabase
-      .from("islands")
-      .select("data")
-      .eq("owner", user.data.user?.id);
-  }
+	async function getIslands() {
+		let user = await supabase.auth.getUser();
+		let { data: islands, error } = await supabase
+			.from('islands')
+			.select('data')
+			.eq('owner', user.data.user?.id);
+	}
+
+	function shuffleArray(array: Array<string>) {
+		for (let i = array.length - 1; i > 0; i--) {
+			const j = Math.floor(Math.random() * (i + 1));
+			[array[i], array[j]] = [array[j], array[i]];
+		}
+		return array;
+	}
+
+	let renameIndex = -1;
+	let newName = '';
+	let deleteIndex = -1;
+	let files: FileList;
+
+	function downloadSave(saveID: string) {
+		const data = {
+			map: {
+				items: Object.fromEntries($map.items),
+				backgrounds: Object.fromEntries($map.backgrounds),
+				colors: Object.fromEntries($map.colors),
+				dbg: $map.dbg,
+			},
+			rbxs: Array.from($rbxStore),
+			pushers: Object.fromEntries($pushers),
+			mergers: Object.fromEntries($mergers),
+			effectors: Object.fromEntries($effectors),
+			interactables: Object.fromEntries($interactables),
+			dialogue: Object.fromEntries($dialogue),
+		};
+
+		let dataStr =
+			'data:text/json;charset=utf-8,' +
+			encodeURIComponent(JSON.stringify(data));
+		let downloadAnchorNode = document.createElement('a');
+		downloadAnchorNode.setAttribute('href', dataStr);
+		downloadAnchorNode.setAttribute(
+			'download',
+			'emojistan-' + saveID + '.json'
+		);
+		document.body.appendChild(downloadAnchorNode); // required for firefox
+		downloadAnchorNode.click();
+		downloadAnchorNode.remove();
+	}
+
+	async function openUploadedSave() {
+		let content = await files[0].text();
+		let obj = JSON.parse(content);
+		saves.add(
+			'Upload-' +
+				new Intl.DateTimeFormat('en-GB', {
+					dateStyle: 'full',
+					timeStyle: 'short',
+				}).format(new Date())
+		);
+
+		const id = $saves.currentSaveID;
+
+		for (let key of Object.keys(obj)) {
+			if (key === 'map') {
+				for (let _key of Object.keys(obj.map)) {
+					if (_key === 'dbg') {
+						localStorage.setItem(id + '_dbg', obj.map.dbg);
+					} else {
+						localStorage.setItem(
+							id + '_' + _key,
+							JSON.stringify(Object.entries(obj.map[_key]))
+						);
+					}
+				}
+			} else if (key === 'rbxs') {
+				localStorage.setItem(
+					id + '_' + key,
+					JSON.stringify(Array.from(obj[key]))
+				);
+			} else {
+				localStorage.setItem(
+					id + '_' + key,
+					JSON.stringify(Object.entries(obj[key]))
+				);
+			}
+		}
+
+		goto('/editor');
+	}
 </script>
 
 <svelte:head>
-  <title>Emojistan</title>
+	<title>Emojistan</title>
 </svelte:head>
 
-<!-- Put this part before </body> tag -->
-<input type="checkbox" id="new-game" class="modal-toggle" />
-<label for="new-game" class="modal cursor-pointer">
-  <label class="modal-box relative" for="">
-    <h3 class="text-lg font-bold">What's the name of the game?</h3>
-    <span class="inline">
-      <input
-        type="text"
-        class="input input-bordered my-4"
-        bind:value={gameName}
-      />
-      <button class="btn" disabled={gameName.length < 3} on:click={newGame}
-        >CREATE</button
-      >
-    </span>
-  </label>
-</label>
+<svelte:window
+	on:keydown={(e) => {
+		if (e.code === 'Escape') {
+			renameIndex = -1;
+			deleteIndex = -1;
+		}
+	}}
+/>
 
-<!-- Put this part before </body> tag -->
-<input type="checkbox" id="delete-save" class="modal-toggle" />
-<label for="delete-save" class="modal cursor-pointer">
-  <label class="modal-box relative" for="">
-    <p class="text-2xl font-bold">
-      Are you sure you want to delete {deletedGameName}?
-    </p>
-
-    <div class="modal-action">
-      <label for="delete-save" class="btn">Cancel</label>
-      <label
-        for="delete-save"
-        class="btn btn-error"
-        on:click={() => {
-          saves.delete(deletedGameID);
-          location.reload(); // REQUIRED FOR DELETING SAVES PROPERLY
-        }}>Delete</label
-      >
-    </div>
-  </label>
-</label>
-
-<div class="drawer-mobile drawer">
-  <input id="my-drawer-2" type="checkbox" class="drawer-toggle" />
-  <div class="drawer-content flex flex-col items-start justify-start">
-    <!-- Page content here -->
-    {#if !$navigating}
-      <h1 class="pt-4 text-2xl">Saves</h1>
-      {#if $saves.loaded}
-        <div class="flex w-1/3 flex-col gap-2 py-8 ">
-          {#each [...$saves.saves] as [id, title]}
-            <div class="relative text-lg shadow-lg">
-              <button
-                class="my-0 flex h-20 w-full flex-row items-center justify-start rounded-md border-r-2 p-4 duration-200 ease-out hover:bg-secondary hover:text-white"
-                on:click={() => openSave(id)}
-              >
-                <div>{title}</div>
-              </button>
-
-              <!-- The button to open modal -->
-              <label
-                on:click={() => {
-                  deletedGameID = id;
-                  deletedGameName = title;
-                }}
-                for="delete-save"
-                class="absolute top-2 right-2 cursor-pointer"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                  class="h-6 w-6"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
-                  />
-                </svg></label
-              >
-            </div>
-          {:else}
-            <p>You do not have any saved games.</p>
-          {/each}
-        </div>
-      {:else}
-        <p>Loading...</p>
-      {/if}
-    {/if}
-    <label for="my-drawer-2" class="btn btn-primary drawer-button lg:hidden"
-      >Open drawer</label
-    >
-  </div>
-  <div class="drawer-side">
-    <label for="my-drawer-2" class="drawer-overlay" />
-
-    <ul class="menu m-4 w-80 rounded bg-base-200 text-base-content">
-      <p class="select-none p-4 text-2xl">Emojistan 🏝️</p>
-      <div class="mx-4 mt-2 box-border ">
-        <button class="btn w-full" on:click={() => goto("/tutorial/controls")}
-          >TUTORIAL</button
-        >
-      </div>
-      <div class="mx-4 mt-2 box-border ">
-        <label for="new-game" class="btn w-full">NEW GAME</label>
-      </div>
-    </ul>
-  </div>
-</div>
+<main>
+	<div id="emojis" class="absolute top-0 h-full w-full" />
+	<!-- <div class="dropdown dropdown-bottom dropdown-end absolute right-4 top-4">
+		<button class="avatar ">
+			<div class="w-12 rounded-full ring ring-neutral-content">
+				<img src="https://picsum.photos/200" alt="profile picture" />
+			</div>
+		</button>
+		<ul
+			tabindex="0"
+			class="dropdown-content menu rounded-box w-52 bg-base-100 p-2 shadow"
+		>
+			<li><a href="/user/1">Profile</a></li>
+			<li><a href="/account">Account</a></li>
+			<li><a href="/">Logout</a></li>
+		</ul>
+	</div> -->
+	<div
+		class="aside mt-16 flex h-[85vh] w-96 flex-col gap-2 overflow-y-auto bg-neutral shadow-xl"
+	>
+		{#if showSaves}
+			<div class="flex flex-row gap-2">
+				<button class="btn w-fit" on:click={() => (showSaves = false)}
+					><svg
+						xmlns="http://www.w3.org/2000/svg"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke-width="1.5"
+						stroke="currentColor"
+						class="h-6 w-6"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
+						/>
+					</svg>
+				</button>
+			</div>
+			<button on:click={createNewGame} class="btn-primary btn">NEW GAME</button>
+			<div class="flex flex-row gap-2">
+				<input class="file-input " type="file" name="save-file" bind:files />
+				{#if files}
+					<button class="btn" on:click={openUploadedSave}>OPEN</button>
+				{/if}
+			</div>
+			<!-- <div class="w-full rounded-lg border-2"> -->
+			<!-- <button class="btn w-full rounded-lg shadow-inner" on:click={() => {}}>
+					UPLOAD SAVE FILE &nbsp;
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke-width="1.5"
+						stroke="currentColor"
+						class="h-6 w-6"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"
+						/>
+					</svg>
+				</button> -->
+			<!-- </div> -->
+			{#each [...$saves.saves] as [id, name], i}
+				<div class="relative flex flex-col rounded-lg bg-slate-300 p-4">
+					{#if renameIndex === i}
+						<form
+							on:submit={() => {
+								saves.rename(id, newName);
+								renameIndex = -1;
+							}}
+						>
+							<!-- svelte-ignore a11y-autofocus -->
+							<input
+								autofocus
+								class="input-bordered input "
+								type="text"
+								bind:value={newName}
+							/>
+						</form>
+					{:else}
+						<h3>{name}</h3>
+						{#if !renameIndex}
+							<button
+								on:click={() => {
+									newName = name;
+									renameIndex = i;
+								}}
+								class="w-fit pl-0 text-slate-500">RENAME</button
+							>
+						{/if}
+					{/if}
+					<p>
+						{#each [...(emojiFreqs.get(id) || [])] as e}
+							<i class="twa twa-{e}" />
+						{/each}
+					</p>
+					<div class="flex w-full flex-row items-end gap-2 self-end pt-12">
+						<button
+							class="btn-ghost btn-sm btn"
+							on:click={() => downloadSave(id)}
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke-width="1.5"
+								stroke="currentColor"
+								class="h-6 w-6"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"
+								/>
+							</svg>
+						</button>
+						<div class="flex flex-grow" />
+						{#if deleteIndex === i}
+							<form
+								on:submit={() => {
+									saves.delete(id);
+									location.reload();
+								}}
+							>
+								<button class="btn-error btn-sm btn">CONFIRM</button>
+							</form>
+							<button
+								class="btn-sm btn"
+								on:click={() => {
+									deleteIndex = -1;
+								}}>CANCEL</button
+							>
+						{:else}
+							<button
+								on:click={() => {
+									deleteIndex = i;
+								}}
+								class="btn-ghost btn-sm btn">DELETE</button
+							>
+						{/if}
+						<button on:click={() => openSave(id)} class="btn-sm btn"
+							>OPEN</button
+						>
+					</div>
+				</div>
+			{/each}
+		{:else}
+			<button on:click={() => (showSaves = true)} class="btn-primary btn w-full"
+				>PLAY</button
+			>
+			<a href="/tutorial/controls" class="btn-secondary btn">TUTORIAL</a>
+			<!-- <a href="/discover" class="btn-accent btn">DISCOVER</a>
+			<button class="btn w-full">OPTIONS</button> -->
+		{/if}
+	</div>
+</main>
 
 <style>
-  svg:hover {
-    fill: red;
-    stroke: red;
-  }
+	.saved {
+		opacity: 100%;
+	}
 
-  .saved {
-    opacity: 100%;
-  }
+	.current {
+		opacity: 100%;
+		transform: scale(150%);
+	}
 
-  .current {
-    opacity: 100%;
-    transform: scale(150%);
-  }
+	main {
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		justify-content: start;
+		align-items: center;
+		width: 100vw;
+		height: 100vh;
+	}
 
-  main {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    justify-content: start;
-    align-items: center;
-    width: 100vw;
-    height: 100vh;
-  }
+	#emojis {
+		background-image: url('/images/emojis.png');
+		background-size: cover;
+	}
 </style>
