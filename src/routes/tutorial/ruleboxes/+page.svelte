@@ -22,9 +22,14 @@
 		INTERACTABLE_H,
 		INTERACTABLE_BG,
 		INTERACTABLE_BORDER,
+		CONTROLLABLE_BORDER,
+		CONTROLLABLE_BG,
+		CONTROLLABLE_H,
+		CONTROLLABLE_W,
 	} from '$src/constants';
 	import { onDestroy } from 'svelte';
 	import { fade, fly } from 'svelte/transition';
+	import Controllable from '$rbx/Controllable.svelte';
 
 	const ruleboxes = [
 		{
@@ -61,6 +66,18 @@
 				height: EFFECTOR_H,
 				bgColor: EFFECTOR_BG,
 				borderColor: EFFECTOR_BORDER,
+			},
+		},
+		{
+			component: Controllable,
+			rbx: {
+				id: '-1',
+				type: 'controllable',
+				position: { x: 0, y: 0 },
+				width: CONTROLLABLE_W,
+				height: CONTROLLABLE_H,
+				bgColor: CONTROLLABLE_BG,
+				borderColor: CONTROLLABLE_BORDER,
 			},
 		},
 		{

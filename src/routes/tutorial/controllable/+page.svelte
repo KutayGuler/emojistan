@@ -62,7 +62,7 @@
 				'A Controllable has emoji and hp slots for Devolve, Default and Evolve. Controllables can evolve or devolve based on their current HP. <br><br> Side Effects will affect their HP and those Side Effects should be chosen from Effectors.',
 			component: Controllable,
 			rbx: {
-				id: '0',
+				id: '4',
 				type: 'controllable',
 				position: { x: 0, y: 0 },
 				width: CONTROLLABLE_W,
@@ -71,10 +71,11 @@
 				borderColor: CONTROLLABLE_BORDER,
 			},
 			props: {
-				id: '0',
+				id: '4',
 				emoji: 'baby',
 				evolve: new Evolve('woman-walking', 5),
-				pseudoSideEffects: [['3', 1]],
+				// @ts-expect-error
+				pseudoSideEffects: [['baby-bottle', 1]],
 			},
 			gameProps: {
 				map: new EditableMap(
@@ -88,7 +89,7 @@
 				),
 				controllables: new Map<StringedNumber, TControllable>([
 					[
-						'0',
+						'4',
 						new TControllable(
 							'baby',
 							1,
@@ -110,6 +111,57 @@
 				]),
 				effectors: new Map<StringedNumber, Effector>([
 					['3', { emoji: 'baby-bottle', hp: 1 }],
+				]),
+				mapClass: 'simulation',
+				SIZE: 4,
+			},
+		},
+		{
+			header: 'Controllable',
+			description:
+				'A Controllable has emoji and hp slots for Devolve, Default and Evolve. Controllables can evolve or devolve based on their current HP. <br><br> Side Effects will affect their HP and those Side Effects should be chosen from Effectors.',
+			component: Controllable,
+			rbx: {
+				id: '5',
+				type: 'controllable',
+				position: { x: 0, y: 0 },
+				width: CONTROLLABLE_W,
+				height: CONTROLLABLE_H,
+				bgColor: CONTROLLABLE_BG,
+				borderColor: CONTROLLABLE_BORDER,
+			},
+			props: {
+				id: '5',
+				emoji: 'monkey',
+				devolve: new Devolve('pig'),
+				// @ts-expect-error
+				pseudoSideEffects: [['test-tube', -1]],
+			},
+			gameProps: {
+				map: new EditableMap(
+					new Map<string, string>([
+						['0_0', 'monkey'],
+						['0_10', 'test-tube'],
+					])
+				),
+				controllables: new Map<StringedNumber, TControllable>([
+					[
+						'5',
+						new TControllable(
+							'monkey',
+							1,
+							[['3', -1]],
+							new Evolve('', 0),
+							new Devolve('pig')
+						),
+					],
+					[
+						'2',
+						new TControllable('pig', 1, [], new Evolve('', 0), new Devolve('')),
+					],
+				]),
+				effectors: new Map<StringedNumber, Effector>([
+					['3', { emoji: 'test-tube', hp: 1 }],
 				]),
 				mapClass: 'simulation',
 				SIZE: 4,

@@ -22,7 +22,7 @@
 		{
 			header: 'Effector',
 			description:
-				'Effector takes an emoji and a number input. Emoji is the effector itself and the number below it is the number of times it can be used before it disappears. It can be a number between 1 and 100 or "Infinite"',
+				'Effector takes an emoji and a number input. Emoji is the effector itself and the number below it is the number of times it can be used before it disappears. It can be a number between 1 and 100 or "Infinite".',
 			component: Effector,
 			rbx: {
 				id: '0',

@@ -73,10 +73,14 @@
 	export let sideEffects: Array<[StringedNumber | 'any', number | 'talk']> = [
 		['any', 'talk'],
 	];
-	export let pseudoSideEffects: Array<[StringedNumber | 'any', number]> = [];
+	export let pseudoSideEffects: Array<[string | 'any', number]> = [];
 	export let evolve = new Evolve('', 2);
 	export let devolve = new Devolve('');
 	export let drops: Drops = ['-1', 1];
+
+
+	console.log(drops);
+	
 
 	// SEQUENCE RELATED
 	let type = types.Map[0];
@@ -406,8 +410,7 @@
 				<!-- svelte-ignore a11y-label-has-associated-control -->
 				<label tabindex="0" class="slot-lg m-1"
 					><i
-						class="twa twa-{$effectors.get(drops[0])?.emoji ||
-							$effectors.get(drops[0])?.emoji}"
+						class="twa twa-{$effectors.get(drops[0])?.emoji || drops[0]}"
 					/></label
 				>
 				<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
