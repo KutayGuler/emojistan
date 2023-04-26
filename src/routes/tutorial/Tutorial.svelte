@@ -21,7 +21,6 @@
 		keyboardfocusableElements.shift();
 
 		for (let element of keyboardfocusableElements) {
-			console.log(element);
 			// element.ariaHidden = "true";
 			element.tabIndex = -1;
 		}

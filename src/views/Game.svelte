@@ -80,8 +80,6 @@
 		}
 	}
 
-	console.log(_controllables);
-
 	for (let [id, effector] of effectors) {
 		const { emoji, ...args } = effector;
 		if (emoji === '') continue;
@@ -115,8 +113,6 @@
 		}
 	}
 
-	console.log(_interactables);
-
 	/* ## DIALOGUE ## */
 	let character = '';
 	let dialogueID = '';
@@ -124,7 +120,6 @@
 
 	onMount(() => {
 		[$currentColor, $currentEmoji] = ['', ''];
-		console.log(dt);
 	});
 
 	let enemyIndexes: Array<number> = [];
@@ -653,7 +648,6 @@
 
 			let { id, evolve, sideEffects, devolve } = _interactable;
 			const sideEffect = sideEffects[effectorItem];
-			console.log(sideEffects, sideEffect);
 
 			if (sideEffect === 0) return;
 

@@ -1,6 +1,6 @@
 <script lang="ts">
 	// SVELTEKIT
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { emojis } from './emojis';
 
@@ -62,6 +62,10 @@
 		]) {
 			store.useStorage($saves.currentSaveID);
 		}
+	});
+
+	onDestroy(() => {
+		location.reload();
 	});
 
 	let currentCategory = '💩';
@@ -145,9 +149,6 @@
 		['#8e562e', '-medium-dark-skin-tone'],
 		['#613d30', '-dark-skin-tone'],
 	];
-
-	// FIXME: SAVE DUPLICATION
-	let svgCount = 0;
 </script>
 
 <svelte:head>
@@ -391,9 +392,7 @@
 													{title}
 												>
 													<i
-														on:load={() => {
-															console.log('loaded:', svgCount++);
-														}}
+														on:load={() => {}}
 														class="twa twa-{name.replace('_', $currentSkin)}"
 													/>
 												</button>

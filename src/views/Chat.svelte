@@ -91,8 +91,6 @@
 			return;
 		}
 
-		console.log(e.code);
-
 		if (interacting) return;
 
 		if (e.code === 'Space') {

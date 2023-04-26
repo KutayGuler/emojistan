@@ -21,7 +21,6 @@
 	// CF #4
 	function spawn(component: RuleboxType, value: any) {
 		const id = rbxStore.spawn(component, position);
-		console.log(id);
 
 		switch (component) {
 			case 'pusher':

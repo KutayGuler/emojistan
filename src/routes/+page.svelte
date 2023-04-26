@@ -141,8 +141,6 @@
 				}).format(new Date())
 		);
 
-		console.log(obj.rbxs);
-
 		const id = $saves.currentSaveID;
 
 		for (let key of Object.keys(obj)) {

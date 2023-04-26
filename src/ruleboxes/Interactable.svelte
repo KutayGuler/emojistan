@@ -78,10 +78,6 @@
 	export let devolve = new Devolve('');
 	export let drops: Drops = ['-1', 1];
 
-
-	console.log(drops);
-	
-
 	// SEQUENCE RELATED
 	let type = types.Map[0];
 	let duration = 0;
@@ -89,14 +85,10 @@
 	let background = '';
 
 	onMount(() => {
-		console.log(id, $interactables);
-
 		let obj = $interactables.get(id);
 		if (obj) {
 			({ emoji, sequence, hp, sideEffects, evolve, devolve, drops } = obj);
 		}
-
-		console.log(obj, sideEffects);
 	});
 
 	function updateStore() {

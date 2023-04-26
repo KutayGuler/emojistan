@@ -56,9 +56,6 @@ function createSaves() {
 		loaded: false,
 	});
 
-	// if logged in, save on server
-	// if not, save on localstorage
-
 	return {
 		set,
 		subscribe,
@@ -326,14 +323,13 @@ function createDialogueTree() {
 					(branch?.at(-1) as Array<Choice>)?.push(choice);
 				}
 
-				console.log(state);
-
 				return state;
 			}),
 	};
 }
 
 export const showLoading = writable(false);
+export const loadedEmojis = writable(false);
 export const modal = createModal();
 
 // VANILLA

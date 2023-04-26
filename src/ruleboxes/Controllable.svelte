@@ -43,8 +43,6 @@
 	export let devolve = new Devolve('');
 
 	onMount(() => {
-		console.log(id, $controllables);
-
 		let obj = $controllables.get(id);
 		if (obj) {
 			({ emoji, hp, sideEffects, evolve, devolve } = obj);
