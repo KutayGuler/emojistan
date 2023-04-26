@@ -7,11 +7,10 @@
 		Effector,
 		Evolve,
 		Interactable,
+		type Branch,
 	} from '$src/types';
 	import Game from '$src/views/Game.svelte';
 	import type { GameProps } from '../types';
-
-	// TODO: change example
 
 	const gameProps: GameProps = {
 		map: new EditableMap(
@@ -40,15 +39,34 @@
 					'dog',
 					[],
 					1,
-					[['any', 1]],
+					[
+						['any', 'talk'],
+						['2', 1],
+					],
+					new Evolve('service-dog', 2),
+					new Devolve(''),
+					['-9', 0]
+				),
+			],
+			[
+				'3',
+				new Interactable(
+					'service-dog',
+					[],
+					1,
+					[['any', 'talk']],
 					new Evolve('', 0),
 					new Devolve(''),
-					['', 0]
+					['-9', 0]
 				),
 			],
 		]),
 		effectors: new Map<StringedNumber, Effector>([
 			['2', new Effector('bone', 1)],
+		]),
+		dt: new Map<string, Branch>([
+			['1', ['bark!']],
+			['3', ['woof.']],
 		]),
 		mapClass: 'simulation',
 		SIZE: 4,

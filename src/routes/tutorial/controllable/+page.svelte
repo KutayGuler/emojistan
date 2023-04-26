@@ -59,7 +59,7 @@
 		{
 			header: 'Controllable',
 			description:
-				'Controllables, as the nume suggests, are the emojis that can be controlled by the player. At least one Controllable is required in the map for your game to be playable.',
+				'A Controllable has emoji and hp slots for Devolve, Default and Evolve. Controllables can evolve or devolve based on their current HP. <br><br> Side Effects will affect their HP and those Side Effects should be chosen from Effectors.',
 			component: Controllable,
 			rbx: {
 				id: '0',
@@ -134,6 +134,6 @@
 	{#if index < tutorialProps.length - 1}
 		<button class="btn-lg btn" on:click={() => index++}>⮞</button>
 	{:else if index === tutorialProps.length - 1}
-		<a href="/tutorial/controllable" class="btn-lg btn">INTERACTABLE ⮞</a>
+		<a href="/tutorial/interactable" class="btn-lg btn">INTERACTABLE ⮞</a>
 	{/if}
 </div>

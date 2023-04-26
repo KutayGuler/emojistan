@@ -204,6 +204,7 @@
 				controllables={$controllables}
 				interactables={$interactables}
 				effectors={$effectors}
+				dt={$dialogueTree}
 				on:noPlayer={() => {
 					test = false;
 					notifications.warning('No controllable player in the map.');

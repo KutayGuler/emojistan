@@ -110,7 +110,7 @@
 	style="background-color: rgba(0, 0, 0.5, 0.8);"
 	class="absolute z-50 flex flex-col items-start justify-start {isTutorial
 		? 'h-[204px] w-[204px] 2xl:h-[236px] 2xl:w-[236px]'
-		: 'h-[624px] w-[624px] 2xl:h-[720px] 2xl:w-[720px]'} w-full overflow-y-auto overflow-x-hidden  backdrop-blur"
+		: 'h-[624px] w-[624px] 2xl:h-[720px] 2xl:w-[720px]'} overflow-y-auto overflow-x-hidden backdrop-blur"
 	transition:scale|local
 >
 	<h1 class="p-4"><i class="twa twa-{character}" /></h1>

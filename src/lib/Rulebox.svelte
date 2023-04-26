@@ -16,7 +16,6 @@
 		mergers,
 		modal,
 		pushers,
-		type StringedNumber,
 	} from '$src/store';
 
 	import type { Rulebox } from '$lib/types/types';

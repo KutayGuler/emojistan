@@ -11,6 +11,21 @@
 	export let gameProps: any;
 	export let veilHeight = 0;
 	export let veilColor = 'bg-indigo-50';
+
+	function disableFocus(node: Element) {
+		let keyboardfocusableElements = document.querySelectorAll(
+			'#rbx a[href], button, input, textarea, select, details, [tabindex]:not([tabindex="-1"])'
+		);
+
+		keyboardfocusableElements = [...keyboardfocusableElements];
+		keyboardfocusableElements.shift();
+
+		for (let element of keyboardfocusableElements) {
+			console.log(element);
+			// element.ariaHidden = "true";
+			element.tabIndex = -1;
+		}
+	}
 </script>
 
 <div
@@ -30,18 +45,21 @@
 				</p>
 			</slot>
 		</div>
-		<div
-			style="width: {rbx.width}px; height: {rbx.height}px;"
-			class="pointer-events-none relative mt-12 mb-24 flex flex-col justify-center"
-		>
-			{#key props}
-				<Rulebox {rbx} {props} />
-			{/key}
+		{#key props}
 			<div
-				style:height={veilHeight + 'px'}
-				class="absolute bottom-0 z-10 w-full {veilColor}"
-			/>
-		</div>
+				use:disableFocus
+				aria-hidden="true"
+				id="rbx"
+				style="width: {rbx.width}px; height: {rbx.height}px;"
+				class="pointer-events-none relative mt-12 mb-24 flex flex-col justify-center"
+			>
+				<Rulebox {rbx} {props} />
+				<div
+					style:height={veilHeight + 'px'}
+					class="absolute bottom-0 z-10 w-full {veilColor}"
+				/>
+			</div>
+		{/key}
 	</div>
 	<div
 		class="relative flex w-full flex-col items-center justify-center self-center"
@@ -56,5 +74,9 @@
 	h1,
 	h3 {
 		color: var(--header);
+	}
+
+	#rbx > * {
+		pointer-events: none;
 	}
 </style>

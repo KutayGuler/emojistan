@@ -5,6 +5,7 @@
 		Evolve,
 		Devolve,
 		Effector,
+		Controllable,
 	} from '$src/types';
 	import {
 		INTERACTABLE_BG,
@@ -15,6 +16,7 @@
 	import Tutorial from '../Tutorial.svelte';
 	import type { TutorialProps } from '../types';
 	import type { StringedNumber } from '$src/store';
+	import Interactable from '$rbx/Interactable.svelte';
 
 	let index = 0;
 
@@ -28,16 +30,47 @@
 		borderColor: INTERACTABLE_BORDER,
 	};
 
-	const tutorialProps: Array<TutorialProps> = [
-		// @ts-expect-error
+	const tutorialProps: Array<TutorialProps<Interactable>> = [
 		{
 			header: 'Interactable',
 			description:
-				'Interactables are the most complex ruleboxes. We will explain each feature with examples.',
+				'Interactables are very similar to Controllables except they cannot be controlled and have two distinct qualities. They can be talked to and they can drop Effectors once they are destroyed.',
 			gameProps: {
-				map: new EditableMap(new Map<string, string>()),
+				map: new EditableMap(
+					new Map<string, string>([['0_0', 'woman-walking']])
+				),
 				mapClass: 'simulation',
 				SIZE: 4,
+				effectors: new Map<StringedNumber, Effector>([
+					['-1', { emoji: 'baby-bottle', hp: 1 }],
+				]),
+				controllables: new Map<StringedNumber, Controllable>([
+					[
+						'2',
+						new Controllable(
+							'woman-walking',
+							1,
+							[],
+							new Evolve('', 0),
+							new Devolve('')
+						),
+					],
+				]),
+				// @ts-expect-error
+				interactables: new Map<number, TInteractable>([
+					[
+						'1',
+						new TInteractable(
+							'baby',
+							[],
+							1,
+							[['any', 'talk']],
+							new Evolve('man-walking', 5),
+							new Devolve(''),
+							['-1', 0]
+						),
+					],
+				]),
 			},
 			veilHeight: 0,
 		},
@@ -48,7 +81,7 @@
 				'Evolve [ <i class="twa twa-dna"></i> ], as the name suggests, makes the Interactable evolvable. When Interactable\'s HP reaches to evolve limit, the emoji transforms and HP resets to evolved version\'s [ <i class="twa twa-man-walking"></i> ] HP. Which in this case is 1.',
 			veilHeight: 476,
 			props: {
-				id: 'evolution',
+				id: '1',
 				emoji: 'baby',
 				isControllable: true,
 				evolve: new Evolve('man-walking', 5),
@@ -68,10 +101,22 @@
 				effectors: new Map<StringedNumber, Effector>([
 					['-1', { emoji: 'baby-bottle', hp: 1 }],
 				]),
+				controllables: new Map<StringedNumber, Controllable>([
+					[
+						'2',
+						new Controllable(
+							'woman-walking',
+							1,
+							[],
+							new Evolve('', 0),
+							new Devolve('')
+						),
+					],
+				]),
 				// @ts-expect-error
 				interactables: new Map<number, TInteractable>([
 					[
-						'evolution',
+						'1',
 						new TInteractable(
 							'baby',
 							[],

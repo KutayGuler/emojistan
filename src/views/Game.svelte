@@ -99,6 +99,12 @@
 
 		for (let [id, effect] of sideEffects) {
 			let effector = structuredClone(effectors.get(id));
+
+			if (id === 'any') {
+				_interactables[emoji].sideEffects.any = effect;
+				continue;
+			}
+
 			if (!effector) continue;
 			_interactables[emoji].sideEffects[effector.emoji] = effect;
 		}
@@ -118,7 +124,7 @@
 
 	onMount(() => {
 		[$currentColor, $currentEmoji] = ['', ''];
-		dt = $dialogueTree;
+		console.log(dt);
 	});
 
 	let enemyIndexes: Array<number> = [];
@@ -646,9 +652,9 @@
 				player.inventory?.get(currentInventoryIndex)?.emoji || 'any';
 
 			let { id, evolve, sideEffects, devolve } = _interactable;
-			console.log();
-			
 			const sideEffect = sideEffects[effectorItem];
+			console.log(sideEffects, sideEffect);
+
 			if (sideEffect === 0) return;
 
 			if (sideEffect === 'talk') {
