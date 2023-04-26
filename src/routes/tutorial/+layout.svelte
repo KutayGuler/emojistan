@@ -36,12 +36,12 @@
 		effector: {
 			link: 'effector',
 			color: EFFECTOR_BORDER,
-			next: 'controllable',
+			next: '',
 		},
 		controllable: {
 			link: 'controllable',
 			color: CONTROLLABLE_BORDER,
-			next: 'interactable'
+			next: 'interactable',
 		},
 		interactable: {
 			link: 'interactable',

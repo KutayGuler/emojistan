@@ -301,6 +301,7 @@
 		// 	},
 		// },
 	];
+
 	let props = tutorialProps[index];
 	$: props = tutorialProps[index];
 </script>

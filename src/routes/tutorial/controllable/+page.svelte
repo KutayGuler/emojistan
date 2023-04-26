@@ -69,5 +69,3 @@
 </script>
 
 <Tutorial {...tutorialProps} --header={CONTROLLABLE_BORDER} />
-
-<p class="self-start p-4">Controllables can only be used on Interactables.</p>
