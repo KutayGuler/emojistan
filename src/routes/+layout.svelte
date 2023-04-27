@@ -8,6 +8,8 @@
 	import { currentSkin, loadedEmojis } from '$src/store';
 	import { emojis } from './editor/emojis';
 	import Loading from './Loading.svelte';
+
+	export const trailingSlash = 'always';
 	// import { tweened } from 'svelte/motion';
 	// import { cubicOut } from 'svelte/easing';
 	// const progress = tweened(0, {
