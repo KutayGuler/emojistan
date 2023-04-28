@@ -68,7 +68,7 @@
 		location.reload();
 	});
 
-	let currentCategory = '💩';
+	let currentCategory = 'pile-of-poo';
 	let filter = '';
 	let sectionIndex = 0;
 
@@ -363,7 +363,7 @@
 											: 'opacity-50 hover:scale-125 hover:opacity-100'} duration-75 ease-out"
 										on:click={() => (currentCategory = category)}
 									>
-										{category}
+										<i class="twa twa-{category} text-2xl" />
 									</button>
 								{/each}
 							</div>

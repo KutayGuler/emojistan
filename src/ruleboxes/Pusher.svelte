@@ -44,7 +44,8 @@
 	<button class="slot" on:click={() => updateSlot(0)}>
 		<i class="twa twa-{slots[0]}" />
 	</button>
-	<div>💨</div>
+	<i class="twa twa-dashing-away text-2xl" />
+	<!-- <div>💨</div> -->
 	<button class="slot" on:click={() => updateSlot(1)}>
 		<i class="twa twa-{slots[1]}" />
 	</button>
