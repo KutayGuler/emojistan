@@ -54,7 +54,7 @@
 	$: rulebox = ruleboxes[$page.url.pathname.split('/')[2]];
 </script>
 
-<main class="flex flex-row">
+<main class="flex flex-row bg-white">
 	<div class="drawer-mobile drawer">
 		<input id="my-drawer-2" type="checkbox" class="drawer-toggle" />
 		<div class="drawer-content flex flex-col items-center justify-start">
