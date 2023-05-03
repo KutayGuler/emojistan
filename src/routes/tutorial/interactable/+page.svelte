@@ -168,6 +168,6 @@
 	{#if index < tutorialProps.length - 1}
 		<button class="btn-lg btn" on:click={() => index++}>⮞</button>
 	{:else if index === tutorialProps.length - 1}
-		<a href="#tutorial-complete" class="btn-lg btn">FINISH</a>
+		<a href="/tutorial/editor" class="btn-lg btn">EDITOR ⮞</a>
 	{/if}
 </div>

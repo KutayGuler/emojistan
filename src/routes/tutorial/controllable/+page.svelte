@@ -23,7 +23,7 @@
 			veilColor: 'bg-green-50',
 			header: 'Controllable',
 			description:
-				'Controllables, as the nume suggests, are the emojis that can be controlled by the player. At least one Controllable is required in the map for your game to be playable.',
+				'Controllables, as the name suggests, are the emojis that can be controlled by the player. At least one Controllable is required in the map for your game to be playable.',
 			component: Controllable,
 			rbx: {
 				id: '0',

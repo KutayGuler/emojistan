@@ -48,6 +48,12 @@
 			color: INTERACTABLE_BORDER,
 			next: '',
 		},
+		editor: {
+			link: 'editor',
+			color:
+				'linear-gradient(90deg, rgba(168,85,247,0.5) 0%, rgba(34,197,94,0.5) 50%, rgba(244,63,94,0.5) 100%)',
+			next: '',
+		},
 	};
 
 	let rulebox = ruleboxes[$page.url.pathname.split('/')[2]];
@@ -85,7 +91,7 @@
 					<li
 						class={capitalizeFirst(link)}
 						style={$page.url.pathname.includes(link)
-							? `background-color: ${color}; color: var(--primary);`
+							? `background: ${color}; color: var(--primary);`
 							: ''}
 					>
 						<a href="../tutorial/{link}">{capitalizeFirst(link)}</a>
