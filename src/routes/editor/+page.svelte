@@ -332,6 +332,37 @@
 										/>
 										as default
 									</button>
+									<label class="label pt-8">
+										<span
+											class="label-text text-xs text-neutral-content 2xl:text-base"
+											>World Map
+										</span></label
+									>
+									<div
+										id="world-map"
+										class="grid h-[166px] w-[166px] grid-cols-12 grid-rows-12 gap-0.5 self-center"
+									>
+										{#each { length: DEFAULT_SIDE_LENGTH * DEFAULT_SIDE_LENGTH } as _, i}
+											{@const selected = i == sectionIndex}
+											<button
+												on:click={() => (sectionIndex = i)}
+												title={`Section #${i}`}
+												class="relative h-[16px] w-[16px] duration-75 ease-out"
+												class:selected
+												style:background-color={$map.dbg}
+											>
+												{#if $map.startingSectionIndex == i}
+													<i class="twa twa-chequered-flag" />
+												{/if}
+											</button>
+										{/each}
+									</div>
+									<button
+										on:click={() => map.updateStartingSection(sectionIndex)}
+										class="btn mt-1 flex w-full flex-row items-center"
+									>
+										Set as &nbsp;<i class="twa twa-chequered-flag" />
+									</button>
 								</div>
 							</div>
 						{/if}
@@ -427,5 +458,15 @@
 
 	.tooltip:before {
 		z-index: 10;
+	}
+
+	.selected,
+	#world-map > button:hover {
+		outline: solid 2px black;
+		z-index: 2;
+	}
+
+	#world-map > button:hover:not(.selected) {
+		scale: 110%;
 	}
 </style>

@@ -70,6 +70,10 @@
 	on:mouseup={() => (holding = false)}
 />
 
+<div class="badge absolute -top-8 right-80">
+	Section #{sectionIndex}
+</div>
+
 <div class="map">
 	{#each { length: DEFAULT_SIDE_LENGTH * DEFAULT_SIDE_LENGTH } as _, i}
 		{@const key = sectionIndex + '_' + i}

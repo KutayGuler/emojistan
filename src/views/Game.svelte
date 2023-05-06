@@ -154,66 +154,67 @@
 		items = items;
 	}
 
-	const calcOperation = true
-		? (code: ArrowKey, index: number) => {
-				if (code === 'ArrowLeft' && index % SIZE === 0) return 0;
-				if (code === 'ArrowUp' && index < SIZE) return 0;
-				if (code === 'ArrowRight' && (index + 1) % SIZE === 0) return 0;
-				if (code === 'ArrowDown' && index >= SIZE * SIZE - SIZE) return 0;
+	const calcOperation =
+		SIZE == 4
+			? (code: ArrowKey, index: number) => {
+					if (code === 'ArrowLeft' && index % SIZE === 0) return 0;
+					if (code === 'ArrowUp' && index < SIZE) return 0;
+					if (code === 'ArrowRight' && (index + 1) % SIZE === 0) return 0;
+					if (code === 'ArrowDown' && index >= SIZE * SIZE - SIZE) return 0;
 
-				switch (code) {
-					case 'ArrowUp':
-						return -SIZE;
-					case 'ArrowRight':
-						return 1;
-					case 'ArrowDown':
-						return SIZE;
-					case 'ArrowLeft':
-						return -1;
-				}
-		  }
-		: (code: ArrowKey, index: number) => {
-				if (code === 'ArrowLeft' && index % SIZE === 0) {
-					if (
-						currentSection % SIZE != 0 &&
-						!items.has(currentSection - 1 + '_' + (ac + SIZE - 1))
-					) {
-						changeSection(SIZE - 1, -1);
+					switch (code) {
+						case 'ArrowUp':
+							return -SIZE;
+						case 'ArrowRight':
+							return 1;
+						case 'ArrowDown':
+							return SIZE;
+						case 'ArrowLeft':
+							return -1;
 					}
-					return 0;
-				}
-				if (code === 'ArrowUp' && index < SIZE) {
-					if (
-						currentSection >= SIZE &&
-						!items.has(currentSection - SIZE + '_' + (ac + SIZE * (SIZE - 1)))
-					) {
-						changeSection(SIZE * (SIZE - 1), -SIZE);
+			  }
+			: (code: ArrowKey, index: number) => {
+					if (code === 'ArrowLeft' && index % SIZE === 0) {
+						if (
+							currentSection % SIZE != 0 &&
+							!items.has(currentSection - 1 + '_' + (ac + SIZE - 1))
+						) {
+							changeSection(SIZE - 1, -1);
+						}
+						return 0;
 					}
-					return 0;
-				}
-				if (code === 'ArrowRight' && (index + 1) % SIZE === 0) {
-					if (
-						(currentSection + 1) % SIZE != 0 &&
-						!items.has(currentSection + 1 + '_' + (ac - SIZE + 1))
-					) {
-						changeSection(-(SIZE - 1), 1);
+					if (code === 'ArrowUp' && index < SIZE) {
+						if (
+							currentSection >= SIZE &&
+							!items.has(currentSection - SIZE + '_' + (ac + SIZE * (SIZE - 1)))
+						) {
+							changeSection(SIZE * (SIZE - 1), -SIZE);
+						}
+						return 0;
 					}
-					return 0;
-				}
-				if (code === 'ArrowDown' && index >= SIZE * SIZE - SIZE) {
-					if (
-						currentSection < SIZE * SIZE - SIZE &&
-						!items.has(currentSection + SIZE + '_' + (ac - SIZE * (SIZE - 1)))
-					) {
-						changeSection(-(SIZE * (SIZE - 1)), SIZE);
+					if (code === 'ArrowRight' && (index + 1) % SIZE === 0) {
+						if (
+							(currentSection + 1) % SIZE != 0 &&
+							!items.has(currentSection + 1 + '_' + (ac - SIZE + 1))
+						) {
+							changeSection(-(SIZE - 1), 1);
+						}
+						return 0;
 					}
-					return 0;
-				}
-				return (
-					(['ArrowUp', 'ArrowDown'].includes(code) ? SIZE : 1) *
-					(['ArrowRight', 'ArrowDown'].includes(code) ? 1 : -1)
-				);
-		  };
+					if (code === 'ArrowDown' && index >= SIZE * SIZE - SIZE) {
+						if (
+							currentSection < SIZE * SIZE - SIZE &&
+							!items.has(currentSection + SIZE + '_' + (ac - SIZE * (SIZE - 1)))
+						) {
+							changeSection(-(SIZE * (SIZE - 1)), SIZE);
+						}
+						return 0;
+					}
+					return (
+						(['ArrowUp', 'ArrowDown'].includes(code) ? SIZE : 1) *
+						(['ArrowRight', 'ArrowDown'].includes(code) ? 1 : -1)
+					);
+			  };
 
 	/**
 	 * function mutates ac if it is equal to "from" parameter

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { fly } from 'svelte/transition';
+	import Background from './Background.svelte';
 
 	const phrases = [
 		'Getting emojis ready...',
@@ -16,7 +17,7 @@
 		'Fencing with a train...',
 	];
 
-	let phraseIndex = 0;
+	let phraseIndex = Math.floor(Math.random() * phrases.length);
 
 	setInterval(() => {
 		phraseIndex = Math.floor(Math.random() * phrases.length);
@@ -24,7 +25,7 @@
 </script>
 
 <main
-	class="absolute z-20 flex h-full w-full items-end justify-end p-4 text-2xl text-slate-300"
+	class="absolute z-20 flex h-full w-full items-center justify-center p-4 text-2xl"
 >
 	{#key phraseIndex}
 		<span in:fly>{phrases[phraseIndex]}</span>
@@ -32,12 +33,9 @@
 	<span class="px-2" id="loading">👾</span>
 </main>
 
-<style>
-	main {
-		background-image: url('/images/emojis.png');
-		background-size: cover;
-	}
+<Background />
 
+<style>
 	@keyframes idle {
 		100% {
 			transform: translateY(-20px);

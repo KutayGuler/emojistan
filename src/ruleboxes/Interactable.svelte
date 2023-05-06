@@ -193,6 +193,8 @@
 	// this function deals with two-way binded variable
 	function updateHP() {
 		if (hp >= evolve.at) {
+	// TODO: Evolve/Devolve auto update with warning
+
 			notifications.warning(
 				'Default HP cannot be bigger than or equal to evolve HP'
 			);
