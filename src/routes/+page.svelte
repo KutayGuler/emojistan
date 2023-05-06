@@ -14,6 +14,7 @@
 	import Saves from './Saves.svelte';
 	import { onMount } from 'svelte';
 	import Background from './Background.svelte';
+	import Discover from './Discover.svelte';
 	export let emojiFreqs = new Map<string, Set<string>>();
 
 	onMount(() => {
@@ -31,6 +32,7 @@
 	});
 
 	let showSaves = false;
+	let showDiscover = false;
 
 	async function signInWithGoogle() {
 		const { data, error } = await supabase.auth.signInWithOAuth({
@@ -78,7 +80,9 @@
 	<title>Emojistan</title>
 </svelte:head>
 
-<main class="relative flex h-screen w-screen items-start justify-start p-8">
+<main
+	class="relative flex h-screen w-screen items-start justify-start gap-4 p-4"
+>
 	<!-- <div class="dropdown dropdown-bottom dropdown-end absolute right-4 top-4">
 		<button class="avatar ">
 			<div class="w-12 rounded-full ring ring-neutral-content">
@@ -123,9 +127,15 @@
 				>PLAY</button
 			>
 			<a href="/tutorial/controls" class="btn-secondary btn">TUTORIAL</a>
-			<btn class="btn-accent btn">DISCOVER</btn>
+			<button
+				on:click={() => (showDiscover = !showDiscover)}
+				class="btn-accent btn">DISCOVER</button
+			>
 		{/if}
 	</aside>
+	{#if showDiscover}
+		<Discover />
+	{/if}
 	<div class="absolute bottom-2 right-2">Emojistan v0.0.1</div>
 </main>
 <Background />

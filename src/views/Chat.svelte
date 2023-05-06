@@ -10,6 +10,8 @@
 	import { dialogueTree as dt } from '$src/store';
 	const dispatch = createEventDispatcher();
 
+	// TODO: track state of the conversation
+
 	export let isTutorial = false;
 	export let character: string;
 	export let dialogueID: string;

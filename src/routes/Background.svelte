@@ -8,19 +8,12 @@
 		return Math.random() * (max - min) + min;
 	}
 
-	function r() {
-		return Math.round(Math.random());
-	}
-
 	for (let array of Object.values(emojis)) {
+		randomEmojis.push(array[Math.round(random(0, array.length))]);
 		randomEmojis.push(array[Math.round(random(0, array.length))]);
 	}
 
-	console.log(randomEmojis);
-
-	const [min, max, minDeg, maxDeg] = [-25, 25, -180, 180];
-	const lr = ['right', 'left'];
-	const tb = ['top', 'bottom'];
+	const [min, max, minDeg, maxDeg] = [0, 100, -180, 180];
 
 	function transform(isSmall: boolean) {
 		let [x, y, deg, s] = [
@@ -33,16 +26,9 @@
 		return `translate(${x}vw, ${y}vh) rotate(${deg}deg) scale(${s}, ${s})`;
 	}
 
-	function getRandomPos() {
-		return `
-      ${lr[r()]}: ${random(15, 20)}vw;
-      ${tb[r()]}: ${random(15, 20)}vh;
-    `;
-	}
-
 	function interpolate(node: Element) {
 		let time = random(50, 100);
-		node.style.transition = `transform ${time}s, stroke 200ms, fill 200ms`;
+		node.style.transition = `transform ${time}s`;
 		node.style.transform = transform(node.classList.contains('small'));
 		time = node.init ? time : 0;
 		setTimeout(() => {
@@ -56,8 +42,9 @@
 	{#each randomEmojis as emoji, i}
 		<i
 			use:interpolate={this}
-			class="{i % 2 == 0 ? 'text-2xl' : 'text-4xl'} shape twa twa-{emoji}"
-			style={getRandomPos()}
+			class="{i % 2 == 0
+				? 'text-2xl'
+				: 'text-4xl'} shape twa twa-{emoji} top-0 left-0"
 		/>
 	{/each}
 </div>

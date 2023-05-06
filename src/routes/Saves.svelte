@@ -143,7 +143,7 @@
 				/>
 			</form>
 		{:else}
-			<h3>{name}</h3>
+			<h4>{name}</h4>
 			{#if !renameIndex}
 				<button
 					on:click={() => {

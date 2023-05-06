@@ -56,6 +56,8 @@
 		},
 	};
 
+	// FIXME: Focus getting stuck after clicking on next tutorial link
+
 	let rulebox = ruleboxes[$page.url.pathname.split('/')[2]];
 	$: rulebox = ruleboxes[$page.url.pathname.split('/')[2]];
 </script>
@@ -80,7 +82,7 @@
 		<div class="drawer-side">
 			<label for="my-drawer-2" class="drawer-overlay" />
 			<ul
-				class="brutal menu m-4 w-80 rounded-md bg-neutral text-neutral-content"
+				class="brutal menu m-4 w-96 rounded-md bg-neutral text-neutral-content"
 			>
 				<li
 					class={$page.url.pathname.includes('controls') ? 'bg-base-300' : ''}

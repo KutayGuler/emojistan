@@ -800,44 +800,6 @@
 			dispatch('quit');
 			return;
 		}
-
-		// if (e.code === 'KeyR') {
-		// 	let closestDistance = 300;
-		// 	let closestID = ac;
-
-		// 	let _controllables = Array.from(items).filter(
-		// 		([id, { emoji }]) => !_effectors[emoji]
-		// 	);
-
-		// 	for (let [id, _] of _controllables) {
-		// 		let _id = +id.split('_')[1];
-		// 		if (_id === ac) continue;
-		// 		if (_id > ac && _id - ac < closestDistance) {
-		// 			closestDistance = _id - ac;
-		// 			closestID = _id;
-		// 		}
-		// 	}
-
-		// 	if (closestDistance === 300) {
-		// 		let smallest = 300;
-		// 		for (let [id, _] of _controllables) {
-		// 			let _id = +id.split('_')[1];
-		// 			if (_id < smallest) smallest = _id;
-		// 		}
-		// 		ac = smallest;
-		// 		ic = ac + keys[directionKey].operation;
-		// 	} else {
-		// 		ac = closestID;
-		// 		ic = ac + keys[directionKey].operation;
-		// 	}
-
-		// 	player = items.get(currentSection + '_' + ac) as ControllableEntity;
-		// 	progress = tweened(calcPlayerHpPercentage(), {
-		// 		duration: 200,
-		// 		easing: cubicOut,
-		// 	});
-		// 	return;
-		// }
 	}
 
 	function noPlayer(rbx: any) {
