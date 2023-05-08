@@ -11,6 +11,7 @@
 		dialogueTree as dialogue,
 	} from '../store';
 	import { rbxStore } from '$lib/stores/store';
+	import { fly, scale } from 'svelte/transition';
 	export let emojiFreqs = new Map<string, Set<string>>();
 
 	function createNewGame() {
@@ -118,89 +119,105 @@
 	}}
 />
 
-<button on:click={createNewGame} class="btn-primary btn">NEW GAME</button>
-<div class="flex flex-row gap-2">
-	<input class="file-input " type="file" name="save-file" bind:files />
+<!-- <div class="flex flex-row gap-2">
+	<input class="file-input" type="file" name="save-file" bind:files />
 	{#if files}
-		<button class="btn" on:click={openUploadedSave}>OPEN</button>
+	<button class="btn" on:click={openUploadedSave}>OPEN</button>
 	{/if}
-</div>
-{#each [...$saves.saves] as [id, name], i}
-	<div class="relative flex flex-col rounded-lg bg-slate-300 p-4">
-		{#if renameIndex === i}
-			<form
-				on:submit={() => {
-					saves.rename(id, newName);
-					renameIndex = -1;
-				}}
+</div> -->
+<div class="z-10 flex h-full flex-grow flex-col gap-2 overflow-x-hidden">
+	<button
+		in:fly={{ x: 200 }}
+		on:click={createNewGame}
+		class="btn-primary btn h-48 text-4xl">NEW GAME</button
+	>
+	<div class="overflow-y-auto overflow-x-hidden">
+		{#each [...$saves.saves] as [id, name], i}
+			<div
+				in:fly={{ delay: (i + 1) * 80, x: 200 }}
+				class="brutal relative mb-2 flex h-48 flex-col rounded-lg bg-slate-300 p-4"
 			>
-				<!-- svelte-ignore a11y-autofocus -->
-				<input
-					autofocus
-					class="input-bordered input "
-					type="text"
-					bind:value={newName}
-				/>
-			</form>
-		{:else}
-			<h4>{name}</h4>
-			{#if !renameIndex}
-				<button
-					on:click={() => {
-						newName = name;
-						renameIndex = i;
-					}}
-					class="w-fit pl-0 text-slate-500">RENAME</button
-				>
-			{/if}
-		{/if}
-		<p>
-			{#each [...(emojiFreqs.get(id) || [])] as e}
-				<i class="twa twa-{e}" />
-			{/each}
-		</p>
-		<div class="flex w-full flex-row items-end gap-2 self-end pt-12">
-			<button class="btn-ghost btn-sm btn" on:click={() => downloadSave(id)}>
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					fill="none"
-					viewBox="0 0 24 24"
-					stroke-width="1.5"
-					stroke="currentColor"
-					class="h-6 w-6"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"
-					/>
-				</svg>
-			</button>
-			<div class="flex flex-grow" />
-			{#if deleteIndex === i}
-				<form
-					on:submit={() => {
-						saves.delete(id);
-						location.reload();
-					}}
-				>
-					<button class="btn-error btn-sm btn">CONFIRM</button>
-				</form>
-				<button
-					class="btn-sm btn"
-					on:click={() => {
-						deleteIndex = -1;
-					}}>CANCEL</button
-				>
-			{:else}
-				<button
-					on:click={() => {
-						deleteIndex = i;
-					}}
-					class="btn-ghost btn-sm btn">DELETE</button
-				>
-			{/if}
-			<button on:click={() => openSave(id)} class="btn-sm btn">OPEN</button>
-		</div>
+				{#if renameIndex === i}
+					<form
+						on:submit={() => {
+							saves.rename(id, newName);
+							renameIndex = -1;
+						}}
+					>
+						<!-- svelte-ignore a11y-autofocus -->
+						<input
+							autofocus
+							class="input-bordered input"
+							type="text"
+							bind:value={newName}
+						/>
+					</form>
+				{:else}
+					<h3>{name}</h3>
+					{#if !renameIndex}
+						<button
+							on:click={() => {
+								newName = name;
+								renameIndex = i;
+							}}
+							class="w-fit pl-0 text-slate-500">RENAME</button
+						>
+					{/if}
+				{/if}
+				<p>
+					{#each [...(emojiFreqs.get(id) || [])] as e}
+						<i class="twa text-4xl twa-{e}" />
+					{/each}
+				</p>
+				<div class="flex flex-grow" />
+				<div class="flex w-full flex-row items-end gap-2 self-end">
+					<button
+						class="btn-ghost btn-sm btn"
+						on:click={() => downloadSave(id)}
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke-width="1.5"
+							stroke="currentColor"
+							class="h-6 w-6"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"
+							/>
+						</svg>
+					</button>
+					<div class="flex flex-grow" />
+					{#if deleteIndex === i}
+						<form
+							on:submit={() => {
+								saves.delete(id);
+								location.reload();
+							}}
+						>
+							<button class="btn-error btn-sm btn">CONFIRM</button>
+						</form>
+						<button
+							class="btn-sm btn"
+							on:click={() => {
+								deleteIndex = -1;
+							}}>CANCEL</button
+						>
+					{:else}
+						<button
+							on:click={() => {
+								deleteIndex = i;
+							}}
+							class="btn-ghost btn-sm btn border-none hover:bg-error"
+							>DELETE</button
+						>
+					{/if}
+					<button on:click={() => openSave(id)} class="btn-sm btn">OPEN</button>
+				</div>
+			</div>
+		{/each}
 	</div>
-{/each}
+</div>

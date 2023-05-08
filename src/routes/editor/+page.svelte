@@ -177,27 +177,27 @@
 	<main
 		class="editor relative box-border flex h-screen flex-col items-center justify-center overflow-hidden"
 	>
-	{#if !test}
-		 <a href="/" class="btn-ghost btn absolute top-0 left-0"
-			 ><svg
-				 xmlns="http://www.w3.org/2000/svg"
-				 fill="none"
-				 viewBox="0 0 24 24"
-				 stroke-width="1.5"
-				 stroke="#29303e"
-				 class="h-6 w-6"
-			 >
-				 <path
-					 stroke-linecap="round"
-					 stroke-linejoin="round"
-					 d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
-				 />
-			 </svg></a
-		 >
-	{/if}
+		{#if !test}
+			<a href="/" class="btn-ghost btn absolute left-0 top-0 border-none"
+				><svg
+					xmlns="http://www.w3.org/2000/svg"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke-width="1.5"
+					stroke="#29303e"
+					class="h-6 w-6"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
+					/>
+				</svg></a
+			>
+		{/if}
 
 		{#if test}
-			<button on:click={toggleTest} class="absolute top-4 right-4 z-10 text-4xl"
+			<button on:click={toggleTest} class="absolute right-4 top-4 z-10 text-4xl"
 				>{CROSS}</button
 			>
 			<Game
@@ -307,7 +307,7 @@
 												on:click={() => {
 													$currentColor = $currentColor === color ? '' : color;
 												}}
-												class="h-5 w-5  duration-75 ease-out {disabled
+												class="h-5 w-5 rounded-sm border border-black duration-75 ease-out {disabled
 													? ''
 													: 'hover:scale-125'}  2xl:h-6 2xl:w-6"
 												style:background-color={color}
@@ -329,7 +329,7 @@
 										class="btn flex w-full flex-row items-center"
 									>
 										Set <div
-											class="m-1 h-4 w-4 rounded  2xl:h-6 2xl:w-6"
+											class="m-1 h-4 w-4 rounded 2xl:h-6 2xl:w-6"
 											style:background={$currentColor}
 										/>
 										as default

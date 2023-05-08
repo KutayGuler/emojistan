@@ -15,8 +15,26 @@
 		@apply text-lg md:text-2xl;
 	}
 
+	.brutal {
+		border: 2px solid black;
+	}
+
+	.brutal-lg {
+		border: 3px solid black;
+	}
+
 	.btn {
-		border: none;
+		@apply brutal box-border;
+	}
+
+	.select-bordered,
+	.input-bordered {
+		@apply brutal
+	}
+
+	.btn:hover,
+	.btn:focus {
+		border: 3px solid black;
 	}
 
 	.info {
@@ -40,7 +58,7 @@
 	}
 
 	.aside {
-		@apply relative h-[624px] w-72 rounded bg-slate-500 p-8 2xl:h-[720px] 2xl:w-80;
+		@apply brutal-lg relative h-[624px] w-72 rounded bg-slate-500 p-8 2xl:h-[720px] 2xl:w-80;
 	}
 
 	.simulation > *,
