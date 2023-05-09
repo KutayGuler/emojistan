@@ -73,6 +73,10 @@
 	};
 </script>
 
+<svelte:head>
+	<title>Emojistan | Tutorial - Controls</title>
+</svelte:head>
+
 <div
 	class="relative flex h-full flex-grow flex-row items-center justify-center gap-4"
 >

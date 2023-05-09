@@ -23,24 +23,17 @@
 		border: 3px solid black;
 	}
 
-	.btn {
+	.btn,
+	.btn:hover,
+	.btn:focus {
 		@apply brutal box-border;
 	}
 
 	.select-bordered,
 	.input-bordered {
-		@apply brutal
+		@apply brutal;
 	}
-
-	.btn:hover,
-	.btn:focus {
-		border: 3px solid black;
-	}
-
-	.info {
-		@apply cursor-help text-center text-lg duration-200 ease-out hover:scale-150;
-	}
-
+	
 	.map {
 		@apply grid h-full w-auto grid-cols-12 grid-rows-12 text-2xl;
 	}

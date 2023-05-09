@@ -1,6 +1,6 @@
 <script lang="ts">
 	// SVELTEKIT
-	import { onDestroy, onMount } from 'svelte';
+	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { emojis } from './emojis';
 
@@ -62,10 +62,6 @@
 		]) {
 			store.useStorage($saves.currentSaveID);
 		}
-	});
-
-	onDestroy(() => {
-		location.reload();
 	});
 
 	let currentCategory = 'pile-of-poo';

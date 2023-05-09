@@ -60,4 +60,8 @@
 	};
 </script>
 
+<svelte:head>
+	<title>Emojistan | Tutorial - Pusher</title>
+</svelte:head>
+
 <Tutorial {...tutorialProps} --header={PUSHER_BORDER} />

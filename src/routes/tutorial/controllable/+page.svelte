@@ -176,6 +176,10 @@
 
 <Tutorial {...props} --header={CONTROLLABLE_BORDER} />
 
+<svelte:head>
+	<title>Emojistan | Tutorial - Controllable</title>
+</svelte:head>
+
 <div class="absolute bottom-4 right-4 flex items-center justify-center gap-2">
 	<p class="absolute -top-8 w-full">
 		{index + 1} / {tutorialProps.length}

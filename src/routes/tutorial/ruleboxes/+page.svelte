@@ -107,6 +107,10 @@
 	});
 </script>
 
+<svelte:head>
+	<title>Emojistan | Tutorial - Ruleboxes</title>
+</svelte:head>
+
 <div class="self-start">
 	<h1 class="text-6xl">Ruleboxes</h1>
 	<p class="w-1/2 pt-2">

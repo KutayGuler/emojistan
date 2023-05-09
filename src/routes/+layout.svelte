@@ -10,11 +10,10 @@
 	import type { LayoutData } from './$types';
 	import { fly } from 'svelte/transition';
 	import Background from './Background.svelte';
-	import Discover from './Discover.svelte';
-	import Saves from './Saves.svelte';
 	import { notifications } from './notifications';
 	import {
 		CONTROLLABLE_BORDER,
+		CROSS,
 		EFFECTOR_BORDER,
 		INTERACTABLE_BORDER,
 		MERGER_BORDER,
@@ -65,6 +64,26 @@
 			});
 	}
 
+	async function signInWithGoogle() {
+		const { data, error } = await supabase.auth.signInWithOAuth({
+			provider: 'google',
+		});
+	}
+
+	async function signInWithPassword() {
+		resolved = false;
+		showDots();
+
+		const { data, error } = await supabase.auth.signInWithPassword({
+			email,
+			password,
+		});
+
+		console.log(data, error);
+		resolved = true;
+		asideShowing = 'menu';
+	}
+
 	let email: string;
 	let username: string;
 	let password: string;
@@ -89,14 +108,14 @@
 	let showing = 'menu';
 
 	const tutorialLinks = [
-		{ href: '/tutorial/controls', background: '' },
+		{ href: '/tutorial/controls', background: '#cfcfcf' },
 		{ href: '/tutorial/ruleboxes', background: '' },
 		{ href: '/tutorial/pusher', background: PUSHER_BORDER },
 		{ href: '/tutorial/merger', background: MERGER_BORDER },
 		{ href: '/tutorial/effector', background: EFFECTOR_BORDER },
 		{ href: '/tutorial/controllable', background: CONTROLLABLE_BORDER },
 		{ href: '/tutorial/interactable', background: INTERACTABLE_BORDER },
-		{ href: '/tutorial/editor', background: '' },
+		{ href: '/tutorial/editor', background: '#ea5234' },
 	];
 </script>
 
@@ -126,9 +145,10 @@
 					</svg>
 				</a>
 				{#each tutorialLinks as { href, background }}
+					{@const isRulebox = href.includes('rule') && $page.route.id == href}
 					<a
 						{href}
-						class="btn"
+						class="btn {isRulebox ? 'glass' : ''}"
 						style:background={href == $page.route.id ? background : ''}
 						>{href.replace('/tutorial/', '')}</a
 					>
@@ -138,7 +158,6 @@
 					class="btn w-full"
 					on:click={() => {
 						asideShowing = 'menu';
-						// moveDown('login');
 					}}
 					><svg
 						xmlns="http://www.w3.org/2000/svg"
@@ -155,7 +174,6 @@
 						/>
 					</svg>
 				</button>
-				<!-- class={asideShowing == 'menu' ? 'hidden' : 'w-full'} -->
 				<form
 					class="flex flex-col gap-2"
 					on:submit|preventDefault={signInWithPassword}
@@ -175,9 +193,6 @@
 						placeholder="password"
 						bind:value={password}
 					/>
-					<!-- {#each up as key} -->
-					<!-- in:receive={{ key }}
-			out:send={{ key }} -->
 					<button
 						type="submit"
 						class="btn-primary btn w-full {!resolved
@@ -185,14 +200,12 @@
 							: ''}"
 						>{resolved ? 'LOGIN' : 'LOGGING IN' + dots[dotIndex]}</button
 					>
-					<!-- {/each} -->
 				</form>
 			{:else if asideShowing == 'signup'}
 				<button
 					class="btn w-full"
 					on:click={() => {
 						asideShowing = 'menu';
-						// moveDown('login');
 					}}
 					><svg
 						xmlns="http://www.w3.org/2000/svg"
@@ -235,9 +248,6 @@
 						placeholder="confirm password"
 						bind:value={confirmPassword}
 					/>
-					<!-- {#each up as key} -->
-					<!-- in:receive={{ key }}
-		out:send={{ key }} -->
 					<button
 						type="submit"
 						class="btn-primary btn w-full {!resolved
@@ -245,7 +255,6 @@
 							: ''}"
 						>{resolved ? 'SIGN UP' : 'SIGNING UP' + dots[dotIndex]}</button
 					>
-					<!-- {/each} -->
 				</form>
 			{:else}
 				<a href="/saves" class="btn-primary btn w-full">PLAY</a>
@@ -255,26 +264,14 @@
 
 			<div class="flex flex-grow" />
 			{#if session}
-				<!-- <div class="dropdown-bottom dropdown-end up-4 dropdown self-end">
-					<button class="avatar">
-						<div class="w-12 rounded-full ring ring-neutral-content">
-							<img src="https://picsum.photos/200" alt="profile picture" />
-						</div>
-					</button>
-					<ul
-						tabindex="0"
-						class="dropdown-content menu rounded-box w-52 bg-base-100 p-2 shadow"
-					>
-						<li><a href="/user/1">Profile</a></li>
-						<li><a href="/account">Account</a></li>
-						<li><a href="/">Logout</a></li>
-					</ul>
-				</div> -->
+				<a href="/profile/{session.user.id}" class="avatar self-end">
+					<div class="w-12 rounded-full ring ring-neutral-content">
+						<!-- svelte-ignore a11y-img-redundant-alt -->
+						<img src="https://picsum.photos/200" alt="profile picture" />
+					</div>
+				</a>
 			{:else}
 				<div class="flex w-full flex-col items-end gap-2 text-neutral-content">
-					<!-- {#each down as key (key)} -->
-					<!-- in:receive={{ key }}
-		out:send={{ key }} -->
 					<button
 						class="btn-ghost btn-xs btn w-fit"
 						on:click={() => {
@@ -283,10 +280,8 @@
 							} else {
 								asideShowing = 'login';
 							}
-							// moveUp(key);
 						}}>Login</button
 					>
-					<!-- {/each} -->
 					<button
 						class="btn-ghost btn-xs btn w-fit"
 						on:click={() => {
@@ -295,7 +290,6 @@
 							} else {
 								asideShowing = 'signup';
 							}
-							// moveUp(key);
 						}}>Sign Up</button
 					>
 				</div>
@@ -308,15 +302,15 @@
 				in:fly={{ x: 100 }}
 				class="z-10 h-full w-full rounded bg-base-200 bg-opacity-95 p-8"
 			>
+				<a
+					href="/"
+					class="btn-ghost btn absolute right-4 top-4 border-none text-2xl"
+					>{CROSS}</a
+				>
 				<slot><!-- optional fallback --></slot>
 			</div>
 		{/if}
-		<!-- {#if showing == 'discover'}
-	<Discover />
-{:else if showing == 'saves'}
-	<Saves {emojiFreqs} />
-{/if} -->
-		<div class="up-2 absolute bottom-2">Emojistan v0.0.1</div>
+		<div class="absolute bottom-2 right-2">Emojistan v0.0.1</div>
 	</main>
 	<Background />
 {:else}
@@ -328,8 +322,6 @@
 {/if}
 
 <Toast />
-
-<!-- <slot /> -->
 
 <Modal />
 

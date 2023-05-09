@@ -11,11 +11,12 @@
 		dialogueTree as dialogue,
 	} from '$src/store';
 	import { rbxStore } from '$lib/stores/store';
-	import { fly, scale } from 'svelte/transition';
+	import { fly } from 'svelte/transition';
+	import { notifications } from '../notifications';
 
 	let emojiFreqs = new Map<string, Set<string>>();
 
-		// TODO: save in store
+	// TODO: save in store
 	onMount(() => {
 		if ($saves.currentSaveID === '') saves.useStorage();
 		for (let [saveID, _] of $saves.saves) {
@@ -120,6 +121,8 @@
 
 		goto('/editor');
 	}
+
+	let fileElement: HTMLInputElement;
 </script>
 
 <svelte:head>
@@ -135,27 +138,52 @@
 	}}
 />
 
-<!-- <div class="flex flex-row gap-2">
-	<input class="file-input" type="file" name="save-file" bind:files />
-	{#if files}
-	<button class="btn" on:click={openUploadedSave}>OPEN</button>
-	{/if}
-</div> -->
-
 <h1 class="text-6xl">Play</h1>
-<button
-	in:fly={{ x: 200 }}
-	on:click={createNewGame}
-	class="btn-primary btn mt-4 h-48 w-full text-4xl">NEW GAME</button
->
-<div class="flex-grow overflow-y-auto overflow-x-hidden">
+
+<div class="flex w-full gap-2 p-4 pl-0">
+	<label
+		for="save-file"
+		class="relative flex h-28 flex-grow cursor-pointer flex-col items-center justify-center gap-2 rounded border-2 border-dashed border-black hover:bg-gray-300"
+	>
+		<span class="drop-title">Drop files here</span>
+		or
+		<input
+			type="file"
+			id="save-file"
+			accept="application/json"
+			required
+			bind:files
+			bind:this={fileElement}
+			on:change={() => {
+				if (files[0].type != 'application/json') {
+					fileElement.value = '';
+					files = false;
+					notifications.danger(
+						'Wrong file type. Save files should be in JSON format.'
+					);
+				}
+			}}
+		/>
+		{#if files}
+			<button class="btn" on:click={openUploadedSave}>OPEN</button>
+		{/if}
+	</label>
+	<button
+		in:fly={{ x: 200 }}
+		on:click={createNewGame}
+		class="btn-primary btn h-28 flex-grow text-4xl">NEW GAME</button
+	>
+</div>
+
+<div class="h-full overflow-y-auto overflow-x-hidden p-4 pl-0">
 	{#each [...$saves.saves] as [id, name], i}
 		<div
 			in:fly={{ delay: (i + 1) * 80, x: 200 }}
-			class="brutal relative mb-2 flex h-48 flex-col rounded-lg bg-slate-300 p-4"
+			class="brutal relative mb-2 flex h-56 flex-col rounded-lg bg-slate-300 p-4"
 		>
 			{#if renameIndex === i}
 				<form
+					class="pb-4"
 					on:submit={() => {
 						saves.rename(id, newName);
 						renameIndex = -1;
@@ -164,22 +192,54 @@
 					<!-- svelte-ignore a11y-autofocus -->
 					<input
 						autofocus
-						class="input-bordered input"
+						class="input-bordered input input-sm"
 						type="text"
 						bind:value={newName}
 					/>
+					<button type="submit"
+						><svg
+							xmlns="http://www.w3.org/2000/svg"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke-width="1.5"
+							stroke="currentColor"
+							class="h-6 w-6"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								d="M4.5 12.75l6 6 9-13.5"
+							/>
+						</svg>
+					</button>
 				</form>
 			{:else}
-				<h3>{name}</h3>
-				{#if !renameIndex}
+				<div class="flex gap-2 pb-4">
+					<h3>{name}</h3>
 					<button
 						on:click={() => {
 							newName = name;
 							renameIndex = i;
 						}}
-						class="w-fit pl-0 text-slate-500">RENAME</button
-					>
-				{/if}
+						class="w-fit pl-0 text-slate-500"
+						><svg
+							xmlns="http://www.w3.org/2000/svg"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke-width="1.5"
+							stroke="currentColor"
+							class="h-6 w-6"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
+							/>
+						</svg>
+					</button>
+				</div>
+				<!-- {#if renameIndex} -->
+				<!-- {/if} -->
 			{/if}
 			<p>
 				{#each [...(emojiFreqs.get(id) || [])] as e}

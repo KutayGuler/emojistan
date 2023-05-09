@@ -184,9 +184,13 @@
 	$: props = tutorialProps[index];
 </script>
 
+<svelte:head>
+	<title>Emojistan | Tutorial - Effector</title>
+</svelte:head>
+
 <Tutorial {...props} --header={EFFECTOR_BORDER} />
 
-<!-- <div class="absolute bottom-4 right-4 flex items-center justify-center gap-2">
+<div class="absolute bottom-4 right-4 flex items-center justify-center gap-2">
 	<p class="absolute -top-8 w-full">
 		{index + 1} / {tutorialProps.length}
 	</p>
@@ -198,4 +202,4 @@
 	{:else if index === tutorialProps.length - 1}
 		<a href="/tutorial/controllable" class="btn-lg btn">CONTROLLABLE ⮞</a>
 	{/if}
-</div> -->
+</div>

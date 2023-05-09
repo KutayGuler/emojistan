@@ -70,8 +70,12 @@
 	let width; // width of webm
 </script>
 
+<svelte:head>
+	<title>Emojistan | Tutorial - Editor</title>
+</svelte:head>
+
 <div
-	class="relative flex h-full w-full flex-row items-start justify-center gap-4"
+	class="relative flex h-full w-full flex-row items-start justify-center gap-4 overflow-y-auto"
 >
 	<div class="relative flex w-full flex-col items-center justify-center">
 		<div class="flex w-full self-start p-4">
@@ -110,6 +114,6 @@
 				</div>
 			</div>
 		{/each}
-		<a href="#tutorial-complete" class="btn-lg btn mb-16">FINISH TUTORIAL</a>
+		<a href="/" class="btn-lg btn mb-32">BACK TO MENU</a>
 	</div>
 </div>
