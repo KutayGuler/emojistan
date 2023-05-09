@@ -10,8 +10,6 @@
 	import { dialogueTree as dt } from '$src/store';
 	const dispatch = createEventDispatcher();
 
-	// TODO: track state of the conversation
-
 	type History = {
 		chatIndex: number;
 		choices: Array<{ text: string; next: string }>;
