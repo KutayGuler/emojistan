@@ -15,8 +15,7 @@
 	import { onMount } from 'svelte';
 	import Background from './Background.svelte';
 	import Discover from './Discover.svelte';
-	import { crossfade, fly } from 'svelte/transition';
-	import { quintOut } from 'svelte/easing';
+	import { fly } from 'svelte/transition';
 	import { notifications } from './notifications';
 	export let emojiFreqs = new Map<string, Set<string>>();
 
@@ -45,6 +44,19 @@
 		});
 	}
 
+	async function signInWithPassword() {
+		resolved = false;
+		showDots();
+
+		const { data, error } = await supabase.auth.signInWithPassword({
+			email,
+			password,
+		});
+
+		console.log(data, error);
+		resolved = true;
+	}
+
 	async function addIsland() {
 		let owner = await supabase.auth.getUser();
 		if (!owner.data.user) {
@@ -52,7 +64,7 @@
 		}
 
 		// CF #8
-		const { data, error } = await supabase.from('islands').insert([
+		const { data, error } = await supabase.from('games').insert([
 			{
 				data: {
 					map: {
@@ -72,10 +84,10 @@
 		]);
 	}
 
-	async function getIslands() {
+	async function getgames() {
 		let user = await supabase.auth.getUser();
-		let { data: islands, error } = await supabase
-			.from('islands')
+		let { data: games, error } = await supabase
+			.from('games')
 			.select('data')
 			.eq('owner', user.data.user?.id);
 	}
@@ -243,15 +255,20 @@
 				</svg>
 			</button>
 			<!-- class={asideShowing == 'menu' ? 'hidden' : 'w-full'} -->
-			<form class="flex flex-col gap-2">
+			<form
+				class="flex flex-col gap-2"
+				on:submit|preventDefault={signInWithPassword}
+			>
 				<h3 class="pt-8 text-neutral-content">Login</h3>
 				<input
+					required
 					type="email"
 					class="input-bordered input w-full"
 					placeholder="email"
 					bind:value={email}
 				/>
 				<input
+					required
 					type="password"
 					class="input-bordered input w-full"
 					placeholder="password"
@@ -261,11 +278,10 @@
 				<!-- in:receive={{ key }}
 				out:send={{ key }} -->
 				<button
-					class="btn-primary btn w-full"
-					on:click={() => {
-						// moveDown(key);
-						asideShowing = 'login';
-					}}>LOGIN</button
+					type="submit"
+					class="btn-primary btn w-full {!resolved
+						? 'pointer-events-none bg-transparent text-primary'
+						: ''}">{resolved ? 'LOGIN' : 'LOGGING IN' + dots[dotIndex]}</button
 				>
 				<!-- {/each} -->
 			</form>

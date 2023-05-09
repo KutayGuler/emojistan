@@ -1,13 +1,29 @@
 <script lang="ts">
-	import Toast from './Toast.svelte';
-	import { navigating } from '$app/stores';
 	import '../app.css';
 	import '../twemoji.css';
-	// import supabase from '../supabase';
+	import Toast from './Toast.svelte';
+	import { navigating } from '$app/stores';
 	import Modal from './Modal.svelte';
-	import { currentSkin, loadedEmojis } from '$src/store';
-	import { emojis } from './editor/emojis';
 	import Loading from './Loading.svelte';
+	import { invalidate } from '$app/navigation';
+	import { onMount } from 'svelte';
+	import type { LayoutData } from './$types';
+
+	export let data: LayoutData;
+
+	$: ({ supabase, session } = data);
+
+	onMount(() => {
+		const {
+			data: { subscription },
+		} = supabase.auth.onAuthStateChange((event, _session) => {
+			if (_session?.expires_at !== session?.expires_at) {
+				invalidate('supabase:auth');
+			}
+		});
+
+		return () => subscription.unsubscribe();
+	});
 
 	// import { tweened } from 'svelte/motion';
 	// import { cubicOut } from 'svelte/easing';

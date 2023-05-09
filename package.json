@@ -2,6 +2,7 @@
   "name": "emojistan",
   "version": "0.0.1",
   "scripts": {
+    "update-types": "npx supabase gen types typescript --project-id \"vuiyurkhfceaoxddvvnf\" > types/supabase.ts",
     "tauri": "tauri",
     "help": "svelte-kit dev --help",
     "dev": "vite dev --open",
@@ -26,6 +27,7 @@
     "prettier": "^2.7.1",
     "prettier-plugin-svelte": "^2.8.1",
     "prettier-plugin-tailwindcss": "^0.2.4",
+    "supabase": "^1.57.2",
     "svelte": "^3.44.0",
     "svelte-check": "^3.1.0",
     "svelte-preprocess": "^5.0.1",
@@ -36,6 +38,7 @@
   },
   "type": "module",
   "dependencies": {
+    "@supabase/auth-helpers-sveltekit": "^0.9.4",
     "@supabase/supabase-js": "^2.1.1",
     "astar-typescript": "^1.2.6",
     "d3-selection": "^3.0.0",
