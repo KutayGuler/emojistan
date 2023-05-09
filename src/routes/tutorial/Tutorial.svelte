@@ -28,18 +28,15 @@
 </script>
 
 <div
-	class="relative flex h-full w-full flex-row items-start justify-center gap-4"
+	class="relative flex h-full w-full flex-row items-start justify-start gap-4"
 >
-	<div class="relative flex w-full flex-col items-center justify-center">
-		<div class="w-full self-start p-4">
+	<div class="relative flex w-1/2 flex-col items-center justify-center">
+		<div class="self-start">
 			{#if header}
-				<span class="flex-inline flex items-center">
-					<h1>{header}</h1>
-					<h3 class="pl-2">{subheader}</h3>
-				</span>
+				<h1 class="text-6xl">{header}</h1>
 			{/if}
 			<slot name="description">
-				<p class="h-32 pt-2">
+				<p class="pb-4 pt-2">
 					{@html description}
 				</p>
 			</slot>
@@ -50,18 +47,18 @@
 				aria-hidden="true"
 				id="rbx"
 				style="width: {rbx.width}px; height: {rbx.height}px;"
-				class="pointer-events-none relative mt-12 mb-24 flex flex-col justify-center"
+				class="pointer-events-none relative mb-24 mt-12 flex flex-col justify-center"
 			>
 				<Rulebox {rbx} {props} />
 				<div
 					style:height={veilHeight + 'px'}
-					class="absolute bottom-0 z-10 w-full {veilColor}"
+					class="absolute bottom-0 z-10 {veilColor}"
 				/>
 			</div>
 		{/key}
 	</div>
 	<div
-		class="relative flex w-full flex-col items-center justify-center self-center"
+		class="relative flex w-1/2 flex-col items-center justify-center self-center"
 	>
 		{#key gameProps}
 			<Game {...gameProps} />
@@ -70,8 +67,7 @@
 </div>
 
 <style>
-	h1,
-	h3 {
+	h1 {
 		color: var(--header);
 	}
 

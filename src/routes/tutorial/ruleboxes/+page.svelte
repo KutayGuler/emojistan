@@ -107,17 +107,15 @@
 	});
 </script>
 
-<div class="self-start p-4">
-	<h1>Ruleboxes</h1>
+<div class="self-start">
+	<h1 class="text-6xl">Ruleboxes</h1>
 	<p class="w-1/2 pt-2">
 		Ruleboxes are the fundamental elements that build the game logic. In the
 		following tutorials, you will learn about each of those Ruleboxes.
 	</p>
 </div>
 
-<div
-	class="relative flex h-full w-full flex-col items-center justify-center gap-8 p-1"
->
+<div class="relative flex h-full flex-col items-center justify-center pb-4">
 	{#each ruleboxes as { rbx, component }, i}
 		{#if index === i}
 			<div

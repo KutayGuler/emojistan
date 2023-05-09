@@ -74,10 +74,10 @@
 </script>
 
 <div
-	class="relative flex h-full w-full flex-row items-center justify-center gap-4"
+	class="relative flex h-full flex-grow flex-row items-center justify-center gap-4"
 >
 	<div class="flex w-full flex-col gap-12">
-		<h1 class="absolute top-0 left-0 p-4">Controls</h1>
+		<h1 class="absolute left-0 top-0 text-6xl">Controls</h1>
 		<div class="flex flex-col items-center justify-center">
 			<p>Movement</p>
 			<div class="flex w-full justify-center">

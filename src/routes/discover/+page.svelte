@@ -1,10 +1,8 @@
 <script lang="ts">
-	import { fly } from 'svelte/transition';
-
 	let filter: 'newest' | 'following' | 'favorites' = 'newest';
 </script>
 
-<h1 class="text-6xl">Discover</h1>
+<h1 class="text-6xl text-accent">Discover</h1>
 <div class="tabs tabs-boxed pt-4">
 	<button
 		on:click={() => (filter = 'newest')}
