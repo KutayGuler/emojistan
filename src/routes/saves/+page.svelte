@@ -13,6 +13,9 @@
 	import { rbxStore } from '$lib/stores/store';
 	import { fly } from 'svelte/transition';
 	import { notifications } from '../notifications';
+	import type { PageData } from './$types';
+
+	export let data: PageData;
 
 	let emojiFreqs = new Map<string, Set<string>>();
 
@@ -248,7 +251,11 @@
 			</p>
 			<div class="flex flex-grow" />
 			<div class="flex w-full flex-row items-end gap-2 self-end">
-				<button class="btn-ghost btn-sm btn" on:click={() => downloadSave(id)}>
+				<button
+					title="Download save file"
+					class="btn-ghost btn-sm btn"
+					on:click={() => downloadSave(id)}
+				>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
 						fill="none"
@@ -264,6 +271,28 @@
 						/>
 					</svg>
 				</button>
+				{#if data.session}
+					<button
+						title="Publish"
+						class="btn-ghost btn-sm btn"
+						on:click={() => {}}
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke-width="1.5"
+							stroke="currentColor"
+							class="h-6 w-6"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z"
+							/>
+						</svg>
+					</button>
+				{/if}
 				<div class="flex flex-grow" />
 				{#if deleteIndex === i}
 					<form

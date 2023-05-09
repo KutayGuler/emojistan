@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { scale } from 'svelte/transition';
+	import { fly, scale } from 'svelte/transition';
 	import { tweened } from 'svelte/motion';
 	import { cubicOut } from 'svelte/easing';
 	import { createEventDispatcher, onMount } from 'svelte/internal';
@@ -58,7 +58,7 @@
 	let currentSection = map.startingSectionIndex;
 	let directionKey: Wasd = 'KeyD';
 	let currentInventoryIndex = 0;
-	let items = new Map<string, Entity | Effector>();
+	let entities = new Map<string, Entity | Effector>();
 	let colors = new Map(map.colors);
 	let backgrounds = new Map(map.backgrounds);
 	let _interactables: _Interactables = {};
@@ -145,13 +145,13 @@
 
 	function changeSection(acSideEffect: number, sectionSideEffect: number) {
 		let _id = currentSection + '_' + ac;
-		let playerData = items.get(_id) as Entity;
-		items.delete(_id);
+		let playerData = entities.get(_id) as Entity;
+		entities.delete(_id);
 		currentSection += sectionSideEffect;
 		ic += acSideEffect;
 		ac += acSideEffect;
-		items.set(currentSection + '_' + ac, playerData);
-		items = items;
+		entities.set(currentSection + '_' + ac, playerData);
+		entities = entities;
 	}
 
 	const calcOperation =
@@ -177,7 +177,7 @@
 					if (code === 'ArrowLeft' && index % SIZE === 0) {
 						if (
 							currentSection % SIZE != 0 &&
-							!items.has(currentSection - 1 + '_' + (ac + SIZE - 1))
+							!entities.has(currentSection - 1 + '_' + (ac + SIZE - 1))
 						) {
 							changeSection(SIZE - 1, -1);
 						}
@@ -186,7 +186,7 @@
 					if (code === 'ArrowUp' && index < SIZE) {
 						if (
 							currentSection >= SIZE &&
-							!items.has(currentSection - SIZE + '_' + (ac + SIZE * (SIZE - 1)))
+							!entities.has(currentSection - SIZE + '_' + (ac + SIZE * (SIZE - 1)))
 						) {
 							changeSection(SIZE * (SIZE - 1), -SIZE);
 						}
@@ -195,7 +195,7 @@
 					if (code === 'ArrowRight' && (index + 1) % SIZE === 0) {
 						if (
 							(currentSection + 1) % SIZE != 0 &&
-							!items.has(currentSection + 1 + '_' + (ac - SIZE + 1))
+							!entities.has(currentSection + 1 + '_' + (ac - SIZE + 1))
 						) {
 							changeSection(-(SIZE - 1), 1);
 						}
@@ -204,7 +204,7 @@
 					if (code === 'ArrowDown' && index >= SIZE * SIZE - SIZE) {
 						if (
 							currentSection < SIZE * SIZE - SIZE &&
-							!items.has(currentSection + SIZE + '_' + (ac - SIZE * (SIZE - 1)))
+							!entities.has(currentSection + SIZE + '_' + (ac - SIZE * (SIZE - 1)))
 						) {
 							changeSection(-(SIZE * (SIZE - 1)), SIZE);
 						}
@@ -223,9 +223,9 @@
 	function transferItem(from: number, to: number) {
 		let _to = currentSection + '_' + to;
 		let _from = currentSection + '_' + from;
-		items.set(_to, items.get(_from) as Effector | Entity);
-		items.delete(_from);
-		items = items; // MAGIC UPDATE, NECESSARY FOR REACTIVITY
+		entities.set(_to, entities.get(_from) as Effector | Entity);
+		entities.delete(_from);
+		entities = entities; // MAGIC UPDATE, NECESSARY FOR REACTIVITY
 
 		if (ac === from) {
 			ac = to;
@@ -264,18 +264,18 @@
 		let _fromID = currentSection + '_' + fromID;
 		let _toID = currentSection + '_' + toID;
 
-		let from = items.get(_fromID) as Entity;
+		let from = entities.get(_fromID) as Entity;
 		let fromInventory: Inventory =
 			from?.inventory || new Map<number, Effector>();
 		let fromHP = from?.hp?.current || 1;
 		let toInventory: Inventory =
-			(items.get(_toID) as Entity)?.inventory || new Map<number, Effector>();
+			(entities.get(_toID) as Entity)?.inventory || new Map<number, Effector>();
 		let mergedInventory = new Map([...fromInventory, ...toInventory]);
 		while (mergedInventory.size > MAX_INVENTORY_SIZE) {
 			mergedInventory.delete(mergedInventory.keys().next().value);
 		}
 
-		items.set(
+		entities.set(
 			_toID,
 			new Entity(
 				mergeResult,
@@ -283,8 +283,8 @@
 				_interactables[mergeResult]?.hp || fromHP
 			)
 		);
-		items.delete(_fromID);
-		items = items; // MAGIC UPDATE, NECESSARY FOR REACTIVITY
+		entities.delete(_fromID);
+		entities = entities; // MAGIC UPDATE, NECESSARY FOR REACTIVITY
 
 		if (ac === fromID) {
 			ac = toID;
@@ -306,7 +306,7 @@
 		for (let i = 0; i < SIZE; i++) {
 			matrix[i] = [];
 			for (let j = 0; j < SIZE; j++) {
-				let item = items.get(currentSection + '_' + (SIZE * i + j));
+				let item = entities.get(currentSection + '_' + (SIZE * i + j));
 				if (item) {
 					if (_interactables[item.emoji]) {
 						matrix[i].push(0);
@@ -338,7 +338,7 @@
 		let from = pathway[0][1] * SIZE + pathway[0][0];
 		let to = pathway[1][1] * SIZE + pathway[1][0];
 
-		if (!items.has(currentSection + '_' + to)) {
+		if (!entities.has(currentSection + '_' + to)) {
 			transferItem(from, to);
 			enemyIndexes[relativeIndex] = to;
 		}
@@ -348,15 +348,15 @@
 		for (let [id, _emoji] of map.items) {
 			if (_effectors[_emoji]) {
 				let { hp } = _effectors[_emoji];
-				items.set(id, new Effector(_emoji, hp));
+				entities.set(id, new Effector(_emoji, hp));
 			} else if (_controllables[_emoji] || _interactables[_emoji]) {
-				items.set(id, new Entity(_emoji, new Map<number, Effector>(), 1));
+				entities.set(id, new Entity(_emoji, new Map<number, Effector>(), 1));
 			} else {
-				items.set(id, new Entity(_emoji));
+				entities.set(id, new Entity(_emoji));
 			}
 		}
 
-		for (let [id, item] of items) {
+		for (let [id, item] of entities) {
 			if (item instanceof Effector) continue;
 			if (
 				ac === -2 &&
@@ -383,8 +383,8 @@
 		hp: HP;
 	}
 
-	let player = items.get(currentSection + '_' + ac) as ControllableEntity;
-	$: player = items.get(currentSection + '_' + ac) as ControllableEntity;
+	let player = entities.get(currentSection + '_' + ac) as ControllableEntity;
+	$: player = entities.get(currentSection + '_' + ac) as ControllableEntity;
 
 	let numbers = new Map<number, number>();
 
@@ -436,18 +436,18 @@
 			colors.delete(currentSection + '_' + index);
 		},
 		spawn({ index, emoji }) {
-			items.set(currentSection + '_' + index, new Entity(emoji));
-			items = items;
+			entities.set(currentSection + '_' + index, new Entity(emoji));
+			entities = entities;
 		},
 		destroy({ index }) {
-			items.delete(currentSection + '_' + index);
+			entities.delete(currentSection + '_' + index);
 		},
 		resetLevel: () => {
-			items.clear();
+			entities.clear();
 			colors = new Map(map.colors);
 			ac = -2;
 			initEntities();
-			items = items;
+			entities = entities;
 			levelCompleted = false;
 		},
 		completeLevel: () => (levelCompleted = true),
@@ -462,9 +462,9 @@
 		let collisionChain = [];
 		let i = 0;
 
-		while (items.has(currentSection + '_' + (ac + operation * i))) {
+		while (entities.has(currentSection + '_' + (ac + operation * i))) {
 			collisionChain.push(
-				items.get(currentSection + '_' + (ac + operation * i))?.emoji
+				entities.get(currentSection + '_' + (ac + operation * i))?.emoji
 			);
 			i++;
 		}
@@ -561,7 +561,7 @@
 		// e.preventDefault();
 		handDirection = '';
 		if (
-			!items.has(currentSection + '_' + ac) ||
+			!entities.has(currentSection + '_' + ac) ||
 			(player?.hp?.current || -1) <= 0 ||
 			chatting
 		) {
@@ -571,7 +571,7 @@
 		if (e.code.includes('Arrow')) {
 			let operation = calcOperation(e.code as ArrowKey, ac);
 			if (!player || operation === 0 || !_controllables[player.emoji]) return;
-			let facingItem = items.get(currentSection + '_' + (ac + operation));
+			let facingItem = entities.get(currentSection + '_' + (ac + operation));
 
 			if (!facingItem) {
 				transferItem(ac, ac + operation);
@@ -621,7 +621,7 @@
 			if (operation === 0) {
 				return;
 			}
-			let interactedItem = items.get(currentSection + '_' + ic);
+			let interactedItem = entities.get(currentSection + '_' + ic);
 
 			if (interactedItem instanceof Effector) {
 				if (player.inventory.size != MAX_INVENTORY_SIZE) {
@@ -632,8 +632,8 @@
 							break;
 						}
 					}
-					items.delete(currentSection + '_' + ic);
-					items = items;
+					entities.delete(currentSection + '_' + ic);
+					entities = entities;
 				}
 				return;
 			}
@@ -709,13 +709,13 @@
 				if (devolve.to !== '') {
 					interactedItem.emoji = devolve.to;
 				} else {
-					items.delete(currentSection + '_' + ic);
+					entities.delete(currentSection + '_' + ic);
 				}
 			} else if (evolve?.to !== '' && evolve.at === interactedItem.hp.current) {
 				interactedItem.emoji = evolve.to;
 			}
 
-			items = items;
+			entities = entities;
 			return;
 		}
 
@@ -747,11 +747,11 @@
 					return;
 				}
 
-				for (let [id, item] of items) {
+				for (let [id, item] of entities) {
 					if (item instanceof Effector || !item || !item.hp || !item.inventory)
 						continue;
 					if (item.hp.current > 0 && _controllables[item.emoji]) {
-						player = items.get(id) as ControllableEntity;
+						player = entities.get(id) as ControllableEntity;
 						ac = +id.split('_')[1];
 						progress = tweened(calcPlayerHpPercentage(), {
 							duration: 200,
@@ -783,16 +783,16 @@
 			if (
 				calcOperation(wasdToArrow[directionKey], ac) === 0 ||
 				!player?.inventory.get(currentInventoryIndex) ||
-				items.has(currentSection + '_' + ic)
+				entities.has(currentSection + '_' + ic)
 			) {
 				return;
 			}
 
 			let droppedItem = player?.inventory.get(currentInventoryIndex);
 			if (!droppedItem) return;
-			items.set(currentSection + '_' + ic, droppedItem);
+			entities.set(currentSection + '_' + ic, droppedItem);
 			deleteFromInventory(currentInventoryIndex);
-			items = items;
+			entities = entities;
 			return;
 		}
 
@@ -828,15 +828,22 @@
 		{#if chatting}
 			<Chat
 				isTutorial={SIZE === 4}
+				history={entities.get(currentSection + "_" + ac)?.history}
 				{character}
 				{dialogueID}
 				dialogueTree={dt}
-				on:end={() => (chatting = false)}
+				on:end={(e) => {
+					//  e.detail.history
+					console.log(e.detail.history);
+					
+					entities.get(currentSection + "_" + ac).history = e.detail.history;
+					chatting = false
+				}}
 			/>
 		{/if}
 		{#each { length: SIZE * SIZE } as _, i}
 			{@const active = ac === i}
-			{@const item = items.get(currentSection + '_' + i)}
+			{@const item = entities.get(currentSection + '_' + i)}
 			{@const background = backgrounds.get(currentSection + '_' + i)}
 			{@const hand =
 				player?.inventory?.get(currentInventoryIndex)?.emoji ||
@@ -864,7 +871,7 @@
 			<dialog
 				open
 				style="background-color: rgba(0, 0, 0.5, 0.5);"
-				class="absolute z-20 flex h-full w-full flex-col items-center justify-center gap-4 self-center "
+				class="absolute z-20 flex h-full w-full flex-col items-center justify-center gap-4 self-center"
 				transition:scale|local
 			>
 				<p class="absolute top-4 w-full text-center text-white">

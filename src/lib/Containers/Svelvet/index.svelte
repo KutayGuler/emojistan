@@ -16,6 +16,8 @@
 	}
 
 	onMount(resize);
+
+	// TODO: add minimap
 </script>
 
 <svelte:window bind:innerWidth on:resize={resize} />
@@ -25,10 +27,10 @@
 	style={`width: ${graphSize}px; height: ${graphSize}px`}
 >
 	<GraphView {graphSize} />
-	<p class="absolute right-0 bottom-0 pr-1 text-xs">
+	<p class="absolute bottom-0 right-0 pr-1 text-xs">
 		Right click to spawn a Rulebox
 	</p>
-	<p class="absolute left-0 bottom-0 pl-1 text-xs">Press R to unstuck</p>
+	<p class="absolute bottom-0 left-0 pl-1 text-xs">Press R to unstuck</p>
 </div>
 
 <style>

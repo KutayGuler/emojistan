@@ -12,10 +12,20 @@
 
 	// TODO: track state of the conversation
 
+	type History = {
+		chatIndex: number;
+		choices: Array<{ text: string; next: string }>;
+	};
+
 	export let isTutorial = false;
 	export let character: string;
 	export let dialogueID: string;
 	export let dialogueTree = new Map<string, Branch>();
+	export let history: History = {
+		chatIndex: 0,
+		choices: [],
+	};
+
 	let currentBranch = dialogueID;
 	let chatIndex = 0;
 	let answerIndexes: Array<number> = [];
@@ -28,9 +38,31 @@
 			dialogueTree = new Map<string, Branch>($dt);
 		}
 
-		currentDialogue = dialogueTree.get(currentBranch) || [];
-		branchChanged();
-		chatIndex++;
+		console.log(history);
+
+		if (history.chatIndex) {
+			for (let choice of history.choices) {
+				currentDialogue = dialogueTree.get(currentBranch) || [];
+				chatIndex = currentDialogue.length;
+				let { text, next } = choice;
+
+				for (let i = 0; i < currentDialogue.length; i++) {
+					let bit = currentDialogue[i];
+					texts.push(typeof bit === 'string' ? bit : text);
+				}
+
+				texts = texts;
+				answerIndexes.push(texts.length - 1);
+				currentBranch = next;
+				interacting = false;
+				branchChanged();
+			}
+		} else {
+			currentDialogue = dialogueTree.get(currentBranch) || [];
+			console.log(currentDialogue);
+			branchChanged();
+			chatIndex++;
+		}
 	});
 
 	function makeChoice(e: SubmitEvent) {
@@ -42,6 +74,11 @@
 		answerIndexes.push(texts.length - 1);
 		currentBranch = next;
 		interacting = false;
+
+		// update history
+		history.chatIndex = chatIndex;
+		history.choices.push({ text, next });
+
 		branchChanged();
 	}
 
@@ -89,7 +126,7 @@
 <svelte:window
 	on:keydown={(e) => {
 		if (e.code === 'Escape') {
-			dispatch('end');
+			dispatch('end', { history });
 			return;
 		}
 
@@ -100,7 +137,7 @@
 		}
 
 		if (chatIndex === texts.length + (choices?.length || 0) + 1) {
-			dispatch('end');
+			dispatch('end', { history });
 		}
 	}}
 />
@@ -111,7 +148,7 @@
 	class="absolute z-50 flex flex-col items-start justify-start {isTutorial
 		? 'h-[204px] w-[204px] 2xl:h-[236px] 2xl:w-[236px]'
 		: 'h-[624px] w-[624px] 2xl:h-[720px] 2xl:w-[720px]'} overflow-y-auto overflow-x-hidden backdrop-blur"
-	transition:scale|local
+	transition:fly|local={{ x: -100 }}
 >
 	<h1 class="p-4"><i class="twa twa-{character}" /></h1>
 	{#if texts}

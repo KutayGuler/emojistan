@@ -190,32 +190,6 @@
 		updateStore();
 	}
 
-	// this function deals with two-way binded variable
-	function updateHP() {
-		if (hp >= evolve.at) {
-	// TODO: Evolve/Devolve auto update with warning
-
-			notifications.warning(
-				'Default HP cannot be bigger than or equal to evolve HP'
-			);
-			hp = evolve.at - 1;
-		}
-
-		updateStore();
-	}
-
-	// this function deals with two-way binded variable
-	function updateEvolveHP() {
-		if (evolve.at <= hp) {
-			notifications.warning(
-				'Evolve HP cannot be smaller than or equal to default HP'
-			);
-			evolve.at = hp + 1;
-		}
-
-		updateStore();
-	}
-
 	function updateDevolveEmoji() {
 		if (emoji === $formattedEmoji) {
 			notifications.warning('An interactable cannot devolve to itself');
@@ -240,6 +214,7 @@
 	let hasInteraction = true;
 	$: hasInteraction = sideEffects.some((m) => m[1] != 0);
 	$: droppables = [...$effectors].filter(([id, e]) => e.emoji != '');
+	$: evolve.at = hp > evolve.at ? hp + 1 : evolve.at;
 </script>
 
 <div class="absolute -top-8 flex flex-row items-center justify-center gap-2">
@@ -267,7 +242,7 @@
 				class="select-bordered select select-sm text-xl"
 				title="HP"
 				bind:value={hp}
-				on:change={updateHP}
+				on:change={updateStore}
 			>
 				{#each hps as _hp}
 					<option value={_hp}>{_hp}</option>
@@ -277,7 +252,7 @@
 	</div>
 	<div
 		use:checkEvolve
-		class="flex scale-75 flex-col  items-center justify-center"
+		class="flex scale-75 flex-col items-center justify-center"
 	>
 		<button title="Evolve Emoji" class="slot-lg" on:click={updateEvolveEmoji}>
 			<i class="twa twa-{evolve.to}" />
@@ -287,7 +262,7 @@
 				class="select-bordered select select-sm text-xl"
 				title="HP"
 				bind:value={evolve.at}
-				on:change={updateEvolveHP}
+				on:change={updateStore}
 			>
 				{#each hps as _hp}
 					<option value={_hp}>{_hp}</option>
@@ -312,7 +287,7 @@
 				<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
 				<ul
 					tabindex="0"
-					class="dropdown-content menu rounded-box bg-base-100 p-2 shadow "
+					class="dropdown-content menu rounded-box bg-base-100 p-2 shadow"
 				>
 					{#each droppables as [id, { emoji }]}
 						<button
@@ -357,7 +332,7 @@
 							</select>
 						{:else if modifierEmoji}
 							<button
-								class="absolute -top-2 -right-2 text-lg"
+								class="absolute -right-2 -top-2 text-lg"
 								on:click={() => removeFromSideEffects(i)}>{CROSS}</button
 							>
 							<div class="slot-lg scale-75">
@@ -383,7 +358,7 @@
 				{/each}
 				{#each pseudoSideEffects as [emoji, value]}
 					<div class="relative flex flex-col items-center">
-						<button class="absolute -top-2 -right-2 text-lg">{CROSS}</button>
+						<button class="absolute -right-2 -top-2 text-lg">{CROSS}</button>
 						<div class="slot-lg scale-75">
 							<i class="twa twa-{emoji}" />
 						</div>

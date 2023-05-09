@@ -9,7 +9,6 @@ import type { Database } from '$api/types';
 export const load: LayoutLoad = async ({ fetch, data, depends }) => {
 	depends('supabase:auth');
 
-	console.time()
 	const supabase = createSupabaseLoadClient<Database>({
 		supabaseUrl: PUBLIC_SUPABASE_URL,
 		supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
@@ -20,8 +19,6 @@ export const load: LayoutLoad = async ({ fetch, data, depends }) => {
 	const {
 		data: { session },
 	} = await supabase.auth.getSession();
-
-	console.timeEnd();
 
 	return { supabase, session };
 };

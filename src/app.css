@@ -25,15 +25,17 @@
 
 	.btn,
 	.btn:hover,
-	.btn:focus {
-		@apply brutal box-border;
-	}
-
+	.btn:focus,
 	.select-bordered,
 	.input-bordered {
 		@apply brutal;
 	}
-	
+
+	.slot,
+	.slot-lg {
+		@apply brutal-lg;
+	}
+
 	.map {
 		@apply grid h-full w-auto grid-cols-12 grid-rows-12 text-2xl;
 	}

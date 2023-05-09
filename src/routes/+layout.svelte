@@ -117,6 +117,10 @@
 		{ href: '/tutorial/interactable', background: INTERACTABLE_BORDER },
 		{ href: '/tutorial/editor', background: '#ea5234' },
 	];
+
+	async function signOut() {
+		const { error } = await supabase.auth.signOut();
+	}
 </script>
 
 {#if $page.route.id != '/editor'}
@@ -264,12 +268,31 @@
 
 			<div class="flex flex-grow" />
 			{#if session}
-				<a href="/profile/{session.user.id}" class="avatar self-end">
-					<div class="w-12 rounded-full ring ring-neutral-content">
-						<!-- svelte-ignore a11y-img-redundant-alt -->
-						<img src="https://picsum.photos/200" alt="profile picture" />
-					</div>
-				</a>
+				<div class="flex items-end justify-between">
+					<button on:click={signOut} class="flex flex-row text-sm text-black"
+						><svg
+							xmlns="http://www.w3.org/2000/svg"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke-width="1.5"
+							stroke="currentColor"
+							class="h-6 w-6"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75"
+							/>
+						</svg>
+						&nbsp; Logout</button
+					>
+					<a href="/profile/{session.user.id}" class="avatar self-end">
+						<div class="w-12 rounded-full ring ring-neutral-content">
+							<!-- svelte-ignore a11y-img-redundant-alt -->
+							<img src="https://picsum.photos/200" alt="profile picture" />
+						</div>
+					</a>
+				</div>
 			{:else}
 				<div class="flex w-full flex-col items-end gap-2 text-neutral-content">
 					<button

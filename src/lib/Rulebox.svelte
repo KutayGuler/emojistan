@@ -97,7 +97,7 @@
 />
 
 <div
-	class="rulebox shadow-xl"
+	class="rulebox border-2 border-black shadow-xl"
 	style="left: {rbx.position.x}px;
     top: {rbx.position.y}px;
     width: {rbx.width}px;
@@ -142,7 +142,7 @@
 	<button
 		style:display={rbx.type === 'ctxMenu' ? 'none' : 'flex'}
 		style="border-color: {rbx.borderColor}"
-		class="absolute top-0 right-0 flex h-6 w-6 cursor-pointer items-center justify-center rounded border-2 bg-white text-center text-xl"
+		class="absolute right-0 top-0 flex h-6 w-6 cursor-pointer items-center justify-center rounded border-2 bg-white text-center text-xl"
 		on:click={remove}
 	>
 		{CROSS}
