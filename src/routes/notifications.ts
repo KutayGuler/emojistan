@@ -3,9 +3,11 @@ import { generateID } from './utils';
 
 const NOTIFICATION_TIMEOUT = 3000;
 
+export type NotificationType = 'danger' | 'info' | 'success' | 'warning';
+
 interface Notification {
 	id: string;
-	type: string;
+	type: NotificationType;
 	message: string;
 	shake: boolean;
 }
@@ -13,7 +15,7 @@ interface Notification {
 const createNotificationStore = () => {
 	const _notifications: Writable<Array<Notification>> = writable([]);
 
-	const send = (message: string, type = 'default') => {
+	const send = (message: string, type: NotificationType) => {
 		_notifications.update((state) => {
 			if (state.length && message === state[state.length - 1].message) {
 				if (state[state.length - 1].shake) {

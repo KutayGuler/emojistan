@@ -1,6 +1,6 @@
 <script lang="ts">
 	let filter: 'newest' | 'following' | 'search' = 'newest';
-	let searchType: 'games' | 'users' = 'games';
+	let searchType: 'games' | 'profiles' = 'games';
 	let query = '';
 
 	function search() {}
@@ -53,7 +53,7 @@
 		</form>
 		<select class="select-bordered select" bind:value={searchType}>
 			<option value="games">Games</option>
-			<option value="users">Users</option>
+			<option value="profiles">Profiles</option>
 		</select>
 		<i
 			class="twa text-4xl twa-{searchType == 'games'

@@ -40,11 +40,11 @@
 
 <div transition:fade class="h-screen w-screen">
 	{#each randomEmojis as emoji, i}
-		<i
+		<ins
 			use:interpolate={this}
 			class="{i % 2 == 0
 				? 'text-2xl'
-				: 'text-4xl'} shape twa twa-{emoji} top-0 left-0"
+				: 'text-4xl'} shape twa twa-{emoji} left-0 top-0"
 		/>
 	{/each}
 </div>

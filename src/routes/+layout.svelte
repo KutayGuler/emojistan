@@ -85,7 +85,6 @@
 	}
 
 	let email: string;
-	let username: string;
 	let password: string;
 	let confirmPassword: string;
 
@@ -125,7 +124,7 @@
 
 {#if $page.route.id != '/editor'}
 	<main
-		class="relative z-20 flex h-screen w-screen items-start justify-start gap-4 p-4"
+		class="relative flex h-screen w-screen items-start justify-start gap-4 p-4"
 	>
 		<aside
 			in:fly={{ x: -100 }}
@@ -233,12 +232,6 @@
 						class="input-bordered input w-full"
 						placeholder="email"
 						bind:value={email}
-					/>
-					<input
-						type="text"
-						class="input-bordered input w-full"
-						placeholder="user name"
-						bind:value={username}
 					/>
 					<input
 						type="password"
