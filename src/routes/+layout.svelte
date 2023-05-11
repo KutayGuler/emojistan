@@ -320,7 +320,7 @@
 			>
 				<a
 					href="/"
-					class="btn-ghost btn absolute right-4 top-4 border-none text-2xl"
+					class="btn-ghost btn absolute right-4 top-4 border-none hover:border-none text-2xl"
 					>{CROSS}</a
 				>
 				<slot><!-- optional fallback --></slot>
