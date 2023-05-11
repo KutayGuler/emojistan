@@ -2,11 +2,19 @@
 	import supabase from '$api/supabase';
 	import type { PageData } from './$types';
 	import { notifications } from '$src/routes/notifications';
+	import Games from './Games.svelte';
+	import Followers from './Followers.svelte';
+	import Following from './Following.svelte';
+	import Favorites from './Favorites.svelte';
 
 	export let data: PageData;
 
 	let username = '';
 	let usernameSet = false;
+
+	type Tab = 'Followers' | 'Following' | 'Games' | 'Favorites' | '';
+
+	let currentTab: Tab = 'Games';
 
 	async function setUsername() {
 		let { data: usernames, error } = await supabase
@@ -15,24 +23,28 @@
 			.eq('username', username);
 
 		if (usernames == null || usernames.length == 0) {
-			console.log(data.session.user.id, username);
-
 			const { data: res, error } = await supabase
 				.from('profiles')
-				.insert({ id: data.session.user.id, username });
+				.insert({ id: data.session?.user.id, username });
 
-			if (res) {
-				usernameSet = true;
-				notifications.success(`Username set to ${username}.`);
-			} else if (error) {
+			if (error) {
 				notifications.warning(error.message);
+				return;
 			}
+
+			usernameSet = true;
+			notifications.success(`Username set to ${username}. Reloading page.`);
+			setTimeout(() => {
+				location.reload();
+			}, 1000);
 		} else {
 			notifications.warning('This username is already taken.');
 		}
 
 		console.log(usernames);
 	}
+
+	const tabs: Array<Tab> = ['Games', 'Favorites', 'Followers', 'Following'];
 </script>
 
 {#if data.profileNotCreated}
@@ -55,33 +67,38 @@
 		<h2>This user has not created a profile yet.</h2>
 	{/if}
 {:else}
-	<div class="flex flex-row items-center gap-2">
-		<div class="avatar">
-			<div class="w-12 rounded-full">
-				<img src="https://picsum.photos/200" />
+	<div class="flex h-full flex-col gap-4">
+		<div class="flex flex-row items-end gap-4">
+			<div class="avatar">
+				<div class="w-16 rounded-full">
+					<img src="https://picsum.photos/200" />
+				</div>
 			</div>
+			<h1 class="text-6xl">{data.username}</h1>
 		</div>
-		
-		<h1 class="text-6xl">{data.username}</h1>
-		<div class="tabs tabs-boxed pt-4">
-			<button class="tab" on:click={() => {}}
-				><span class="text-base-content">36</span>&nbsp; Followers</button
-			>
-			<button class="tab" on:click={() => {}}
-				><span class="text-base-content">36</span>&nbsp; Following</button
-			>
+		<div class="tabs tabs-boxed z-10 w-full">
+			{#each tabs as tab}
+				<button
+					on:click={() => {
+						currentTab = currentTab == tab ? '' : tab;
+					}}
+					class:tab-active={currentTab == tab}
+					class="tab">{tab} 25</button
+				>
+			{/each}
 		</div>
-	</div>
-
-	<div class="brutal my-8 h-48 w-full rounded p-4">bio</div>
-
-	<div class="flex w-full flex-row gap-2">
-		<div class="w-full overflow-y-auto">
-			<h2>Games <i class="twa twa-joystick" /></h2>
-		</div>
-		<div class="w-full overflow-y-auto">
-			<h2>Favorites <i class="twa twa-red-heart" /></h2>
+		<div
+			class="brutal flex h-full w-full flex-col rounded bg-neutral p-4 text-neutral-content"
+		>
+			{#if currentTab === 'Games'}
+				<Games />
+			{:else if currentTab === 'Favorites'}
+				<Favorites></Favorites>
+			{:else if currentTab === 'Followers'}
+				<Followers />
+			{:else if currentTab === 'Following'}
+				<Following />
+			{/if}
 		</div>
 	</div>
 {/if}
-asdsasd
