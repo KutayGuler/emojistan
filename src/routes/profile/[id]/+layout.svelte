@@ -62,19 +62,12 @@
 	{/if}
 {:else}
 	<div class="flex h-full flex-col gap-4">
-		<div class="flex flex-row items-end gap-4">
-			<div class="avatar">
-				<div class="w-16 rounded-full">
-					<img src="https://picsum.photos/200" />
-				</div>
-			</div>
-			<h1 class="text-6xl">{data.username}</h1>
-		</div>
+		<h1 class="text-6xl">{data.username}</h1>
 		<div class="tabs tabs-boxed z-10 w-full">
 			{#each tabs as tab}
 				{@const href = tab.toLowerCase()}
 				<a
-					{href}
+					href="/profile/{$page.params.id}/{href}"
 					class="tab {$page.route.id?.includes(href)
 						? 'brutal tab-active'
 						: ''}">{tab} 25</a

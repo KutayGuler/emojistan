@@ -313,7 +313,7 @@
 							on:click={() => {
 								deleteIndex = i;
 							}}
-							class="btn-ghost btn-sm btn border-none hover:bg-error"
+							class="btn-ghost btn-sm btn border-none hover:border-none hover:bg-error"
 							>DELETE</button
 						>
 					{/if}

@@ -5,15 +5,13 @@ export const load: LayoutServerLoad = async ({
 	params,
 	route,
 }) => {
-	// console.log(route);
-	// console.log(route.id.split('/').length);
-	console.log('layout.server');
-
 	const session = await getSession();
 
 	let isOwner = false;
 	let profileNotCreated = false;
 	let username = '';
+
+	// TODO: get counts
 
 	let { data: usernames, error } = await supabase
 		.from('profiles')
