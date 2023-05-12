@@ -21,6 +21,7 @@
 	} from '$src/constants';
 
 	export let data: LayoutData;
+	let username = '';
 
 	$: ({ supabase, session } = data);
 
@@ -282,11 +283,8 @@
 						</svg>
 						&nbsp; Logout</button
 					>
-					<a href="/profile/{session.user.id}" class="avatar self-end">
-						<div class="w-12 rounded-full ring ring-neutral-content">
-							<!-- svelte-ignore a11y-img-redundant-alt -->
-							<img src="https://picsum.photos/200" alt="profile picture" />
-						</div>
+					<a href="/profile/{data.username}" class="avatar self-end">
+						<i class="twa twa-alien text-4xl" />
 					</a>
 				</div>
 			{:else}
@@ -332,8 +330,7 @@
 		<div class="absolute bottom-2 right-2">Emojistan v0.0.1</div>
 	</main>
 	<Background />
-{:else if $navigating?.to?.route.id == '/editor'}
-	<!-- <Background /> -->
+{:else if $navigating?.to?.route.id == '/editor' || $navigating?.from?.route.id == '/editor'}
 	<Loading />
 {:else if $page.route.id == '/editor'}
 	<slot />

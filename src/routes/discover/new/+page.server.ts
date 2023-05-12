@@ -8,7 +8,7 @@ export const load: PageServerLoad = async ({
 	let { data: games, error } = await supabase.from('games').select('*');
 	// TODO: Paginate
 
-	console.log(games);
+	// console.log(games);
 
 	return {
 		games,

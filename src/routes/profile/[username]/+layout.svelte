@@ -7,10 +7,14 @@
 
 	let username = '';
 	let usernameSet = false;
-	let currentTab: Tab = 'Games';
 
-	type Tab = 'Followers' | 'Following' | 'Games' | 'Favorites' | '';
-	const tabs: Array<Tab> = ['Games', 'Favorites', 'Followers', 'Following'];
+	const tabs = [
+		'About',
+		'Games',
+		'Favorites',
+		'Followers',
+		'Following',
+	] as const;
 
 	async function setUsername() {
 		let { data: usernames, error } = await supabase
@@ -58,26 +62,28 @@
 			</form>
 		{/if}
 	{:else}
-		<h2>This user has not created a profile yet.</h2>
+		<!-- TODO: profile could not be found image -->
+		<h2 />
 	{/if}
 {:else}
 	<div class="flex h-full flex-col gap-4">
 		<div class="flex flex-row items-end gap-4">
 			<div class="placeholder avatar">
 				<div class="w-16 rounded-full bg-neutral text-neutral-content">
-					<i class="twa twa-eggplant text-2xl" />
+					<i class="twa twa-alien text-4xl" />
 				</div>
 			</div>
 			<h1 class="text-6xl">{data.username}</h1>
 		</div>
 		<div class="tabs tabs-boxed z-10 w-full">
 			{#each tabs as tab}
-				{@const href = tab.toLowerCase()}
+				{@const href = tab == 'About' ? '' : tab.toLowerCase()}
+				{@const selected =
+					(href != '' && $page.route.id?.includes(href)) ||
+					(href == '' && $page.route.id?.split('/').length == 3)}
 				<a
-					href="/profile/{$page.params.id}/{href}"
-					class="tab {$page.route.id?.includes(href)
-						? 'brutal tab-active'
-						: ''}">{tab} 25</a
+					href="/profile/{$page.params.username}/{href}"
+					class="tab {selected ? 'brutal tab-active' : ''}">{tab} 25</a
 				>
 			{/each}
 		</div>

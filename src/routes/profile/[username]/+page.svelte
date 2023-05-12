@@ -1,3 +1,3 @@
 <script lang="ts">
-	// TODO: bio
+	 // TODO: bio
 </script>

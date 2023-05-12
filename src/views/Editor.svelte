@@ -6,6 +6,8 @@
 	export let sectionIndex = 0;
 	export let copyMode: CopyMode;
 	export let emojiMode: 'Foreground' | 'Background';
+	
+	// TODO: add default skin color as choice
 
 	function clickedCell(index: number) {
 		if (emojiMode[0] === 'F') {
