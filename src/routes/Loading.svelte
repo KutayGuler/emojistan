@@ -25,15 +25,16 @@
 </script>
 
 <main
-	class="absolute z-20 flex h-full w-full items-center justify-center p-4 text-2xl"
+	class="absolute left-0 top-0 z-30 flex h-full w-full items-center justify-center bg-white p-4 text-2xl"
 >
-	{#key phraseIndex}
-		<span in:fly>{phrases[phraseIndex]}</span>
-	{/key}
-	<span class="px-2" id="loading">👾</span>
+	<div class="absolute">
+		{#key phraseIndex}
+			<span in:fly>{phrases[phraseIndex]}</span>
+		{/key}
+		<span class="px-2" id="loading"><i class="twa twa-alien-monster" /></span>
+	</div>
+	<Background />
 </main>
-
-<Background />
 
 <style>
 	@keyframes idle {

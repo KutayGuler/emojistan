@@ -12,6 +12,7 @@ export const load: LayoutServerLoad = async ({
 	let username = '';
 
 	// TODO: get counts
+	// TODO: change [id] with [username]
 
 	let { data: usernames, error } = await supabase
 		.from('profiles')

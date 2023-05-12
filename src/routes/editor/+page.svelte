@@ -174,7 +174,9 @@
 		class="editor relative box-border flex h-screen flex-col items-center justify-center overflow-hidden"
 	>
 		{#if !test}
-			<a href="/" class="btn-ghost btn absolute left-0 top-0 border-none"
+			<a
+				href="/"
+				class="btn-ghost btn absolute left-0 top-0 border-none hover:border-none"
 				><svg
 					xmlns="http://www.w3.org/2000/svg"
 					fill="none"

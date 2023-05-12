@@ -64,6 +64,7 @@
 			});
 	}
 
+	// TODO: Sign in with Facebook & Google
 	async function signInWithGoogle() {
 		const { data, error } = await supabase.auth.signInWithOAuth({
 			provider: 'google',
@@ -120,14 +121,16 @@
 	async function signOut() {
 		const { error } = await supabase.auth.signOut();
 	}
+
+	$: console.log($navigating?.to?.route.id == '/editor');
 </script>
 
-{#if $page.route.id != '/editor'}
+{#if $navigating?.to?.route.id != '/editor' && $page.route.id != '/editor'}
 	<main
 		class="relative flex h-screen w-screen items-start justify-start gap-4 p-4"
 	>
 		<aside
-			in:fly={{ x: -100 }}
+			in:fly|local={{ x: -100 }}
 			class="aside z-10 flex h-full w-96 flex-col gap-2 overflow-y-auto bg-neutral bg-opacity-95 shadow-xl"
 		>
 			{#if $page.route.id?.includes('tutorial')}
@@ -315,12 +318,12 @@
 			<slot><!-- optional fallback --></slot>
 		{:else}
 			<div
-				in:fly={{ x: 100 }}
+				in:fly|local={{ x: 100 }}
 				class="z-10 h-full w-full rounded bg-base-200 bg-opacity-95 p-8"
 			>
 				<a
 					href="/"
-					class="btn-ghost btn absolute right-4 top-4 border-none hover:border-none text-2xl"
+					class="btn-ghost btn absolute right-4 top-4 border-none text-2xl hover:border-none"
 					>{CROSS}</a
 				>
 				<slot><!-- optional fallback --></slot>
@@ -329,12 +332,11 @@
 		<div class="absolute bottom-2 right-2">Emojistan v0.0.1</div>
 	</main>
 	<Background />
-{:else}
-	<slot />
-{/if}
-
-{#if $navigating && !$navigating.from?.route.id?.includes('tut')}
+{:else if $navigating?.to?.route.id == '/editor'}
+	<!-- <Background /> -->
 	<Loading />
+{:else if $page.route.id == '/editor'}
+	<slot />
 {/if}
 
 <Toast />

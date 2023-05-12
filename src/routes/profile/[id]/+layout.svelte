@@ -62,7 +62,14 @@
 	{/if}
 {:else}
 	<div class="flex h-full flex-col gap-4">
-		<h1 class="text-6xl">{data.username}</h1>
+		<div class="flex flex-row items-end gap-4">
+			<div class="placeholder avatar">
+				<div class="w-16 rounded-full bg-neutral text-neutral-content">
+					<i class="twa twa-eggplant text-2xl" />
+				</div>
+			</div>
+			<h1 class="text-6xl">{data.username}</h1>
+		</div>
 		<div class="tabs tabs-boxed z-10 w-full">
 			{#each tabs as tab}
 				{@const href = tab.toLowerCase()}
