@@ -13,7 +13,7 @@ export const load: LayoutServerLoad = async ({
 
 	let { data: profileData, error } = await supabase
 		.from('profiles')
-		.select('id, username')
+		.select('user_id, username')
 		.eq('username', params.username);
 
 	if (profileData == null || profileData.length == 0) {
@@ -22,14 +22,14 @@ export const load: LayoutServerLoad = async ({
 		if (isOwner) {
 			let { data: _profileData, error } = await supabase
 				.from('profiles')
-				.select('id, username')
+				.select('user_id, username')
 				.eq('id', params.username);
 
 			profileNotCreated =
 				_profileData != null && _profileData[0].username == null;
 		}
 	} else {
-		isOwner = profileData[0].id == session?.user.id;
+		isOwner = profileData[0].user_id == session?.user.id;
 		profileNotCreated = profileData[0].username == null;
 	}
 

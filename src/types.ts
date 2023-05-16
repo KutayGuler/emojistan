@@ -127,7 +127,10 @@ export interface Mutations {
 }
 
 export interface EditableMap {
-	startingSectionIndex: number;
+	/**
+	 * starting section index
+	 */
+	ssi: number;
 	items: Map<string, string>;
 	colors: Map<string, string>;
 	backgrounds: Map<string, string>;
@@ -141,7 +144,7 @@ export class EditableMap {
 		backgrounds = new Map<string, string>(),
 		dbg = DEFAULT_BG
 	) {
-		this.startingSectionIndex = 0;
+		this.ssi = 0;
 		this.items = items;
 		this.colors = colors;
 		this.backgrounds = backgrounds;

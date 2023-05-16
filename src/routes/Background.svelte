@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { emojis } from './editor/emojis';
+	// @ts-nocheck
+	import { emojis } from './(game)/editor/emojis';
 	import { fade } from 'svelte/transition';
 
 	let randomEmojis: Array<string> = [];

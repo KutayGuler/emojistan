@@ -74,7 +74,7 @@
 					<i class="twa twa-alien text-4xl" />
 				</div>
 			</div>
-			<h1 class="text-6xl">{data.username}</h1>
+			<h1 class="text-6xl">{$page.params.username}</h1>
 		</div>
 		<div class="tabs tabs-boxed z-10 w-full">
 			{#each tabs as tab}

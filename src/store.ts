@@ -123,7 +123,7 @@ function createEditableMap() {
 		set,
 		subscribe,
 		useStorage: (id: string) => {
-			const startingSectionIndex = parseInt(
+			const ssi = parseInt(
 				localStorage.getItem(id + '_ssi') || '0'
 			);
 			const dbg = localStorage.getItem(id + '_dbg') || DEFAULT_BG;
@@ -134,7 +134,7 @@ function createEditableMap() {
 			);
 
 			update((state) => {
-				state.startingSectionIndex = startingSectionIndex;
+				state.ssi = ssi;
 				state.items = new Map(items) || new Map();
 				state.colors = new Map(colors) || new Map();
 				state.backgrounds = new Map(backgrounds) || new Map();
@@ -160,7 +160,7 @@ function createEditableMap() {
 		},
 		updateStartingSection: (index: number) =>
 			update((state) => {
-				state.startingSectionIndex = index;
+				state.ssi = index;
 				return state;
 			}),
 		updateDefaultColor: (color: string) =>

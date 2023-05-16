@@ -55,7 +55,7 @@
 	let levelCompleted = false;
 	let ac = -2; // ACTIVE CELL
 	let ic: number; // INTERACTED CELL
-	let currentSection = map.startingSectionIndex;
+	let currentSection = map.ssi;
 	let directionKey: Wasd = 'KeyD';
 	let currentInventoryIndex = 0;
 	let entities = new Map<string, Entity | Effector>();

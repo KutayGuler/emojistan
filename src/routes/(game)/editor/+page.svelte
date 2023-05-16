@@ -5,8 +5,8 @@
 	import { emojis } from './emojis';
 
 	// VIEWS
-	import Game from '../../views/Game.svelte';
-	import Editor from '../../views/Editor.svelte';
+	import Game from '../../../views/Game.svelte';
+	import Editor from '../../../views/Editor.svelte';
 
 	// STORES
 	import {
@@ -23,14 +23,14 @@
 		dialogueTree,
 		showLoading,
 		controllables,
-	} from '../../store';
+	} from '../../../store';
 	import {
 		CROSS,
 		DEFAULT_BG,
 		DEFAULT_SIDE_LENGTH,
 		palette,
 	} from '$src/constants';
-	import { notifications } from '../notifications';
+	import { notifications } from '../../notifications';
 	import { rbxStore } from '$lib/stores/store';
 
 	import Svelvet from '$lib';
@@ -104,11 +104,14 @@
 		switch (copyMode) {
 			case 'Emoji':
 				map.clearItems();
+				// TODO: should be clear section instead
 				break;
 			case 'Color':
+				// TODO: should be clear section instead
 				map.clearColors();
 				break;
 			case 'Both':
+				// TODO: should be clear section instead
 				map.clearAll();
 				break;
 		}
@@ -351,7 +354,7 @@
 												class:selected
 												style:background-color={$map.dbg}
 											>
-												{#if $map.startingSectionIndex == i}
+												{#if $map.ssi == i}
 													<i class="twa twa-chequered-flag" />
 												{/if}
 											</button>

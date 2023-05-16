@@ -12,7 +12,7 @@
 	} from '$src/store';
 	import { rbxStore } from '$lib/stores/store';
 	import { fly } from 'svelte/transition';
-	import { notifications } from '../notifications';
+	import { notifications } from '$src/routes/notifications';
 	import type { PageData } from './$types';
 
 	export let data: PageData;
@@ -61,6 +61,7 @@
 				backgrounds: Object.fromEntries($map.backgrounds),
 				colors: Object.fromEntries($map.colors),
 				dbg: $map.dbg,
+				ssi: $map.ssi,
 			},
 			rbxs: Array.from($rbxStore),
 			pushers: Object.fromEntries($pushers),
@@ -240,8 +241,6 @@
 							</svg>
 						</button>
 					</div>
-					<!-- {#if renameIndex} -->
-					<!-- {/if} -->
 				{/if}
 				<p>
 					{#each [...(emojiFreqs.get(id) || [])] as e}
