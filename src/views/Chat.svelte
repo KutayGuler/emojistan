@@ -36,8 +36,6 @@
 			dialogueTree = new Map<string, Branch>($dt);
 		}
 
-		console.log(history);
-
 		if (history.chatIndex) {
 			for (let choice of history.choices) {
 				currentDialogue = dialogueTree.get(currentBranch) || [];
@@ -57,7 +55,6 @@
 			}
 		} else {
 			currentDialogue = dialogueTree.get(currentBranch) || [];
-			console.log(currentDialogue);
 			branchChanged();
 			chatIndex++;
 		}

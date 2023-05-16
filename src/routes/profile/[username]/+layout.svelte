@@ -3,6 +3,7 @@
 	import type { PageData } from './$types';
 	import { notifications } from '$src/routes/notifications';
 	import { page } from '$app/stores';
+	import { goto } from '$app/navigation';
 	export let data: PageData;
 
 	let username = '';
@@ -35,13 +36,11 @@
 			usernameSet = true;
 			notifications.success(`Username set to ${username}. Reloading page.`);
 			setTimeout(() => {
-				location.reload();
+				goto('/profile/' + username, { replaceState: true });
 			}, 1000);
 		} else {
 			notifications.warning('This username is already taken.');
 		}
-
-		console.log(usernames);
 	}
 </script>
 
@@ -62,8 +61,10 @@
 			</form>
 		{/if}
 	{:else}
-		<!-- TODO: profile could not be found image -->
-		<h2 />
+		<div class="flex h-full w-full flex-col items-center justify-center gap-12">
+			<i class="twa twa-face-in-clouds scale-150 text-9xl" />
+			<h2>{$page.params.username} is not here</h2>
+		</div>
 	{/if}
 {:else}
 	<div class="flex h-full flex-col gap-4">

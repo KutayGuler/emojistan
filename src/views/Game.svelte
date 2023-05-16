@@ -186,7 +186,9 @@
 					if (code === 'ArrowUp' && index < SIZE) {
 						if (
 							currentSection >= SIZE &&
-							!entities.has(currentSection - SIZE + '_' + (ac + SIZE * (SIZE - 1)))
+							!entities.has(
+								currentSection - SIZE + '_' + (ac + SIZE * (SIZE - 1))
+							)
 						) {
 							changeSection(SIZE * (SIZE - 1), -SIZE);
 						}
@@ -204,7 +206,9 @@
 					if (code === 'ArrowDown' && index >= SIZE * SIZE - SIZE) {
 						if (
 							currentSection < SIZE * SIZE - SIZE &&
-							!entities.has(currentSection + SIZE + '_' + (ac - SIZE * (SIZE - 1)))
+							!entities.has(
+								currentSection + SIZE + '_' + (ac - SIZE * (SIZE - 1))
+							)
 						) {
 							changeSection(-(SIZE * (SIZE - 1)), SIZE);
 						}
@@ -828,16 +832,13 @@
 		{#if chatting}
 			<Chat
 				isTutorial={SIZE === 4}
-				history={entities.get(currentSection + "_" + ac)?.history}
+				history={entities.get(currentSection + '_' + ac)?.history}
 				{character}
 				{dialogueID}
 				dialogueTree={dt}
 				on:end={(e) => {
-					//  e.detail.history
-					console.log(e.detail.history);
-					
-					entities.get(currentSection + "_" + ac).history = e.detail.history;
-					chatting = false
+					entities.get(currentSection + '_' + ac).history = e.detail.history;
+					chatting = false;
 				}}
 			/>
 		{/if}

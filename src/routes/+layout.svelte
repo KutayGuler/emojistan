@@ -54,7 +54,7 @@
 				password,
 			})
 			.then((res) => {
-				console.log(res.user);
+				// TODO: change this
 				alert('signed up successfully! check your email!');
 				asideShowing = 'menu';
 				resolved = true;
@@ -81,7 +81,6 @@
 			password,
 		});
 
-		console.log(data, error);
 		resolved = true;
 		asideShowing = 'menu';
 	}
@@ -122,8 +121,6 @@
 	async function signOut() {
 		const { error } = await supabase.auth.signOut();
 	}
-
-	$: console.log($navigating?.to?.route.id == '/editor');
 </script>
 
 {#if $navigating?.to?.route.id != '/editor' && $page.route.id != '/editor'}
@@ -283,7 +280,7 @@
 						</svg>
 						&nbsp; Logout</button
 					>
-					<a href="/profile/{data.username}" class="avatar self-end">
+					<a href="/profile/{data.username || session.user.id}" class="avatar self-end">
 						<i class="twa twa-alien text-4xl" />
 					</a>
 				</div>
