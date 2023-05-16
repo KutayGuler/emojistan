@@ -177,8 +177,8 @@
 		class="editor relative box-border flex h-screen flex-col items-center justify-center overflow-hidden"
 	>
 		{#if !test}
-			<a
-				href="/"
+			<button
+				on:click={history.back}
 				class="btn-ghost btn absolute left-0 top-0 border-none hover:border-none"
 				><svg
 					xmlns="http://www.w3.org/2000/svg"
@@ -193,7 +193,7 @@
 						stroke-linejoin="round"
 						d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
 					/>
-				</svg></a
+				</svg></button
 			>
 		{/if}
 

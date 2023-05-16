@@ -10,9 +10,9 @@
 		type Branch,
 	} from '$src/types';
 	import Game from '$src/views/Game.svelte';
-	import type { GameProps } from '../types';
+	import type { ComponentProps } from 'svelte/internal';
 
-	const gameProps: GameProps = {
+	const gameProps: ComponentProps<Game> = {
 		map: new EditableMap(
 			new Map<string, string>([
 				['0_5', 'woman-walking'],

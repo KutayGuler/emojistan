@@ -166,7 +166,7 @@
 	{#if chatIndex === texts.length + 1 && choices}
 		<form
 			use:choicesSpawned
-			class="flex flex-wrap gap-2 p-2"
+			class="flex w-full flex-wrap gap-2 p-2"
 			on:submit|preventDefault={makeChoice}
 		>
 			{#each choices as choice, i}

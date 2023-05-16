@@ -35,6 +35,8 @@
 	import { AStarFinder } from 'astar-typescript';
 	import Chat from './Chat.svelte';
 
+	// FIXME: History restoring is not working properly
+
 	/* ## DATA ## */
 	export let dt = new Map<string, Branch>(); // dialogue tree
 	export let map = new EditableMap(new Map<MapLocation, string>());
@@ -359,6 +361,8 @@
 				entities.set(id, new Entity(_emoji));
 			}
 		}
+
+		console.log(entities);
 
 		for (let [id, item] of entities) {
 			if (item instanceof Effector) continue;
@@ -809,6 +813,8 @@
 	function noPlayer(rbx: any) {
 		if (ac === -2) dispatch('noPlayer');
 	}
+
+	console.log(ac);
 </script>
 
 <svelte:window on:keydown={handle} />

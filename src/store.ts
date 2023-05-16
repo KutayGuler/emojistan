@@ -123,9 +123,7 @@ function createEditableMap() {
 		set,
 		subscribe,
 		useStorage: (id: string) => {
-			const ssi = parseInt(
-				localStorage.getItem(id + '_ssi') || '0'
-			);
+			const ssi = parseInt(localStorage.getItem(id + '_ssi') || '0');
 			const dbg = localStorage.getItem(id + '_dbg') || DEFAULT_BG;
 			const items = JSON.parse(localStorage.getItem(id + '_items') as string);
 			const colors = JSON.parse(localStorage.getItem(id + '_colors') as string);
@@ -156,6 +154,8 @@ function createEditableMap() {
 					JSON.stringify(Array.from(state.backgrounds.entries()))
 				);
 				localStorage.setItem(id + '_dbg', state.dbg);
+				// @ts-expect-error
+				localStorage.setItem(id + '_ssi', state.ssi);
 			});
 		},
 		updateStartingSection: (index: number) =>
@@ -265,11 +265,11 @@ function createDialogueTree() {
 		set,
 		subscribe,
 		useStorage: (id: string) => {
-			const val = JSON.parse(localStorage.getItem(id + '_dialogue') as string);
+			const val = JSON.parse(localStorage.getItem(id + '_dt') as string);
 			set(new Map(val) || new Map<number, Branch>());
 			subscribe((state) => {
 				localStorage.setItem(
-					id + '_dialogue',
+					id + '_dt',
 					JSON.stringify(Array.from(state.entries()))
 				);
 			});

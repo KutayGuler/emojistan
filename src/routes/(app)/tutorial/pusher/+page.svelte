@@ -12,7 +12,7 @@
 	import type { TutorialProps } from '../types';
 	import type { StringedNumber } from '$src/store';
 
-	const tutorialProps: TutorialProps = {
+	const tutorialProps: TutorialProps<Pusher> = {
 		header: 'Pusher',
 		description:
 			'Pusher takes two emoji inputs and makes <i class="twa twa-leaf-fluttering-in-wind text-2xl"></i> pushable by <i class="twa twa-wind-face text-2xl"></i> ',

@@ -23,7 +23,7 @@ export const load: LayoutServerLoad = async ({
 			let { data: _profileData, error } = await supabase
 				.from('profiles')
 				.select('user_id, username')
-				.eq('id', params.username);
+				.eq('user_id', params.username);
 
 			profileNotCreated =
 				_profileData != null && _profileData[0].username == null;

@@ -11,12 +11,14 @@ export const load: LayoutServerLoad = async ({
 		let { data: usernames, error } = await supabase
 			.from('profiles')
 			.select('username')
-			.eq('id', session.user.id);
+			.eq('user_id', session.user.id);
 
 		if (usernames && usernames.length > 0) {
 			username = usernames[0].username;
 		}
 	}
+
+	console.log(session, username);
 
 	return {
 		session,

@@ -1,16 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
-	import {
-		saves,
-		map,
-		pushers,
-		mergers,
-		interactables,
-		effectors,
-		dialogueTree as dialogue,
-	} from '$src/store';
-	import { rbxStore } from '$lib/stores/store';
+	import { saves } from '$src/store';
 	import { fly } from 'svelte/transition';
 	import { notifications } from '$src/routes/notifications';
 	import type { PageData } from './$types';
@@ -54,21 +45,28 @@
 	let deleteIndex = -1;
 	let files: FileList;
 
+	function getObjFromStorage(key: string) {
+		return Object.fromEntries(JSON.parse(localStorage.getItem(key) as string));
+	}
+
 	function downloadSave(saveID: string) {
 		const data = {
 			map: {
-				items: Object.fromEntries($map.items),
-				backgrounds: Object.fromEntries($map.backgrounds),
-				colors: Object.fromEntries($map.colors),
-				dbg: $map.dbg,
-				ssi: $map.ssi,
+				items: getObjFromStorage(saveID + '_items'),
+				backgrounds: getObjFromStorage(saveID + '_backgrounds'),
+				colors: getObjFromStorage(saveID + '_colors'),
+				dbg: localStorage.getItem(saveID + '_dbg'),
+				ssi: localStorage.getItem(saveID + '_ssi'),
 			},
-			rbxs: Array.from($rbxStore),
-			pushers: Object.fromEntries($pushers),
-			mergers: Object.fromEntries($mergers),
-			effectors: Object.fromEntries($effectors),
-			interactables: Object.fromEntries($interactables),
-			dialogue: Object.fromEntries($dialogue),
+			rbxs: Array.from(
+				JSON.parse(localStorage.getItem(saveID + '_rbxs') as string)
+			),
+			pushers: getObjFromStorage(saveID + '_pushers'),
+			mergers: getObjFromStorage(saveID + '_mergers'),
+			effectors: getObjFromStorage(saveID + '_effectors'),
+			interactables: getObjFromStorage(saveID + '_interactables'),
+			controllables: getObjFromStorage(saveID + '_controllables'),
+			dt: getObjFromStorage(saveID + '_dt'),
 		};
 
 		let dataStr =

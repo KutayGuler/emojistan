@@ -3,7 +3,7 @@
 	import supabase from '$api/supabase';
 	import Game from '$src/views/Game.svelte';
 	import Loading from '$src/routes/Loading.svelte';
-	import type { GameProps } from '$src/routes/tutorial/types';
+	import type { ComponentProps } from 'svelte/internal';
 
 	async function getGameData() {
 		let { data, error } = await supabase
@@ -11,22 +11,22 @@
 			.select('data')
 			.eq('id', $page.params.id);
 
-		let gameData = data[0].data as GameProps;
+		let gameData = data[0].data as ComponentProps<Game>;
 
 		if (error) {
 			throw error;
-		} else if (data && data[0]) {
+		} else if (gameData) {
 			for (let [key, val] of Object.entries(gameData)) {
 				if (key == 'map') continue;
 				gameData[key] = new Map(Object.entries(val));
 			}
 
 			for (let [key, val] of Object.entries(gameData.map)) {
-				if (key == 'dbg') continue;
+				if (key == 'dbg' || key == 'ssi') continue;
 				gameData.map[key] = new Map(Object.entries(val));
 			}
-			gameData.map.ssi = 0;
 			console.log(gameData);
+			gameData.map.ssi = parseInt(gameData.map.ssi);
 
 			return gameData;
 		}
@@ -43,5 +43,5 @@
 		<Game {...data} />
 	</div>
 {:catch error}
-	<p>Could not get game data.</p>
+	<p>{error} Could not get game data.</p>
 {/await}

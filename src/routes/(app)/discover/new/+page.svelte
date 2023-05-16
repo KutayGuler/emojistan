@@ -5,7 +5,7 @@
 </script>
 
 {#if data.games}
-	<div class="h-full overflow-y-auto">
+	<div class="h-full overflow-y-auto overflow-x-hidden px-1">
 		{#each data.games as { id, name, profiles }, i}
 			<div
 				in:fly={{ delay: (i + 1) * 80, x: 200 }}
@@ -28,9 +28,6 @@
 				<div class="flex flex-grow" />
 				<a
 					href="/games/{id}"
-					on:click={() => {
-						// TODO play
-					}}
 					class="btn-sm btn self-end">PLAY</a
 				>
 			</div>
