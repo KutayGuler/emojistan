@@ -210,8 +210,21 @@ function createEditableMap() {
 				state.items.delete(sectionIndex + '_' + index);
 				return state;
 			}),
-		clearItems: () =>
+		clearItems: (sectionIndex: number) =>
 			update((state) => {
+				let keys = [];
+
+				for (let key of state.items.keys()) {
+					if (+key.split('_')[0] == sectionIndex) {
+						keys.push(key);
+					}
+				}
+
+				console.log(keys);
+				for (let key of keys) {
+					state.items.delete(key);
+				}
+				return state;
 				state.items.clear();
 				return state;
 			}),

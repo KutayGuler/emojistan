@@ -18,7 +18,6 @@ export const handle: Handle = async ({ event, resolve }) => {
 	 * of calling `const { data: { session } } = await supabase.auth.getSession()`
 	 * you just call this `await getSession()`
 	 */
-	// @ts-expect-error
 	event.locals.getSession = async () => {
 		const {
 			data: { session },

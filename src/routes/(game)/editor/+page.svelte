@@ -103,7 +103,7 @@
 	function clearMap() {
 		switch (copyMode) {
 			case 'Emoji':
-				map.clearItems();
+				map.clearItems(sectionIndex);
 				// TODO: should be clear section instead
 				break;
 			case 'Color':
@@ -142,6 +142,7 @@
 	let [x, y] = [0, 0];
 
 	const skins: [string, SkinTone][] = [
+		['#ffdc5d', ''],
 		['#f7d7c4', '-light-skin-tone'],
 		['#d8b094', '-medium-light-skin-tone'],
 		['#bb9167', '-medium-skin-tone'],
@@ -176,27 +177,6 @@
 	<main
 		class="editor relative box-border flex h-screen flex-col items-center justify-center overflow-hidden"
 	>
-		{#if !test}
-			<button
-				on:click={history.back}
-				class="btn-ghost btn absolute left-0 top-0 border-none hover:border-none"
-				><svg
-					xmlns="http://www.w3.org/2000/svg"
-					fill="none"
-					viewBox="0 0 24 24"
-					stroke-width="1.5"
-					stroke="#29303e"
-					class="h-6 w-6"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
-					/>
-				</svg></button
-			>
-		{/if}
-
 		{#if test}
 			<button on:click={toggleTest} class="absolute right-4 top-4 z-10 text-4xl"
 				>{CROSS}</button
@@ -217,6 +197,12 @@
 					test = false;
 				}}
 			/>
+			<div
+				class="absolute bottom-8 left-8 flex flex-row items-center md:bottom-4 md:left-4"
+			>
+				<kbd class="kbd kbd-sm mr-2 2xl:kbd-md">Esc</kbd>
+				<p class="2xl:text-md text-sm">Exit test mode</p>
+			</div>
 		{:else}
 			<div
 				class="flex h-full w-full flex-row items-center justify-center gap-8 text-lg 2xl:top-8 2xl:text-2xl"
@@ -403,11 +389,14 @@
 							</div>
 							<div class="flex flex-row gap-2">
 								{#each skins as [hexcode, skinName]}
+									{@const selected = $currentSkin === skinName}
 									<button
-										class="h-6 w-6 rounded"
+										class="brutal h-6 w-6 rounded duration-75 ease-out {selected
+											? 'scale-125'
+											: 'hover:scale-125'}"
 										style:background={hexcode}
 										on:click={() => {
-											$currentSkin = $currentSkin === skinName ? '' : skinName;
+											$currentSkin = selected ? '' : skinName;
 										}}
 									/>
 								{/each}
