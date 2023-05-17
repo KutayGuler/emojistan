@@ -10,7 +10,6 @@
 
 	let emojiFreqs = new Map<string, Set<string>>();
 
-	// TODO: save in store
 	onMount(() => {
 		if ($saves.currentSaveID === '') saves.useStorage();
 		for (let [saveID, _] of $saves.saves) {
