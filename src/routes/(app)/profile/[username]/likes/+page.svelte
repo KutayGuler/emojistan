@@ -1,7 +1,5 @@
 <script lang="ts">
 	let favorites: Array<object> = [];
-
-	export let data;
 </script>
 
 {#if favorites.length > 0}

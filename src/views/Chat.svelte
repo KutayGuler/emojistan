@@ -39,7 +39,7 @@
 		if (history.chatIndex) {
 			for (let choice of history.choices) {
 				currentDialogue = dialogueTree.get(currentBranch) || [];
-				chatIndex = currentDialogue.length;
+				chatIndex += currentDialogue.length;
 				let { text, next } = choice;
 
 				for (let i = 0; i < currentDialogue.length; i++) {
@@ -51,7 +51,6 @@
 				answerIndexes.push(texts.length - 1);
 				currentBranch = next;
 				interacting = false;
-				branchChanged();
 			}
 		} else {
 			currentDialogue = dialogueTree.get(currentBranch) || [];

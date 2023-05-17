@@ -25,7 +25,7 @@
 				if (key == 'dbg' || key == 'ssi') continue;
 				gameData.map[key] = new Map(Object.entries(val));
 			}
-			console.log(gameData);
+
 			gameData.map.ssi = parseInt(gameData.map.ssi);
 
 			return gameData;

@@ -35,8 +35,6 @@
 	import { AStarFinder } from 'astar-typescript';
 	import Chat from './Chat.svelte';
 
-	// FIXME: History restoring is not working properly
-
 	/* ## DATA ## */
 	export let dt = new Map<string, Branch>(); // dialogue tree
 	export let map = new EditableMap(new Map<MapLocation, string>());

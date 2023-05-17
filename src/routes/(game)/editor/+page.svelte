@@ -102,17 +102,15 @@
 
 	function clearMap() {
 		switch (copyMode) {
+			// TODO: should I add clearBackgrounds?
 			case 'Emoji':
 				map.clearItems(sectionIndex);
-				// TODO: should be clear section instead
 				break;
 			case 'Color':
-				// TODO: should be clear section instead
-				map.clearColors();
+				map.clearColors(sectionIndex);
 				break;
 			case 'Both':
-				// TODO: should be clear section instead
-				map.clearAll();
+				map.clearAll(sectionIndex);
 				break;
 		}
 	}

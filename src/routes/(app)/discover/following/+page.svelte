@@ -12,6 +12,7 @@
 {:else}
 	{#await getFollowingGames()}
 		games loading.
+		<!-- TODO: skeleton -->
 	{:then games}
 		games loaded.
 	{/await}

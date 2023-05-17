@@ -13,7 +13,7 @@ export const load: LayoutServerLoad = async ({
 
 	let { data: profileData, error } = await supabase
 		.from('profiles')
-		.select('user_id, username')
+		.select('id, username')
 		.eq('username', params.username);
 
 	if (profileData == null || profileData.length == 0) {
@@ -22,16 +22,41 @@ export const load: LayoutServerLoad = async ({
 		if (isOwner) {
 			let { data: _profileData, error } = await supabase
 				.from('profiles')
-				.select('user_id, username')
-				.eq('user_id', params.username);
+				.select('id, username')
+				.eq('id', params.username);
 
 			profileNotCreated =
 				_profileData != null && _profileData[0].username == null;
 		}
 	} else {
-		isOwner = profileData[0].user_id == session?.user.id;
+		isOwner = profileData[0].id == session?.user.id;
 		profileNotCreated = profileData[0].username == null;
 	}
+
+	let {
+		data: games,
+		error: gamesError,
+		count: gamesCount,
+	} = await supabase
+		.from('games')
+		.select('id, name', { count: 'exact', head: true })
+		.eq('username', params.username);
+
+	// let { data: followers, error: followersError, count: followersCount } = await supabase
+	// .from('follows')
+	// .select('id, name', { count: 'exact', head: true })
+	// .eq('following_id', params.username);
+
+	// console.log(followers, followersCount);
+
+	// TODO: get profile ID first.
+
+	// let { data: games, error: gamesError, count: gamesCount } = await supabase
+	// .from('follows')
+	// .select('*', { count: 'exact', head: true })
+	// .eq('following_id', params.username);
+
+	// TODO: GET ALL DATA AT ONCE
 
 	return {
 		isOwner,

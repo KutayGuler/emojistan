@@ -178,9 +178,19 @@ function createEditableMap() {
 				state.colors.delete(sectionIndex + '_' + index);
 				return state;
 			}),
-		clearColors: () =>
+		clearColors: (sectionIndex: number) =>
 			update((state) => {
-				state.colors.clear();
+				let keys = [];
+
+				for (let key of state.colors.keys()) {
+					if (+key.split('_')[0] == sectionIndex) {
+						keys.push(key);
+					}
+				}
+
+				for (let key of keys) {
+					state.colors.delete(key);
+				}
 				return state;
 			}),
 		filterColors: () =>
@@ -220,19 +230,48 @@ function createEditableMap() {
 					}
 				}
 
-				console.log(keys);
 				for (let key of keys) {
 					state.items.delete(key);
 				}
 				return state;
-				state.items.clear();
-				return state;
 			}),
-		clearAll: () =>
+		clearAll: (sectionIndex: number) =>
 			update((state) => {
-				state.items.clear();
-				state.colors.clear();
-				state.backgrounds.clear();
+				let keys = [];
+
+				for (let key of state.items.keys()) {
+					if (+key.split('_')[0] == sectionIndex) {
+						keys.push(key);
+					}
+				}
+
+				for (let key of keys) {
+					state.items.delete(key);
+				}
+
+				keys = [];
+
+				for (let key of state.colors.keys()) {
+					if (+key.split('_')[0] == sectionIndex) {
+						keys.push(key);
+					}
+				}
+
+				for (let key of keys) {
+					state.colors.delete(key);
+				}
+
+				keys = [];
+
+				for (let key of state.backgrounds.keys()) {
+					if (+key.split('_')[0] == sectionIndex) {
+						keys.push(key);
+					}
+				}
+
+				for (let key of keys) {
+					state.backgrounds.delete(key);
+				}
 				return state;
 			}),
 	};
