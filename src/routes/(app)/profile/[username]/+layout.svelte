@@ -9,7 +9,12 @@
 	let username = '';
 	let usernameSet = false;
 
-	const tabs = ['Games', 'Likes', 'Followers', 'Following'] as const;
+	const tabs = [
+		{ title: 'Games', count: data.games.count || 0 },
+		{ title: 'Likes', count: data.likes?.count || 0 },
+		{ title: 'Followers', count: data.follower.count || 0 },
+		{ title: 'Following', count: data.following.count || 0 },
+	];
 
 	async function setUsername() {
 		let { data: usernames, error } = await supabase
@@ -36,8 +41,6 @@
 			notifications.warning('This username is already taken.');
 		}
 	}
-
-	$: console.log($page.route);
 </script>
 
 {#if data.profileNotCreated}
@@ -75,16 +78,18 @@
 		<div class="tabs tabs-boxed z-10 w-full">
 			<a
 				href="/profile/{$page.params.username}"
-				class="tab {$page.route.id.at(-1) == ']' ? 'brutal tab-active' : ''}">Bio</a
+				class="tab {$page.route.id?.at(-1) == ']' ? 'brutal tab-active' : ''}"
+				>Bio</a
 			>
-			{#each tabs as tab}
-				{@const href = tab.toLowerCase()}
+			{#each tabs as { title, count }}
+				{@const href = title.toLowerCase()}
 				{@const selected = href != '' && $page.route.id?.includes(href)}
 				<a
 					href="/profile/{$page.params.username}/{href}"
 					class="tab {selected ? 'brutal tab-active' : ''}"
 				>
-					{tab}
+					{title}
+					{count}
 				</a>
 			{/each}
 		</div>
