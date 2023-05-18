@@ -27,9 +27,6 @@
 					src: '/images/copy-mode.webm',
 					alt: '',
 				},
-				// TODO: add color only example
-				// TODO: add world map tutorial
-				// TODO: add svelte-tour
 			],
 		},
 		{

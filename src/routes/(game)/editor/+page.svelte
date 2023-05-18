@@ -102,7 +102,6 @@
 
 	function clearMap() {
 		switch (copyMode) {
-			// TODO: should I add clearBackgrounds?
 			case 'Emoji':
 				map.clearItems(sectionIndex);
 				break;

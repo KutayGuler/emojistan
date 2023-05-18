@@ -210,6 +210,20 @@ function createEditableMap() {
 				state.backgrounds.delete(sectionIndex + '_' + index);
 				return state;
 			}),
+		clearBackgrounds: (sectionIndex: number) => update((state) => {
+			let keys = [];
+
+			for (let key of state.backgrounds.keys()) {
+				if (+key.split('_')[0] == sectionIndex) {
+					keys.push(key);
+				}
+			}
+
+			for (let key of keys) {
+				state.items.delete(key);
+			}
+			return state;
+		}),
 		addEmoji: (sectionIndex: number, index: number, emoji: string) =>
 			update((state) => {
 				state.items.set(sectionIndex + '_' + index, emoji);
@@ -350,6 +364,7 @@ function createDialogueTree() {
 					let _state = state.get(id);
 					_state?.splice(_state?.length - 1, 0, text);
 				} else {
+					// @ts-expect-error
 					state.get(id)?.push(text);
 				}
 				return state;
