@@ -39,17 +39,14 @@ export const load: LayoutServerLoad = async ({
 	let games = await supabase
 		.from('games')
 		.select('id, name, profile:profiles!games_user_id_fkey(username)', { count: 'exact' })
-		.eq('username', params.username)
+		.eq('user_id', profileData[0].id)
 		.range(0, 10);
-
 
 	let follower = await supabase
 		.from('follows')
 		.select('follower_id, profile:profiles!follows_follower_id_fkey(username)', { count: 'exact'})
 		.eq('following_id', profileData[0].id)
 		.range(0, 10);
-
-	console.log(follower.data)
 
 	let following = await supabase
 		.from('follows')
@@ -62,11 +59,6 @@ export const load: LayoutServerLoad = async ({
 		.select('game:games(id, name), profile:profiles(username)', { count: 'exact' })
 		.eq('liker_id', profileData[0].id)
 		.range(0, 10);
-
-	console.log(likes.data, likes.error);
-
-
-	// console.log(games, follower, following);
 
 	return {
 		bio: profileData[0].bio,

@@ -18,8 +18,6 @@ export const load: LayoutServerLoad = async ({
 		}
 	}
 
-	console.log(session, username);
-
 	return {
 		session,
 		username,

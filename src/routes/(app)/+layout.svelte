@@ -43,18 +43,20 @@
 		resolved = false;
 		showDots();
 
+		// TODO: length limit on username
+
 		supabase.auth
 			.signUp({
 				email,
 				password,
 			})
 			.then((res) => {
-				notifications.success('Signed up successfully! Check your email!')
+				notifications.success('Signed up successfully! Check your email!');
 				asideShowing = 'menu';
 				resolved = true;
 			})
 			.catch((err) => {
-				notifications.success('An error occured')
+				notifications.success('An error occured');
 				resolved = true;
 			});
 	}

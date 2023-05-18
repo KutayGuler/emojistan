@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { fly } from 'svelte/transition';
-
 	export let index: number;
 	export let id: string;
 	export let name: string;
@@ -12,17 +11,30 @@
 	in:fly={{ delay: (index + 1) * 80, x: 200 }}
 	class="brutal relative mb-2 flex h-56 flex-col rounded-lg bg-slate-300 p-4 text-neutral"
 >
-	<div class="flex flex-col gap-2 pb-4">
-		<h3>{name}</h3>
-		{#if profile}
-			<a href="/profile/{profile.username}" class="link">{profile.username}</a>
-		{/if}
-	</div>
-	<p>
+	<h3>{name}</h3>
+
+	<div class="flex flex-row gap-2">
 		{#each [...emojis.keys()] as emoji}
 			<i class="twa text-4xl twa-{emoji}" />
 		{/each}
-	</p>
+	</div>
 	<div class="flex flex-grow" />
-	<a href="/games/{id}" class="btn-sm btn self-end">PLAY</a>
+	<div class="flex flex-row justify-between">
+		{#if profile}
+			<a
+				href="/profile/{profile.username}"
+				class="btn-ghost btn-sm btn flex gap-2 rounded-l-full border-none pl-0 hover:border-none"
+			>
+				<div class="placeholder avatar">
+					<div class="w-8 rounded-full bg-neutral text-neutral-content">
+						<i class="twa twa-alien text-lg" />
+					</div>
+				</div>
+				<div>
+					{profile.username}
+				</div>
+			</a>
+		{/if}
+		<a href="/games/{id}" class="btn-sm btn self-end">PLAY</a>
+	</div>
 </div>
