@@ -8,7 +8,7 @@
 >
 	<div class="placeholder avatar">
 		<div class="w-24 rounded-full bg-neutral">
-			<i class="twa twa-detective text-6xl" />
+			<i class="twa twa-alien text-6xl" />
 		</div>
 	</div>
 	{username}

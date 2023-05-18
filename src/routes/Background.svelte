@@ -28,7 +28,7 @@
 	}
 
 	function interpolate(node: Element) {
-		let time = random(50, 100);
+		let time = node.init ? random(50, 100) : random(0, 1);
 		node.style.transition = `transform ${time}s`;
 		node.style.transform = transform(node.classList.contains('small'));
 		time = node.init ? time : 0;
@@ -41,7 +41,7 @@
 
 <div transition:fade class="h-screen w-screen">
 	{#each randomEmojis as emoji, i}
-		<ins
+		<i
 			use:interpolate={this}
 			class="{i % 2 == 0
 				? 'text-2xl'

@@ -9,8 +9,6 @@ export const load: LayoutServerLoad = async ({
 	let isOwner = false;
 	let profileNotCreated = true;
 
-	// TODO: get counts
-
 	let { data: profileData, error } = await supabase
 		.from('profiles')
 		.select('id, username, bio')

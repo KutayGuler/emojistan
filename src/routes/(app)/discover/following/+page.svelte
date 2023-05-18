@@ -1,19 +1,12 @@
 <script lang="ts">
+	import GameCard from '../../GameCard.svelte';
 	export let data;
-
-	async function getFollowingGames() {
-		// TODO: Relational stuff in db
-		// TODO: implement this
-	}
 </script>
 
 {#if !data.session?.user.id}
-	login to see the games of people you follow
-{:else}
-	{#await getFollowingGames()}
-		games loading.
-		<!-- TODO: skeleton -->
-	{:then games}
-		games loaded.
-	{/await}
+	Login to see the games of people you follow.
+{:else if data?.followingGames}
+	{#each data.followingGames as { id, name, profile }, index}
+		<GameCard {index} {id} {name} {profile} emojis={new Set()} />
+	{/each}
 {/if}

@@ -49,18 +49,16 @@
 				password,
 			})
 			.then((res) => {
-				// TODO: change this
-				alert('signed up successfully! check your email!');
+				notifications.success('Signed up successfully! Check your email!')
 				asideShowing = 'menu';
 				resolved = true;
 			})
 			.catch((err) => {
-				console.error(err);
+				notifications.success('An error occured')
 				resolved = true;
 			});
 	}
 
-	// TODO: Sign in with Facebook & Google
 	async function signInWithGoogle() {
 		const { data, error } = await supabase.auth.signInWithOAuth({
 			provider: 'google',

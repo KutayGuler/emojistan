@@ -16,8 +16,6 @@
 	}
 
 	onMount(resize);
-
-	// TODO: add minimap
 </script>
 
 <svelte:window bind:innerWidth on:resize={resize} />

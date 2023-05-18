@@ -3,10 +3,7 @@
 	import { page } from '$app/stores';
 	import GameCard from '$src/routes/(app)/GameCard.svelte';
 	import type { PageData } from './$types';
-
 	export let data: PageData;
-
-	// TODO: make a game component
 
 	let lastRange = 10;
 
