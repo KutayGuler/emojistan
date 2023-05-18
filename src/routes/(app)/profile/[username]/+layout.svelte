@@ -9,11 +9,11 @@
 	let username = '';
 	let usernameSet = false;
 
-	const tabs = [
-		{ title: 'Games', count: data.games.count || 0 },
-		{ title: 'Likes', count: data.likes?.count || 0 },
-		{ title: 'Followers', count: data.follower.count || 0 },
-		{ title: 'Following', count: data.following.count || 0 },
+	$: tabs = [
+		{ title: 'Games', count: data?.games?.count || 0 },
+		{ title: 'Likes', count: data?.likes?.count || 0 },
+		{ title: 'Followers', count: data?.follower?.count || 0 },
+		{ title: 'Following', count: data?.following?.count || 0 },
 	];
 
 	async function setUsername() {

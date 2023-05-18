@@ -86,7 +86,7 @@
 			{#if searchType == 'games'}
 				<GameCard {index} {...result} />
 			{:else if searchType == 'profiles'}
-				<ProfileCard {...result} />
+				<ProfileCard username={result.profile.username} />
 			{/if}
 		{/each}
 	{/if}
