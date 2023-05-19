@@ -16,7 +16,7 @@
 	} from '$src/constants';
 
 	export let data: LayoutData;
-	let username = '';
+	let usernameInput = '';
 
 	$: ({ supabase, session } = data);
 
@@ -40,10 +40,13 @@
 			return;
 		}
 
+		if (usernameInput.length > 20) {
+			notifications.warning('Username too long.');
+			return;
+		}
+
 		resolved = false;
 		showDots();
-
-		// TODO: length limit on username
 
 		supabase.auth
 			.signUp({

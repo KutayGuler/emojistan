@@ -426,3 +426,6 @@ export const controllables = createMapStore<StringedNumber, Controllable>(
 	'controllables'
 );
 export const dialogueTree = createDialogueTree();
+
+// USER
+export const liked_game_ids: Writable<Set<string>> = writable(new Set());
