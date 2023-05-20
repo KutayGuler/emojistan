@@ -37,8 +37,6 @@
 		}
 	}
 
-	console.log(data);
-
 	// 	// TODO: error
 	// }
 </script>
