@@ -96,7 +96,7 @@
 			{/each}
 		</div>
 		<div
-			class="brutal flex h-full w-full flex-col overflow-y-auto rounded bg-neutral p-4 text-neutral-content"
+			class="brutal flex h-full w-full flex-col overflow-y-auto overflow-x-hidden rounded bg-neutral p-4 text-neutral-content"
 		>
 			<slot />
 		</div>

@@ -18,8 +18,6 @@
 		liked = !liked;
 		loading = true;
 
-		// FIXME: supabase delete is not working
-
 		if (!liked) {
 			const { data, error } = await supabase
 				.from('likes')

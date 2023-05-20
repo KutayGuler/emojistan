@@ -18,18 +18,6 @@
 
 	$: ({ supabase, session } = data);
 
-	onMount(() => {
-		const {
-			data: { subscription },
-		} = supabase.auth.onAuthStateChange((event, _session) => {
-			if (_session?.expires_at !== session?.expires_at) {
-				invalidate('supabase:auth');
-			}
-		});
-
-		return () => subscription.unsubscribe();
-	});
-
 	const tutorialLinks = [
 		{ href: '/tutorial/controls', background: '#cfcfcf' },
 		{ href: '/tutorial/ruleboxes', background: '' },
