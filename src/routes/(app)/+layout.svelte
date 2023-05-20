@@ -5,7 +5,6 @@
 	import type { LayoutData } from '../$types';
 	import { fly } from 'svelte/transition';
 	import Background from '../Background.svelte';
-	import { notifications } from '../notifications';
 	import {
 		CONTROLLABLE_BORDER,
 		CROSS,
@@ -16,7 +15,6 @@
 	} from '$src/constants';
 
 	export let data: LayoutData;
-	let usernameInput = '';
 
 	$: ({ supabase, session } = data);
 
@@ -31,79 +29,6 @@
 
 		return () => subscription.unsubscribe();
 	});
-
-	let resolved = true;
-
-	async function signUp() {
-		if (password != confirmPassword) {
-			notifications.warning('Passwords are not matching.');
-			return;
-		}
-
-		if (usernameInput.length > 20) {
-			notifications.warning('Username too long.');
-			return;
-		}
-
-		resolved = false;
-		showDots();
-
-		supabase.auth
-			.signUp({
-				email,
-				password,
-			})
-			.then((res) => {
-				notifications.success('Signed up successfully! Check your email!');
-				asideShowing = 'menu';
-				resolved = true;
-			})
-			.catch((err) => {
-				notifications.success('An error occured');
-				resolved = true;
-			});
-	}
-
-	async function signInWithGoogle() {
-		const { data, error } = await supabase.auth.signInWithOAuth({
-			provider: 'google',
-		});
-	}
-
-	async function signInWithPassword() {
-		resolved = false;
-		showDots();
-
-		const { data, error } = await supabase.auth.signInWithPassword({
-			email,
-			password,
-		});
-
-		resolved = true;
-		asideShowing = 'menu';
-	}
-
-	let email: string;
-	let password: string;
-	let confirmPassword: string;
-
-	let dots = ['...', '..', '.', ''];
-	let dotIndex = 0;
-
-	function showDots() {
-		if (resolved) {
-			return;
-		}
-
-		let timeout = setTimeout(() => {
-			dotIndex = (dotIndex + 1) % dots.length;
-			showDots();
-			clearTimeout(timeout);
-		}, 500);
-	}
-
-	let asideShowing = 'menu';
-	let showing = 'menu';
 
 	const tutorialLinks = [
 		{ href: '/tutorial/controls', background: '#cfcfcf' },
@@ -157,102 +82,6 @@
 					>{href.replace('/tutorial/', '')}</a
 				>
 			{/each}
-		{:else if asideShowing == 'login'}
-			<button
-				class="btn w-full"
-				on:click={() => {
-					asideShowing = 'menu';
-				}}
-				><svg
-					xmlns="http://www.w3.org/2000/svg"
-					fill="none"
-					viewBox="0 0 24 24"
-					stroke-width="1.5"
-					stroke="currentColor"
-					class="h-6 w-6"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3"
-					/>
-				</svg>
-			</button>
-			<form
-				class="flex flex-col gap-2"
-				on:submit|preventDefault={signInWithPassword}
-			>
-				<h3 class="pt-8 text-neutral-content">Login</h3>
-				<input
-					required
-					type="email"
-					class="input-bordered input w-full"
-					placeholder="email"
-					bind:value={email}
-				/>
-				<input
-					required
-					type="password"
-					class="input-bordered input w-full"
-					placeholder="password"
-					bind:value={password}
-				/>
-				<button
-					type="submit"
-					class="btn-primary btn w-full {!resolved
-						? 'pointer-events-none bg-transparent text-primary'
-						: ''}">{resolved ? 'LOGIN' : 'LOGGING IN' + dots[dotIndex]}</button
-				>
-			</form>
-		{:else if asideShowing == 'signup'}
-			<button
-				class="btn w-full"
-				on:click={() => {
-					asideShowing = 'menu';
-				}}
-				><svg
-					xmlns="http://www.w3.org/2000/svg"
-					fill="none"
-					viewBox="0 0 24 24"
-					stroke-width="1.5"
-					stroke="currentColor"
-					class="h-6 w-6"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3"
-					/>
-				</svg>
-			</button>
-			<form class="flex flex-col gap-2" on:submit|preventDefault={signUp}>
-				<h3 class="pt-8 text-neutral-content">Sign Up</h3>
-				<input
-					type="email"
-					class="input-bordered input w-full"
-					placeholder="email"
-					bind:value={email}
-				/>
-				<input
-					type="password"
-					class="input-bordered input w-full"
-					placeholder="password"
-					bind:value={password}
-				/>
-				<input
-					type="password"
-					class="input-bordered input w-full"
-					placeholder="confirm password"
-					bind:value={confirmPassword}
-				/>
-				<button
-					type="submit"
-					class="btn-primary btn w-full {!resolved
-						? 'pointer-events-none bg-transparent text-primary'
-						: ''}"
-					>{resolved ? 'SIGN UP' : 'SIGNING UP' + dots[dotIndex]}</button
-				>
-			</form>
 		{:else}
 			<a
 				href="/saves"
@@ -305,26 +134,8 @@
 			</div>
 		{:else}
 			<div class="flex w-full flex-col items-end gap-2 text-neutral-content">
-				<button
-					class="btn-ghost btn-xs btn w-fit"
-					on:click={() => {
-						if (asideShowing == 'login') {
-							asideShowing = 'menu';
-						} else {
-							asideShowing = 'login';
-						}
-					}}>Login</button
-				>
-				<button
-					class="btn-ghost btn-xs btn w-fit"
-					on:click={() => {
-						if (asideShowing == 'signup') {
-							asideShowing = 'menu';
-						} else {
-							asideShowing = 'signup';
-						}
-					}}>Sign Up</button
-				>
+				<a href="/login" class="btn-ghost btn-xs btn w-fit">Login</a>
+				<a href="/signup" class="btn-ghost btn-xs btn w-fit">Sign Up</a>
 			</div>
 		{/if}
 		<div class="absolute bottom-0 left-1 text-xs text-base-300">
@@ -336,7 +147,11 @@
 	{:else}
 		<div
 			in:fly|local={{ x: 100 }}
-			class="brutal z-10 h-full w-full rounded bg-base-200 bg-opacity-95 p-8"
+			class="brutal z-10 h-full w-full rounded {['/signup', '/login'].includes(
+				$page.url.pathname
+			)
+				? 'bg-neutral'
+				: 'bg-base-200'} bg-opacity-95 p-8"
 		>
 			<a
 				href="/"
