@@ -40,25 +40,25 @@ export const load: LayoutServerLoad = async ({
 		.from('games')
 		.select('id, name, profile:profiles!games_user_id_fkey(username)', { count: 'exact' })
 		.eq('user_id', profileData[0].id)
-		.range(0, 10);
+		.range(0, 9);
 
 	let follower = await supabase
 		.from('follows')
 		.select('follower_id, profile:profiles!follows_follower_id_fkey(username)', { count: 'exact'})
 		.eq('following_id', profileData[0].id)
-		.range(0, 10);
+		.range(0, 9);
 
 	let following = await supabase
 		.from('follows')
 		.select('following_id, profile:profiles!follows_following_id_fkey(username)', { count: 'exact' })
 		.eq('follower_id', profileData[0].id)
-		.range(0, 10);
+		.range(0, 9);
 
 	let likes = await supabase
 		.from('likes')
 		.select('game:games(id, name), profile:profiles(username)', { count: 'exact' })
 		.eq('liker_id', profileData[0].id)
-		.range(0, 10);
+		.range(0, 9);
 
 	return {
 		bio: profileData[0].bio,

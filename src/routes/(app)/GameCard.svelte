@@ -3,11 +3,12 @@
 	import { page } from '$app/stores';
 	import { liked_game_ids } from '$src/store';
 	import supabase from '$api/supabase';
-	export let index: number;
+	export let index = 0;
 	export let id: string;
 	export let name: string;
 	export let profile: any;
 	export let emojis = new Set<string>();
+	export let div: HTMLDivElement;
 	let liked = $liked_game_ids.has(id);
 
 	let loading = false;
@@ -39,6 +40,7 @@
 </script>
 
 <div
+	bind:this={div}
 	id="card"
 	in:fly={{ delay: (index + 1) * 80, x: 200 }}
 	class="brutal relative mb-2 flex flex-col rounded-lg bg-slate-300 p-4 text-neutral"

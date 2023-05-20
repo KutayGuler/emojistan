@@ -7,8 +7,9 @@ export const load: LayoutServerLoad = async ({
 
 let { data: newGames, error } = await supabase
   .from('games')
-  .select('id, name')
-  .range(0, 10)
+  .select('id, name, profile:profiles!games_user_id_fkey(username)')
+  .order('created_at', { ascending: false})
+  .range(0, 9)
 
   let followingGames, followingError;
 
@@ -17,7 +18,7 @@ let { data: newGames, error } = await supabase
     .from('follows')
     .select('following_id')
     .eq('follower_id', session.user.id)
-    .range(0, 10)
+    .range(0, 9)
 
     let following_ids = _following ? _following?.map(({ following_id }) => following_id) : [];
     

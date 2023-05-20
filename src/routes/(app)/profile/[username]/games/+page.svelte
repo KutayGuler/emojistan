@@ -5,7 +5,7 @@
 	import type { PageData } from './$types';
 	export let data: PageData;
 
-	let lastRange = 10;
+	let lastRange = 9;
 
 	async function getGames() {
 		let { data: games, error } = await supabase

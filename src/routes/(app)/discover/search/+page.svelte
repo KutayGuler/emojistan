@@ -9,7 +9,6 @@
 	let searching = false;
 	let searchError = false;
 	let cache = new Map<string, object>();
-	export let data;
 
 	async function search() {
 		console.log(cache);
@@ -88,8 +87,9 @@
 				<GameCard {index} {...result} />
 			</div>
 		{:else if searchType == 'profiles'}
-		<!-- TODO: Profile card wrapper -->
-			<ProfileCard username={result.profile.username} />
+			<div class="flex h-full flex-wrap gap-2 overflow-y-auto">
+				<ProfileCard username={result.username} />
+			</div>
 		{/if}
 	{/each}
 {/if}

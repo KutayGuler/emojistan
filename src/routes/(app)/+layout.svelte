@@ -146,11 +146,14 @@
 				</svg>
 			</a>
 			{#each tutorialLinks as { href, background }}
-				{@const isRulebox = href.includes('rule') && $page.route.id == href}
+				{@const loading = $navigating?.to?.url.pathname == href}
+				{@const isRulebox =
+					href.includes('rule') && $page.url.pathname.includes('rule')}
 				<a
+					class:loading
 					{href}
 					class="btn {isRulebox ? 'glass' : ''}"
-					style:background={href == $page.route.id ? background : ''}
+					style:background={href == $page.url.pathname ? background : ''}
 					>{href.replace('/tutorial/', '')}</a
 				>
 			{/each}
@@ -330,7 +333,7 @@
 	{:else}
 		<div
 			in:fly|local={{ x: 100 }}
-			class="z-10 h-full w-full rounded bg-base-200 bg-opacity-95 p-8"
+			class="brutal z-10 h-full w-full rounded bg-base-200 bg-opacity-95 p-8"
 		>
 			<a
 				href="/"
