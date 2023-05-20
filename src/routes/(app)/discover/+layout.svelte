@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { onMount } from 'svelte/internal';
 	const tabs = ['New', 'Following', 'Search'];
 </script>
 

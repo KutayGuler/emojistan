@@ -7,59 +7,41 @@
 	export let id: string;
 	export let name: string;
 	export let profile: any;
-	export let emojis: Set<string>;
+	export let emojis = new Set<string>();
 	let liked = $liked_game_ids.has(id);
-	console.log($liked_game_ids, liked, id);
 
 	let loading = false;
 
 	async function toggleLike() {
-		// const { data, error } = await supabase
-		// 	.from('likes')
-		// 	.select('*')
-		// 	.eq('liker_id', $page.data.session?.user.id)
-		// 	.eq('game_id', id);
-
-		// console.log(data);
-		// return;
-
 		if (loading) return;
 		liked = !liked;
 		loading = true;
 
+		// FIXME: supabase delete is not working
+
 		if (!liked) {
-			console.log('delete obj:', {
-				liker_id: $page.data.session?.user.id,
-				game_id: id,
-			});
 			const { data, error } = await supabase
 				.from('likes')
 				.delete()
 				.match({ liker_id: $page.data.session?.user.id, game_id: id });
 
-			console.log(data, error);
-			loading = false;
-
 			$liked_game_ids.delete(id);
 		} else {
-			console.log('insert');
-
 			const { data, error } = await supabase
 				.from('likes')
 				.insert({ game_id: id, liker_id: $page.data.session?.user.id });
 
-			loading = false;
-
-			console.log(data);
-
 			$liked_game_ids.add(id);
 		}
+
+		loading = false;
 	}
 </script>
 
 <div
+	id="card"
 	in:fly={{ delay: (index + 1) * 80, x: 200 }}
-	class="brutal relative mb-2 flex h-56 flex-col rounded-lg bg-slate-300 p-4 text-neutral"
+	class="brutal relative mb-2 flex flex-col rounded-lg bg-slate-300 p-4 text-neutral"
 >
 	<h3>{name}</h3>
 	<p class="text-md text-slate-500">
@@ -112,3 +94,9 @@
 		</div>
 	</div>
 </div>
+
+<style>
+	#card {
+		min-height: 224px;
+	}
+</style>

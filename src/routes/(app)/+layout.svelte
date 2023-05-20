@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { page } from '$app/stores';
+	import { navigating, page } from '$app/stores';
 	import { invalidate } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import type { LayoutData } from '../$types';
@@ -251,9 +251,26 @@
 				>
 			</form>
 		{:else}
-			<a href="/saves" class="btn-primary btn w-full">PLAY</a>
-			<a href="/tutorial/controls" class="btn-secondary btn">TUTORIAL</a>
-			<a href="/discover" class="btn-accent btn">DISCOVER</a>
+			<a
+				href="/saves"
+				class="btn-primary btn w-full {$navigating?.to?.url.pathname.includes(
+					'saves'
+				)
+					? 'loading'
+					: ''}">PLAY</a
+			>
+			<a
+				href="/tutorial/controls"
+				class="btn-secondary btn {$navigating?.to?.url.pathname.includes('tut')
+					? 'loading'
+					: ''}">TUTORIAL</a
+			>
+			<a
+				href="/discover"
+				class="btn-accent btn {$navigating?.to?.url.pathname.includes('disc')
+					? 'loading'
+					: ''}">DISCOVER</a
+			>
 		{/if}
 
 		<div class="flex flex-grow" />

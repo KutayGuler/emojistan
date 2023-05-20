@@ -25,7 +25,7 @@
 </script>
 
 {#each data?.games?.data || [] as { id, name, profile }, index}
-	<GameCard {index} {id} {name} {profile} emojis={new Set()}></GameCard>
+	<GameCard {index} {id} {name} {profile} emojis={new Set()} />
 {:else}
 	<i
 		class="twa twa-floppy-disk absolute scale-150 self-center pt-[50%] text-9xl opacity-20"
