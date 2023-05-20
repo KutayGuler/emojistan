@@ -17,7 +17,7 @@
 		});
 
 		return () => subscription.unsubscribe();
-		// TODO: redirect user after login
+		// TODO: redirect and refresh after login
 	});
 
 	let resolved = true;

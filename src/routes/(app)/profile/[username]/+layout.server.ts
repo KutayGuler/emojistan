@@ -56,12 +56,15 @@ export const load: LayoutServerLoad = async ({
 
 	let likes = await supabase
 		.from('likes')
-		.select('game:games(id, name), profile:profiles(username)', { count: 'exact' })
+		.select('games(id, name), profile:profiles(username)', { count: 'exact' })
 		.eq('liker_id', profileData[0].id)
+		.order('created_at', { ascending: false })
 		.range(0, 9);
 
+	likes.data = likes.data?.map(({ games, profile }) => ({ id: games.id, name: games.name, profile }) )
+
 	return {
-		bio: profileData[0].bio,
+		profileData: profileData[0],
 		isOwner,
 		profileNotCreated,
 		games,

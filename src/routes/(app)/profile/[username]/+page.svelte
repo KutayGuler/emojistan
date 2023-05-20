@@ -3,11 +3,12 @@
 	export let data: PageData;
 </script>
 
-{#if data.bio}
+{#if data.profileData.bio}
 	<p class="text-2xl">
-		{data.bio} Lorem ipsum dolor sit amet consectetur adipisicing elit. Ut odio eius
-		provident. Voluptas incidunt harum nobis ad fuga, deserunt nihil totam perferendis
-		porro ipsum fugit similique quod sapiente quasi culpa ullam ex vel iusto omnis!
+		{data.profileData.bio} Lorem ipsum dolor sit amet consectetur adipisicing elit.
+		Ut odio eius provident. Voluptas incidunt harum nobis ad fuga, deserunt nihil
+		totam perferendis porro ipsum fugit similique quod sapiente quasi culpa ullam
+		ex vel iusto omnis!
 	</p>
 {:else}
 	<i

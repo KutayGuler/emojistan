@@ -1,18 +1,31 @@
 <script lang="ts">
-	import ProfileCard from '../../../ProfileCard.svelte';
-	import type { PageData } from './$types';
+	import Paginatable from '$src/routes/(app)/Paginatable.svelte';
+	import GameCard from '$src/routes/(app)/GameCard.svelte';
+	import supabase from '$api/supabase';
+	import type { PageData } from '../$types';
+	import ProfileCard from '$src/routes/(app)/ProfileCard.svelte';
 	export let data: PageData;
 
-	// TODO: intersection observer
+	async function supabaseQuery(from: number, to: number) {
+		const res = await supabase
+			.from('follows')
+			.select(
+				'follower_id, profile:profiles!follows_follower_id_fkey(username)'
+			)
+			.eq('following_id', data.profileData.id)
+			.range(from, to);
 
+		return res;
+	}
 </script>
 
-<div class="flex flex-wrap gap-2">
-	{#each data?.follower?.data || [] as { profile }}
-		<ProfileCard username={profile.username} />
-	{:else}
-		<i
-			class="twa twa-detective absolute scale-150 self-center pt-[50%] text-9xl opacity-20"
-		/>
-	{/each}
-</div>
+<Paginatable
+	wrap
+	data={data.follower.data}
+	component={ProfileCard}
+	{supabaseQuery}
+>
+	<i
+		class="twa twa-detective absolute scale-150 self-center pt-[50%] text-9xl opacity-20"
+	/>
+</Paginatable>

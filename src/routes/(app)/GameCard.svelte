@@ -8,7 +8,7 @@
 	export let name: string;
 	export let profile: any;
 	export let emojis = new Set<string>();
-	export let div: HTMLDivElement;
+	export let div: HTMLDivElement | null = null;
 	let liked = $liked_game_ids.has(id);
 
 	let loading = false;

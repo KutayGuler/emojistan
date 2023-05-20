@@ -26,6 +26,7 @@ let { data: newGames, error } = await supabase
       .from('games')
       .select('name, id, profile:profiles!games_user_id_fkey(username)')
       .in('user_id', following_ids)
+      .range(0, 9)
       
     followingGames = data;
   }

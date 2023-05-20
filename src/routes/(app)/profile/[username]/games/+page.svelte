@@ -1,33 +1,26 @@
 <script lang="ts">
-	import supabase from '$api/supabase';
-	import { page } from '$app/stores';
+	import Paginatable from '$src/routes/(app)/Paginatable.svelte';
 	import GameCard from '$src/routes/(app)/GameCard.svelte';
-	import type { PageData } from './$types';
+	import supabase from '$api/supabase';
+	import type { PageData } from '../$types';
 	export let data: PageData;
 
-	let lastRange = 9;
-
-	async function getGames() {
-		let { data: games, error } = await supabase
+	async function supabaseQuery(from: number, to: number) {
+		let res = await supabase
 			.from('games')
-			.select('id, name')
-			.eq('username', $page.params.username)
-			.range(lastRange, lastRange + 10);
+			.select('id, name, profile:profiles!games_user_id_fkey(username)', {
+				count: 'exact',
+			})
+			.eq('user_id', data.profileData.id)
+			.range(from, to);
 
-		lastRange += 10;
-
-		return games;
+		return res;
 	}
-
-	// TODO: intersection observer
-
-	// getGames();
 </script>
 
-{#each data?.games?.data || [] as { id, name, profile }, index}
-	<GameCard {index} {id} {name} {profile} emojis={new Set()} />
-{:else}
+<Paginatable data={data.games.data} component={GameCard} {supabaseQuery}>
 	<i
+		slot="fallback"
 		class="twa twa-floppy-disk absolute scale-150 self-center pt-[50%] text-9xl opacity-20"
 	/>
-{/each}
+</Paginatable>
