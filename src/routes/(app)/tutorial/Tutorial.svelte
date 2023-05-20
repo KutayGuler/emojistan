@@ -4,8 +4,7 @@
 	import Game from '$src/views/Game.svelte';
 
 	export let header: string | undefined = '';
-	export let subheader = '';
-	export let description: string;
+	export let description = '';
 	export let rbx: TRulebox;
 	export let props: any;
 	export let gameProps: any;
@@ -35,11 +34,11 @@
 			{#if header}
 				<h1 class="text-6xl">{header}</h1>
 			{/if}
-			<slot name="description">
-				<p class="pb-4 pt-2">
+			<div class="pb-4 pt-2">
+				<slot name="description">
 					{@html description}
-				</p>
-			</slot>
+				</slot>
+			</div>
 		</div>
 		{#key props}
 			<div

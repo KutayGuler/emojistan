@@ -5,7 +5,7 @@ import type Game from '../../../views/Game.svelte';
 
 export interface TutorialProps<T extends SvelteComponent> {
 	header?: string;
-	description: string;
+	description?: string;
 	component: ComponentType;
 	rbx: Rulebox;
 	props: ComponentProps<T>;

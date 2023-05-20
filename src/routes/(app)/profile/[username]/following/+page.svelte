@@ -2,6 +2,8 @@
 	import ProfileCard from '$src/routes/(app)/ProfileCard.svelte';
 	import type { PageData } from './$types';
 	export let data: PageData;
+
+	// TODO: intersection observer
 </script>
 
 <div class="flex flex-wrap gap-2">

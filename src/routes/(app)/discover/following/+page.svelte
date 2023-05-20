@@ -1,6 +1,8 @@
 <script lang="ts">
 	import GameCard from '../../GameCard.svelte';
 	export let data;
+
+	// TODO: intersection observer
 </script>
 
 {#if !data.session?.user.id}

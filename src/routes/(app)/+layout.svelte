@@ -327,6 +327,9 @@
 				>
 			</div>
 		{/if}
+		<div class="absolute bottom-0 left-1 text-xs text-base-300">
+			Emojistan v0.0.1
+		</div>
 	</aside>
 	{#if $page.route.id == '/(app)'}
 		<slot />
@@ -343,7 +346,6 @@
 			<slot><!-- optional fallback --></slot>
 		</div>
 	{/if}
-	<div class="absolute bottom-0 right-1 text-xs">Emojistan v0.0.1</div>
 </main>
 <Background />
 

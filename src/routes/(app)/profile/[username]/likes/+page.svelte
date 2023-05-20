@@ -2,6 +2,9 @@
 	import GameCard from '$src/routes/(app)/GameCard.svelte';
 	import type { PageData } from './$types';
 	export let data: PageData;
+
+	// TODO: intersection observer
+
 </script>
 
 {#each data?.likes?.data || [] as { game: { id, name }, profile }, index}

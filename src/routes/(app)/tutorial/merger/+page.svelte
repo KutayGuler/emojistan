@@ -12,10 +12,8 @@
 	import type { TutorialProps } from '../types';
 	import type { StringedNumber } from '$src/store';
 
-	const tutorialProps: TutorialProps = {
+	const tutorialProps: TutorialProps<Merger> = {
 		header: 'Merger',
-		description:
-			'Merger takes three emoji inputs. To put it simply, <i class="twa twa-cloud text-2xl" /> + <i class="twa twa-snowflake text-2xl" /> = <i class="twa twa-cloud-with-snow text-2xl" />. Alternatively, <i class="twa twa-cloud text-2xl" /> = <i class="twa twa-cloud-with-snow text-2xl" />',
 		component: Merger,
 		rbx: {
 			id: '-1',
@@ -85,14 +83,21 @@
 </svelte:head>
 
 <Tutorial {...tutorialProps} --header={MERGER_BORDER}>
-	<p slot="description">
-		Merger takes three emoji inputs. To put it simply, <br />
-		<i class="twa twa-cloud text-2xl" />
-		+
-		<i class="twa twa-snowflake text-2xl" /> =
-		<i class="twa twa-cloud-with-snow text-2xl" />
-		<br /><br />
-		Alternatively, &nbsp;<i class="twa twa-cloud text-2xl" />
-		= <i class="twa twa-cloud-with-snow text-2xl" />
-	</p>
+	<div slot="description">
+		Merger takes three emoji inputs. To put it simply,
+		<div class="w-fit rounded bg-neutral p-2 text-neutral-content">
+			<i class="twa twa-cloud text-2xl" />
+			+
+			<i class="twa twa-snowflake text-2xl" /> =
+			<i class="twa twa-cloud-with-snow text-2xl" />
+		</div>
+		<br />
+		Alternatively,
+		<div class="w-fit rounded bg-neutral p-2 text-neutral-content">
+			<i class="twa twa-cloud text-2xl" />
+			+
+			<i class="twa twa-snowflake text-2xl" />
+			= <i class="twa twa-cloud-with-snow text-2xl" />
+		</div>
+	</div>
 </Tutorial>
