@@ -1,7 +1,5 @@
 <script lang="ts">
 	import { navigating, page } from '$app/stores';
-	import { invalidate } from '$app/navigation';
-	import { onMount } from 'svelte';
 	import type { LayoutData } from '../$types';
 	import { fly } from 'svelte/transition';
 	import Background from '../Background.svelte';
@@ -13,6 +11,8 @@
 		MERGER_BORDER,
 		PUSHER_BORDER,
 	} from '$src/constants';
+	import { goto, invalidate, invalidateAll } from '$app/navigation';
+	import { notifications } from '../notifications';
 
 	export let data: LayoutData;
 
@@ -31,6 +31,13 @@
 
 	async function signOut() {
 		const { error } = await supabase.auth.signOut();
+		if (error) {
+			notifications.warning('An error occured. Could not logout.');
+			return;
+		}
+
+		// invalidate('supabase:auth');
+		invalidateAll();
 	}
 </script>
 
@@ -115,7 +122,11 @@
 				>
 				<a
 					href="/profile/{data.username || session.user.id}"
-					class="avatar self-end"
+					class="avatar self-end {$navigating?.to?.url.pathname.includes(
+						'profile'
+					)
+						? ''
+						: ''}"
 				>
 					<i class="twa twa-alien text-4xl" />
 				</a>

@@ -17,5 +17,3 @@
 </script>
 
 <Paginatable data={data.newGames} component={GameCard} {supabaseQuery} />
-
-<!-- TODO: fallback page -->

@@ -2,6 +2,8 @@
 	import supabase from '$api/supabase';
 	import { notifications } from '$src/routes/notifications';
 
+	// TODO: Google, Facebook Providers
+
 	let resolved = true;
 
 	let dots = ['...', '..', '.', ''];

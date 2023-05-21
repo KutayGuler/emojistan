@@ -2,6 +2,7 @@
 	import type { PostgrestSingleResponse } from '@supabase/supabase-js';
 	import type { ComponentType } from 'svelte';
 	import IntersectionObserver from 'svelte-intersection-observer';
+	import { notifications } from '../notifications';
 	export let component: ComponentType;
 	export let data: Array<any> = [];
 	export let wrap = false;
@@ -34,11 +35,10 @@
 
 		if (Array.isArray(_data)) {
 			data = [...data, ..._data];
+		} else if (_error) {
+			notifications.warning("An error occured while trying to get the data.")
 		}
 	}
-
-	// 	// TODO: error
-	// }
 </script>
 
 {#if data}
@@ -49,9 +49,19 @@
 	>
 		{#each data || [] as props, index}
 			{#if index == data.length - 1}
-				<svelte:component this={component} {...props} bind:div={element} />
+				<svelte:component
+					this={component}
+					{index}
+					{...props}
+					bind:div={element}
+				/>
 			{:else}
-				<svelte:component this={component} {...props} />
+				<!-- TODO: figure this animation shit out -->
+				<svelte:component
+					this={component}
+					index={index < paginationCount ? 0 : paginationCount - index}
+					{...props}
+				/>
 			{/if}
 		{/each}
 	</div>

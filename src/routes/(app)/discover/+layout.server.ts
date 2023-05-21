@@ -11,7 +11,7 @@ let { data: newGames, error } = await supabase
   .order('created_at', { ascending: false})
   .range(0, 9)
 
-  let followingGames, followingError;
+  let followingGames, followingError, following_ids;
 
   if (session) {
     let { data: _following, error: _followingError } = await supabase
@@ -20,7 +20,7 @@ let { data: newGames, error } = await supabase
     .eq('follower_id', session.user.id)
     .range(0, 9)
 
-    let following_ids = _following ? _following?.map(({ following_id }) => following_id) : [];
+    following_ids = _following ? _following?.map(({ following_id }) => following_id) : [];
     
     const { data, error } = await supabase
       .from('games')
@@ -33,6 +33,7 @@ let { data: newGames, error } = await supabase
 
 	return {
     newGames,
-    followingGames
+    followingGames,
+    following_ids
 	};
 };

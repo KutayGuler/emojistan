@@ -10,6 +10,8 @@ import { browser } from '$app/environment';
 
 export const load: LayoutLoad = async ({ fetch, data, depends }) => {
 	depends('supabase:auth');
+	console.log("layout.ts")
+	console.log(data)
 
 	const supabase = createSupabaseLoadClient<Database>({
 		supabaseUrl: PUBLIC_SUPABASE_URL,

@@ -1,25 +1,27 @@
 <script lang="ts">
 	import Paginatable from '../../Paginatable.svelte';
 	import GameCard from '../../GameCard.svelte';
-	import supabase from '$api/supabase';
 	import type { PageData } from '../$types';
+	import supabase from '$api/supabase';
 	export let data: PageData;
 
 	async function supabaseQuery(from: number, to: number) {
-		// const res = await supabase
-		// 	.from('games')
-		// 	.select('name, id, profile:profiles!games_user_id_fkey(username)')
-		// 	.in('user_id', data.profileData.id)
-		// 	.order('created_at', { ascending: false })
-		// 	.range(from, to);
+		const res = await supabase
+			.from('games')
+			.select('name, id, profile:profiles!games_user_id_fkey(username)')
+			.in('user_id', data.following_ids)
+			.range(0, 9);
 
-		// TODO: following users should be kept track of
-
-		// return res;
-		return [];
+		return res;
 	}
 </script>
 
-<Paginatable data={data.followingGames} component={GameCard} {supabaseQuery}>
-	<div slot="fallback">Login to see the games of people you follow.</div>
-</Paginatable>
+{#if data.session}
+	<Paginatable
+		data={data.followingGames}
+		component={GameCard}
+		{supabaseQuery}
+	/>
+{:else}
+	<div>Login to see the games of people you follow.</div>
+{/if}
