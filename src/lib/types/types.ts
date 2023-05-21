@@ -20,6 +20,10 @@ import {
 	CONTROLLABLE_BORDER,
 	CONTROLLABLE_H,
 	CONTROLLABLE_W,
+	SEQUENCER_BG,
+	SEQUENCER_BORDER,
+	SEQUENCER_H,
+	SEQUENCER_W,
 } from '$src/constants';
 import type { StringedNumber } from '$src/store';
 import type { XYPosition, Position } from './utils';
@@ -30,6 +34,7 @@ export type RuleboxType =
 	| 'effector'
 	| 'interactable'
 	| 'controllable'
+	| 'sequencer'
 	| 'ctxMenu';
 
 export interface Rulebox {
@@ -76,6 +81,12 @@ export class Rulebox {
 				this.height = INTERACTABLE_H;
 				this.borderColor = INTERACTABLE_BORDER;
 				this.bgColor = INTERACTABLE_BG;
+				return;
+			case 'sequencer':
+				this.width = SEQUENCER_W;
+				this.height = SEQUENCER_H;
+				this.borderColor = SEQUENCER_BORDER;
+				this.bgColor = SEQUENCER_BG;
 				return;
 			case 'controllable':
 				this.width = CONTROLLABLE_W;

@@ -5,6 +5,7 @@
 		interactables,
 		effectors,
 		controllables,
+		sequencers,
 	} from '../store';
 	import type { RuleboxType } from '$lib/types';
 	import { rbxStore } from '$lib/stores/store';
@@ -14,6 +15,7 @@
 		Interactable,
 		Controllable,
 		Effector,
+		Sequencer
 	} from '$src/types';
 
 	export let position: { x: number; y: number };
@@ -37,6 +39,9 @@
 				break;
 			case 'interactable':
 				interactables.add(id, value);
+				break;
+			case 'sequencer':
+				sequencers.add(id, value);
 				break;
 			case 'ctxMenu':
 				break;
@@ -81,6 +86,10 @@
 					)
 				),
 		},
+		{
+			name: 'Sequencer',
+			onClick: () => spawn('sequencer', new Sequencer([]))
+		}
 	];
 </script>
 

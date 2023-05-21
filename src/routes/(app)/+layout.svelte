@@ -11,7 +11,7 @@
 		MERGER_BORDER,
 		PUSHER_BORDER,
 	} from '$src/constants';
-	import { goto, invalidate, invalidateAll } from '$app/navigation';
+	import { invalidate } from '$app/navigation';
 	import { notifications } from '../notifications';
 
 	export let data: LayoutData;
@@ -36,8 +36,7 @@
 			return;
 		}
 
-		// invalidate('supabase:auth');
-		invalidateAll();
+		invalidate('supabase:auth');
 	}
 </script>
 

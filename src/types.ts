@@ -56,6 +56,10 @@ export class Entity {
 export interface Effector {
 	emoji: string;
 	hp: number | 'Infinite';
+	// speed: number;
+	// range: number;
+	// type: 'equippable' | 'collidable'
+	// could be higher in z-index, and be stored in a different Map
 }
 
 export class Effector {
@@ -70,12 +74,12 @@ export interface _Effectors {
 }
 
 interface _InteractableSideEffects {
-	[emoji: string]: number | 'talk';
+	[emoji: string]: SideEffect;
 }
 
 export interface _Interactable {
 	id: string;
-	sequence: Array<SequenceItem>;
+	sequenceID: StringedNumber;
 	points: number;
 	hp: number;
 	sideEffects: _InteractableSideEffects;
@@ -111,7 +115,7 @@ export interface _Collisions {
 	};
 }
 
-export interface Mutations {
+export interface Actions {
 	paint(
 		{ index, background }: { index: number; background: string },
 		_start?: number
@@ -121,10 +125,28 @@ export interface Mutations {
 		{ index, emoji }: { index: number; emoji: string },
 		_start?: number
 	): void;
+	spawnRTP(
+		{ index, emoji }: { index: number; emoji: string },
+		_start?: number
+	): void;
 	destroy({ index }: { index: number }): void;
-	resetLevel: Function;
-	completeLevel: Function;
+	reset: Function;
+	complete: Function;
+	// addquest
 }
+
+interface Quest {
+	status: "completed" | "failed" | "in progress"
+	title: string
+	description: string
+	type: string
+	checker: Function
+}
+
+// quests
+// collect 5 stars
+// dialogues will also trigger stuff
+// dialogues will branch based on quests
 
 export interface EditableMap {
 	/**
@@ -152,8 +174,18 @@ export class EditableMap {
 	}
 }
 
+export interface Sequencer {
+	sequence: Array<SequenceItem>;
+}
+
+export class Sequencer {
+	constructor(sequence: Array<SequenceItem>) {
+		this.sequence = sequence;
+	}
+}
+
 export interface SequenceItem {
-	type: keyof Mutations;
+	type: keyof Actions;
 	index: number;
 	background: string;
 	duration: number;
@@ -163,7 +195,7 @@ export interface SequenceItem {
 
 export class SequenceItem {
 	constructor(
-		type: keyof Mutations,
+		type: keyof Actions,
 		index: number,
 		background: string,
 		duration: number,
@@ -204,11 +236,13 @@ export class Devolve {
 export type Drops = [id: StringedNumber, amount: number];
 export type _Drops = [id: string, amount: number];
 
+export type SideEffect = number | 'talk' | 'trigger';
+
 export interface Interactable {
 	emoji: string;
-	sequence: Array<SequenceItem>;
+	sequenceID: StringedNumber;
 	hp: number;
-	sideEffects: Array<[StringedNumber | 'any', number | 'talk']>;
+	sideEffects: Array<[StringedNumber | 'any', SideEffect]>;
 	evolve: Evolve;
 	devolve: Devolve;
 	drops: Drops;
@@ -217,15 +251,15 @@ export interface Interactable {
 export class Interactable {
 	constructor(
 		emoji: string,
-		sequence: Array<SequenceItem>,
+		sequenceID: StringedNumber,
 		hp: number,
-		sideEffects: Array<[StringedNumber | 'any', number | 'talk']>,
+		sideEffects: Array<[StringedNumber | 'any', SideEffect]>,
 		evolve: Evolve,
 		devolve: Devolve,
 		drops: Drops
 	) {
 		this.emoji = emoji;
-		this.sequence = sequence;
+		this.sequenceID = sequenceID;
 		this.hp = hp;
 		this.sideEffects = sideEffects;
 		this.evolve = evolve;

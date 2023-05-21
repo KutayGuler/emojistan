@@ -6,6 +6,8 @@
 	export let layer = 1;
 	let text = '';
 
+	// TODO: option to delete choice
+
 	function toggleNextBranch(next: string) {
 		nextBranch = nextBranch === next ? '' : next;
 	}
@@ -21,6 +23,8 @@
 		dialogueTree.addTextTo(currentBranch, text);
 		text = '';
 	}
+
+	function attemptDelete(label: string) {}
 
 	$: if (currentBranch !== '' && !$dialogueTree.has(currentBranch)) {
 		dialogueTree.add(currentBranch);
@@ -119,12 +123,12 @@
 							{@const chosen = choice.next === nextBranch}
 							<div
 								class="relative flex w-1/4 flex-col gap-2 rounded-xl border-2 {chosen
-									? 'border-primary'
+									? 'border-secondary'
 									: 'border-black'}"
 							>
 								<button
 									class="btn {chosen
-										? 'btn-primary'
+										? 'btn-secondary'
 										: ''} flex-grow border-none focus:border-none"
 									on:click={() => toggleNextBranch(choice.next)}
 									>{choice.label}</button
@@ -159,26 +163,36 @@
 									</svg>
 								</button>
 								{#if choiceEditIndex === i}
-									<form
-										on:submit={() => {
-											choice.label = choiceLabel;
-											choice.text = choiceText;
-											choiceEditIndex = -1;
-										}}
-										class="absolute -bottom-40 flex w-full flex-col gap-2 rounded border-2 border-black bg-slate-300 p-2"
+									<div
+										class="absolute -bottom-52 flex w-full flex-col gap-2 rounded border-2 border-black bg-slate-300 p-2"
 									>
-										<input
-											class="input-bordered input input-sm"
-											type="text"
-											bind:value={choiceLabel}
-										/>
-										<input
-											class="input-bordered input input-sm"
-											type="text"
-											bind:value={choiceText}
-										/>
-										<button class="btn-primary btn" type="submit">SAVE</button>
-									</form>
+										<form
+											class="flex w-full flex-col gap-2"
+											on:submit={() => {
+												choice.label = choiceLabel;
+												choice.text = choiceText;
+												choiceEditIndex = -1;
+											}}
+										>
+											<input
+												class="input-bordered input input-sm"
+												type="text"
+												bind:value={choiceLabel}
+											/>
+											<input
+												class="input-bordered input input-sm"
+												type="text"
+												bind:value={choiceText}
+											/>
+											<button class="btn-primary btn" type="submit">SAVE</button
+											>
+										</form>
+										<button
+											on:click={() => attemptDelete(choice.label)}
+											class="btn-error btn-ghost btn"
+											type="submit">DELETE</button
+										>
+									</div>
 								{/if}
 							</div>
 						{/each}

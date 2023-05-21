@@ -26,6 +26,7 @@
 	import Effector from '$rbx/Effector.svelte';
 	import Controllable from '$rbx/Controllable.svelte';
 	import { CROSS } from '$src/constants';
+	import Sequencer from '$rbx/Sequencer.svelte';
 
 	export let rbx: Rulebox;
 	export let props: any = {};
@@ -158,6 +159,8 @@
 		<Effector id={rbx.id} {...props} />
 	{:else if rbx.type === 'pusher'}
 		<Pusher id={rbx.id} {...props} />
+	{:else if rbx.type === 'sequencer'}
+		<Sequencer id={rbx.id} {...props} />
 	{:else if rbx.type === 'merger'}
 		<Merger id={rbx.id} {...props} />
 	{/if}

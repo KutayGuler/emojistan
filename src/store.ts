@@ -11,6 +11,7 @@ import {
 	type Merger,
 	type Pusher,
 	type SkinTone,
+	Sequencer,
 } from './types';
 import { generateID } from './routes/utils';
 
@@ -420,6 +421,9 @@ export const pushers = createMapStore<StringedNumber, Pusher>('pushers');
 export const mergers = createMapStore<StringedNumber, Merger>('mergers');
 export const effectors = createMapStore<StringedNumber, Effector>('effectors');
 export const interactables = createMapStore<StringedNumber, Interactable>(
+	'interactables'
+);
+export const sequencers = createMapStore<StringedNumber, Sequencer>(
 	'interactables'
 );
 export const controllables = createMapStore<StringedNumber, Controllable>(

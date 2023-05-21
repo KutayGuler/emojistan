@@ -1,8 +1,6 @@
 <script lang="ts">
 	import {
 		INTERACTABLE_H,
-		MIN_DURATION,
-		MIN_INDEX,
 		DEFAULT_SIDE_LENGTH,
 		CROSS,
 		MAX_SIDE_EFFECT,
@@ -14,13 +12,12 @@
 		Evolve,
 		Interactable,
 		SequenceItem,
-		type Mutations,
 		type Drops,
+		type SideEffect,
 	} from '$src/types';
 	import { onDestroy, onMount } from 'svelte';
 	import { notifications } from '../routes/notifications';
 	import {
-		map,
 		formattedEmoji,
 		interactables,
 		effectors,
@@ -28,27 +25,9 @@
 	} from '../store';
 	import { hasDuplicateIn, hasDuplicate } from './utils';
 
-	let defaultBackground = $map.dbg;
-
-	// Add Inventory: ["drop"]
-	const types: {
-		[key in 'Map' | 'Background' | 'Level']: Array<keyof Mutations>;
-	} = {
-		Map: ['spawn', 'destroy'],
-		Background: ['paint', 'erase'],
-		Level: ['resetLevel', 'completeLevel'],
-	};
-
-	const typeIcons = {
-		Player: '👾',
-		Map: '🗺️',
-		Background: '🖌️',
-		Level: '🎬',
-	};
-
 	let indexes: Array<number> = [];
 	let hps: Array<number> = [];
-	let modifierPoints: Array<number | 'talk'> = [];
+	let modifierPoints: Array<SideEffect> = [];
 
 	for (let i = 0; i < 100; i++) {
 		hps[i] = i + 1;
@@ -56,6 +35,7 @@
 	}
 
 	modifierPoints.unshift('talk');
+	modifierPoints.unshift('trigger');
 
 	for (let i = 0; i >= -100; i--) {
 		modifierPoints.unshift(i);
@@ -68,9 +48,9 @@
 	// COMPONENT RELATED
 	export let id: StringedNumber;
 	export let emoji = '';
-	export let sequence: Array<SequenceItem> = [];
+	export let sequenceID: StringedNumber;
 	export let hp = 1;
-	export let sideEffects: Array<[StringedNumber | 'any', number | 'talk']> = [
+	export let sideEffects: Array<[StringedNumber | 'any', SideEffect]> = [
 		['any', 'talk'],
 	];
 	export let pseudoSideEffects: Array<[string | 'any', number]> = [];
@@ -78,26 +58,26 @@
 	export let devolve = new Devolve('');
 	export let drops: Drops = ['-1', 1];
 
-	// SEQUENCE RELATED
-	let type = types.Map[0];
-	let duration = 0;
-	let index = 0;
-	let background = '';
-
 	onMount(() => {
 		let obj = $interactables.get(id);
 		if (obj) {
-			({ emoji, sequence, hp, sideEffects, evolve, devolve, drops } = obj);
+			({ emoji, sequenceID, hp, sideEffects, evolve, devolve, drops } = obj);
 		}
 	});
 
 	function updateStore() {
 		interactables.update(
 			id,
-			new Interactable(emoji, sequence, hp, sideEffects, evolve, devolve, drops)
+			new Interactable(
+				emoji,
+				sequenceID,
+				hp,
+				sideEffects,
+				evolve,
+				devolve,
+				drops
+			)
 		);
-
-		rbxStore.adjustHeight(id, sequence.length, INTERACTABLE_H);
 	}
 
 	onDestroy(() => {
@@ -128,21 +108,6 @@
 		}
 		sideEffects.push([effectorID, 0]);
 		sideEffects = sideEffects;
-		updateStore();
-	}
-
-	function addToSequence() {
-		sequence = [
-			...sequence,
-			new SequenceItem(type, MIN_INDEX, '', 1, MIN_DURATION, ''),
-		];
-		updateStore();
-		[type, duration, index, background] = [types.Map[0], 0, 0, ''];
-	}
-
-	function removeFromSequence(i: number) {
-		sequence.splice(i, 1);
-		sequence = sequence;
 		updateStore();
 	}
 
@@ -197,11 +162,6 @@
 		}
 
 		devolve.to = $formattedEmoji;
-		updateStore();
-	}
-
-	function updateSlot(i: number) {
-		sequence[i].emoji = $formattedEmoji;
 		updateStore();
 	}
 
@@ -418,114 +378,6 @@
 			</div>
 		</div>
 	</div>
-	<!-- <div class="flex w-full flex-col gap-2 p-4">
-		<div class="divider">EVENT SEQUENCE</div>
-		{#each sequence as s, i}
-			<span class="flex w-full flex-row items-start justify-center gap-2">
-				<select
-					class="select-bordered select"
-					title="event type"
-					bind:value={s.type}
-				>
-					{#each Object.entries(types) as [group, values]}
-						<optgroup label={`${group} ${typeIcons[group]}`}>
-							{#each values as t}
-								<option value={t}>{t}</option>
-							{/each}
-						</optgroup>
-					{/each}
-				</select>
-				{#if s.type === 'spawn'}
-					<button class="slot" on:click={() => updateSlot(i)}>
-						<i class="twa twa-{s.emoji}" />
-					</button>
-					at
-					<select
-						class="select-bordered select"
-						title="index"
-						id="index"
-						bind:value={s.index}
-						on:change={updateStore}
-					>
-						{#each indexes as j}
-							<option value={j}>{j}</option>
-						{/each}
-					</select>
-				{:else if s.type === 'destroy' || s.type === 'erase'}
-					<select
-						class="select-bordered select"
-						title="index"
-						id="index"
-						bind:value={s.index}
-						on:change={updateStore}
-					>
-						{#each indexes as j}
-							<option value={j}>{j}</option>
-						{/each}
-					</select>
-				{:else if s.type === 'wait'}
-					<select
-						class="select-bordered select"
-						title="duration"
-						id="duration"
-						bind:value={s.duration}
-						on:change={updateStore}
-					>
-						{#each DURATIONS as d}
-							<option value={d}>{d}</option>
-						{/each}
-					</select>
-				{:else if s.type === 'paint'}
-					<select
-						class="select-bordered select"
-						title="index"
-						id="index"
-						bind:value={s.index}
-						on:change={updateStore}
-					>
-						{#each indexes as j}
-							<option value={j}>{j}</option>
-						{/each}
-					</select>
-					to
-					<select
-						class="select-bordered select"
-						title="color"
-						bind:value={s.background}
-						style:background={s.background}
-						on:change={updateStore}
-					>
-						{#each palette.filter((color) => color != defaultBackground) as color}
-							<option value={color} style:background={color} />
-						{/each}
-					</select>
-				{/if}
-				<div class="flex flex-grow justify-end">
-					<button
-						class="text-2xl"
-						id="remove"
-						on:click={() => removeFromSequence(i)}>{CROSS}</button
-					>
-				</div>
-			</span>
-		{/each}
-		<label class="flex items-center justify-center gap-2">
-			<select
-				class="select-bordered select"
-				title="event type"
-				bind:value={type}
-			>
-				{#each Object.entries(types) as [group, values]}
-					<optgroup label={`${group} ${typeIcons[group]}`}>
-						{#each values as t}
-							<option value={t}>{t}</option>
-						{/each}
-					</optgroup>
-				{/each}
-			</select>
-			<button class="btn text-2xl" on:click={addToSequence}>+</button>
-		</label>
-	</div> -->
 </main>
 
 <style>

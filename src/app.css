@@ -115,10 +115,12 @@
 	-moz-osx-font-smoothing: grayscale;
 	-webkit-text-size-adjust: 100%;
 
+	/* CF #8 */
 	/* RULEBOXES */
 	--pusher: #64748b;
 	--merger: #334155;
 	--interactable: #f43f5e;
+	--sequencer: #f59e0b;
 	--controllable: #22c55e;
 	--effector: #a855f7;
 
@@ -153,13 +155,15 @@ body {
 	background-color: #475569;
 }
 
+/* CF #9 */
 /* RULEBOXES */
 
 .Pusher:hover,
 .Merger:hover,
 .Interactable:hover,
 .Controllable:hover,
-.Effector:hover {
+.Effector:hover,
+.Sequencer:hover {
 	color: var(--primary);
 }
 
@@ -171,6 +175,9 @@ body {
 }
 .Interactable:hover {
 	background-color: var(--interactable);
+}
+.Sequencer:hover {
+	background-color: var(--sequencer);
 }
 .Controllable:hover {
 	background-color: var(--controllable);

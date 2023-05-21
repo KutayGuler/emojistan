@@ -4,7 +4,7 @@
 	let currentBranch = '';
 
 	const _interactables = [...$interactables].filter(
-		([_, { emoji }]) => emoji != ''
+		([_, { emoji }]) => emoji != '' && emoji != undefined
 	);
 </script>
 

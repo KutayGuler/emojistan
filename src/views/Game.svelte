@@ -18,7 +18,7 @@
 		EditableMap,
 		type ArrowKey,
 		type CollisionType,
-		type Mutations,
+		type Actions,
 		type Wasd,
 		type _Collisions,
 		type _Interactable,
@@ -34,6 +34,12 @@
 	} from '$src/types';
 	import { AStarFinder } from 'astar-typescript';
 	import Chat from './Chat.svelte';
+
+	// TODO: if the interactable does not have a side effect because of effector,
+	// effector shouldn't lose hp
+	// F to apply on self
+	// X to throw
+	// Space to use
 
 	/* ## DATA ## */
 	export let dt = new Map<string, Branch>(); // dialogue tree
@@ -432,8 +438,8 @@
 		}
 	}
 
-	// MUTATIONS
-	const m: Mutations = {
+	// Actions
+	const m: Actions = {
 		paint({ index, background }) {
 			colors.set(currentSection + '_' + index, background);
 			colors = colors;
@@ -445,10 +451,15 @@
 			entities.set(currentSection + '_' + index, new Entity(emoji));
 			entities = entities;
 		},
+		spawnRTP({ index, emoji }) {
+			// entities.set(currentSection + '_' + index, new Entity(emoji));
+			// entities = entities;
+			// TODO:
+		},
 		destroy({ index }) {
 			entities.delete(currentSection + '_' + index);
 		},
-		resetLevel: () => {
+		reset: () => {
 			entities.clear();
 			colors = new Map(map.colors);
 			ac = -2;
@@ -456,7 +467,7 @@
 			entities = entities;
 			levelCompleted = false;
 		},
-		completeLevel: () => (levelCompleted = true),
+		complete: () => (levelCompleted = true),
 	};
 
 	function getCollisionType(key1: string, key2: string): CollisionType {
@@ -656,16 +667,17 @@
 			let { id, evolve, sideEffects, devolve } = _interactable;
 			const sideEffect = sideEffects[effectorItem];
 
-			if (sideEffect === 0) return;
-
-			if (sideEffect === 'talk') {
+			if (sideEffect === 0) {
+			} else if (sideEffect === 'talk') {
 				dialogueID = id.toString();
 				character = interactedItem.emoji;
 				chatting = true;
 				return;
+			} else if (sideEffect === 'trigger') {
+				// TODO: stuff
+				return;
 			}
 
-			if (sideEffect === 0) return;
 			interactedItem.hp.current += sideEffect;
 
 			handDirection = getHandDirection(operation);
@@ -884,7 +896,7 @@
 				</p>
 				<button
 					class="btn-success btn-lg btn w-1/4 text-success-content"
-					on:click={() => m.resetLevel()}>REPLAY</button
+					on:click={() => m.reset()}>REPLAY</button
 				>
 				<button
 					class="btn-error btn-lg btn w-1/4 text-error-content"

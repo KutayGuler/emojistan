@@ -6,9 +6,9 @@
 	import { navigating } from '$app/stores';
 	import Loading from './Loading.svelte';
 	import type { LayoutData } from './$types';
-	import { invalidateAll } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import { notifications } from './notifications';
+	import { invalidate } from '$app/navigation';
 
 	export let data: LayoutData;
 
@@ -20,10 +20,8 @@
 		} = supabase.auth.onAuthStateChange(async (event, _session) => {
 			if (_session?.expires_at !== session?.expires_at) {
 				console.log(data);
-				// invalidate('supabase:auth');
-				invalidateAll();
+				invalidate('supabase:auth');
 				notifications.success('Logged in as ' + username);
-				// goto('/');
 				console.log('invalidate');
 			}
 		});

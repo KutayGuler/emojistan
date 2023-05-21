@@ -10,6 +10,8 @@
 	import { onDestroy, onMount } from 'svelte';
 	import { hasDuplicateIn, hasDuplicate } from './utils';
 
+	// TODO:
+
 	export let id: StringedNumber;
 	export let emoji = '';
 	export let hp: number | 'Infinite' = 1;

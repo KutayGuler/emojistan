@@ -23,6 +23,7 @@
 		dialogueTree,
 		showLoading,
 		controllables,
+		sequencers,
 	} from '../../../store';
 	import {
 		CROSS,
@@ -57,6 +58,7 @@
 			effectors,
 			interactables,
 			controllables,
+			sequencers,
 			rbxStore,
 			dialogueTree,
 		]) {
