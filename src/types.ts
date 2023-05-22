@@ -74,7 +74,7 @@ export interface _Effectors {
 }
 
 interface _InteractableSideEffects {
-	[emoji: string]: SideEffect;
+	[emoji: string]: Exclude<SideEffect, 'trigger'> | Array<SequenceItem>;
 }
 
 export interface _Interactable {
@@ -238,13 +238,14 @@ export class Devolve {
 export type Drops = [id: StringedNumber, amount: number];
 export type _Drops = [id: string, amount: number];
 
-export type SideEffect = number | 'talk' | 'trigger';
+export type SideEffect = number | 'talk' | 'trigger' | Array<SequenceItem>;
 
 export interface Interactable {
 	emoji: string;
 	sequenceID: StringedNumber;
 	hp: number;
 	sideEffects: Array<[StringedNumber | 'any', SideEffect]>;
+	triggers: Map<StringedNumber | 'any', StringedNumber>;
 	evolve: Evolve;
 	devolve: Devolve;
 	drops: Drops;
@@ -256,6 +257,7 @@ export class Interactable {
 		sequenceID: StringedNumber,
 		hp: number,
 		sideEffects: Array<[StringedNumber | 'any', SideEffect]>,
+		triggers: Map<StringedNumber | 'any', StringedNumber>,
 		evolve: Evolve,
 		devolve: Devolve,
 		drops: Drops
@@ -264,6 +266,7 @@ export class Interactable {
 		this.sequenceID = sequenceID;
 		this.hp = hp;
 		this.sideEffects = sideEffects;
+		this.triggers = triggers;
 		this.evolve = evolve;
 		this.devolve = devolve;
 		this.drops = drops;

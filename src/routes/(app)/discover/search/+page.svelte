@@ -34,7 +34,7 @@
 			searchError = true;
 			searchResult = [];
 		} else if (data) {
-			cache.set(query.toLowerCase(), data);
+			cache.set(searchType + "_" + query.toLowerCase(), data);
 			searchResult = data;
 		}
 	}

@@ -1,6 +1,5 @@
 <script lang="ts">
 	import Paginatable from '$src/routes/(app)/Paginatable.svelte';
-	import GameCard from '$src/routes/(app)/GameCard.svelte';
 	import supabase from '$api/supabase';
 	import type { PageData } from '../$types';
 	import ProfileCard from '$src/routes/(app)/ProfileCard.svelte';
@@ -17,6 +16,8 @@
 
 		return res;
 	}
+
+	// FIXME: not working
 </script>
 
 <Paginatable

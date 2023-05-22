@@ -16,6 +16,7 @@
 		Controllable,
 		HP,
 		EditableMap,
+		Sequencer,
 		type ArrowKey,
 		type CollisionType,
 		type Actions,
@@ -49,6 +50,7 @@
 	export let interactables = new Map<string, Interactable>();
 	export let controllables = new Map<string, Controllable>();
 	export let effectors = new Map<string, Effector>();
+	export let sequencers = new Map<string, Sequencer>();
 	export let mapClass = DEFAULT_MAP_CLASS;
 	export let SIZE = DEFAULT_SIDE_LENGTH;
 	export let showHP = true;
@@ -94,24 +96,36 @@
 	}
 
 	for (let [id, interactable] of structuredClone(interactables)) {
-		const { emoji, sideEffects, ...args } = interactable;
-		console.log(emoji, sideEffects, args);
+		const { emoji, sideEffects, triggers, ...args } = interactable;
 		if (!emoji || !sideEffects) continue;
 		_interactables[emoji] = {} as _Interactable;
 		Object.assign(_interactables[emoji], args);
 		_interactables[emoji].id = id;
 		_interactables[emoji].sideEffects = {};
 
+		console.log(triggers, sequencers);
 		for (let [id, effect] of sideEffects) {
-			let effector = structuredClone(effectors.get(id));
+			if (effect == 'trigger') {
+				let sequenceID = triggers.get(id);
+				let sequencer = structuredClone(sequencers.get(sequenceID));
+				console.log(sequencer);
+				effect = sequencer?.sequence || [];
+			}
 
 			if (id === 'any') {
 				_interactables[emoji].sideEffects.any = effect;
 				continue;
 			}
 
+			let effector = structuredClone(effectors.get(id));
 			if (!effector) continue;
 			_interactables[emoji].sideEffects[effector.emoji] = effect;
+		}
+
+		console.log(triggers);
+		for (let [effectorID, sequenceID] of triggers) {
+			console.log(effectorID, sequenceID);
+			let sequence = structuredClone(sequencers.get(sequenceID));
 		}
 
 		const dropsID = _interactables[emoji].drops[0];
@@ -674,8 +688,10 @@
 				character = interactedItem.emoji;
 				chatting = true;
 				return;
-			} else if (sideEffect === 'trigger') {
-				// TODO: stuff
+			} else if (Array.isArray(sideEffect)) {
+				for (let { type, ...args } of sideEffect) {
+					m[type](args);
+				}
 				return;
 			}
 
@@ -701,17 +717,6 @@
 			) {
 				deleteFromInventory(currentInventoryIndex);
 			}
-
-			// for (let { type, ...args } of sequence) {
-			// 	if (type === 'wait') {
-			// 		await m.wait(args.duration);
-			// 	} else {
-			// 		let res = m[type](args);
-			// 		if (res === 'cancelLoop') {
-			// 			break;
-			// 		}
-			// 	}
-			// }
 
 			// EVOLVE & DEVOLVE INTERACTED ITEM
 			if (interactedItem.hp.current <= 0) {

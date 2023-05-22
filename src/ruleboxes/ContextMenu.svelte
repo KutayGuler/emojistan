@@ -6,6 +6,7 @@
 		effectors,
 		controllables,
 		sequencers,
+		type StringedNumber,
 	} from '../store';
 	import type { RuleboxType } from '$lib/types';
 	import { rbxStore } from '$lib/stores/store';
@@ -80,6 +81,7 @@
 						'-1',
 						1,
 						[['any', 'talk']],
+						new Map<StringedNumber | "any", StringedNumber>(),
 						new Evolve('', 2),
 						new Devolve(''),
 						['-1', 0]

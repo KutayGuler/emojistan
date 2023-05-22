@@ -1,17 +1,14 @@
 <script lang="ts">
 	import {
-		INTERACTABLE_H,
 		DEFAULT_SIDE_LENGTH,
 		CROSS,
 		MAX_SIDE_EFFECT,
 		EFFECTOR_BORDER,
 	} from '$src/constants';
-	import { rbxStore } from '$src/lib/stores/store';
 	import {
 		Devolve,
 		Evolve,
 		Interactable,
-		SequenceItem,
 		type Drops,
 		type SideEffect,
 	} from '$src/types';
@@ -54,6 +51,7 @@
 	export let sideEffects: Array<[StringedNumber | 'any', SideEffect]> = [
 		['any', 'talk'],
 	];
+	export let triggers = new Map<StringedNumber | 'any', StringedNumber>();
 	export let pseudoSideEffects: Array<[string | 'any', number]> = [];
 	export let evolve = new Evolve('', 2);
 	export let devolve = new Devolve('');
@@ -62,7 +60,16 @@
 	onMount(() => {
 		let obj = $interactables.get(id);
 		if (obj) {
-			({ emoji, sequenceID, hp, sideEffects, evolve, devolve, drops } = obj);
+			({
+				emoji,
+				sequenceID,
+				hp,
+				sideEffects,
+				triggers,
+				evolve,
+				devolve,
+				drops,
+			} = obj);
 		}
 	});
 
@@ -74,6 +81,7 @@
 				sequenceID,
 				hp,
 				sideEffects,
+				triggers,
 				evolve,
 				devolve,
 				drops
@@ -285,6 +293,13 @@
 								<select
 									name="Sequence name"
 									class="select-bordered select select-sm absolute -bottom-10"
+									on:change={(e) => {
+										console.log(triggers);
+										// @ts-expect-error
+										triggers.set(effectorID, e.target.value);
+										console.log(triggers);
+										updateStore();
+									}}
 								>
 									{#each [...$sequencers] as [id, sequencer]}
 										<option value={id}>{sequencer.name}</option>
@@ -307,7 +322,10 @@
 							<select
 								class="select-bordered select select-sm absolute -bottom-4"
 								bind:value
-								on:change={updateStore}
+								on:change={() => {
+									triggers.delete(effectorID);
+									updateStore();
+								}}
 							>
 								{#each modifierPoints as point}
 									<option value={point}

@@ -106,6 +106,8 @@
 		updateStore();
 	}
 
+	// TODO: might ask the user to remove the relations first
+
 	function updateStore() {
 		sequencers.update(id, new Sequencer(name, sequence));
 		rbxStore.adjustHeight(id, sequence.length, SEQUENCER_H);

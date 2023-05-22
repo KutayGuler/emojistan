@@ -4,7 +4,7 @@
 	import { onDestroy, onMount } from 'svelte';
 	import { hasDuplicateIn, hasDuplicate } from './utils';
 
-	// TODO:
+	// TODO: collideable and throwable stuff
 
 	export let id: StringedNumber;
 	export let emoji = '';
@@ -29,6 +29,8 @@
 			return;
 		}
 	});
+
+	// TODO: might ask the user to remove the relations first
 
 	function updateStore() {
 		effectors.update(id, new Effector(emoji, hp));

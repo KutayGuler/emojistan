@@ -1,9 +1,9 @@
 <script lang="ts">
-	export let username: string;
+	export let profile: object;
 </script>
 
 <a
-	href="/profile/{username}"
+	href="/profile/{profile.username}"
 	class="brutal flex h-48 w-48 flex-col items-center justify-center gap-2 rounded bg-base-300 text-neutral"
 >
 	<div class="placeholder avatar">
@@ -11,5 +11,5 @@
 			<i class="twa twa-alien text-6xl" />
 		</div>
 	</div>
-	{username}
+	{profile.username}
 </a>

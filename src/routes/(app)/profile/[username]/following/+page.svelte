@@ -1,6 +1,5 @@
 <script lang="ts">
 	import Paginatable from '$src/routes/(app)/Paginatable.svelte';
-	import GameCard from '$src/routes/(app)/GameCard.svelte';
 	import supabase from '$api/supabase';
 	import type { PageData } from '../$types';
 	import ProfileCard from '$src/routes/(app)/ProfileCard.svelte';
@@ -18,6 +17,10 @@
 
 		return res;
 	}
+
+	console.log(data.following.data);
+
+	// FIXME: not working
 </script>
 
 <Paginatable
@@ -27,6 +30,7 @@
 	{supabaseQuery}
 >
 	<i
+		slot="fallback"
 		class="twa twa-face-with-monocle absolute scale-150 self-center pt-[50%] text-9xl opacity-20"
 	/>
 </Paginatable>

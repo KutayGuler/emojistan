@@ -120,9 +120,9 @@
 
 	type ViewKey = 'editor' | 'rules' | 'dialogue';
 	const views: { [key in ViewKey]: string } = {
-		editor: 'world-map',
-		rules: 'books',
-		dialogue: 'speech-balloon',
+		editor: 'world-map|Map Editor',
+		rules: 'books|Ruleboxes',
+		dialogue: 'speech-balloon|Dialogue Editor',
 	};
 
 	let viewKey: ViewKey = 'editor';
@@ -186,6 +186,7 @@
 				mergers={$mergers}
 				controllables={$controllables}
 				interactables={$interactables}
+				sequencers={$sequencers}
 				effectors={$effectors}
 				dt={$dialogueTree}
 				on:noPlayer={() => {
@@ -204,13 +205,15 @@
 			</div>
 		{:else}
 			<div
-				class="flex h-full w-full flex-row items-center justify-center gap-8 text-lg 2xl:top-8 2xl:text-2xl"
+				class="flex h-full w-full flex-row items-center justify-center gap-4 text-lg 2xl:top-8 2xl:text-2xl"
 			>
-				{#each Object.entries(views) as [key, icon]}
+				{#each Object.entries(views) as [key, data]}
+					{@const [icon, title] = data.split('|')}
 					<button
+						{title}
 						class="{viewKey === key
-							? 'scale-150 opacity-100'
-							: 'opacity-50'} duration-200 ease-out hover:scale-150 hover:opacity-100"
+							? 'scale-125 bg-primary'
+							: 'bg-neutral'} btn-square rounded duration-200 ease-out hover:scale-125"
 						on:click={() => changeViewTo(key)}
 					>
 						<i class="twa twa-{icon}" />
@@ -232,6 +235,13 @@
 								>
 								<div class="flex flex-col gap-2">
 									<div class="form-control">
+										<label for="recently-used" class="label">
+											<span
+												class="label-text text-xs text-neutral-content 2xl:text-base"
+												>Recently Used
+											</span>
+										</label>
+										<!-- TODO: recently used -->
 										<label for="emoji-mode" class="label">
 											<span
 												class="label-text text-xs text-neutral-content 2xl:text-base"
@@ -353,6 +363,14 @@
 									</button>
 								</div>
 							</div>
+						{:else if viewKey == 'rules'}
+							<label for="recently-used" class="label">
+								<span
+									class="label-text text-xs text-neutral-content 2xl:text-base"
+									>Recently Used
+								</span>
+							</label>
+							<!-- TODO: recently used -->
 						{/if}
 					</aside>
 					{#if viewKey === 'editor'}

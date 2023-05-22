@@ -6,16 +6,17 @@ import {
 	Effector,
 	EditableMap,
 	Controllable,
+	Sequencer,
+	Interactable,
 	type Branch,
-	type Interactable,
 	type Merger,
 	type Pusher,
 	type SkinTone,
-	Sequencer,
 } from './types';
 import { generateID } from './routes/utils';
+import type { RuleboxType } from './lib';
 
-function createMapStore<K, V>(name: string) {
+function createMapStore<K, V>(name: `${RuleboxType}s`) {
 	const { set, subscribe, update } = writable(new Map<K, V>());
 
 	return {
@@ -424,7 +425,7 @@ export const interactables = createMapStore<StringedNumber, Interactable>(
 	'interactables'
 );
 export const sequencers = createMapStore<StringedNumber, Sequencer>(
-	'interactables'
+	'sequencers'
 );
 export const controllables = createMapStore<StringedNumber, Controllable>(
 	'controllables'
