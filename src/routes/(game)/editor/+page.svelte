@@ -24,6 +24,7 @@
 		showLoading,
 		controllables,
 		sequencers,
+		recentlyUsed,
 	} from '../../../store';
 	import {
 		CROSS,
@@ -37,6 +38,7 @@
 	import Svelvet from '$lib';
 	import DialogueEditor from './DialogueEditor.svelte';
 	import type { CopyMode, SkinTone } from '$src/types';
+	import RecentlyUsed from './RecentlyUsed.svelte';
 
 	onMount(() => {
 		if ($saves.currentSaveID === '') {
@@ -79,6 +81,7 @@
 
 	function pickEmoji(emoji: string) {
 		$currentEmoji = emoji === $currentEmoji ? '' : emoji;
+		recentlyUsed.add(emoji);
 	}
 
 	let innerWidth: number;
@@ -235,13 +238,7 @@
 								>
 								<div class="flex flex-col gap-2">
 									<div class="form-control">
-										<label for="recently-used" class="label">
-											<span
-												class="label-text text-xs text-neutral-content 2xl:text-base"
-												>Recently Used
-											</span>
-										</label>
-										<!-- TODO: recently used -->
+										<RecentlyUsed />
 										<label for="emoji-mode" class="label">
 											<span
 												class="label-text text-xs text-neutral-content 2xl:text-base"
@@ -364,13 +361,7 @@
 								</div>
 							</div>
 						{:else if viewKey == 'rules'}
-							<label for="recently-used" class="label">
-								<span
-									class="label-text text-xs text-neutral-content 2xl:text-base"
-									>Recently Used
-								</span>
-							</label>
-							<!-- TODO: recently used -->
+							<RecentlyUsed />
 						{/if}
 					</aside>
 					{#if viewKey === 'editor'}
@@ -432,7 +423,6 @@
 													{title}
 												>
 													<i
-														on:load={() => {}}
 														class="twa twa-{name.replace('_', $currentSkin)}"
 													/>
 												</button>

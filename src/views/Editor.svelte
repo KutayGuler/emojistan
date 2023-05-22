@@ -1,7 +1,13 @@
 <script lang="ts">
 	import { DEFAULT_SIDE_LENGTH } from '$src/constants';
 	import type { CopyMode } from '$src/types';
-	import { currentEmoji, currentColor, map, formattedEmoji } from '../store';
+	import {
+		currentEmoji,
+		currentColor,
+		map,
+		formattedEmoji,
+		recentlyUsed,
+	} from '../store';
 
 	export let sectionIndex = 0;
 	export let copyMode: CopyMode;
@@ -44,16 +50,19 @@
 
 	function rightClickedCell(index: number) {
 		let key = sectionIndex + '_' + index;
+		let emoji = $map.items.get(key) || '';
 		switch (copyMode) {
 			case 'Emoji':
-				$currentEmoji = $map.items.get(key) || '';
+				$currentEmoji = emoji;
+				recentlyUsed.add(emoji);
 				break;
 			case 'Color':
 				$currentColor = $map.colors.get(key) || '';
 				break;
 			case 'Both':
-				$currentEmoji = $map.items.get(key) || '';
+				$currentEmoji = emoji;
 				$currentColor = $map.colors.get(key) || '';
+				recentlyUsed.add(emoji);
 				break;
 		}
 	}

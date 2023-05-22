@@ -16,8 +16,6 @@
 
 		return res;
 	}
-
-	// FIXME: not working
 </script>
 
 <Paginatable

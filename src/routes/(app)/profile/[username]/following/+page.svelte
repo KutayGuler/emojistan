@@ -17,10 +17,6 @@
 
 		return res;
 	}
-
-	console.log(data.following.data);
-
-	// FIXME: not working
 </script>
 
 <Paginatable

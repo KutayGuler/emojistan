@@ -45,6 +45,11 @@
 	/* ## DATA ## */
 	export let dt = new Map<string, Branch>(); // dialogue tree
 	export let map = new EditableMap(new Map<MapLocation, string>());
+	export let collideables = new Map<MapLocation, string>();
+	collideables.set('0_12', 'fire');
+	collideables.set('0_13', 'fire');
+	collideables.set('0_14', 'fire');
+	collideables.set('0_15', 'fire');
 	export let pushers = new Map<string, Pusher>();
 	export let mergers = new Map<string, Merger>();
 	export let interactables = new Map<string, Interactable>();
@@ -103,6 +108,7 @@
 		_interactables[emoji].id = id;
 		_interactables[emoji].sideEffects = {};
 
+		// FIXME: triggers returns as an object
 		console.log(triggers, sequencers);
 		for (let [id, effect] of sideEffects) {
 			if (effect == 'trigger') {
@@ -607,13 +613,15 @@
 
 			if (!facingItem) {
 				transferItem(ac, ac + operation);
-				for (let i = 0; i < enemyIndexes.length; i++) {
-					followPlayer(
-						coordinateToPosObj(enemyIndexes[i]),
-						coordinateToPosObj(ac),
-						i
-					);
-				}
+				// for (let i = 0; i < enemyIndexes.length; i++) {
+				// 	followPlayer(
+				// 		coordinateToPosObj(enemyIndexes[i]),
+				// 		coordinateToPosObj(ac),
+				// 		i
+				// 	);
+				// }
+
+				// TODO: check if collideables are there
 
 				return;
 			}
@@ -867,6 +875,7 @@
 		{#each { length: SIZE * SIZE } as _, i}
 			{@const active = ac === i}
 			{@const item = entities.get(currentSection + '_' + i)}
+			{@const collideable = collideables.get(`${currentSection}_${i}`)}
 			{@const background = backgrounds.get(currentSection + '_' + i)}
 			{@const hand =
 				player?.inventory?.get(currentInventoryIndex)?.emoji ||
@@ -875,6 +884,9 @@
 				class="cell"
 				style:background={colors.get(currentSection + '_' + i) || map.dbg}
 			>
+				{#if collideable}
+					<div class="absolute z-[3]"><i class="twa twa-{collideable}" /></div>
+				{/if}
 				{#if active}
 					<div class="absolute z-[2] text-base {directionKey} {handDirection}">
 						<i class="twa twa-{hand}" />

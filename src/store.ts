@@ -397,6 +397,36 @@ function createDialogueTree() {
 	};
 }
 
+function createRecentlyUsed() {
+	const { set, subscribe, update } = writable(new Set<string>())
+
+	return {
+		set,
+		subscribe,
+		update,
+		add: (emoji: string) => update((state) => {
+			if (state.has(emoji)) {
+				state.delete(emoji);
+				state.add(emoji);
+			} else {
+				state.add(emoji);
+			}
+
+			if (state.size > 16) {
+				for (let _emoji of state) {
+					if (emoji != _emoji) {
+						state.delete(_emoji);
+						break;
+					}
+				}
+			}
+
+			return state;
+		})
+	}
+
+}
+
 export const showLoading = writable(false);
 export const loadedEmojis = writable(false);
 export const modal = createModal();
@@ -434,3 +464,6 @@ export const dialogueTree = createDialogueTree();
 
 // USER
 export const liked_game_ids: Writable<Set<string>> = writable(new Set());
+
+// QUALITY OF LIFE
+export const recentlyUsed = createRecentlyUsed();
