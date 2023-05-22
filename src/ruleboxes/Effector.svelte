@@ -1,11 +1,5 @@
 <script lang="ts">
-	import { notifications } from '$src/routes/notifications';
-	import {
-		effectors,
-		formattedEmoji,
-		interactables,
-		type StringedNumber,
-	} from '$src/store';
+	import { effectors, formattedEmoji, type StringedNumber } from '$src/store';
 	import { Effector } from '$src/types';
 	import { onDestroy, onMount } from 'svelte';
 	import { hasDuplicateIn, hasDuplicate } from './utils';

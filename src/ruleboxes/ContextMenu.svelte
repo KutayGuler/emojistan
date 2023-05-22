@@ -15,7 +15,7 @@
 		Interactable,
 		Controllable,
 		Effector,
-		Sequencer
+		Sequencer,
 	} from '$src/types';
 
 	export let position: { x: number; y: number };
@@ -77,19 +77,20 @@
 					'interactable',
 					new Interactable(
 						'',
-						[],
+						'-1',
 						1,
 						[['any', 'talk']],
 						new Evolve('', 2),
 						new Devolve(''),
-						['', 0]
+						['-1', 0]
 					)
 				),
 		},
 		{
 			name: 'Sequencer',
-			onClick: () => spawn('sequencer', new Sequencer([]))
-		}
+			onClick: () =>
+				spawn('sequencer', new Sequencer('Event_' + $sequencers.size, [])),
+		},
 	];
 </script>
 

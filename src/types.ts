@@ -125,10 +125,10 @@ export interface Actions {
 		{ index, emoji }: { index: number; emoji: string },
 		_start?: number
 	): void;
-	spawnRTP(
-		{ index, emoji }: { index: number; emoji: string },
-		_start?: number
-	): void;
+	// spawnRTP(
+	// 	{ index, emoji }: { index: number; emoji: string },
+	// 	_start?: number
+	// ): void;
 	destroy({ index }: { index: number }): void;
 	reset: Function;
 	complete: Function;
@@ -175,11 +175,13 @@ export class EditableMap {
 }
 
 export interface Sequencer {
+	name: string;
 	sequence: Array<SequenceItem>;
 }
 
 export class Sequencer {
-	constructor(sequence: Array<SequenceItem>) {
+	constructor(name: string, sequence: Array<SequenceItem>) {
+		this.name = name;
 		this.sequence = sequence;
 	}
 }

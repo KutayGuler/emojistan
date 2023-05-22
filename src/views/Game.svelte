@@ -88,14 +88,15 @@
 
 	for (let [id, effector] of effectors) {
 		const { emoji, ...args } = effector;
-		if (emoji === '') continue;
+		if (!emoji) continue;
 		_effectors[emoji] = {} as Effector;
 		Object.assign(_effectors[emoji], args);
 	}
 
 	for (let [id, interactable] of structuredClone(interactables)) {
 		const { emoji, sideEffects, ...args } = interactable;
-		if (emoji === '') continue;
+		console.log(emoji, sideEffects, args);
+		if (!emoji || !sideEffects) continue;
 		_interactables[emoji] = {} as _Interactable;
 		Object.assign(_interactables[emoji], args);
 		_interactables[emoji].id = id;
@@ -451,11 +452,11 @@
 			entities.set(currentSection + '_' + index, new Entity(emoji));
 			entities = entities;
 		},
-		spawnRTP({ index, emoji }) {
-			// entities.set(currentSection + '_' + index, new Entity(emoji));
-			// entities = entities;
-			// TODO:
-		},
+		// spawnRTP({ index, emoji }) {
+		// 	// entities.set(currentSection + '_' + index, new Entity(emoji));
+		// 	// entities = entities;
+		// 	// TODO:
+		// },
 		destroy({ index }) {
 			entities.delete(currentSection + '_' + index);
 		},

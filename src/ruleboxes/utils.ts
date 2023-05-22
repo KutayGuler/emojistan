@@ -5,6 +5,7 @@ import type { Controllable, Effector, Interactable } from '$src/types';
 import { controllables, effectors, interactables } from '$src/store';
 import type { RuleboxType } from '$src/lib';
 
+// CF #10
 export function hasDuplicateIn<
 	R extends Controllable | Effector | Interactable
 >(
@@ -26,6 +27,7 @@ export function hasDuplicateIn<
 	return false;
 }
 
+// CF #11
 export function hasDuplicate() {
 	for (let val of [
 		...get(controllables).values(),

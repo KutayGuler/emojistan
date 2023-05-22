@@ -22,6 +22,7 @@
 		interactables,
 		effectors,
 		type StringedNumber,
+		sequencers,
 	} from '../store';
 	import { hasDuplicateIn, hasDuplicate } from './utils';
 
@@ -34,8 +35,8 @@
 		modifierPoints[i] = i + 1;
 	}
 
-	modifierPoints.unshift('talk');
 	modifierPoints.unshift('trigger');
+	modifierPoints.unshift('talk');
 
 	for (let i = 0; i >= -100; i--) {
 		modifierPoints.unshift(i);
@@ -80,23 +81,23 @@
 		);
 	}
 
-	onDestroy(() => {
-		// if (emoji === '') {
-		// 	interactables.remove(id);
-		// 	rbxStore.remove(id);
-		// 	return;
-		// }
+	// onDestroy(() => {
+	// 	// if (emoji === '') {
+	// 	// 	interactables.remove(id);
+	// 	// 	rbxStore.remove(id);
+	// 	// 	return;
+	// 	// }
 
-		sideEffects = sideEffects.filter((m) => {
-			if (m[0] === 'any') return true;
-			return $effectors.get(m[0])?.emoji != '';
-		});
-		sideEffects = sideEffects.filter((m, i) => {
-			if (i === 0) return true;
-			return m[1] != 0;
-		});
-		updateStore();
-	});
+	// 	sideEffects = sideEffects.filter((m) => {
+	// 		if (m[0] === 'any') return true;
+	// 		return $effectors.get(m[0])?.emoji != '';
+	// 	});
+	// 	sideEffects = sideEffects.filter((m, i) => {
+	// 		if (i === 0) return true;
+	// 		return m[1] != 0;
+	// 	});
+	// 	updateStore();
+	// });
 
 	function addTosideEffects(effectorID: StringedNumber | 'any') {
 		if (sideEffects.some(([id, val]) => id === effectorID)) return;
@@ -112,8 +113,10 @@
 	}
 
 	function removeEmptySideEffect(rbx: any, i: number) {
+		console.log(i, sideEffects);
 		sideEffects.splice(i, 1);
 		sideEffects = sideEffects;
+		console.log(sideEffects);
 		updateStore();
 	}
 
@@ -269,50 +272,51 @@
 			</p>
 		{/if}
 		<div class="flex items-center justify-center px-12">
-			<div class="flex w-fit flex-wrap items-start justify-start gap-8">
+			<div
+				class="flex w-fit flex-wrap items-start justify-start gap-x-9 gap-y-14"
+			>
 				{#each sideEffects as [effectorID, value], i}
 					{@const modifierEmoji = $effectors.get(effectorID)?.emoji}
 					<div class="relative flex flex-col items-center">
-						{#if effectorID === 'any'}
-							<div class="slot-lg scale-75">
-								{effectorID}
-							</div>
-							<select
-								class="select-bordered select select-sm absolute -bottom-4"
-								bind:value
-								on:change={updateStore}
-							>
-								{#each modifierPoints as point}
-									<option value={point}
-										>{typeof point === 'number' && point > 0
-											? `+${point}`
-											: point}</option
-									>
-								{/each}
-							</select>
-						{:else if modifierEmoji}
-							<button
-								class="absolute -right-2 -top-2 text-lg"
-								on:click={() => removeFromSideEffects(i)}>{CROSS}</button
-							>
-							<div class="slot-lg scale-75">
-								<i class="twa twa-{modifierEmoji}" />
-							</div>
-							<select
-								class="select-bordered select select-sm absolute -bottom-4"
-								bind:value
-								on:change={updateStore}
-							>
-								{#each modifierPoints as point}
-									<option value={point}
-										>{typeof point === 'number' && point > 0
-											? `+${point}`
-											: point}</option
-									>
-								{/each}
-							</select>
-						{:else}
+						{#if !(effectorID === 'any' || modifierEmoji)}
 							<div use:removeEmptySideEffect={i} />
+						{:else}
+							{#if value == 'trigger'}
+								<select
+									name="Sequence name"
+									class="select-bordered select select-sm absolute -bottom-10"
+								>
+									{#each [...$sequencers] as [id, sequencer]}
+										<option value={id}>{sequencer.name}</option>
+									{/each}
+								</select>
+							{/if}
+							{#if effectorID === 'any'}
+								<div class="slot-lg scale-75">
+									{effectorID}
+								</div>
+							{:else if modifierEmoji}
+								<button
+									class="absolute -right-2 -top-2 text-lg"
+									on:click={() => removeFromSideEffects(i)}>{CROSS}</button
+								>
+								<div class="slot-lg scale-75">
+									<i class="twa twa-{modifierEmoji}" />
+								</div>
+							{/if}
+							<select
+								class="select-bordered select select-sm absolute -bottom-4"
+								bind:value
+								on:change={updateStore}
+							>
+								{#each modifierPoints as point}
+									<option value={point}
+										>{typeof point === 'number' && point > 0
+											? `+${point}`
+											: point}</option
+									>
+								{/each}
+							</select>
 						{/if}
 					</div>
 				{/each}

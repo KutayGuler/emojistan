@@ -6,24 +6,27 @@
 		palette,
 		DEFAULT_SIDE_LENGTH,
 		INTERACTABLE_H,
+		SEQUENCER_H,
 	} from '$src/constants';
 	import { rbxStore } from '$src/lib/stores/store';
+	import { notifications } from '$src/routes/notifications';
 	import {
 		map,
 		formattedEmoji,
-		type StringedNumber,
 		sequencers,
+		type StringedNumber,
 	} from '$src/store';
 	import { SequenceItem, type Actions, Sequencer } from '$src/types';
 	import { onMount } from 'svelte/internal';
 
 	export let id: StringedNumber;
+	export let name: string;
 	export let sequence: Array<SequenceItem> = [];
 
 	onMount(() => {
 		let obj = $sequencers.get(id);
 		if (obj) {
-			({ sequence } = obj);
+			({ sequence, name } = obj);
 		}
 	});
 
@@ -51,21 +54,21 @@
 	const types: {
 		[key in 'Map' | 'Background' | 'Game']: Array<keyof Actions>;
 	} = {
-		Map: ['spawn', 'spawnRTP', 'destroy'],
+		Map: ['spawn', 'destroy'], // 'spawnRTP'
 		Background: ['paint', 'erase'],
 		Game: ['reset', 'complete'],
 	};
 
 	const typeDescriptions: { [key in keyof Actions]: string } = {
-		// TODO: type descriptions
-		paint: 'paint string',
-		erase: 'erase string',
-		spawn: 'spawn string',
-		spawnRTP:
-			'spawnRTP\n\nGiven player is the origin (x: 0, y: 0); provide X and Y values to spawn an object relative to player.',
-		destroy: 'destroy string',
-		reset: 'reset string',
-		complete: 'complete string',
+		paint: 'paint\n\nPaint the specificied cell in the current section.',
+		erase:
+			'erase\n\nErase a color from the specified cell in the current section.',
+		spawn: 'spawn\n\nSpawn an emoji in the specified cell.',
+		// spawnRTP:
+		// 	'spawnRTP\n\nGiven player is the origin (x: 0, y: 0);\nprovide X and Y values to spawn an object relative to player.',
+		destroy: 'destory\n\nDestroy the emoji in the specified cell.',
+		reset: 'reset\n\nReset the game state to default.',
+		complete: 'complete\n\nComplete the game.',
 	};
 
 	const typeIcons: {
@@ -104,15 +107,82 @@
 	}
 
 	function updateStore() {
-		sequencers.update(id, new Sequencer(sequence));
-		rbxStore.adjustHeight(id, sequence.length, INTERACTABLE_H);
+		sequencers.update(id, new Sequencer(name, sequence));
+		rbxStore.adjustHeight(id, sequence.length, SEQUENCER_H);
+	}
+
+	let openNameEdit = false;
+	let nameInput = '';
+
+	function changeName() {
+		if (nameInput == '') {
+			notifications.warning('Sequencer name cannot be empty');
+			return;
+		}
+
+		name = nameInput;
+		updateStore();
+		openNameEdit = false;
 	}
 </script>
 
 <div class="flex w-full flex-col gap-2 p-4">
-	<div class="divider">EVENT SEQUENCE</div>
+	<div class="divider">
+		{#if openNameEdit}
+			<form class="flex flex-row items-center gap-2" on:submit={changeName}>
+				<input
+					class="input-bordered input input-sm"
+					type="text"
+					bind:value={nameInput}
+				/>
+				<button
+					type="submit"
+					title="Change name"
+					class="btn-sm btn w-fit self-center"
+					><svg
+						xmlns="http://www.w3.org/2000/svg"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke-width="1.5"
+						stroke="currentColor"
+						class="h-4 w-4"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							d="M4.5 12.75l6 6 9-13.5"
+						/>
+					</svg></button
+				>
+			</form>
+		{:else}
+			{name}
+			<button
+				on:click={() => {
+					nameInput = name;
+					openNameEdit = true;
+				}}
+				title="Change name"
+				class="btn-xs btn w-fit self-center"
+				><svg
+					xmlns="http://www.w3.org/2000/svg"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke-width="1.5"
+					stroke="currentColor"
+					class="h-4 w-4"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
+					/>
+				</svg></button
+			>
+		{/if}
+	</div>
 	{#each sequence as s, i}
-		<span class="flex w-full flex-row items-start justify-center gap-2">
+		<span class="flex w-full flex-row items-center justify-center gap-2">
 			<select
 				class="select-bordered select"
 				title={typeDescriptions[s.type]}

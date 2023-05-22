@@ -41,8 +41,8 @@ export const INTERACTABLE_BG = '#fff1f2'; // rose-50
 export const INTERACTABLE_BORDER = '#f43f5e'; // rose-500
 
 /* SEQUENCER */
-export const SEQUENCER_W = 450;
-export const SEQUENCER_H = 600;
+export const SEQUENCER_W = 400;
+export const SEQUENCER_H = 200;
 export const SEQUENCER_BG = '#fffbeb'; // amber-50
 export const SEQUENCER_BORDER = '#f59e0b'; // amber-500
 

@@ -16,6 +16,7 @@
 		mergers,
 		modal,
 		pushers,
+		sequencers,
 	} from '$src/store';
 
 	import type { Rulebox } from '$lib/types/types';
@@ -54,10 +55,27 @@
 				danger: true,
 			});
 			return;
+		} else if (false) {
+			// TODO: sequencer has connected interactables
+			modal.show({
+				content:
+					'All dialogue content connected to this Interactable will be lost.',
+				header: 'Are you sure?',
+				confirmText: 'DELETE',
+				onConfirm: () => {
+					dialogueTree.remove(rbx.id.toString());
+					rbxStore.remove(rbx.id);
+					interactables.remove(rbx.id);
+				},
+				input: false,
+				danger: true,
+			});
+			return;
 		}
 
 		rbxStore.remove(rbx.id);
 
+		// CF #11
 		switch (rbx.type) {
 			case 'pusher':
 				pushers.remove(rbx.id);
@@ -70,6 +88,9 @@
 				break;
 			case 'controllable':
 				controllables.remove(rbx.id);
+				break;
+			case 'sequencer':
+				sequencers.remove(rbx.id);
 				break;
 			case 'interactable':
 				interactables.remove(rbx.id);
