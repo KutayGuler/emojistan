@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { fly, scale } from 'svelte/transition';
+	import { scale } from 'svelte/transition';
 	import { tweened } from 'svelte/motion';
 	import { cubicOut } from 'svelte/easing';
 	import { createEventDispatcher, onMount } from 'svelte/internal';
-	import { currentColor, currentEmoji, dialogueTree } from '../store';
+	import { currentColor, currentEmoji } from '../store';
 	import {
 		DEFAULT_MAP_CLASS,
 		DEFAULT_SIDE_LENGTH,
@@ -33,7 +33,7 @@
 		type Inventory,
 		type MapLocation,
 	} from '$src/types';
-	import { AStarFinder } from 'astar-typescript';
+	// import { AStarFinder } from 'astar-typescript';
 	import Chat from './Chat.svelte';
 
 	// TODO: if the interactable does not have a side effect because of effector,
@@ -45,11 +45,6 @@
 	/* ## DATA ## */
 	export let dt = new Map<string, Branch>(); // dialogue tree
 	export let map = new EditableMap(new Map<MapLocation, string>());
-	export let collideables = new Map<MapLocation, string>();
-	collideables.set('0_12', 'fire');
-	collideables.set('0_13', 'fire');
-	collideables.set('0_14', 'fire');
-	collideables.set('0_15', 'fire');
 	export let pushers = new Map<string, Pusher>();
 	export let mergers = new Map<string, Merger>();
 	export let interactables = new Map<string, Interactable>();
@@ -60,6 +55,7 @@
 	export let SIZE = DEFAULT_SIDE_LENGTH;
 	export let showHP = true;
 	export let showInventory = true;
+	let collideables = new Map<MapLocation, Effector>();
 
 	let completionMessage: 'Level Completed!' | 'Game Over. No players left.' =
 		'Level Completed!';
@@ -323,63 +319,72 @@
 		}
 	}
 
-	function coordinateToPosObj(num: number) {
-		return { x: num % SIZE, y: Math.floor(num / SIZE) };
-	}
+	// A-STAR
+	// function coordinateToPosObj(num: number) {
+	// 	return { x: num % SIZE, y: Math.floor(num / SIZE) };
+	// }
 
-	function followPlayer(
-		startPos: { x: number; y: number },
-		goalPos: { x: number; y: number },
-		relativeIndex: number
-	) {
-		let matrix: Array<Array<number>> = [];
+	// A-STAR
+	// function followPlayer(
+	// 	startPos: { x: number; y: number },
+	// 	goalPos: { x: number; y: number },
+	// 	relativeIndex: number
+	// ) {
+	// 	let matrix: Array<Array<number>> = [];
 
-		for (let i = 0; i < SIZE; i++) {
-			matrix[i] = [];
-			for (let j = 0; j < SIZE; j++) {
-				let item = entities.get(currentSection + '_' + (SIZE * i + j));
-				if (item) {
-					if (_interactables[item.emoji]) {
-						matrix[i].push(0);
-					} else {
-						matrix[i].push(1);
-					}
-				} else {
-					matrix[i].push(0);
-				}
-			}
-		}
+	// 	for (let i = 0; i < SIZE; i++) {
+	// 		matrix[i] = [];
+	// 		for (let j = 0; j < SIZE; j++) {
+	// 			let item = entities.get(currentSection + '_' + (SIZE * i + j));
+	// 			if (item) {
+	// 				if (_interactables[item.emoji]) {
+	// 					matrix[i].push(0);
+	// 				} else {
+	// 					matrix[i].push(1);
+	// 				}
+	// 			} else {
+	// 				matrix[i].push(0);
+	// 			}
+	// 		}
+	// 	}
 
-		let astar: {
-			aStarInstance: AStarFinder;
-		} = {
-			aStarInstance: new AStarFinder({
-				grid: {
-					matrix,
-				},
-				diagonalAllowed: false,
-			}),
-		};
+	// 	let astar: {
+	// 		aStarInstance: AStarFinder;
+	// 	} = {
+	// 		aStarInstance: new AStarFinder({
+	// 			grid: {
+	// 				matrix,
+	// 			},
+	// 			diagonalAllowed: false,
+	// 		}),
+	// 	};
 
-		let pathway = astar.aStarInstance.findPath(startPos, goalPos);
-		pathway.slice(0, 2);
+	// 	let pathway = astar.aStarInstance.findPath(startPos, goalPos);
+	// 	pathway.slice(0, 2);
 
-		if (pathway?.length <= 1) return;
+	// 	if (pathway?.length <= 1) return;
 
-		let from = pathway[0][1] * SIZE + pathway[0][0];
-		let to = pathway[1][1] * SIZE + pathway[1][0];
+	// 	let from = pathway[0][1] * SIZE + pathway[0][0];
+	// 	let to = pathway[1][1] * SIZE + pathway[1][0];
 
-		if (!entities.has(currentSection + '_' + to)) {
-			transferItem(from, to);
-			enemyIndexes[relativeIndex] = to;
-		}
-	}
+	// 	if (!entities.has(currentSection + '_' + to)) {
+	// 		transferItem(from, to);
+	// 		enemyIndexes[relativeIndex] = to;
+	// 	}
+	// }
 
 	function initEntities() {
 		for (let [id, _emoji] of map.items) {
 			if (_effectors[_emoji]) {
-				let { hp } = _effectors[_emoji];
-				entities.set(id, new Effector(_emoji, hp));
+				let { hp, equippable, collideable } = _effectors[_emoji];
+				if (collideable) {
+					collideables.set(
+						id,
+						new Effector(_emoji, hp, equippable, collideable)
+					);
+				} else {
+					entities.set(id, new Effector(_emoji, hp, equippable, collideable));
+				}
 			} else if (_controllables[_emoji] || _interactables[_emoji]) {
 				entities.set(id, new Entity(_emoji, new Map<number, Effector>(), 1));
 			} else {
@@ -462,11 +467,11 @@
 	// Actions
 	const m: Actions = {
 		paint({ index, background }) {
-			colors.set(currentSection + '_' + index, background);
+			colors.set(`${currentSection}_${index}`, background);
 			colors = colors;
 		},
 		erase({ index }) {
-			colors.delete(currentSection + '_' + index);
+			colors.delete(`${currentSection}_${index}`);
 		},
 		spawn({ index, emoji }) {
 			entities.set(currentSection + '_' + index, new Entity(emoji));
@@ -729,11 +734,12 @@
 			// EVOLVE & DEVOLVE INTERACTED ITEM
 			if (interactedItem.hp.current <= 0) {
 				const _drops = _interactables[interactedItem.emoji].drops;
+				const { hp, equippable, collideable } = _effectors[_drops[0]];
 
 				if (_drops[0]) {
 					addToInventory(
 						new Array(_drops[1]).fill(
-							new Effector(_drops[0], _effectors[_drops[0]].hp)
+							new Effector(_drops[0], hp, equippable, collideable)
 						)
 					);
 				}
@@ -743,7 +749,7 @@
 				} else {
 					entities.delete(currentSection + '_' + ic);
 				}
-			} else if (evolve?.to !== '' && evolve.at === interactedItem.hp.current) {
+			} else if (evolve?.to !== '' && interactedItem.hp.current >= evolve.at) {
 				interactedItem.emoji = evolve.to;
 			}
 
@@ -801,7 +807,7 @@
 
 			let playerEvolve = _controllables[player?.emoji || '']?.evolve;
 
-			if (playerEvolve?.to !== '' && player.hp.current === playerEvolve?.at) {
+			if (playerEvolve?.to !== '' && player.hp.current >= playerEvolve?.at) {
 				player.emoji = playerEvolve.to;
 				player.hp.max = _controllables[playerEvolve.to]?.hp || 1;
 				player.hp.current = player.hp.max;
@@ -867,7 +873,7 @@
 				{dialogueID}
 				dialogueTree={dt}
 				on:end={(e) => {
-					entities.get(currentSection + '_' + ac).history = e.detail.history;
+					entities.get(`${currentSection}_${ac}`).history = e.detail.history;
 					chatting = false;
 				}}
 			/>
@@ -876,19 +882,21 @@
 			{@const active = ac === i}
 			{@const item = entities.get(currentSection + '_' + i)}
 			{@const collideable = collideables.get(`${currentSection}_${i}`)}
-			{@const background = backgrounds.get(currentSection + '_' + i)}
+			{@const background = backgrounds.get(`${currentSection}_${i}`)}
 			{@const hand =
 				player?.inventory?.get(currentInventoryIndex)?.emoji ||
 				keys[directionKey].emoji}
 			<div
 				class="cell"
-				style:background={colors.get(currentSection + '_' + i) || map.dbg}
+				style:background={colors.get(`${currentSection}_${i}`) || map.dbg}
 			>
 				{#if collideable}
-					<div class="absolute z-[3]"><i class="twa twa-{collideable}" /></div>
+					<div class="absolute z-[2] scale-125">
+						<i class="twa twa-{collideable}" />
+					</div>
 				{/if}
 				{#if active}
-					<div class="absolute z-[2] text-base {directionKey} {handDirection}">
+					<div class="absolute z-[3] text-base {directionKey} {handDirection}">
 						<i class="twa twa-{hand}" />
 					</div>
 				{/if}

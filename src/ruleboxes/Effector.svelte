@@ -9,6 +9,8 @@
 	export let id: StringedNumber;
 	export let emoji = '';
 	export let hp: number | 'Infinite' = 1;
+	export let equippable = true;
+	export let collideable = false;
 
 	let modifierPoints: Array<number | 'Infinite'> = ['Infinite'];
 
@@ -19,7 +21,7 @@
 	onMount(() => {
 		let obj = $effectors.get(id);
 		if (obj) {
-			({ emoji, hp } = obj);
+			({ emoji, hp, equippable, collideable } = obj);
 		}
 	});
 
@@ -33,7 +35,7 @@
 	// TODO: might ask the user to remove the relations first
 
 	function updateStore() {
-		effectors.update(id, new Effector(emoji, hp));
+		effectors.update(id, new Effector(emoji, hp, equippable, collideable));
 	}
 
 	function updateEmoji() {
@@ -46,8 +48,8 @@
 	}
 </script>
 
-<div class="absolute -top-8 flex flex-row items-center justify-center gap-2">
-	<div class="flex flex-col items-center justify-center">
+<div class="absolute -top-8 flex flex-col items-center justify-center gap-2">
+	<div class="relative flex flex-col items-center justify-center">
 		<button class="slot-lg" on:click={updateEmoji}>
 			<i class="twa twa-{emoji}" />
 		</button>
@@ -63,5 +65,9 @@
 				{/each}
 			</select>
 		</div>
+	</div>
+	<div class="flex flex-row gap-2 pt-5">
+		<button><i class="twa twa-collision text-2xl" /></button>
+		<button><i class="twa twa-gloves text-2xl" /></button>
 	</div>
 </div>

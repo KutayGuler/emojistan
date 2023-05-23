@@ -38,6 +38,7 @@ export interface Entity {
 	emoji: string;
 	inventory?: Inventory;
 	hp?: HP;
+	history: Array<any>;
 }
 
 export class Entity {
@@ -56,16 +57,20 @@ export class Entity {
 export interface Effector {
 	emoji: string;
 	hp: number | 'Infinite';
+	equippable: boolean
+	collideable: boolean
+
+	// throwable: boolean
 	// speed: number;
 	// range: number;
-	// type: 'equippable' | 'collidable'
-	// could be higher in z-index, and be stored in a different Map
 }
 
 export class Effector {
-	constructor(emoji: string, hp: number | 'Infinite') {
+	constructor(emoji: string, hp: number | 'Infinite', equippable: boolean, collideable: boolean) {
 		this.emoji = emoji;
 		this.hp = hp;
+		this.equippable = equippable;
+		this.collideable = collideable;
 	}
 }
 
@@ -153,17 +158,17 @@ export interface EditableMap {
 	 * starting section index
 	 */
 	ssi: number;
-	items: Map<string, string>;
-	colors: Map<string, string>;
-	backgrounds: Map<string, string>;
+	items: Map<MapLocation, string>;
+	colors: Map<MapLocation, string>;
+	backgrounds: Map<MapLocation, string>;
 	dbg: string;
 }
 
 export class EditableMap {
 	constructor(
-		items = new Map<string, string>(),
-		colors = new Map<string, string>(),
-		backgrounds = new Map<string, string>(),
+		items = new Map<MapLocation, string>(),
+		colors = new Map<MapLocation, string>(),
+		backgrounds = new Map<MapLocation, string>(),
 		dbg = DEFAULT_BG
 	) {
 		this.ssi = 0;

@@ -54,7 +54,7 @@ export const CONTROLLABLE_BORDER = '#22c55e'; // green-500
 
 /* EFFECTOR */
 export const EFFECTOR_W = 180;
-export const EFFECTOR_H = 90;
+export const EFFECTOR_H = 120;
 export const EFFECTOR_BG = '#faf5ff'; // purple-50
 export const EFFECTOR_BORDER = '#a855f7'; // purple-500
 

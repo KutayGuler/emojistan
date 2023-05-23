@@ -119,7 +119,7 @@
 />
 
 <div
-	class="rulebox border-2 border-black shadow-xl"
+	class="rulebox cursor-auto border-2 border-black shadow-xl"
 	style="left: {rbx.position.x}px;
     top: {rbx.position.y}px;
     width: {rbx.width}px;
