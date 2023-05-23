@@ -44,35 +44,37 @@
 
 	onMount(() => {
 		let obj = $controllables.get(id);
+		console.log(obj);
 		if (obj) {
 			({ emoji, hp, sideEffects, evolve, devolve } = obj);
 		}
 	});
 
 	function updateStore() {
+		console.log("update store", hp);
 		controllables.update(
 			id,
 			new Controllable(emoji, hp, sideEffects, evolve, devolve)
 		);
 	}
 
-	// onDestroy(() => {
-	// 	// if (emoji === '') {
-	// 	// 	controllables.remove(id);
-	// 	// 	rbxStore.remove(id);
-	// 	// 	return;
-	// 	// }
+	onDestroy(() => {
+		// if (emoji === '') {
+		// 	controllables.remove(id);
+		// 	rbxStore.remove(id);
+		// 	return;
+		// }
 
-	// 	sideEffects = sideEffects.filter((sideEffect) => {
-	// 		if (sideEffect[0] === 'any') return true;
-	// 		return $effectors.get(sideEffect[0])?.emoji != '';
-	// 	});
-	// 	sideEffects = sideEffects.filter((m, i) => {
-	// 		if (i === 0) return true;
-	// 		return m[1] != 0;
-	// 	});
-	// 	updateStore();
-	// });
+		// sideEffects = sideEffects.filter((sideEffect) => {
+		// 	if (sideEffect[0] === 'any') return true;
+		// 	return $effectors.get(sideEffect[0])?.emoji != '';
+		// });
+		// sideEffects = sideEffects.filter((m, i) => {
+		// 	if (i === 0) return true;
+		// 	return m[1] != 0;
+		// });
+		updateStore();
+	});
 
 	function addTosideEffects(equippableID: 'any' | StringedNumber) {
 		if (sideEffects.some(([id, val]) => id === equippableID)) return;
@@ -145,6 +147,8 @@
 			evolve.at = hp + 1;
 		}
 	}
+
+	// TODO: Update hp
 
 	$: droppables = [...$effectors].filter(([id, e]) => e.emoji != '');
 	$: evolve.at = hp > evolve.at ? hp + 1 : evolve.at;

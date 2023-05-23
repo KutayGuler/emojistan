@@ -26,8 +26,8 @@
 		on:click|stopPropagation
 	>
 		<h3>{$modal.header}</h3>
-		<p class="text-neutral-300">{$modal.content}</p>
-		<button class="absolute top-4 right-4" on:click={() => dialog.close()}
+		<p class="text-neutral-300">{@html $modal.content}</p>
+		<button class="absolute right-4 top-4" on:click={() => dialog.close()}
 			>{CROSS}</button
 		>
 	</div>

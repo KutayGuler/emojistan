@@ -54,22 +54,40 @@
 				danger: true,
 			});
 			return;
-		} else if (false) {
-			// TODO: sequencer has connected interactables
-			modal.show({
-				content:
-					'All dialogue content connected to this Interactable will be lost.',
-				header: 'Are you sure?',
-				confirmText: 'DELETE',
-				onConfirm: () => {
-					dialogueTree.remove(rbx.id.toString());
-					rbxStore.remove(rbx.id);
-					interactables.remove(rbx.id);
-				},
-				input: false,
-				danger: true,
-			});
-			return;
+		} else if (rbx.type === 'effector') {
+			for (let [id, val] of [...$controllables, ...$interactables]) {
+				for (let [effectorID, _] of val.sideEffects) {
+					if (rbx.id == effectorID) {
+						modal.show({
+							content: `Remove the Effector from <i class="twa twa-${val.emoji}"></i>'s side effects before deleting it.`,
+							header: 'Existing Relations',
+							confirmText: 'OKAY',
+							onConfirm: () => {},
+							input: false,
+							danger: false,
+						});
+						return;
+					}
+				}
+			}
+		} else if (rbx.type === 'sequencer') {
+			for (let [_, val] of $interactables) {
+				console.log(val.triggers);
+				for (let [id, effectType] of val.sideEffects) {
+					console.log(id, effectType);
+					if (effectType === 'trigger' && val.triggers.has(id)) {
+						modal.show({
+							content: `Remove the trigger from <i class="twa twa-${val.emoji}"></i>'s side effects before deleting it.`,
+							header: 'Existing Relations',
+							confirmText: 'OKAY',
+							onConfirm: () => {},
+							input: false,
+							danger: false,
+						});
+						return;
+					}
+				}
+			}
 		}
 
 		rbxStore.remove(rbx.id);

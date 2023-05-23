@@ -319,6 +319,11 @@
 		}
 	}
 
+	function handleHealthMutation() {
+		// TODO: a global function that should handle evolve & devolve events
+		// of both player and interactables
+	}
+
 	// A-STAR
 	// function coordinateToPosObj(num: number) {
 	// 	return { x: num % SIZE, y: Math.floor(num / SIZE) };
@@ -374,16 +379,15 @@
 	// }
 
 	function initEntities() {
+		console.log(_effectors);
 		for (let [id, _emoji] of map.items) {
 			if (_effectors[_emoji]) {
-				let { hp, equippable, collideable } = _effectors[_emoji];
-				if (collideable) {
-					collideables.set(
-						id,
-						new Effector(_emoji, hp, equippable, collideable)
-					);
+				let { hp, type } = _effectors[_emoji];
+				console.log(type);
+				if (type == 'collideable' || type == 'both') {
+					collideables.set(id, new Effector(_emoji, hp, type));
 				} else {
-					entities.set(id, new Effector(_emoji, hp, equippable, collideable));
+					entities.set(id, new Effector(_emoji, hp, type));
 				}
 			} else if (_controllables[_emoji] || _interactables[_emoji]) {
 				entities.set(id, new Entity(_emoji, new Map<number, Effector>(), 1));
@@ -391,8 +395,6 @@
 				entities.set(id, new Entity(_emoji));
 			}
 		}
-
-		console.log(entities);
 
 		for (let [id, item] of entities) {
 			if (item instanceof Effector) continue;
@@ -404,6 +406,12 @@
 				ac = +id.split('_')[1];
 				ic = ac + 1;
 				directionKey = 'KeyD';
+
+				if (item.hp) {
+					item.hp.max = _controllables[item.emoji]?.hp || 1;
+					item.hp.current = _controllables[item.emoji]?.hp || 1;
+					return;
+				}
 			}
 
 			if (item.hp) {
@@ -431,8 +439,10 @@
 	}
 
 	function calcPlayerHpPercentage(): number {
+		console.log(player);
 		if (!player) return 0;
 		let { hp } = player;
+		console.log(numbers.get(Math.floor((hp.current * 100) / hp.max)));
 		if (!hp) return 0;
 		if (hp.current > hp.max) return 1;
 		return numbers.get(Math.floor((hp.current * 100) / hp.max)) || 0;
@@ -618,6 +628,7 @@
 
 			if (!facingItem) {
 				transferItem(ac, ac + operation);
+
 				// for (let i = 0; i < enemyIndexes.length; i++) {
 				// 	followPlayer(
 				// 		coordinateToPosObj(enemyIndexes[i]),
@@ -625,6 +636,19 @@
 				// 		i
 				// 	);
 				// }
+				let collideable = collideables.get(`${currentSection}_${ac}`);
+				console.log(collideable);
+				if (collideable) {
+					let sideEffect =
+						_controllables[player.emoji].sideEffects[collideable.emoji];
+					player.hp.add(sideEffect);
+					progress.set(calcPlayerHpPercentage());
+					collideable.hp -= 1;
+					if (collideable.hp <= 0) {
+						collideables.delete(`${currentSection}_${ac}`);
+						collideables = collideables;
+					}
+				}
 
 				// TODO: check if collideables are there
 
@@ -667,6 +691,8 @@
 				return;
 			}
 			let interactedItem = entities.get(currentSection + '_' + ic);
+
+			// TODO: interactedItem could be in collideables
 
 			if (interactedItem instanceof Effector) {
 				if (player.inventory.size != MAX_INVENTORY_SIZE) {
@@ -734,13 +760,11 @@
 			// EVOLVE & DEVOLVE INTERACTED ITEM
 			if (interactedItem.hp.current <= 0) {
 				const _drops = _interactables[interactedItem.emoji].drops;
-				const { hp, equippable, collideable } = _effectors[_drops[0]];
+				const { hp, type } = _effectors[_drops[0]];
 
 				if (_drops[0]) {
 					addToInventory(
-						new Array(_drops[1]).fill(
-							new Effector(_drops[0], hp, equippable, collideable)
-						)
+						new Array(_drops[1]).fill(new Effector(_drops[0], hp, type))
 					);
 				}
 
@@ -844,7 +868,7 @@
 		if (ac === -2) dispatch('noPlayer');
 	}
 
-	console.log(ac);
+	$: console.log(player, _controllables);
 </script>
 
 <svelte:window on:keydown={handle} />
@@ -892,7 +916,7 @@
 			>
 				{#if collideable}
 					<div class="absolute z-[2] scale-125">
-						<i class="twa twa-{collideable}" />
+						<i class="twa twa-{collideable.emoji}" />
 					</div>
 				{/if}
 				{#if active}

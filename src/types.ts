@@ -54,11 +54,12 @@ export class Entity {
 	}
 }
 
+export type EffectorType = 'equippable' | 'collideable' | 'both'
+
 export interface Effector {
 	emoji: string;
 	hp: number | 'Infinite';
-	equippable: boolean
-	collideable: boolean
+	type: EffectorType;
 
 	// throwable: boolean
 	// speed: number;
@@ -66,11 +67,10 @@ export interface Effector {
 }
 
 export class Effector {
-	constructor(emoji: string, hp: number | 'Infinite', equippable: boolean, collideable: boolean) {
+	constructor(emoji: string, hp: number | 'Infinite', type: EffectorType) {
 		this.emoji = emoji;
 		this.hp = hp;
-		this.equippable = equippable;
-		this.collideable = collideable;
+		this.type = type;
 	}
 }
 

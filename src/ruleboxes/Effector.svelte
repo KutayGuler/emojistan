@@ -1,16 +1,15 @@
 <script lang="ts">
 	import { effectors, formattedEmoji, type StringedNumber } from '$src/store';
-	import { Effector } from '$src/types';
+	import { Effector, type EffectorType } from '$src/types';
 	import { onDestroy, onMount } from 'svelte';
 	import { hasDuplicateIn, hasDuplicate } from './utils';
 
-	// TODO: collideable and throwable stuff
+	// TODO: throwable stuff
 
 	export let id: StringedNumber;
 	export let emoji = '';
 	export let hp: number | 'Infinite' = 1;
-	export let equippable = true;
-	export let collideable = false;
+	export let type: EffectorType = 'equippable';
 
 	let modifierPoints: Array<number | 'Infinite'> = ['Infinite'];
 
@@ -18,11 +17,14 @@
 		modifierPoints[i] = i;
 	}
 
+	let mounted = false;
+
 	onMount(() => {
 		let obj = $effectors.get(id);
 		if (obj) {
-			({ emoji, hp, equippable, collideable } = obj);
+			({ emoji, hp, type } = obj);
 		}
+		mounted = true;
 	});
 
 	onDestroy(() => {
@@ -32,10 +34,8 @@
 		}
 	});
 
-	// TODO: might ask the user to remove the relations first
-
 	function updateStore() {
-		effectors.update(id, new Effector(emoji, hp, equippable, collideable));
+		effectors.update(id, new Effector(emoji, hp, type));
 	}
 
 	function updateEmoji() {
@@ -46,6 +46,8 @@
 		emoji = $formattedEmoji;
 		updateStore();
 	}
+
+	$: mounted && type && updateStore();
 </script>
 
 <div class="absolute -top-8 flex flex-col items-center justify-center gap-2">
@@ -66,8 +68,44 @@
 			</select>
 		</div>
 	</div>
-	<div class="flex flex-row gap-2 pt-5">
-		<button><i class="twa twa-collision text-2xl" /></button>
-		<button><i class="twa twa-gloves text-2xl" /></button>
+	<div class="flex flex-col items-start pt-8">
+		<label class="label cursor-pointer" title="Collideable">
+			<input
+				class="radio checked:bg-purple-500"
+				name="type"
+				value="collideable"
+				type="radio"
+				bind:group={type}
+			/>
+			<span class="label-text pl-4 text-lg">
+				<i class="twa twa-collision" />
+			</span>
+		</label>
+		<label class="label cursor-pointer" title="Equippable">
+			<input
+				class="radio checked:bg-purple-500"
+				name="type"
+				value="equippable"
+				type="radio"
+				bind:group={type}
+			/>
+			<span class="label-text pl-4 text-lg">
+				<i class="twa twa-gloves" />
+			</span>
+		</label>
+		<label class="label cursor-pointer" title="Collideable & Equippable">
+			<input
+				class="radio checked:bg-purple-500"
+				name="type"
+				value="both"
+				type="radio"
+				bind:group={type}
+			/>
+			<span class="label-text pl-4 text-lg">
+				<i class="twa twa-collision" />
+				&
+				<i class="twa twa-gloves" />
+			</span>
+		</label>
 	</div>
 </div>

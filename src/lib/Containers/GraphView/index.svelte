@@ -86,22 +86,16 @@
 	}
 
 	function clickedOnRuleboxes() {
-		console.log('click');
 		rbxStore.removeCtxMenu();
 	}
 </script>
 
 <!-- This is the container that holds GraphView and we have disabled right click functionality to prevent a sticking behavior -->
+<!-- svelte-ignore a11y-click-events-have-key-events -->
 <div
 	class="Ruleboxes cursor-grab"
 	bind:this={ruleboxesDiv}
 	on:click={clickedOnRuleboxes}
-	on:mousedown={(e) => {
-		console.log('touch start');
-	}}
-	on:mouseup={(e) => {
-		console.log('touch end');
-	}}
 >
 	<!-- This container is transformed by d3zoom -->
 	<div class="Rbx">

@@ -61,7 +61,7 @@
 		},
 		{
 			name: 'Effector',
-			onClick: () => spawn('effector', new Effector('', 1)),
+			onClick: () => spawn('effector', new Effector('', 1, 'equippable')),
 		},
 		{
 			name: 'Controllable',
@@ -81,7 +81,7 @@
 						'-1',
 						1,
 						[['any', 'talk']],
-						new Map<StringedNumber | "any", StringedNumber>(),
+						new Map<StringedNumber | 'any', StringedNumber>(),
 						new Evolve('', 2),
 						new Devolve(''),
 						['-1', 0]

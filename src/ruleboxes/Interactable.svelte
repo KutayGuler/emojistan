@@ -89,23 +89,23 @@
 		);
 	}
 
-	// onDestroy(() => {
-	// 	// if (emoji === '') {
-	// 	// 	interactables.remove(id);
-	// 	// 	rbxStore.remove(id);
-	// 	// 	return;
-	// 	// }
+	onDestroy(() => {
+		// if (emoji === '') {
+		// 	interactables.remove(id);
+		// 	rbxStore.remove(id);
+		// 	return;
+		// }
 
-	// 	sideEffects = sideEffects.filter((m) => {
-	// 		if (m[0] === 'any') return true;
-	// 		return $effectors.get(m[0])?.emoji != '';
-	// 	});
-	// 	sideEffects = sideEffects.filter((m, i) => {
-	// 		if (i === 0) return true;
-	// 		return m[1] != 0;
-	// 	});
-	// 	updateStore();
-	// });
+		// sideEffects = sideEffects.filter((m) => {
+		// 	if (m[0] === 'any') return true;
+		// 	return $effectors.get(m[0])?.emoji != '';
+		// });
+		// sideEffects = sideEffects.filter((m, i) => {
+		// 	if (i === 0) return true;
+		// 	return m[1] != 0;
+		// });
+		updateStore();
+	});
 
 	function addTosideEffects(effectorID: StringedNumber | 'any') {
 		if (sideEffects.some(([id, val]) => id === effectorID)) return;
@@ -117,14 +117,6 @@
 		}
 		sideEffects.push([effectorID, 0]);
 		sideEffects = sideEffects;
-		updateStore();
-	}
-
-	function removeEmptySideEffect(rbx: any, i: number) {
-		console.log(i, sideEffects);
-		sideEffects.splice(i, 1);
-		sideEffects = sideEffects;
-		console.log(sideEffects);
 		updateStore();
 	}
 
@@ -247,31 +239,35 @@
 	<div class="form-control flex w-full flex-col p-4">
 		<div class="divider flex flex-row pb-6">
 			<p>SIDE EFFECTS ({sideEffects.length} / {MAX_SIDE_EFFECT})</p>
-			<div class="dropdown-right dropdown">
-				<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
-				<label
-					for=""
-					tabindex="0"
-					class="btn text-2xl"
-					style:background={EFFECTOR_BORDER}>+</label
-				>
-				<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
-				<ul
-					tabindex="0"
-					class="dropdown-content menu rounded-box bg-base-100 p-2 shadow"
-				>
-					{#each droppables as [id, { emoji }]}
-						<button
-							class="rounded-md p-1 hover:bg-base-200"
-							on:click={() => addTosideEffects(id)}
-						>
-							<i class="twa twa-{emoji}" />
-						</button>
-					{:else}
-						<div class="rounded-md p-1">No effectors defined.</div>
-					{/each}
-				</ul>
-			</div>
+			{#if emoji}
+				<div class="dropdown-right dropdown">
+					<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
+					<label
+						for=""
+						tabindex="0"
+						class="btn text-2xl {emoji
+							? 'bg-purple-500'
+							: 'pointer-events bg-purple-100'}"
+						style:background={EFFECTOR_BORDER}>+</label
+					>
+					<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
+					<ul
+						tabindex="0"
+						class="dropdown-content menu rounded-box bg-base-100 p-2 shadow"
+					>
+						{#each droppables as [id, { emoji }]}
+							<button
+								class="rounded-md p-1 hover:bg-base-200"
+								on:click={() => addTosideEffects(id)}
+							>
+								<i class="twa twa-{emoji}" />
+							</button>
+						{:else}
+							<div class="rounded-md p-1">No effectors defined.</div>
+						{/each}
+					</ul>
+				</div>
+			{/if}
 		</div>
 		{#if !hasInteraction}
 			<p class="text-error">
@@ -286,56 +282,54 @@
 				{#each sideEffects as [effectorID, value], i}
 					{@const modifierEmoji = $effectors.get(effectorID)?.emoji}
 					<div class="relative flex flex-col items-center">
-						{#if !(effectorID === 'any' || modifierEmoji)}
-							<div use:removeEmptySideEffect={i} />
-						{:else}
-							{#if value == 'trigger'}
-								<select
-									name="Sequence name"
-									class="select-bordered select select-sm absolute -bottom-10"
-									on:change={(e) => {
-										console.log(triggers);
-										// @ts-expect-error
-										triggers.set(effectorID, e.target.value);
-										console.log(triggers);
-										updateStore();
-									}}
-								>
-									{#each [...$sequencers] as [id, sequencer]}
-										<option value={id}>{sequencer.name}</option>
-									{/each}
-								</select>
-							{/if}
-							{#if effectorID === 'any'}
-								<div class="slot-lg scale-75">
-									{effectorID}
-								</div>
-							{:else if modifierEmoji}
-								<button
-									class="absolute -right-2 -top-2 text-lg"
-									on:click={() => removeFromSideEffects(i)}>{CROSS}</button
-								>
-								<div class="slot-lg scale-75">
-									<i class="twa twa-{modifierEmoji}" />
-								</div>
-							{/if}
+						{#if value == 'trigger'}
 							<select
-								class="select-bordered select select-sm absolute -bottom-4"
-								bind:value
-								on:change={() => {
-									triggers.delete(effectorID);
+								title="Sequencer name"
+								disabled={$sequencers.size == 0}
+								name="Sequence name"
+								class="select-bordered select select-sm absolute -bottom-10"
+								on:change={(e) => {
+									console.log(triggers);
+									// @ts-expect-error
+									triggers.set(effectorID, e.target.value);
+									console.log(triggers);
 									updateStore();
 								}}
 							>
-								{#each modifierPoints as point}
-									<option value={point}
-										>{typeof point === 'number' && point > 0
-											? `+${point}`
-											: point}</option
-									>
+								{#each [...$sequencers] as [id, sequencer]}
+									<option value={id}>{sequencer.name}</option>
 								{/each}
 							</select>
 						{/if}
+						{#if effectorID === 'any'}
+							<div class="slot-lg scale-75">
+								{effectorID}
+							</div>
+						{:else if modifierEmoji}
+							<button
+								class="absolute -right-2 -top-2 text-lg"
+								on:click={() => removeFromSideEffects(i)}>{CROSS}</button
+							>
+							<div class="slot-lg scale-75">
+								<i class="twa twa-{modifierEmoji}" />
+							</div>
+						{/if}
+						<select
+							class="select-bordered select select-sm absolute -bottom-4"
+							bind:value
+							on:change={() => {
+								triggers.delete(effectorID);
+								updateStore();
+							}}
+						>
+							{#each modifierPoints as point}
+								<option value={point}
+									>{typeof point === 'number' && point > 0
+										? `+${point}`
+										: point}</option
+								>
+							{/each}
+						</select>
 					</div>
 				{/each}
 				{#each pseudoSideEffects as [emoji, value]}

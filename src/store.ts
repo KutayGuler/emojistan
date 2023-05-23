@@ -297,7 +297,7 @@ interface ModalData {
 	header: string;
 	content: string;
 	confirmText: string;
-	onConfirm: (arg?: string) => void | (() => void);
+	onConfirm?: (arg?: string) => void | (() => void);
 	input?: boolean;
 	danger?: boolean;
 }
