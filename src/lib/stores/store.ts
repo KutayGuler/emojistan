@@ -79,25 +79,6 @@ export const onMouseMove = (e: any, rbxID: string) => {
 	});
 };
 
-// This is the function handler for the touch event on mobile to select a rbx.
-export const onTouchMove = (e: any, rbxID: string) => {
-	rbxStore.update((rbx) => {
-		rbx.forEach((rbx: Rulebox) => {
-			if (rbx.id === rbxID) {
-				//calculates the location of the selected rbx
-				const { x, y, width, height } = e.target.getBoundingClientRect();
-				const offsetX =
-					((e.touches[0].clientX - x) / width) * e.target.offsetWidth;
-				const offsetY =
-					((e.touches[0].clientY - y) / height) * e.target.offsetHeight;
-				// centers the rbx consistently under the user's touch
-				rbx.position.x += offsetX - rbx.width / 2;
-				rbx.position.y += offsetY - rbx.height / 2;
-			}
-		});
-		return [...rbx];
-	});
-};
 // if the user clicks a rbx without moving it, this function fires allowing a user to invoke the callback function
 export const onRuleboxClick = (e: any, rbxID: string) => {
 	get(rbxStore).forEach((rbx) => {

@@ -2,7 +2,6 @@
 	import {
 		onMouseMove,
 		onRuleboxClick,
-		onTouchMove,
 		rbxStore,
 		rbxSelected,
 		rbxIdSelected,
@@ -131,20 +130,6 @@
 		class="min-h-6 w-full cursor-move"
 		style:display={rbx.type === 'ctxMenu' ? 'none' : 'block'}
 		style:background-color={rbx.borderColor}
-		on:touchmove={(e) => {
-			if (shouldMove) {
-				onTouchMove(e, rbx.id);
-			}
-		}}
-		on:touchstart={(e) => {
-			e.preventDefault();
-			moving = true;
-			$rbxSelected = true;
-		}}
-		on:touchend={(e) => {
-			moving = false;
-			$rbxSelected = false;
-		}}
 		on:mousedown={(e) => {
 			e.preventDefault();
 			moving = true;
