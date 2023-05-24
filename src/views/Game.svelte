@@ -35,12 +35,6 @@
 	// import { AStarFinder } from 'astar-typescript';
 	import Chat from './Chat.svelte';
 
-	// TODO: if the interactable does not have a side effect because of effector,
-	// effector shouldn't lose hp
-	// F to apply on self
-	// X to throw
-	// Space to use
-
 	/* ## DATA ## */
 	export let dt = new Map<string, Branch>(); // dialogue tree
 	export let map = new EditableMap(new Map<MapLocation, string>());
@@ -760,8 +754,7 @@
 			let { id, evolve, sideEffects, devolve } = _interactable;
 			const sideEffect = sideEffects[effectorItem];
 
-			if (sideEffect === 0) {
-				// ?
+			if (!sideEffect || sideEffect === 0) {
 				return;
 			} else if (sideEffect === 'talk') {
 				dialogueID = id.toString();

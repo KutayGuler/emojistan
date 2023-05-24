@@ -84,7 +84,7 @@
 				<span class="flex-inline flex items-center">
 					<h1>Editor</h1>
 				</span>
-				<p class="h-32 pt-2 text-gray-400">
+				<p class="h-32 pt-2 text-slate-500">
 					We have learned about the ruleboxes, now let's see how we can
 					integrate them to our game. But to do that we have to understand the
 					different types of editors in Emojistan.
@@ -92,19 +92,19 @@
 			</div>
 		</div>
 
-		{#each data as { header, icon, description, gifs }}
-			<div class="w-full p-4 pb-32">
-				<div class="divider pb-4">
-					<h1>{header} <i class="twa twa-{icon}" /></h1>
-				</div>
+		<div class="flex w-full flex-col gap-96 p-4">
+			{#each data as { header, icon, description, gifs }}
 				<div class="self-start">
-					<p class="text-gray-400">
+					<div class="divider pb-4">
+						<h1>{header} <i class="twa twa-{icon}" /></h1>
+					</div>
+					<p class="text-slate-500">
 						{description}
 					</p>
 					{#each gifs as { src, alt, header, description }}
 						<div class="py-8" bind:clientWidth={width}>
 							<h1>{header}</h1>
-							<p class="pb-8 text-gray-400">{@html description}</p>
+							<p class="pb-8 text-slate-500">{@html description}</p>
 							<img {src} {alt} />
 							<video {width} autoplay loop controls>
 								<track kind="captions" />
@@ -113,8 +113,8 @@
 						</div>
 					{/each}
 				</div>
-			</div>
-		{/each}
-		<a href="/" class="btn-lg btn mb-32">BACK TO MENU</a>
+			{/each}
+		</div>
+		<a href="/" class="btn-lg btn my-32">BACK TO MENU</a>
 	</div>
 </div>

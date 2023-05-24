@@ -7,6 +7,7 @@
 		Effector,
 		Controllable,
 		type Branch,
+		type MapLocation,
 	} from '$src/types';
 	import {
 		INTERACTABLE_BG,
@@ -40,7 +41,7 @@
 			},
 			gameProps: {
 				map: new EditableMap(
-					new Map<string, string>([
+					new Map<MapLocation, string>([
 						['0_5', 'woman-walking'],
 						['0_6', 'service-dog'],
 					])
@@ -62,9 +63,10 @@
 						'3',
 						new TInteractable(
 							'service-dog',
-							[],
+							'-1',
 							1,
 							[['any', 'talk']],
+							new Map(),
 							new Evolve('', 0),
 							new Devolve(''),
 							['-9', 0]
@@ -104,7 +106,7 @@
 			},
 			gameProps: {
 				map: new EditableMap(
-					new Map<string, string>([
+					new Map<MapLocation, string>([
 						['0_5', 'woman-walking'],
 						['0_6', 'axe'],
 						['0_11', 'evergreen-tree'],
@@ -129,12 +131,13 @@
 						'5',
 						new TInteractable(
 							'evergreen-tree',
-							[],
+							'-1',
 							3,
 							[
 								['any', 0],
 								['2', -1],
 							],
+							new Map(),
 							new Evolve('', 0),
 							new Devolve(''),
 							['6', 2]
@@ -142,8 +145,8 @@
 					],
 				]),
 				effectors: new Map<StringedNumber, Effector>([
-					['2', { emoji: 'axe', hp: 9 }],
-					['6', { emoji: 'wood', hp: 1 }],
+					['2', { emoji: 'axe', hp: 9, type: 'equippable' }],
+					['6', { emoji: 'wood', hp: 1, type: 'equippable' }],
 				]),
 				mapClass: 'simulation',
 				SIZE: 4,

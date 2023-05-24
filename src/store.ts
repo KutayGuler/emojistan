@@ -420,7 +420,6 @@ function createRecentlyUsed() {
 		subscribe,
 		update,
 		useStorage: (id: string) => {
-			// TODO: use useStorage
 			const val = JSON.parse(localStorage.getItem(id + '_ru') as string);
 			set(new Set(val) || new Set<string>());
 			subscribe((state) => {

@@ -76,6 +76,9 @@
 					>{href.replace('/tutorial/', '')}</a
 				>
 			{/each}
+			<p class="text-warning">
+				Tutorial is not up to date! New documentation will come soon.
+			</p>
 		{:else}
 			<a
 				href="/saves"

@@ -8,13 +8,14 @@
 		Evolve,
 		Interactable,
 		type Branch,
+		type MapLocation,
 	} from '$src/types';
 	import Game from '$src/views/Game.svelte';
 	import type { ComponentProps } from 'svelte/internal';
 
 	const gameProps: ComponentProps<Game> = {
 		map: new EditableMap(
-			new Map<string, string>([
+			new Map<MapLocation, string>([
 				['0_5', 'woman-walking'],
 				['0_6', 'dog'],
 				['0_11', 'bone'],
@@ -37,12 +38,13 @@
 				'1',
 				new Interactable(
 					'dog',
-					[],
+					'-1',
 					1,
 					[
 						['any', 'talk'],
 						['2', 1],
 					],
+					new Map(),
 					new Evolve('service-dog', 2),
 					new Devolve(''),
 					['-9', 0]
@@ -52,9 +54,10 @@
 				'3',
 				new Interactable(
 					'service-dog',
-					[],
+					'-1',
 					1,
 					[['any', 'talk']],
+					new Map(),
 					new Evolve('', 0),
 					new Devolve(''),
 					['-9', 0]
@@ -62,7 +65,7 @@
 			],
 		]),
 		effectors: new Map<StringedNumber, Effector>([
-			['2', new Effector('bone', 1)],
+			['2', new Effector('bone', 1, 'equippable')],
 		]),
 		dt: new Map<string, Branch>([
 			['1', ['bark!']],

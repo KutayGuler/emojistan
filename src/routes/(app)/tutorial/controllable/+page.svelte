@@ -5,6 +5,7 @@
 		Devolve,
 		Evolve,
 		Effector,
+		type MapLocation,
 	} from '$src/types';
 	import {
 		CONTROLLABLE_BG,
@@ -39,7 +40,7 @@
 				emoji: 'baby',
 			},
 			gameProps: {
-				map: new EditableMap(new Map<string, string>([['0_0', 'baby']])),
+				map: new EditableMap(new Map<MapLocation, string>([['0_0', 'baby']])),
 				controllables: new Map<StringedNumber, TControllable>([
 					[
 						'1',
@@ -79,7 +80,7 @@
 			},
 			gameProps: {
 				map: new EditableMap(
-					new Map<string, string>([
+					new Map<MapLocation, string>([
 						['0_0', 'baby'],
 						['0_10', 'baby-bottle'],
 						['0_11', 'baby-bottle'],
@@ -110,7 +111,7 @@
 					],
 				]),
 				effectors: new Map<StringedNumber, Effector>([
-					['3', { emoji: 'baby-bottle', hp: 1 }],
+					['3', { emoji: 'baby-bottle', hp: 1, type: 'equippable' }],
 				]),
 				mapClass: 'simulation',
 				SIZE: 4,
@@ -139,7 +140,7 @@
 			},
 			gameProps: {
 				map: new EditableMap(
-					new Map<string, string>([
+					new Map<MapLocation, string>([
 						['0_0', 'monkey'],
 						['0_10', 'test-tube'],
 					])
@@ -161,7 +162,7 @@
 					],
 				]),
 				effectors: new Map<StringedNumber, Effector>([
-					['3', { emoji: 'test-tube', hp: 1 }],
+					['3', { emoji: 'test-tube', hp: 1, type: 'equippable' }],
 				]),
 				mapClass: 'simulation',
 				SIZE: 4,

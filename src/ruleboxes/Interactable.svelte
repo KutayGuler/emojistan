@@ -46,7 +46,7 @@
 	// COMPONENT RELATED
 	export let id: StringedNumber;
 	export let emoji = '';
-	export let sequenceID: StringedNumber;
+	export let sequenceID: StringedNumber = '-1';
 	export let hp = 1;
 	export let sideEffects: Array<[StringedNumber | 'any', SideEffect]> = [
 		['any', 'talk'],

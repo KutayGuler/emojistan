@@ -6,6 +6,7 @@
 		Devolve,
 		Evolve,
 		Interactable,
+		type MapLocation,
 	} from '$src/types';
 	import {
 		EFFECTOR_BG,
@@ -39,7 +40,7 @@
 			},
 			gameProps: {
 				map: new EditableMap(
-					new Map<string, string>([
+					new Map<MapLocation, string>([
 						['0_5', 'woman-walking'],
 						['0_6', 'test-tube'],
 					])
@@ -57,7 +58,7 @@
 					],
 				]),
 				effectors: new Map<StringedNumber, TEffector>([
-					['0', { emoji: 'test-tube', hp: 1 }],
+					['0', { emoji: 'test-tube', hp: 1, type: 'equippable' }],
 				]),
 				mapClass: 'simulation',
 				SIZE: 4,
@@ -82,7 +83,7 @@
 			},
 			gameProps: {
 				map: new EditableMap(
-					new Map<string, string>([
+					new Map<MapLocation, string>([
 						['0_5', 'monkey'],
 						['0_6', 'test-tube'],
 					])
@@ -110,7 +111,7 @@
 					],
 				]),
 				effectors: new Map<StringedNumber, TEffector>([
-					['2', { emoji: 'test-tube', hp: 1 }],
+					['2', { emoji: 'test-tube', hp: 1, type: 'equippable' }],
 				]),
 				mapClass: 'simulation',
 				SIZE: 4,
@@ -135,7 +136,7 @@
 			},
 			gameProps: {
 				map: new EditableMap(
-					new Map<string, string>([
+					new Map<MapLocation, string>([
 						['0_5', 'woman-walking'],
 						['0_6', 'axe'],
 						['0_11', 'evergreen-tree'],
@@ -160,9 +161,10 @@
 						'-1',
 						new Interactable(
 							'evergreen-tree',
-							[],
+							'-1',
 							3,
 							[['2', -1]],
+							new Map(),
 							new Evolve('', 0),
 							new Devolve(''),
 							['3', 2]
@@ -170,8 +172,8 @@
 					],
 				]),
 				effectors: new Map<StringedNumber, TEffector>([
-					['2', { emoji: 'axe', hp: 9 }],
-					['3', { emoji: 'wood', hp: 1 }],
+					['2', { emoji: 'axe', hp: 9, type: 'equippable' }],
+					['3', { emoji: 'wood', hp: 1, type: 'equippable' }],
 				]),
 				mapClass: 'simulation',
 				SIZE: 4,

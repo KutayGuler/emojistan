@@ -5,6 +5,7 @@
 		Controllable,
 		Evolve,
 		Devolve,
+		type MapLocation,
 	} from '$src/types';
 	import { PUSHER_BG, PUSHER_BORDER, PUSHER_H, PUSHER_W } from '$src/constants';
 	import Tutorial from '../Tutorial.svelte';
@@ -32,7 +33,7 @@
 		},
 		gameProps: {
 			map: new EditableMap(
-				new Map<string, string>([
+				new Map<MapLocation, string>([
 					['0_5', 'wind-face'],
 					['0_6', 'leaf-fluttering-in-wind'],
 				])

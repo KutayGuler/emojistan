@@ -5,6 +5,7 @@
 		Controllable,
 		Devolve,
 		Evolve,
+		type MapLocation,
 	} from '$src/types';
 	import { MERGER_BG, MERGER_BORDER, MERGER_H, MERGER_W } from '$src/constants';
 	import Tutorial from '../Tutorial.svelte';
@@ -30,7 +31,7 @@
 		},
 		gameProps: {
 			map: new EditableMap(
-				new Map<string, string>([
+				new Map<MapLocation, string>([
 					['0_5', 'cloud'],
 					['0_6', 'snowflake'],
 				])
