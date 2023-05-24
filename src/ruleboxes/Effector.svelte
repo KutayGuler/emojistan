@@ -4,8 +4,6 @@
 	import { onDestroy, onMount } from 'svelte';
 	import { hasDuplicateIn, hasDuplicate } from './utils';
 
-	// TODO: throwable stuff
-
 	export let id: StringedNumber;
 	export let emoji = '';
 	export let hp: number | 'Infinite' = 1;

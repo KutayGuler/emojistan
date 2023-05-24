@@ -319,9 +319,33 @@
 		}
 	}
 
-	function handleHealthMutation() {
-		// TODO: a global function that should handle evolve & devolve events
-		// of both player and interactables
+	function attemptPlayerEvolution() {
+		if (player.hp.current <= 0) {
+			let playerDevolve = _controllables[player?.emoji || '']?.devolve;
+
+			if (playerDevolve.to !== '') {
+				player.emoji = playerDevolve.to;
+				player.hp.max = _controllables[playerDevolve.to]?.hp || 1;
+				player.hp.current = player.hp.max;
+				progress.set(calcPlayerHpPercentage());
+				return;
+			}
+
+			// TODO: better modal
+			completionMessage = 'Game Over. No players left.';
+			levelCompleted = true;
+			return;
+		}
+
+		let playerEvolve = _controllables[player?.emoji || '']?.evolve;
+
+		if (playerEvolve?.to !== '' && player.hp.current >= playerEvolve?.at) {
+			player.emoji = playerEvolve.to;
+			player.hp.max = _controllables[playerEvolve.to]?.hp || 1;
+			player.hp.current = player.hp.max;
+		}
+
+		progress.set(calcPlayerHpPercentage());
 	}
 
 	// A-STAR
@@ -490,7 +514,6 @@
 		// spawnRTP({ index, emoji }) {
 		// 	// entities.set(currentSection + '_' + index, new Entity(emoji));
 		// 	// entities = entities;
-		// 	// TODO:
 		// },
 		destroy({ index }) {
 			entities.delete(currentSection + '_' + index);
@@ -629,6 +652,7 @@
 			if (!facingItem) {
 				transferItem(ac, ac + operation);
 
+				// A-STAR
 				// for (let i = 0; i < enemyIndexes.length; i++) {
 				// 	followPlayer(
 				// 		coordinateToPosObj(enemyIndexes[i]),
@@ -636,21 +660,27 @@
 				// 		i
 				// 	);
 				// }
+
 				let collideable = collideables.get(`${currentSection}_${ac}`);
-				console.log(collideable);
 				if (collideable) {
 					let sideEffect =
 						_controllables[player.emoji].sideEffects[collideable.emoji];
-					player.hp.add(sideEffect);
-					progress.set(calcPlayerHpPercentage());
-					collideable.hp -= 1;
-					if (collideable.hp <= 0) {
-						collideables.delete(`${currentSection}_${ac}`);
-						collideables = collideables;
+					if (!sideEffect || sideEffect === 0) {
+						return;
 					}
-				}
 
-				// TODO: check if collideables are there
+					player.hp.add(sideEffect);
+
+					if (collideable.hp !== 'Infinite') {
+						collideable.hp -= 1;
+						if (collideable.hp <= 0) {
+							collideables.delete(`${currentSection}_${ac}`);
+							collideables = collideables;
+						}
+					}
+
+					attemptPlayerEvolution();
+				}
 
 				return;
 			}
@@ -685,14 +715,15 @@
 
 		if (e.code === 'Space' && !chatting) {
 			// required so that items are not overflowing from the map
-
+			// (this comment was added before switching to larger world map)
 			const operation = calcOperation(wasdToArrow[directionKey], ac);
 			if (operation === 0) {
 				return;
 			}
-			let interactedItem = entities.get(currentSection + '_' + ic);
-
-			// TODO: interactedItem could be in collideables
+			let interactedItem =
+				entities.get(currentSection + '_' + ic) ||
+				collideables.get(`${currentSection}_${ic}`);
+			let pickedFromEntities = entities.has(currentSection + '_' + ic);
 
 			if (interactedItem instanceof Effector) {
 				if (player.inventory.size != MAX_INVENTORY_SIZE) {
@@ -703,13 +734,21 @@
 							break;
 						}
 					}
-					entities.delete(currentSection + '_' + ic);
-					entities = entities;
+
+					if (pickedFromEntities) {
+						entities.delete(currentSection + '_' + ic);
+						entities = entities;
+					} else {
+						collideables.delete(`${currentSection}_${ic}`);
+						collideables = collideables;
+					}
 				}
 				return;
 			}
-			if (!interactedItem || !interactedItem.hp || !interactedItem.inventory)
+
+			if (!interactedItem || !interactedItem.hp || !interactedItem.inventory) {
 				return;
+			}
 
 			let _interactable: _Interactable = _interactables[interactedItem.emoji];
 
@@ -722,6 +761,8 @@
 			const sideEffect = sideEffects[effectorItem];
 
 			if (sideEffect === 0) {
+				// ?
+				return;
 			} else if (sideEffect === 'talk') {
 				dialogueID = id.toString();
 				character = interactedItem.emoji;
@@ -760,9 +801,9 @@
 			// EVOLVE & DEVOLVE INTERACTED ITEM
 			if (interactedItem.hp.current <= 0) {
 				const _drops = _interactables[interactedItem.emoji].drops;
-				const { hp, type } = _effectors[_drops[0]];
-
+				
 				if (_drops[0]) {
+					const { hp, type } = _effectors[_drops[0]];
 					addToInventory(
 						new Array(_drops[1]).fill(new Effector(_drops[0], hp, type))
 					);
@@ -787,7 +828,7 @@
 
 			const sideEffect =
 				_controllables[player.emoji].sideEffects[effectorItem.emoji];
-			if (!sideEffect || sideEffect === 0 || sideEffect === 'Infinite') return;
+			if (!sideEffect || sideEffect === 0) return;
 
 			player.hp.add(sideEffect);
 
@@ -798,46 +839,7 @@
 				}
 			}
 
-			if (player.hp.current <= 0) {
-				let playerDevolve = _controllables[player?.emoji || '']?.devolve;
-
-				if (playerDevolve.to !== '') {
-					player.emoji = playerDevolve.to;
-					player.hp.max = _controllables[playerDevolve.to]?.hp || 1;
-					player.hp.current = player.hp.max;
-					progress.set(calcPlayerHpPercentage());
-					return;
-				}
-
-				for (let [id, item] of entities) {
-					if (item instanceof Effector || !item || !item.hp || !item.inventory)
-						continue;
-					if (item.hp.current > 0 && _controllables[item.emoji]) {
-						player = entities.get(id) as ControllableEntity;
-						ac = +id.split('_')[1];
-						progress = tweened(calcPlayerHpPercentage(), {
-							duration: 200,
-							easing: cubicOut,
-						});
-
-						return;
-					}
-				}
-
-				completionMessage = 'Game Over. No players left.';
-				levelCompleted = true;
-				return;
-			}
-
-			let playerEvolve = _controllables[player?.emoji || '']?.evolve;
-
-			if (playerEvolve?.to !== '' && player.hp.current >= playerEvolve?.at) {
-				player.emoji = playerEvolve.to;
-				player.hp.max = _controllables[playerEvolve.to]?.hp || 1;
-				player.hp.current = player.hp.max;
-			}
-
-			progress.set(calcPlayerHpPercentage());
+			attemptPlayerEvolution();
 			return;
 		}
 
@@ -851,10 +853,19 @@
 			}
 
 			let droppedItem = player?.inventory.get(currentInventoryIndex);
+			console.log(droppedItem);
 			if (!droppedItem) return;
-			entities.set(currentSection + '_' + ic, droppedItem);
-			deleteFromInventory(currentInventoryIndex);
-			entities = entities;
+
+			if (droppedItem.type == 'equippable') {
+				entities.set(currentSection + '_' + ic, droppedItem);
+				deleteFromInventory(currentInventoryIndex);
+				entities = entities;
+			} else if (['collideable', 'both'].includes(droppedItem.type)) {
+				collideables.set(`${currentSection}_${ic}`, droppedItem);
+				deleteFromInventory(currentInventoryIndex);
+				collideables = collideables;
+			}
+
 			return;
 		}
 
@@ -915,7 +926,7 @@
 				style:background={colors.get(`${currentSection}_${i}`) || map.dbg}
 			>
 				{#if collideable}
-					<div class="absolute z-[2] scale-125">
+					<div class="absolute z-[2] scale-150">
 						<i class="twa twa-{collideable.emoji}" />
 					</div>
 				{/if}

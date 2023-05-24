@@ -98,7 +98,7 @@ export interface _Interactables {
 }
 
 interface _ControllableSideEffects {
-	[emoji: string]: number | 'Infinite';
+	[emoji: string]: number;
 }
 
 export interface _Controllable {
