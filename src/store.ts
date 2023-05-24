@@ -27,6 +27,7 @@ function createMapStore<K, V>(name: `${RuleboxType}s`) {
 			const val = JSON.parse(localStorage.getItem(id + '_' + name) as string);
 			set(new Map(val) || new Map<number, V>());
 			subscribe((state) => {
+				console.log(state);
 				localStorage.setItem(
 					id + '_' + name,
 					JSON.stringify(Array.from(state.entries()))

@@ -50,9 +50,6 @@
 	export let showInventory = true;
 	let collideables = new Map<MapLocation, Effector>();
 
-	let completionMessage: 'Level Completed!' | 'Game Over. No players left.' =
-		'Level Completed!';
-
 	/* ## STATE ## */
 	let levelCompleted = false;
 	let ac = -2; // ACTIVE CELL
@@ -326,6 +323,7 @@
 				content: 'No players left.',
 				header: 'Game Over',
 				confirmText: 'REPLAY',
+				// @ts-expect-error
 				onConfirm: m.reset,
 				input: false,
 				danger: false,
@@ -936,26 +934,6 @@
 				{/if}
 			</div>
 		{/each}
-		<!-- {#if levelCompleted}
-			<dialog
-				open
-				style="background-color: rgba(0, 0, 0.5, 0.5);"
-				class="absolute z-20 flex h-full w-full flex-col items-center justify-center gap-4 self-center"
-				transition:scale|local
-			>
-				<p class="absolute top-4 w-full text-center text-white">
-					{completionMessage}
-				</p>
-				<button
-					class="btn-success btn-lg btn w-1/4 text-success-content"
-					on:click={() => m.reset()}>REPLAY</button
-				>
-				<button
-					class="btn-error btn-lg btn w-1/4 text-error-content"
-					on:click={() => dispatch('quit')}>QUIT</button
-				>
-			</dialog>
-		{/if} -->
 	</div>
 	{#key ac}
 		{#if ac != -2 && showInventory}

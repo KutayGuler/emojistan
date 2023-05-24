@@ -1,6 +1,4 @@
 <script lang="ts">
-	// TODO: polish this page a little bit
-
 	const data = [
 		{
 			header: 'MAP EDITOR',

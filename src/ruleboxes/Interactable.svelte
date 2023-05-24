@@ -11,6 +11,7 @@
 		Interactable,
 		type Drops,
 		type SideEffect,
+		type MapLocation,
 	} from '$src/types';
 	import { onDestroy, onMount } from 'svelte';
 	import { notifications } from '../routes/notifications';
@@ -74,6 +75,7 @@
 	});
 
 	function updateStore() {
+		console.log(triggers);
 		interactables.update(
 			id,
 			new Interactable(
@@ -172,6 +174,13 @@
 		if (evolve.at < hp) {
 			evolve.at = hp + 1;
 		}
+	}
+
+	function useTrigger(node: Element, id: string) {
+		console.log(node.value);
+		// TODO: swithc triggers from set to array of [id, val]
+		triggers.set(id as StringedNumber, node.value);
+		console.log(triggers);
 	}
 
 	let hasInteraction = true;
@@ -284,6 +293,7 @@
 					<div class="relative flex flex-col items-center">
 						{#if value == 'trigger'}
 							<select
+								use:useTrigger={effectorID}
 								title="Sequencer name"
 								disabled={$sequencers.size == 0}
 								name="Sequence name"

@@ -39,6 +39,7 @@
 	import DialogueEditor from './DialogueEditor.svelte';
 	import type { CopyMode, SkinTone } from '$src/types';
 	import RecentlyUsed from './RecentlyUsed.svelte';
+	import Publish from '$src/views/Publish.svelte';
 
 	onMount(() => {
 		if ($saves.currentSaveID === '') {
@@ -122,11 +123,12 @@
 
 	let test = false;
 
-	type ViewKey = 'editor' | 'rules' | 'dialogue';
+	type ViewKey = 'editor' | 'rules' | 'dialogue' | 'publish';
 	const views: { [key in ViewKey]: string } = {
 		editor: 'world-map|Map Editor',
 		rules: 'books|Ruleboxes',
 		dialogue: 'speech-balloon|Dialogue Editor',
+		publish: 'floppy-disk|Publish'
 	};
 
 	let viewKey: ViewKey = 'editor';
@@ -226,6 +228,8 @@
 			</div>
 			{#if viewKey === 'dialogue'}
 				<DialogueEditor />
+			{:else if viewKey == 'publish'}
+				<Publish></Publish>
 			{:else}
 				<div
 					class="relative box-border flex flex-row items-center justify-center"
