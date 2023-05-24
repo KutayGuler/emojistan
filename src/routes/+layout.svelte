@@ -19,10 +19,8 @@
 			data: { subscription },
 		} = supabase.auth.onAuthStateChange(async (event, _session) => {
 			if (_session?.expires_at !== session?.expires_at) {
-				console.log(data);
 				invalidate('supabase:auth');
 				notifications.success('Logged in as ' + username);
-				console.log('invalidate');
 			}
 		});
 

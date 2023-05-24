@@ -289,10 +289,9 @@
 								name="Sequence name"
 								class="select-bordered select select-sm absolute -bottom-10"
 								on:change={(e) => {
-									console.log(triggers);
 									// @ts-expect-error
 									triggers.set(effectorID, e.target.value);
-									console.log(triggers);
+
 									updateStore();
 								}}
 							>

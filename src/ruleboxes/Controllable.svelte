@@ -44,14 +44,13 @@
 
 	onMount(() => {
 		let obj = $controllables.get(id);
-		console.log(obj);
+
 		if (obj) {
 			({ emoji, hp, sideEffects, evolve, devolve } = obj);
 		}
 	});
 
 	function updateStore() {
-		console.log("update store", hp);
 		controllables.update(
 			id,
 			new Controllable(emoji, hp, sideEffects, evolve, devolve)
@@ -147,8 +146,6 @@
 			evolve.at = hp + 1;
 		}
 	}
-
-	// TODO: Update hp
 
 	$: droppables = [...$effectors].filter(([id, e]) => e.emoji != '');
 	$: evolve.at = hp > evolve.at ? hp + 1 : evolve.at;

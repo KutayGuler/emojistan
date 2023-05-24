@@ -12,6 +12,7 @@ import {
 	type Merger,
 	type Pusher,
 	type SkinTone,
+	type MapLocation,
 } from './types';
 import { generateID } from './routes/utils';
 import type { RuleboxType } from './lib';
@@ -172,12 +173,12 @@ function createEditableMap() {
 			}),
 		updateColorAt: (sectionIndex: number, index: number, color: string) =>
 			update((state) => {
-				state.colors.set(sectionIndex + '_' + index, color);
+				state.colors.set(`${sectionIndex}_${index}`, color);
 				return state;
 			}),
 		deleteColorAt: (sectionIndex: number, index: number) =>
 			update((state) => {
-				state.colors.delete(sectionIndex + '_' + index);
+				state.colors.delete(`${sectionIndex}_${index}`);
 				return state;
 			}),
 		clearColors: (sectionIndex: number) =>
@@ -191,7 +192,7 @@ function createEditableMap() {
 				}
 
 				for (let key of keys) {
-					state.colors.delete(key);
+					state.colors.delete(key as MapLocation);
 				}
 				return state;
 			}),
@@ -204,12 +205,12 @@ function createEditableMap() {
 			}),
 		updateBackgroundAt: (sectionIndex: number, index: number, emoji: string) =>
 			update((state) => {
-				state.backgrounds.set(sectionIndex + '_' + index, emoji);
+				state.backgrounds.set(`${sectionIndex}_${index}`, emoji);
 				return state;
 			}),
 		deleteBackgroundAt: (sectionIndex: number, index: number) =>
 			update((state) => {
-				state.backgrounds.delete(sectionIndex + '_' + index);
+				state.backgrounds.delete(`${sectionIndex}_${index}`);
 				return state;
 			}),
 		clearBackgrounds: (sectionIndex: number) => update((state) => {
@@ -222,18 +223,18 @@ function createEditableMap() {
 			}
 
 			for (let key of keys) {
-				state.items.delete(key);
+				state.items.delete(key as MapLocation);
 			}
 			return state;
 		}),
 		addEmoji: (sectionIndex: number, index: number, emoji: string) =>
 			update((state) => {
-				state.items.set(sectionIndex + '_' + index, emoji);
+				state.items.set(`${sectionIndex}_${index}`, emoji);
 				return state;
 			}),
 		removeEmoji: (sectionIndex: number, index: number) =>
 			update((state) => {
-				state.items.delete(sectionIndex + '_' + index);
+				state.items.delete(`${sectionIndex}_${index}`);
 				return state;
 			}),
 		clearItems: (sectionIndex: number) =>
@@ -247,7 +248,7 @@ function createEditableMap() {
 				}
 
 				for (let key of keys) {
-					state.items.delete(key);
+					state.items.delete(key as MapLocation);
 				}
 				return state;
 			}),
@@ -262,7 +263,7 @@ function createEditableMap() {
 				}
 
 				for (let key of keys) {
-					state.items.delete(key);
+					state.items.delete(key as MapLocation);
 				}
 
 				keys = [];
@@ -274,7 +275,7 @@ function createEditableMap() {
 				}
 
 				for (let key of keys) {
-					state.colors.delete(key);
+					state.colors.delete(key as MapLocation);
 				}
 
 				keys = [];
@@ -286,7 +287,7 @@ function createEditableMap() {
 				}
 
 				for (let key of keys) {
-					state.backgrounds.delete(key);
+					state.backgrounds.delete(key as MapLocation);
 				}
 				return state;
 			}),
@@ -347,11 +348,25 @@ function createDialogueTree() {
 				state.set(id, []);
 				return state;
 			}),
-		remove: (id: string) =>
+		removeChoice: (parentBranchName: string, choiceID: string) =>
+			update((state) => {
+				state.get(parentBranchName)?.pop();
+				state.delete(choiceID);
+				if (typeof state.get(choiceID)?.at(-1) !== 'string') {
+					// delete all related subbranches
+					state.forEach((_, key) => {
+						if (key.includes(choiceID)) {
+							state.delete(key);
+						}
+					});
+				}
+				return state;
+			}),
+		remove: (id: string,) =>
 			update((state) => {
 				state.delete(id);
 				if (typeof state.get(id)?.at(-1) !== 'string') {
-					// delete all subbranches
+					// delete all related subbranches
 					state.forEach((_, key) => {
 						if (key.includes(id)) {
 							state.delete(key);
@@ -359,7 +374,7 @@ function createDialogueTree() {
 					});
 				}
 				return state;
-			}),
+		}),
 		addTextTo: (id: string, text: string) =>
 			update((state) => {
 				if (typeof state.get(id)?.at(-1) !== 'string') {
@@ -404,6 +419,17 @@ function createRecentlyUsed() {
 		set,
 		subscribe,
 		update,
+		useStorage: (id: string) => {
+			// TODO: use useStorage
+			const val = JSON.parse(localStorage.getItem(id + '_ru') as string);
+			set(new Set(val) || new Set<string>());
+			subscribe((state) => {
+				localStorage.setItem(
+					id + '_ru',
+					JSON.stringify(Array.from(state.values()))
+				);
+			});
+		},
 		add: (emoji: string) => update((state) => {
 			if (state.has(emoji)) {
 				state.delete(emoji);

@@ -5,8 +5,6 @@
 	import type { PageData } from '../$types';
 	export let data: PageData;
 
-	console.log(data.profileData);
-
 	async function supabaseQuery(from: number, to: number) {
 		let res = await supabase
 			.from('likes')

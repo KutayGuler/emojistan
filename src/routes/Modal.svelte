@@ -43,6 +43,7 @@
 			}}>CANCEL</button
 		>
 		<button
+			autofocus
 			disabled={$modal.input && inputValue.length < 2}
 			class="btn {$modal.danger ? 'btn-error' : 'btn-primary'}"
 			on:click={confirm}>{$modal.confirmText}</button

@@ -11,7 +11,6 @@
 	let cache = new Map<string, object>();
 
 	async function search() {
-		console.log(cache);
 		let cacheResult = cache.get(query.toLowerCase());
 		if (cacheResult) {
 			// @ts-expect-error
@@ -34,7 +33,7 @@
 			searchError = true;
 			searchResult = [];
 		} else if (data) {
-			cache.set(searchType + "_" + query.toLowerCase(), data);
+			cache.set(searchType + '_' + query.toLowerCase(), data);
 			searchResult = data;
 		}
 	}

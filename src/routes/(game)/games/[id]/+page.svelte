@@ -31,8 +31,6 @@
 			return gameData;
 		}
 	}
-
-	console.log($page.route.id);
 </script>
 
 {#await getGameData()}

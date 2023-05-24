@@ -33,8 +33,6 @@
 			password,
 		});
 
-		console.log(data, error);
-
 		resolved = true;
 	}
 

@@ -6,8 +6,6 @@
 	export let layer = 1;
 	let text = '';
 
-	// TODO: option to delete choice
-
 	function toggleNextBranch(next: string) {
 		nextBranch = nextBranch === next ? '' : next;
 	}
@@ -24,7 +22,9 @@
 		text = '';
 	}
 
-	function attemptDelete(label: string) {}
+	function attemptDelete(next: string) {
+		dialogueTree.removeChoice(currentBranch, next);
+	}
 
 	$: if (currentBranch !== '' && !$dialogueTree.has(currentBranch)) {
 		dialogueTree.add(currentBranch);
@@ -188,7 +188,7 @@
 											>
 										</form>
 										<button
-											on:click={() => attemptDelete(choice.label)}
+											on:click={() => attemptDelete(choice.next)}
 											class="btn-error btn-ghost btn"
 											type="submit">DELETE</button
 										>

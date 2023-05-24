@@ -75,6 +75,7 @@ export const storeNames = [
 	'dbg',
 	'dt',
 	'ssi',
+	'ru'
 ];
 
 /* INTERACTABLE */

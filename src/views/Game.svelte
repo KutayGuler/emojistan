@@ -1,9 +1,8 @@
 <script lang="ts">
-	import { scale } from 'svelte/transition';
 	import { tweened } from 'svelte/motion';
 	import { cubicOut } from 'svelte/easing';
 	import { createEventDispatcher, onMount } from 'svelte/internal';
-	import { currentColor, currentEmoji } from '../store';
+	import { currentColor, currentEmoji, modal } from '../store';
 	import {
 		DEFAULT_MAP_CLASS,
 		DEFAULT_SIDE_LENGTH,
@@ -105,12 +104,12 @@
 		_interactables[emoji].sideEffects = {};
 
 		// FIXME: triggers returns as an object
-		console.log(triggers, sequencers);
+
 		for (let [id, effect] of sideEffects) {
 			if (effect == 'trigger') {
 				let sequenceID = triggers.get(id);
 				let sequencer = structuredClone(sequencers.get(sequenceID));
-				console.log(sequencer);
+
 				effect = sequencer?.sequence || [];
 			}
 
@@ -124,9 +123,7 @@
 			_interactables[emoji].sideEffects[effector.emoji] = effect;
 		}
 
-		console.log(triggers);
 		for (let [effectorID, sequenceID] of triggers) {
-			console.log(effectorID, sequenceID);
 			let sequence = structuredClone(sequencers.get(sequenceID));
 		}
 
@@ -331,9 +328,14 @@
 				return;
 			}
 
-			// TODO: better modal
-			completionMessage = 'Game Over. No players left.';
-			levelCompleted = true;
+			modal.show({
+				content: 'No players left.',
+				header: 'Game Over',
+				confirmText: 'REPLAY',
+				onConfirm: m.reset,
+				input: false,
+				danger: false,
+			});
 			return;
 		}
 
@@ -403,11 +405,10 @@
 	// }
 
 	function initEntities() {
-		console.log(_effectors);
 		for (let [id, _emoji] of map.items) {
 			if (_effectors[_emoji]) {
 				let { hp, type } = _effectors[_emoji];
-				console.log(type);
+
 				if (type == 'collideable' || type == 'both') {
 					collideables.set(id, new Effector(_emoji, hp, type));
 				} else {
@@ -463,10 +464,9 @@
 	}
 
 	function calcPlayerHpPercentage(): number {
-		console.log(player);
 		if (!player) return 0;
 		let { hp } = player;
-		console.log(numbers.get(Math.floor((hp.current * 100) / hp.max)));
+
 		if (!hp) return 0;
 		if (hp.current > hp.max) return 1;
 		return numbers.get(Math.floor((hp.current * 100) / hp.max)) || 0;
@@ -801,7 +801,7 @@
 			// EVOLVE & DEVOLVE INTERACTED ITEM
 			if (interactedItem.hp.current <= 0) {
 				const _drops = _interactables[interactedItem.emoji].drops;
-				
+
 				if (_drops[0]) {
 					const { hp, type } = _effectors[_drops[0]];
 					addToInventory(
@@ -853,7 +853,7 @@
 			}
 
 			let droppedItem = player?.inventory.get(currentInventoryIndex);
-			console.log(droppedItem);
+
 			if (!droppedItem) return;
 
 			if (droppedItem.type == 'equippable') {
@@ -878,8 +878,6 @@
 	function noPlayer(rbx: any) {
 		if (ac === -2) dispatch('noPlayer');
 	}
-
-	$: console.log(player, _controllables);
 </script>
 
 <svelte:window on:keydown={handle} />
@@ -945,7 +943,7 @@
 				{/if}
 			</div>
 		{/each}
-		{#if levelCompleted}
+		<!-- {#if levelCompleted}
 			<dialog
 				open
 				style="background-color: rgba(0, 0, 0.5, 0.5);"
@@ -964,7 +962,7 @@
 					on:click={() => dispatch('quit')}>QUIT</button
 				>
 			</dialog>
-		{/if}
+		{/if} -->
 	</div>
 	{#key ac}
 		{#if ac != -2 && showInventory}

@@ -63,6 +63,7 @@
 			sequencers,
 			rbxStore,
 			dialogueTree,
+			recentlyUsed
 		]) {
 			store.useStorage($saves.currentSaveID);
 		}
