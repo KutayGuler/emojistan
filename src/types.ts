@@ -240,17 +240,18 @@ export class Devolve {
 	}
 }
 
-export type Drops = [id: StringedNumber, amount: number];
+export type Drops = [id: StringedNumber | 'any', amount: number];
 export type _Drops = [id: string, amount: number];
 
+// Array<SequenceItem> is required for type-safety inside Game component
 export type SideEffect = number | 'talk' | 'trigger' | Array<SequenceItem>;
+export type SideEffectArray = Array<[effectorID: StringedNumber | 'any', sideEffect: SideEffect, triggerID: StringedNumber | "none"]> 
 
 export interface Interactable {
 	emoji: string;
 	sequenceID: StringedNumber;
 	hp: number;
-	sideEffects: Array<[StringedNumber | 'any', SideEffect]>;
-	triggers: Array<[StringedNumber | 'any', StringedNumber | "none"]>;
+	sideEffects: SideEffectArray;
 	evolve: Evolve;
 	devolve: Devolve;
 	drops: Drops;
@@ -261,8 +262,7 @@ export class Interactable {
 		emoji: string,
 		sequenceID: StringedNumber,
 		hp: number,
-		sideEffects: Array<[StringedNumber | 'any', SideEffect]>,
-		triggers: Array<[StringedNumber | 'any', StringedNumber | "none"]>,
+		sideEffects: SideEffectArray,
 		evolve: Evolve,
 		devolve: Devolve,
 		drops: Drops
@@ -271,7 +271,6 @@ export class Interactable {
 		this.sequenceID = sequenceID;
 		this.hp = hp;
 		this.sideEffects = sideEffects;
-		this.triggers = triggers;
 		this.evolve = evolve;
 		this.devolve = devolve;
 		this.drops = drops;

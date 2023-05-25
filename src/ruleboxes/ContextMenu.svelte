@@ -80,8 +80,7 @@
 						'',
 						'-1',
 						1,
-						[['any', 'talk']],
-						[['any', 'none']],
+						[['any', 'talk', 'none']],
 						new Evolve('', 2),
 						new Devolve(''),
 						['-1', 0]

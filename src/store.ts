@@ -351,7 +351,8 @@ function createDialogueTree() {
 			}),
 		removeChoice: (parentBranchName: string, choiceID: string) =>
 			update((state) => {
-				state.get(parentBranchName)?.pop();
+				let length = state.get(parentBranchName)?.length 
+				state.get(parentBranchName)[length - 1] = state.get(parentBranchName)?.at(-1).filter(({ next }) => next != choiceID);;
 				state.delete(choiceID);
 				if (typeof state.get(choiceID)?.at(-1) !== 'string') {
 					// delete all related subbranches
@@ -476,7 +477,7 @@ export type StringedNumber = `${number}`;
 // MAPS
 export const pushers = createMapStore<StringedNumber, Pusher>('pushers');
 export const mergers = createMapStore<StringedNumber, Merger>('mergers');
-export const effectors = createMapStore<StringedNumber, Effector>('effectors');
+export const effectors = createMapStore<StringedNumber | 'any', Effector>('effectors');
 export const interactables = createMapStore<StringedNumber, Interactable>(
 	'interactables'
 );

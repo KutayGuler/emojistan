@@ -8,7 +8,7 @@
 	import type { LayoutData } from './$types';
 	import { onMount } from 'svelte';
 	import { notifications } from './notifications';
-	import { invalidate } from '$app/navigation';
+	import { invalidate, invalidateAll } from '$app/navigation';
 
 	export let data: LayoutData;
 
@@ -19,8 +19,12 @@
 			data: { subscription },
 		} = supabase.auth.onAuthStateChange(async (event, _session) => {
 			if (_session?.expires_at !== session?.expires_at) {
-				invalidate('supabase:auth');
-				notifications.success('Logged in as ' + username);
+				// invalidate('supabase:auth'); // huntabyte: invalidateAll()
+				invalidateAll();
+				if (username) {
+					notifications.success('Logged in as ' + username);
+				}
+				console.log(data);
 			}
 		});
 

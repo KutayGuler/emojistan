@@ -11,12 +11,11 @@
 		MERGER_BORDER,
 		PUSHER_BORDER,
 	} from '$src/constants';
-	import { invalidate } from '$app/navigation';
 	import { notifications } from '../notifications';
+	import { enhance } from '$app/forms';
 
 	export let data: LayoutData;
-
-	$: ({ supabase, session } = data);
+	let loggingOut = false;
 
 	const tutorialLinks = [
 		{ href: '/tutorial/controls', background: '#cfcfcf' },
@@ -28,16 +27,6 @@
 		{ href: '/tutorial/interactable', background: INTERACTABLE_BORDER },
 		{ href: '/tutorial/editor', background: '#ea5234' },
 	];
-
-	async function signOut() {
-		const { error } = await supabase.auth.signOut();
-		if (error) {
-			notifications.warning('An error occured. Could not logout.');
-			return;
-		}
-
-		invalidate('supabase:auth');
-	}
 </script>
 
 <main
@@ -103,27 +92,47 @@
 		{/if}
 
 		<div class="flex flex-grow" />
-		{#if session}
+		{#if data.session}
 			<div class="flex items-end justify-between">
-				<button on:click={signOut} class="flex flex-row text-sm text-black"
-					><svg
-						xmlns="http://www.w3.org/2000/svg"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke-width="1.5"
-						stroke="currentColor"
-						class="h-6 w-6"
-					>
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75"
-						/>
-					</svg>
-					&nbsp; Logout</button
+				<form
+					action="/logout"
+					method="POST"
+					use:enhance={() => {
+						loggingOut = true;
+
+						return async ({ update, result }) => {
+							await update();
+							console.log(result);
+								// @ts-expect-error
+							if (result.message) {
+								// @ts-expect-error
+								notifications.warning(result.message);
+							}
+
+							loggingOut = false;
+						};
+					}}
 				>
+					<button type="submit" class="flex flex-row text-sm text-black"
+						><svg
+							xmlns="http://www.w3.org/2000/svg"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke-width="1.5"
+							stroke="currentColor"
+							class="h-6 w-6"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75"
+							/>
+						</svg>
+						&nbsp; {loggingOut ? 'Logging out...' : 'Logout'}</button
+					>
+				</form>
 				<a
-					href="/profile/{data.username || session.user.id}"
+					href="/profile/{data.username || data.session.user.id}"
 					class="avatar self-end {$navigating?.to?.url.pathname.includes(
 						'profile'
 					)

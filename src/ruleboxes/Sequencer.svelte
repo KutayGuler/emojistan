@@ -5,7 +5,6 @@
 		CROSS,
 		palette,
 		DEFAULT_SIDE_LENGTH,
-		INTERACTABLE_H,
 		SEQUENCER_H,
 	} from '$src/constants';
 	import { rbxStore } from '$src/lib/stores/store';

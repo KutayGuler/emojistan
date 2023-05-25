@@ -41,10 +41,9 @@
 					'-1',
 					1,
 					[
-						['any', 'talk'],
-						['2', 1],
+						['any', 'talk', 'none'],
+						['2', 1, 'none'],
 					],
-					new Map(),
 					new Evolve('service-dog', 2),
 					new Devolve(''),
 					['-9', 0]
@@ -56,8 +55,7 @@
 					'service-dog',
 					'-1',
 					1,
-					[['any', 'talk']],
-					new Map(),
+					[['any', 'talk', 'none']],
 					new Evolve('', 0),
 					new Devolve(''),
 					['-9', 0]

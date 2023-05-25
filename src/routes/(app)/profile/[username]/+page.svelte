@@ -1,15 +1,56 @@
 <script lang="ts">
+	import supabase from '$api/supabase';
+	import { notifications } from '$src/routes/notifications';
 	import type { PageData } from './$types';
 	export let data: PageData;
+	let openEdit = false;
+	let updating = false;
+
+	async function updateBio() {
+		if (updating) return;
+		updating = true;
+
+		const { data: _data, error } = await supabase
+			.from('profiles')
+			.update({ bio: data.profileData?.bio })
+			.eq('id', data.profileData?.id);
+
+		updating = false;
+		openEdit = false;
+
+		if (error) {
+			notifications.warning('An error occured. Please try again later.');
+		} else {
+			notifications.success('Bio updated.');
+		}
+	}
 </script>
 
-{#if data.profileData.bio}
-	<p class="text-2xl">
-		{data.profileData.bio} Lorem ipsum dolor sit amet consectetur adipisicing elit.
-		Ut odio eius provident. Voluptas incidunt harum nobis ad fuga, deserunt nihil
-		totam perferendis porro ipsum fugit similique quod sapiente quasi culpa ullam
-		ex vel iusto omnis!
-	</p>
+{#if data.profileData?.bio}
+	{#if openEdit}
+		<textarea
+			class="textarea-bordered textarea mb-2 h-full bg-base-200 text-2xl text-neutral"
+			name="bio"
+			cols="30"
+			rows="10"
+			bind:value={data.profileData.bio}
+		/>
+		<form class="self-end" on:submit={updateBio}>
+			<button
+				type="submit"
+				class="btn-primary btn-sm btn w-fit {updating ? 'loading' : ''}"
+				>{updating ? 'UPDATING' : 'UPDATE'}</button
+			>
+		</form>
+	{:else}
+		<p class="h-full text-2xl">{data.profileData.bio}</p>
+		<button
+			on:click={() => {
+				openEdit = true;
+			}}
+			class="btn-ghost btn-sm btn w-fit self-end">Edit bio</button
+		>
+	{/if}
 {:else}
 	<i
 		class="twa twa-fountain-pen absolute scale-150 self-center pt-[50%] text-9xl opacity-20"

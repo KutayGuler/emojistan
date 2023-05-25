@@ -5,9 +5,12 @@
 	export let nextBranch = '';
 	export let layer = 1;
 	let text = '';
+	let textEditIndex = -1;
+	let editValue = '';
 
-	// TODO: option to add requirement to select a choice (check inventory)
-	// should be selected from effectors
+	let choiceEditIndex = -1;
+	let choiceLabel = '';
+	let choiceText = '';
 
 	function toggleNextBranch(next: string) {
 		nextBranch = nextBranch === next ? '' : next;
@@ -27,6 +30,9 @@
 
 	function attemptDelete(next: string) {
 		dialogueTree.removeChoice(currentBranch, next);
+		choiceEditIndex = -1;
+		choiceLabel = '';
+		choiceText = '';
 	}
 
 	$: if (currentBranch !== '' && !$dialogueTree.has(currentBranch)) {
@@ -38,13 +44,6 @@
 		$dialogueTree.get(currentBranch)?.length === 0 ||
 		(typeof $dialogueTree.get(currentBranch)?.at(-1) !== 'string' &&
 			$dialogueTree.get(currentBranch)?.at(-1)?.length === 4);
-
-	let textEditIndex = -1;
-	let editValue = '';
-
-	let choiceEditIndex = -1;
-	let choiceLabel = '';
-	let choiceText = '';
 </script>
 
 <svelte:window

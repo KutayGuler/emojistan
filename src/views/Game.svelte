@@ -87,20 +87,16 @@
 	}
 
 	for (let [id, interactable] of structuredClone(interactables)) {
-		const { emoji, sideEffects, triggers, ...args } = interactable;
+		const { emoji, sideEffects, ...args } = interactable;
 		if (!emoji || !sideEffects) continue;
 		_interactables[emoji] = {} as _Interactable;
 		Object.assign(_interactables[emoji], args);
 		_interactables[emoji].id = id;
 		_interactables[emoji].sideEffects = {};
 
-		// FIXME: triggers returns as an object
-
-		for (let [id, effect] of sideEffects) {
+		for (let [id, effect, triggerID] of sideEffects) {
 			if (effect == 'trigger') {
-				let sequenceID = triggers.get(id);
-				let sequencer = structuredClone(sequencers.get(sequenceID));
-
+				let sequencer = structuredClone(sequencers.get(triggerID));
 				effect = sequencer?.sequence || [];
 			}
 
@@ -112,10 +108,6 @@
 			let effector = structuredClone(effectors.get(id));
 			if (!effector) continue;
 			_interactables[emoji].sideEffects[effector.emoji] = effect;
-		}
-
-		for (let [effectorID, sequenceID] of triggers) {
-			let sequence = structuredClone(sequencers.get(sequenceID));
 		}
 
 		const dropsID = _interactables[emoji].drops[0];
@@ -897,6 +889,7 @@
 				{dialogueID}
 				dialogueTree={dt}
 				on:end={(e) => {
+					// @ts-expect-error
 					entities.get(`${currentSection}_${ac}`).history = e.detail.history;
 					chatting = false;
 				}}

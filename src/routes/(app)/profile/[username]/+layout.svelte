@@ -41,8 +41,6 @@
 			notifications.warning('This username is already taken.');
 		}
 	}
-
-	// TODO: profile edit bio
 </script>
 
 {#if data.profileNotCreated}

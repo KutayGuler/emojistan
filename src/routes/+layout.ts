@@ -9,9 +9,7 @@ import { liked_game_ids } from '$src/store';
 import { browser } from '$app/environment';
 
 export const load: LayoutLoad = async ({ fetch, data, depends }) => {
-	depends('supabase:auth');
-	
-	
+	// depends('supabase:auth');
 
 	const supabase = createSupabaseLoadClient<Database>({
 		supabaseUrl: PUBLIC_SUPABASE_URL,

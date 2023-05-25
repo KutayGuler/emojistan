@@ -11,7 +11,7 @@
 		Interactable,
 		type Drops,
 		type SideEffect,
-		type MapLocation,
+		type SideEffectArray,
 	} from '$src/types';
 	import { onDestroy, onMount } from 'svelte';
 	import { notifications } from '../routes/notifications';
@@ -49,10 +49,7 @@
 	export let emoji = '';
 	export let sequenceID: StringedNumber = '-1';
 	export let hp = 1;
-	export let sideEffects: Array<[StringedNumber | 'any', SideEffect]> = [
-		['any', 'talk'],
-	];
-	export let triggers: Array<[StringedNumber | 'any', StringedNumber]> = [];
+	export let sideEffects: SideEffectArray = [['any', 'talk', 'none']];
 	export let pseudoSideEffects: Array<[string | 'any', number]> = [];
 	export let evolve = new Evolve('', 2);
 	export let devolve = new Devolve('');
@@ -61,21 +58,11 @@
 	onMount(() => {
 		let obj = $interactables.get(id);
 		if (obj) {
-			({
-				emoji,
-				sequenceID,
-				hp,
-				sideEffects,
-				triggers,
-				evolve,
-				devolve,
-				drops,
-			} = obj);
+			({ emoji, sequenceID, hp, sideEffects, evolve, devolve, drops } = obj);
 		}
 	});
 
 	function updateStore() {
-		console.log(triggers);
 		interactables.update(
 			id,
 			new Interactable(
@@ -83,7 +70,6 @@
 				sequenceID,
 				hp,
 				sideEffects,
-				triggers,
 				evolve,
 				devolve,
 				drops
@@ -109,7 +95,10 @@
 		updateStore();
 	});
 
-	function addTosideEffects(effectorID: StringedNumber | 'any') {
+	function addTosideEffects(
+		effectorID: StringedNumber | 'any',
+		triggerID: StringedNumber | 'none'
+	) {
 		if (sideEffects.some(([id, val]) => id === effectorID)) return;
 		if (sideEffects.length === MAX_SIDE_EFFECT) {
 			notifications.warning(
@@ -117,7 +106,7 @@
 			);
 			return;
 		}
-		sideEffects.push([effectorID, 0]);
+		sideEffects.push([effectorID, 0, triggerID]);
 		sideEffects = sideEffects;
 		updateStore();
 	}
@@ -180,8 +169,6 @@
 	$: hasInteraction = sideEffects.some((m) => m[1] != 0);
 	$: droppables = [...$effectors].filter(([id, e]) => e.emoji != '');
 	$: evolve.at = hp > evolve.at ? hp + 1 : evolve.at;
-
-	// TODO: change sideEffects to [effectorID, value, triggerID]
 </script>
 
 <div class="absolute -top-8 flex flex-row items-center justify-center gap-2">
@@ -262,7 +249,7 @@
 						{#each droppables as [id, { emoji }]}
 							<button
 								class="rounded-md p-1 hover:bg-base-200"
-								on:click={() => addTosideEffects(id)}
+								on:click={() => addTosideEffects(id, 'none')}
 							>
 								<i class="twa twa-{emoji}" />
 							</button>
@@ -283,29 +270,16 @@
 			<div
 				class="flex w-fit flex-wrap items-start justify-start gap-x-9 gap-y-14"
 			>
-				{#each sideEffects as [effectorID, value], i}
+				{#each sideEffects as [effectorID, value, triggerID], i}
 					{@const modifierEmoji = $effectors.get(effectorID)?.emoji}
 					<div class="relative flex flex-col items-center">
 						{#if value == 'trigger'}
 							<select
 								title="Sequencer name"
 								name="Sequence name"
-								class="select-bordered select select-sm absolute -bottom-10"
-								on:change={(e) => {
-									let index = triggers.findIndex(
-										([_id, _]) => _id == effectorID
-									);
-
-									if (index >= 0) {
-										// @ts-expect-error
-										triggers[index] = [effectorID, e.target.value];
-									} else {
-										// @ts-expect-error
-										triggers.push([effectorID, e.target.value]);
-									}
-
-									updateStore();
-								}}
+								class="select-bordered select select-sm absolute -bottom-10 border-amber-500"
+								bind:value={triggerID}
+								on:change={updateStore}
 							>
 								<option value="none">none</option>
 								{#each [...$sequencers] as [id, sequencer]}
@@ -329,10 +303,7 @@
 						<select
 							class="select-bordered select select-sm absolute -bottom-4"
 							bind:value
-							on:change={() => {
-								triggers.filter(([_id, _]) => _id == effectorID);
-								updateStore();
-							}}
+							on:change={updateStore}
 						>
 							{#each modifierPoints as point}
 								<option value={point}
@@ -395,9 +366,7 @@
 					class="select-bordered select select-sm text-xl"
 					title="HP"
 					bind:value={drops[1]}
-					on:change={() => {
-						updateStore();
-					}}
+					on:change={updateStore}
 				>
 					{#each [0, ...hps] as _hp}
 						<option value={_hp}>{_hp}</option>
