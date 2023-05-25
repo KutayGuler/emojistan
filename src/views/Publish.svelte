@@ -10,6 +10,8 @@
 		// supabase
 	}
 
+	// TODO: huntabyte authentication stuff
+
 	function unpublish() {
 		modal.show({
 			content:

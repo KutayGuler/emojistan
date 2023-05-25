@@ -6,6 +6,9 @@
 	export let layer = 1;
 	let text = '';
 
+	// TODO: option to add requirement to select a choice (check inventory)
+	// should be selected from effectors
+
 	function toggleNextBranch(next: string) {
 		nextBranch = nextBranch === next ? '' : next;
 	}

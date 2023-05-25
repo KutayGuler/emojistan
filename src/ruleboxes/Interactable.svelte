@@ -52,7 +52,7 @@
 	export let sideEffects: Array<[StringedNumber | 'any', SideEffect]> = [
 		['any', 'talk'],
 	];
-	export let triggers = new Map<StringedNumber | 'any', StringedNumber>();
+	export let triggers: Array<[StringedNumber | 'any', StringedNumber]> = [];
 	export let pseudoSideEffects: Array<[string | 'any', number]> = [];
 	export let evolve = new Evolve('', 2);
 	export let devolve = new Devolve('');
@@ -176,17 +176,12 @@
 		}
 	}
 
-	function useTrigger(node: Element, id: string) {
-		console.log(node.value);
-		// TODO: swithc triggers from set to array of [id, val]
-		triggers.set(id as StringedNumber, node.value);
-		console.log(triggers);
-	}
-
 	let hasInteraction = true;
 	$: hasInteraction = sideEffects.some((m) => m[1] != 0);
 	$: droppables = [...$effectors].filter(([id, e]) => e.emoji != '');
 	$: evolve.at = hp > evolve.at ? hp + 1 : evolve.at;
+
+	// TODO: change sideEffects to [effectorID, value, triggerID]
 </script>
 
 <div class="absolute -top-8 flex flex-row items-center justify-center gap-2">
@@ -293,18 +288,26 @@
 					<div class="relative flex flex-col items-center">
 						{#if value == 'trigger'}
 							<select
-								use:useTrigger={effectorID}
 								title="Sequencer name"
-								disabled={$sequencers.size == 0}
 								name="Sequence name"
 								class="select-bordered select select-sm absolute -bottom-10"
 								on:change={(e) => {
-									// @ts-expect-error
-									triggers.set(effectorID, e.target.value);
+									let index = triggers.findIndex(
+										([_id, _]) => _id == effectorID
+									);
+
+									if (index >= 0) {
+										// @ts-expect-error
+										triggers[index] = [effectorID, e.target.value];
+									} else {
+										// @ts-expect-error
+										triggers.push([effectorID, e.target.value]);
+									}
 
 									updateStore();
 								}}
 							>
+								<option value="none">none</option>
 								{#each [...$sequencers] as [id, sequencer]}
 									<option value={id}>{sequencer.name}</option>
 								{/each}
@@ -327,7 +330,7 @@
 							class="select-bordered select select-sm absolute -bottom-4"
 							bind:value
 							on:change={() => {
-								triggers.delete(effectorID);
+								triggers.filter(([_id, _]) => _id == effectorID);
 								updateStore();
 							}}
 						>

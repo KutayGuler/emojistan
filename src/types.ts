@@ -250,7 +250,7 @@ export interface Interactable {
 	sequenceID: StringedNumber;
 	hp: number;
 	sideEffects: Array<[StringedNumber | 'any', SideEffect]>;
-	triggers: Map<StringedNumber | 'any', StringedNumber>;
+	triggers: Array<[StringedNumber | 'any', StringedNumber | "none"]>;
 	evolve: Evolve;
 	devolve: Devolve;
 	drops: Drops;
@@ -262,7 +262,7 @@ export class Interactable {
 		sequenceID: StringedNumber,
 		hp: number,
 		sideEffects: Array<[StringedNumber | 'any', SideEffect]>,
-		triggers: Map<StringedNumber | 'any', StringedNumber>,
+		triggers: Array<[StringedNumber | 'any', StringedNumber | "none"]>,
 		evolve: Evolve,
 		devolve: Devolve,
 		drops: Drops

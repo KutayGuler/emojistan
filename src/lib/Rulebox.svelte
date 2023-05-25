@@ -73,7 +73,10 @@
 		} else if (rbx.type === 'sequencer') {
 			for (let [_, val] of $interactables) {
 				for (let [id, effectType] of val.sideEffects) {
-					if (effectType === 'trigger' && val.triggers.has(id)) {
+					if (
+						effectType === 'trigger' &&
+						val.triggers.some(([_id, tid]) => id == _id && tid == rbx.id)
+					) {
 						modal.show({
 							content: `Remove the trigger from <i class="twa twa-${val.emoji}"></i>'s side effects before deleting it.`,
 							header: 'Existing Relations',

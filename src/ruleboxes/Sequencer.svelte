@@ -26,7 +26,7 @@
 	onMount(() => {
 		let obj = $sequencers.get(id);
 		if (obj) {
-			({ sequence, name } = obj);
+			({ name, sequence } = obj);
 		}
 	});
 
