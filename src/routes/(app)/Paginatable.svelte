@@ -36,7 +36,7 @@
 		if (Array.isArray(_data)) {
 			data = [...data, ..._data];
 		} else if (_error) {
-			notifications.warning("An error occured while trying to get the data.")
+			notifications.warning('An error occured while trying to get the data.');
 		}
 	}
 </script>
@@ -56,7 +56,6 @@
 					bind:div={element}
 				/>
 			{:else}
-				<!-- TODO: figure this animation shit out -->
 				<svelte:component
 					this={component}
 					index={index < paginationCount ? 0 : paginationCount - index}

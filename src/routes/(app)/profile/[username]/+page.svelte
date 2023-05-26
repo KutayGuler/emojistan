@@ -6,7 +6,6 @@
 	let updating = false;
 
 	async function updateBio() {
-		// TODO: email confirmations
 		if (updating) return;
 		updating = true;
 
@@ -19,8 +18,6 @@
 			// @ts-expect-error
 			.update({ bio: data.profileData?.bio })
 			.eq('id', data.profileData?.id);
-
-		console.log(_data, error, rest);
 
 		updating = false;
 		openEdit = false;

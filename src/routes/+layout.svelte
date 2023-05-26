@@ -24,7 +24,6 @@
 				if (username) {
 					notifications.success('Logged in as ' + username);
 				}
-				console.log(data);
 			}
 		});
 

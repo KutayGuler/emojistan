@@ -86,8 +86,6 @@
 	}
 
 	async function updateGame() {
-		console.log($map);
-
 		if (!map.hasControllable()) {
 			notifications.warning('No controllable found in the starting section.');
 			return;

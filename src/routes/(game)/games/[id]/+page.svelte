@@ -12,7 +12,6 @@
 			.eq('id', $page.params.id);
 
 		let gameData: any = _data[0].data;
-		console.log(gameData);
 
 		if (error) {
 			throw error;
@@ -23,14 +22,12 @@
 			}
 
 			for (let [key, val] of Object.entries(gameData.map)) {
-				console.log(val);
 				if (key == 'dbg' || key == 'ssi') continue;
 				gameData.map[key] = new Map(val);
 			}
 
 			gameData.map.ssi = parseInt(gameData.map.ssi);
 
-			console.log(gameData);
 			return gameData;
 		}
 	}

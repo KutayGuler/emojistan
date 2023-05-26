@@ -102,8 +102,8 @@
 
 						return async ({ update, result }) => {
 							await update();
-							console.log(result);
-								// @ts-expect-error
+
+							// @ts-expect-error
 							if (result.message) {
 								// @ts-expect-error
 								notifications.warning(result.message);

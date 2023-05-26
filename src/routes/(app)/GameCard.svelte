@@ -12,8 +12,6 @@
 
 	let loading = false;
 
-	// TODO: player should be able to download their published games
-
 	async function toggleLike() {
 		if (loading) return;
 		liked = !liked;
