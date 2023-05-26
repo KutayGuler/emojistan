@@ -65,8 +65,7 @@
 							'service-dog',
 							'-1',
 							1,
-							[['any', 'talk']],
-							new Map(),
+							[['any', 'talk', 'none']],
 							new Evolve('', 0),
 							new Devolve(''),
 							['-9', 0]
@@ -99,7 +98,7 @@
 				id: '5',
 				emoji: 'evergreen-tree',
 				hp: 3,
-				sideEffects: [['any', 0]],
+				sideEffects: [['any', 0, 'none']],
 				pseudoSideEffects: [['axe', -1]],
 				// @ts-expect-error
 				drops: ['wood', 2],
@@ -134,10 +133,9 @@
 							'-1',
 							3,
 							[
-								['any', 0],
-								['2', -1],
+								['any', 0, 'none'],
+								['2', -1, 'none'],
 							],
-							new Map(),
 							new Evolve('', 0),
 							new Devolve(''),
 							['6', 2]

@@ -3,9 +3,7 @@ import type { PageServerLoad } from "./$types";
 import { AuthApiError } from "@supabase/supabase-js";
 
 // @ts-expect-error
-export async function load({ locals: { getSession }, depends }): PageServerLoad {
-	// depends('supabase:auth');
-
+export async function load({ locals: { getSession } }): PageServerLoad {
   const session = await getSession();
 
   if (session) {

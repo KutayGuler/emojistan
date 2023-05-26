@@ -15,7 +15,6 @@
 			...rest
 		} = await data.supabase
 			.from('profiles')
-			// @ts-expect-error
 			.update({ bio: data.profileData?.bio })
 			.eq('id', data.profileData?.id);
 
