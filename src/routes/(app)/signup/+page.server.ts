@@ -5,7 +5,7 @@ import type { PageServerLoad } from "./$types";
 export async function load({ locals: { getSession } }): PageServerLoad {
   const session = await getSession();
 
-  // TODO: huntabyte
+  // TODO: huntabyt
 
   if (session) {
     throw redirect(302, "/");
