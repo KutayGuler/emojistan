@@ -1,8 +1,9 @@
 <script lang="ts">
-	import supabase from '$api/supabase';
 	import { notifications } from '$src/routes/notifications';
 
 	// TODO: Google, Facebook Providers
+
+	export let data;
 
 	let resolved = true;
 
@@ -18,7 +19,7 @@
 		resolved = false;
 		showDots();
 
-		supabase.auth
+		data.supabase.auth
 			.signUp({
 				email,
 				password,

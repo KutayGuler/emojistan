@@ -292,6 +292,28 @@ function createEditableMap() {
 				}
 				return state;
 			}),
+		hasControllable: () => {
+			let _hasControllable = false;
+
+			update((state) => {
+				let controllableEmojis = []
+	
+				for (let { emoji } of get(controllables).values()) {
+					controllableEmojis.push(emoji)
+				}
+				
+				for (let [key, val] of state.items.entries()) {
+					if (state.ssi == +key.split("_")[0] && controllableEmojis.includes(val)) {
+						_hasControllable = true;
+						return state;
+					}
+				}
+				
+				return state;
+			})
+
+			return _hasControllable
+		}
 	};
 }
 

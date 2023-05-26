@@ -26,6 +26,7 @@
 	.btn,
 	.btn:hover,
 	.btn:focus,
+	.textarea-bordered,
 	.select-bordered,
 	.input-bordered {
 		@apply brutal;

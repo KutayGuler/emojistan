@@ -138,6 +138,11 @@
 	}
 
 	function toggleTest() {
+		if (!map.hasControllable()) {
+			notifications.warning("No controllable found in the starting section.");
+			return;
+		}
+
 		test = !test;
 		if (!test) {
 			$currentEmoji = '';

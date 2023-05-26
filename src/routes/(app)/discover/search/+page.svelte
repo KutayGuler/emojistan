@@ -1,7 +1,8 @@
 <script lang="ts">
-	import supabase from '$api/supabase';
 	import GameCard from '../../GameCard.svelte';
 	import ProfileCard from '../../ProfileCard.svelte';
+
+	export let data;
 
 	let searchType: 'games' | 'profiles' = 'games';
 	let query = '';
@@ -22,7 +23,7 @@
 		searching = true;
 		let column = searchType == 'games' ? 'name' : 'username';
 
-		const { data, error } = await supabase
+		const { data: _data, error } = await data.supabase
 			.from(searchType)
 			.select()
 			.textSearch(column, query);
@@ -32,9 +33,9 @@
 		if (error) {
 			searchError = true;
 			searchResult = [];
-		} else if (data) {
+		} else if (_data) {
 			cache.set(searchType + '_' + query.toLowerCase(), data);
-			searchResult = data;
+			searchResult = _data;
 		}
 	}
 </script>

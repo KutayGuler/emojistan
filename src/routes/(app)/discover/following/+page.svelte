@@ -2,11 +2,10 @@
 	import Paginatable from '../../Paginatable.svelte';
 	import GameCard from '../../GameCard.svelte';
 	import type { PageData } from '../$types';
-	import supabase from '$api/supabase';
 	export let data: PageData;
 
 	async function supabaseQuery(from: number, to: number) {
-		const res = await supabase
+		const res = await data.supabase
 			.from('games')
 			.select('name, id, profile:profiles!games_user_id_fkey(username)')
 			.in('user_id', data.following_ids)

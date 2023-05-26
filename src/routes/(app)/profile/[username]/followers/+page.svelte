@@ -1,12 +1,11 @@
 <script lang="ts">
 	import Paginatable from '$src/routes/(app)/Paginatable.svelte';
-	import supabase from '$api/supabase';
 	import type { PageData } from '../$types';
 	import ProfileCard from '$src/routes/(app)/ProfileCard.svelte';
 	export let data: PageData;
 
 	async function supabaseQuery(from: number, to: number) {
-		const res = await supabase
+		const res = await data.supabase
 			.from('follows')
 			.select(
 				'follower_id, profile:profiles!follows_follower_id_fkey(username)'

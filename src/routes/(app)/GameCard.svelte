@@ -2,7 +2,6 @@
 	import { fly } from 'svelte/transition';
 	import { page } from '$app/stores';
 	import { liked_game_ids } from '$src/store';
-	import supabase from '$api/supabase';
 	export let index = 0;
 	export let id: string;
 	export let name: string;
@@ -13,20 +12,22 @@
 
 	let loading = false;
 
+	// TODO: player should be able to download their published games
+
 	async function toggleLike() {
 		if (loading) return;
 		liked = !liked;
 		loading = true;
 
 		if (!liked) {
-			const { data, error } = await supabase
+			const { data, error } = await $page.data.supabase
 				.from('likes')
 				.delete()
 				.match({ liker_id: $page.data.session?.user.id, game_id: id });
 
 			$liked_game_ids.delete(id);
 		} else {
-			const { data, error } = await supabase
+			const { data, error } = await $page.data.supabase
 				.from('likes')
 				.insert({ game_id: id, liker_id: $page.data.session?.user.id });
 

@@ -1,5 +1,4 @@
 <script lang="ts">
-	import supabase from '$api/supabase';
 	import type { PageData } from './$types';
 	import { notifications } from '$src/routes/notifications';
 	import { page } from '$app/stores';
@@ -17,13 +16,15 @@
 	];
 
 	async function setUsername() {
-		let { data: usernames, error } = await supabase
+		// if (username.length < 3 || username.length > )
+
+		let { data: usernames, error } = await data.supabase
 			.from('profiles')
 			.select('*')
 			.eq('username', username);
 
 		if (usernames == null || usernames.length == 0) {
-			const { data: res, error } = await supabase
+			const { data: res, error } = await data.supabase
 				.from('profiles')
 				.insert({ id: data.session?.user.id, username });
 
@@ -40,6 +41,34 @@
 		} else {
 			notifications.warning('This username is already taken.');
 		}
+	}
+
+	async function toggleFollow() {
+		let error;
+
+		if (data.youFollow) {
+			const { error: err } = await data.supabase
+				.from('follows')
+				.delete()
+				.eq('follower_id', data.session?.user.id)
+				.eq('following_id', data.profileData.id);
+
+			error = err;
+		} else {
+			const { error: err } = await data.supabase.from('follows').insert({
+				follower_id: data.session?.user.id,
+				following_id: data.profileData?.id,
+			});
+
+			error = err;
+		}
+
+		if (error) {
+			notifications.warning('An error occured.');
+			return;
+		}
+
+		data.youFollow = !data.youFollow;
 	}
 </script>
 
@@ -67,13 +96,23 @@
 	{/if}
 {:else}
 	<div class="flex h-full flex-col gap-4">
-		<div class="flex flex-row items-end gap-4">
+		<div class="flex flex-row items-center justify-start gap-4">
 			<div class="placeholder avatar">
-				<div class="w-16 rounded-full bg-neutral text-neutral-content">
-					<i class="twa twa-alien text-4xl" />
+				<div class="w-12 rounded-full bg-neutral text-neutral-content">
+					<i class="twa twa-alien text-2xl" />
 				</div>
 			</div>
-			<h1 class="text-6xl">{$page.params.username}</h1>
+			<h1 class="text-4xl">{$page.params.username}</h1>
+			{#if !data.isOwner}
+				<button
+					on:click={toggleFollow}
+					class="btn-sm btn {data.youFollow ? 'btn-primary' : ''}"
+					>{data.youFollow ? 'FOLLOWING' : 'FOLLOW'}</button
+				>
+				{#if data.followsYou}
+					<div class="badge badge-sm p-2">Follows You</div>
+				{/if}
+			{/if}
 		</div>
 		<div class="tabs tabs-boxed z-10 w-full">
 			<a

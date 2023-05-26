@@ -857,10 +857,6 @@
 			return;
 		}
 	}
-
-	function noPlayer(rbx: any) {
-		if (ac === -2) dispatch('noPlayer');
-	}
 </script>
 
 <svelte:window on:keydown={handle} />
@@ -880,7 +876,7 @@
 			</div>
 		{/if}
 	{/key}
-	<div class={mapClass} use:noPlayer>
+	<div class={mapClass}>
 		{#if chatting}
 			<Chat
 				isTutorial={SIZE === 4}

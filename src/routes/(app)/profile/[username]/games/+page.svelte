@@ -1,12 +1,11 @@
 <script lang="ts">
 	import Paginatable from '$src/routes/(app)/Paginatable.svelte';
 	import GameCard from '$src/routes/(app)/GameCard.svelte';
-	import supabase from '$api/supabase';
 	import type { PageData } from '../$types';
 	export let data: PageData;
 
 	async function supabaseQuery(from: number, to: number) {
-		let res = await supabase
+		let res = await data.supabase
 			.from('games')
 			.select('id, name, profile:profiles!games_user_id_fkey(username)', {
 				count: 'exact',
