@@ -48,7 +48,20 @@
 				: ''}">{resolved ? 'LOGIN' : 'LOGGING IN...'}</button
 		>
 		<div class="divider text-neutral-content">OR</div>
-		<form action="?/login_with_google">
+		<form action="?/login_with_google" 		use:enhance={() => {
+			resolved = false;
+
+			return async ({ update, result }) => {
+				await update();
+				// @ts-expect-error
+				if (result.data && result.data.error) {
+					// @ts-expect-error
+					notifications.warning(result.data.error);
+				}
+
+				resolved = true;
+			};
+		}}>
 			<button class="btn w-full bg-base-100 text-neutral hover:bg-base-200">
 				LOGIN WITH GOOGLE <svg
 					width="46px"
