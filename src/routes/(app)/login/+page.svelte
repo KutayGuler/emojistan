@@ -48,7 +48,7 @@
 				: ''}">{resolved ? 'LOGIN' : 'LOGGING IN...'}</button
 		>
 		<div class="divider text-neutral-content">OR</div>
-		<form action="?/login_with_google" 		use:enhance={() => {
+		<form action="?/login_with_google" method="POST" class="w-full"	use:enhance={() => {
 			resolved = false;
 
 			return async ({ update, result }) => {
