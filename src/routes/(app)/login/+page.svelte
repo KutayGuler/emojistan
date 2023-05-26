@@ -48,6 +48,7 @@
 				: ''}">{resolved ? 'LOGIN' : 'LOGGING IN...'}</button
 		>
 		<div class="divider text-neutral-content">OR</div>
+		<form action="login_with_google">	
 		<button class="btn w-full bg-base-100 text-neutral hover:bg-base-200">
 			LOGIN WITH GOOGLE <svg
 				width="46px"
@@ -169,6 +170,7 @@
 				</g>
 			</svg>
 		</button>
+	</form>
 		<button class="btn w-full bg-base-100 text-neutral hover:bg-base-200"
 			>LOGIN WITH FACEBOOK &nbsp; <img
 				class="h-6 w-6"
