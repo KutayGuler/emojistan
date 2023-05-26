@@ -34,26 +34,4 @@ export const actions: Actions = {
 
     throw redirect(303, '/')
   },
-
-  login_with_google: async ({ request, locals: { supabase } }) => {
-    const body = Object.fromEntries(await request.formData())
-
-    const { data, error: err } = await supabase.auth.signInWithOAuth({
-			provider: "google"
-		});
-
-    if (err) {
-      if (err instanceof AuthApiError && err.status === 400) {
-        return fail(400, {
-          error: 'Invalid credentials'
-        })
-      }
-
-      return fail(500, {
-        error: 'Server error. Try again later.'
-      })
-    }
-
-    throw redirect(303, '/')
-  }
 };
