@@ -1,36 +1,12 @@
 <script lang="ts">
+	import { enhance } from '$app/forms';
 	import { notifications } from '$src/routes/notifications';
-
-	export let data;
+	import { fly } from 'svelte/transition';
 
 	let resolved = true;
 
 	let dots = ['...', '..', '.', ''];
 	let dotIndex = 0;
-
-	async function signUp() {
-		if (password != confirmPassword) {
-			notifications.warning('Passwords are not matching.');
-			return;
-		}
-
-		resolved = false;
-		showDots();
-
-		data.supabase.auth
-			.signUp({
-				email,
-				password,
-			})
-			.then((res) => {
-				notifications.success('Signed up successfully! Check your email!');
-				resolved = true;
-			})
-			.catch((err) => {
-				notifications.success('An error occured');
-				resolved = true;
-			});
-	}
 
 	function showDots() {
 		if (resolved) {
@@ -44,46 +20,85 @@
 		}, 500);
 	}
 
-	let email: string;
-	let password: string;
-	let confirmPassword: string;
-	// TODO: agree to terms and services
+	let signedUp = false;
 </script>
 
 <div class="flex h-full w-full flex-col items-center justify-center">
-	<form
-		class="flex h-full w-1/2 flex-col items-start justify-center gap-2 pb-32"
-		on:submit|preventDefault={signUp}
-	>
-		<h3 class="pb-8 text-neutral-content">Sign Up</h3>
-		<label class="pl-1 text-sm text-neutral-content" for="email">Email</label>
+	{#if signedUp}
+		<div in:fly class="text-neutral-content">
+			<h1>Signup Successful!</h1>
+			<p>Please check your email for confirmation.</p>
+		</div>
+	{:else}
+		<form
+			action="?/signup"
+			method="POST"
+			class="flex h-full w-1/2 flex-col items-start justify-center gap-2 pb-32"
+			use:enhance={() => {
+				resolved = false;
+				showDots();
 
-		<input
-			type="email"
-			class="input-bordered input w-full"
-			bind:value={email}
-		/>
-		<label class="pl-1 text-sm text-neutral-content" for="password"
-			>Password</label
+				return async ({ update, result }) => {
+					await update();
+					// @ts-expect-error
+					if (result.data && result.data.error) {
+						// @ts-expect-error
+						notifications.warning(result.data.error);
+					} else {
+						signedUp = true;
+					}
+
+					resolved = true;
+				};
+			}}
 		>
-		<input
-			type="password"
-			class="input-bordered input w-full"
-			bind:value={password}
-		/>
-		<label class="pl-1 text-sm text-neutral-content" for="password"
-			>Confirm password</label
-		>
-		<input
-			type="password"
-			class="input-bordered input w-full"
-			bind:value={confirmPassword}
-		/>
-		<button
-			type="submit"
-			class="btn-primary btn w-full {!resolved
-				? 'pointer-events-none bg-transparent text-primary'
-				: ''}">{resolved ? 'SIGN UP' : 'SIGNING UP' + dots[dotIndex]}</button
-		>
-	</form>
+			<h3 class="pb-8 text-neutral-content">Sign Up</h3>
+			<label class="pl-1 text-sm text-neutral-content" for="email">Email</label>
+			<input
+				required
+				name="email"
+				type="email"
+				class="input-bordered input w-full"
+			/>
+			<label class="pl-1 text-sm text-neutral-content" for="password"
+				>Password</label
+			>
+			<input
+				minlength="8"
+				maxlength="36"
+				required
+				name="password"
+				type="password"
+				class="input-bordered input w-full"
+			/>
+			<label class="pl-1 text-sm text-neutral-content" for="password"
+				>Confirm password</label
+			>
+			<input
+				minlength="8"
+				maxlength="36"
+				required
+				name="passwordConfirm"
+				type="password"
+				class="input-bordered input w-full"
+			/>
+			<div class="form-control w-full">
+				<label class="label cursor-pointer">
+					<span class="label-text text-neutral-content"
+						>I have read the <a class="link-primary link" href="/terms">Terms</a
+						>
+						and
+						<a class="link-primary link" href="/privacy">Privacy</a></span
+					>
+					<input required type="checkbox" class="checkbox-primary checkbox" />
+				</label>
+			</div>
+			<button
+				type="submit"
+				class="btn-primary btn w-full {!resolved
+					? 'pointer-events-none bg-transparent text-primary'
+					: ''}">{resolved ? 'SIGN UP' : 'SIGNING UP' + dots[dotIndex]}</button
+			>
+		</form>
+	{/if}
 </div>

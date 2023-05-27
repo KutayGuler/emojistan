@@ -7,10 +7,10 @@
 	async function supabaseQuery(from: number, to: number) {
 		let res = await data.supabase
 			.from('games')
-			.select('id, name, profile:profiles!games_user_id_fkey(username)', {
+			.select('id, name, description, profile:profiles!games_user_id_fkey(username)', {
 				count: 'exact',
 			})
-			.eq('user_id', data.profileData.id)
+			.eq('user_id', data.profileData?.id)
 			.range(from, to);
 
 		return res;

@@ -7,8 +7,8 @@
 	async function supabaseQuery(from: number, to: number) {
 		let res = await data.supabase
 			.from('likes')
-			.select('games(id, name), profile:profiles(username)')
-			.eq('liker_id', data.profileData.id)
+			.select('games(id, name, description), profile:profiles(username)')
+			.eq('liker_id', data.profileData?.id)
 			.order('created_at', { ascending: false })
 			.range(from, to);
 

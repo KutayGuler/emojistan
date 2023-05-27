@@ -2,6 +2,21 @@
 	import { enhance } from '$app/forms';
 	import { notifications } from '$src/routes/notifications';
 	let resolved = true;
+
+	let dots = ['...', '..', '.', ''];
+	let dotIndex = 0;
+
+	function showDots() {
+		if (resolved) {
+			return;
+		}
+
+		let timeout = setTimeout(() => {
+			dotIndex = (dotIndex + 1) % dots.length;
+			showDots();
+			clearTimeout(timeout);
+		}, 500);
+	}
 </script>
 
 <div class="flex h-full w-full flex-col items-center justify-center">
@@ -11,6 +26,7 @@
 		class="form-control flex h-full w-1/2 flex-col items-start justify-center gap-2 pb-32"
 		use:enhance={() => {
 			resolved = false;
+			showDots();
 
 			return async ({ update, result }) => {
 				await update();
@@ -45,7 +61,7 @@
 			type="submit"
 			class="btn-primary btn w-full {!resolved
 				? 'pointer-events-none bg-transparent text-primary'
-				: ''}">{resolved ? 'LOGIN' : 'LOGGING IN...'}</button
+				: ''}">{resolved ? 'LOGIN' : 'LOGGING IN' + dots[dotIndex]}</button
 		>
 	</form>
 </div>

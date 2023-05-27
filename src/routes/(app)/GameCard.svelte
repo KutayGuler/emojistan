@@ -5,6 +5,7 @@
 	export let index = 0;
 	export let id: string;
 	export let name: string;
+	export let description: string;
 	export let profile: any;
 	export let emojis = new Set<string>();
 	export let div: HTMLDivElement | null = null;
@@ -43,11 +44,7 @@
 	class="brutal relative mb-2 flex flex-col rounded-lg bg-slate-300 p-4 text-neutral"
 >
 	<h3>{name}</h3>
-	<p class="text-md text-slate-500">
-		Lorem ipsum dolor sit amet consectetur adipisicing elit. Exercitationem
-		doloribus unde quae? Soluta vel deserunt ipsam aliquam amet esse officia
-		impedit, illum est, vitae placeat?
-	</p>
+	<p class="text-md text-slate-500">{description}</p>
 	<div class="flex flex-row gap-2">
 		{#each [...emojis.keys()] as emoji}
 			<i class="twa text-4xl twa-{emoji}" />

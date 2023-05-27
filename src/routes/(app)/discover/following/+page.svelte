@@ -7,7 +7,7 @@
 	async function supabaseQuery(from: number, to: number) {
 		const res = await data.supabase
 			.from('games')
-			.select('name, id, profile:profiles!games_user_id_fkey(username)')
+			.select('id, name, description, profile:profiles!games_user_id_fkey(username)')
 			.in('user_id', data.following_ids)
 			.range(0, 9);
 

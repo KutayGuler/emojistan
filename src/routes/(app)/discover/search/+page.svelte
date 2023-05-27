@@ -1,6 +1,7 @@
 <script lang="ts">
 	import GameCard from '../../GameCard.svelte';
 	import ProfileCard from '../../ProfileCard.svelte';
+	import supabase from '$api/supabase';
 
 	export let data;
 
@@ -23,7 +24,7 @@
 		searching = true;
 		let column = searchType == 'games' ? 'name' : 'username';
 
-		const { data: _data, error } = await data.supabase
+		const { data: _data, error } = await supabase
 			.from(searchType)
 			.select()
 			.textSearch(column, query);

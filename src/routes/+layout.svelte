@@ -31,6 +31,14 @@
 	});
 </script>
 
+<svelte:head>
+	<script
+		defer
+		data-domain="emojistan.app"
+		src="https://plausible.io/js/script.js"
+	></script>
+</svelte:head>
+
 <Toast />
 
 <Modal />
