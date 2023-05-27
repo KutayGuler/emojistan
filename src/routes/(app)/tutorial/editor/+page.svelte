@@ -71,6 +71,20 @@
 
 <svelte:head>
 	<title>Emojistan | Tutorial - Editor</title>
+	<meta name="description" content="Tutorial with step by step videos showing how to use the Emojistan editor." />
+	<script type="application/ld+json">
+    {
+      "@context": "https://schema.org/",
+      "@type": "Tutorial",
+      "name": "Editor",
+      "author": {
+        "@type": "Person",
+        "name": "Kutay Güler"
+      },
+      "datePublished": "2023-05-27",
+      "description": "Tutorial with step by step videos showing how to use the Emojistan editor.",
+    }
+	</script>
 </svelte:head>
 
 <div

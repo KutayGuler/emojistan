@@ -76,6 +76,20 @@
 
 <svelte:head>
 	<title>Emojistan | Tutorial - Controls</title>
+	<meta name="description" content="A list of keyboard controls" />
+	<script type="application/ld+json">
+    {
+      "@context": "https://schema.org/",
+      "@type": "Tutorial",
+      "name": "Controls",
+      "author": {
+        "@type": "Person",
+        "name": "Kutay Güler"
+      },
+      "datePublished": "2023-05-27",
+      "description": "A list of keyboard controls",
+    }
+	</script>
 </svelte:head>
 
 <div
@@ -105,12 +119,6 @@
 				<kbd class="kbd md:kbd-sm">D</kbd>
 			</div>
 		</div>
-		<!-- <div class="flex flex-col items-center justify-center">
-			<p>Switch Player</p>
-			<div class="flex w-full justify-center gap-2">
-				<kbd class="kbd md:kbd-sm">R</kbd>
-			</div>
-		</div> -->
 		<div class="flex flex-col items-center justify-center">
 			<p>Interact</p>
 			<kbd class="kbd px-12 md:kbd-sm">Space</kbd>

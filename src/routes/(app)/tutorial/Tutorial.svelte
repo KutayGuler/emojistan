@@ -26,6 +26,24 @@
 	}
 </script>
 
+<svelte:head>
+	<title>Emojistan | Tutorial - {header}</title>
+	<meta name="description" content={description} />
+	<script type="application/ld+json">
+    {
+      "@context": "https://schema.org/",
+      "@type": "Tutorial",
+      "name": {{header}},
+      "author": {
+        "@type": "Person",
+        "name": "Kutay Güler"
+      },
+      "datePublished": "2023-05-27",
+      "description": {{description}},
+    }
+	</script>
+</svelte:head>
+
 <div
 	class="relative flex h-full w-full flex-row items-start justify-start gap-4"
 >

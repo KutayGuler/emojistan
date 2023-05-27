@@ -79,10 +79,6 @@
 	};
 </script>
 
-<svelte:head>
-	<title>Emojistan | Tutorial - Merger</title>
-</svelte:head>
-
 <Tutorial {...tutorialProps} --header={MERGER_BORDER}>
 	<div slot="description">
 		Merger takes three emoji inputs. To put it simply,

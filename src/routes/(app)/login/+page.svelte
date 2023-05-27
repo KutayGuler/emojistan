@@ -19,6 +19,11 @@
 	}
 </script>
 
+<svelte:head>
+	<title>Emojistan | Login</title>
+	<meta name="description" content="Login to access your Emojistan account." />
+</svelte:head>
+
 <div class="flex h-full w-full flex-col items-center justify-center">
 	<form
 		action="?/login"

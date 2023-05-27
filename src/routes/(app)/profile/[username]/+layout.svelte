@@ -72,6 +72,11 @@
 	}
 </script>
 
+<svelte:head>
+	<title>Emojistan | {username}</title>
+	<meta name="description" content={data.profileData?.bio || ""} />
+</svelte:head>
+
 {#if data.profileNotCreated}
 	{#if data.isOwner}
 		<h2>

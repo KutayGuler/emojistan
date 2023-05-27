@@ -23,6 +23,14 @@
 	let signedUp = false;
 </script>
 
+<svelte:head>
+	<title>Emojistan | Sign Up</title>
+	<meta
+		name="description"
+		content="Sign up to Emojistan to share your games with other players."
+	/>
+</svelte:head>
+
 <div class="flex h-full w-full flex-col items-center justify-center">
 	{#if signedUp}
 		<div in:fly class="text-neutral-content">
