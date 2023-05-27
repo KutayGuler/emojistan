@@ -89,7 +89,7 @@
 			</div>
 		{:else if searchType == 'profiles'}
 			<div class="flex h-full flex-wrap gap-2 overflow-y-auto">
-				<ProfileCard username={result.username} />
+				<ProfileCard profile={result} />
 			</div>
 		{/if}
 	{/each}
