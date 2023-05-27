@@ -29,6 +29,24 @@
 	];
 </script>
 
+<svelte:head>
+	<meta
+		name="description"
+		content="Emojistan is a game platform and a pseudo game engine where you can make your own games and share them with the world."
+	/>
+	<meta
+		name="keywords"
+		content="emoji, free games, online games, building games, virtual worlds, game engine"
+	/>
+	<meta property="og:type" content="website" />
+	<meta property="og:title" content="Emojistan" />
+	<meta property="og:url" content="https://emojistan.app/" />
+	<meta
+		property="og:description"
+		content="Emojistan is the place where emojis are interactive. Create and share emoji worlds to your own liking with it's easy to use editor."
+	/>
+</svelte:head>
+
 <main
 	class="relative flex h-screen w-screen items-start justify-start gap-4 p-4"
 >
