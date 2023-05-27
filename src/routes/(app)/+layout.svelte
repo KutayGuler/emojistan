@@ -38,14 +38,24 @@
 		name="keywords"
 		content="emoji, free games, online games, building games, virtual worlds, game engine"
 	/>
+	<meta property="og:url" content="https://emojistan.app/" />
 	<meta property="og:type" content="website" />
 	<meta property="og:title" content="Emojistan" />
-	<meta property="og:url" content="https://emojistan.app/" />
 	<meta property="og:image" content="/images/cover.png" />
 	<meta
 		property="og:description"
 		content="Emojistan is the place where emojis are interactive. Create emoji worlds to your own liking and share them with the world!"
 	/>
+
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta property="twitter:domain" content="emojistan.app" />
+	<meta property="twitter:url" content="https://emojistan.app/" />
+	<meta name="twitter:title" content="Emojistan" />
+	<meta
+		name="twitter:description"
+		content="Emojistan is the place where emojis are interactive. Create emoji worlds to your own liking and share them with the world!"
+	/>
+	<meta name="twitter:image" content="https://emojistan.app/images/cover.png" />
 </svelte:head>
 
 <main
