@@ -44,7 +44,7 @@
 	<meta property="og:image" content="/images/cover.png" />
 	<meta
 		property="og:description"
-		content="Emojistan is the place where emojis are interactive. Create and share emoji worlds to your own liking with it's easy to use editor."
+		content="Emojistan is the place where emojis are interactive. Create emoji worlds to your own liking and share them with the world!"
 	/>
 </svelte:head>
 
