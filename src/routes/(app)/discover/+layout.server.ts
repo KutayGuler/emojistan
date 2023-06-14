@@ -7,7 +7,7 @@ export const load: LayoutServerLoad = async ({
 
 let { data: newGames, error } = await supabase
   .from('games')
-  .select('id, name, profile:profiles!games_user_id_fkey(username)')
+  .select('id, name, description, profile:profiles!games_user_id_fkey(username)')
   .order('created_at', { ascending: false})
   .range(0, 9)
 
@@ -24,7 +24,7 @@ let { data: newGames, error } = await supabase
     
     const { data, error } = await supabase
       .from('games')
-      .select('name, id, profile:profiles!games_user_id_fkey(username)')
+      .select('name, id, description, profile:profiles!games_user_id_fkey(username)')
       .in('user_id', following_ids)
       .range(0, 9)
       

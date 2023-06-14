@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { CROSS } from '$src/constants';
-	import { dialogueTree } from '$src/store';
+	import { CROSS, EFFECTOR_BORDER, MAX_INVENTORY_SIZE } from '$src/constants';
+	import { dialogueTree, effectors } from '$src/store';
 	export let currentBranch = '';
 	export let nextBranch = '';
 	export let layer = 1;
@@ -44,6 +44,8 @@
 		$dialogueTree.get(currentBranch)?.length === 0 ||
 		(typeof $dialogueTree.get(currentBranch)?.at(-1) !== 'string' &&
 			$dialogueTree.get(currentBranch)?.at(-1)?.length === 4);
+
+	$: droppables = [...$effectors].filter(([id, e]) => e.emoji != '');
 </script>
 
 <svelte:window
@@ -119,7 +121,7 @@
 							<p>{leaf}</p>
 						{/if}
 					</div>
-				{:else}
+				{:else if Array.isArray(leaf)}
 					<div class="mt-4 flex flex-grow flex-row items-start gap-2">
 						{#each leaf as choice, i}
 							{@const chosen = choice.next === nextBranch}
@@ -189,6 +191,57 @@
 												type="text"
 												bind:value={choiceText}
 											/>
+											constraint
+											<div class="dropdown-right dropdown">
+												<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
+												<label
+													for=""
+													tabindex="0"
+													class="btn bg-purple-500 text-2xl"
+													style:background={EFFECTOR_BORDER}
+													>
+													{#if choice.constraint.emoji}
+														 <i class="twa twa-{choice.constraint.emoji}"></i>
+													{:else}
+														 +
+													{/if}
+													<!-- TODO: constraint -->
+												</label
+												>
+												<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
+												<ul
+													tabindex="0"
+													class="dropdown-content menu rounded-box bg-base-100 p-2 shadow"
+												>
+													{#each droppables as [id, { emoji }]}
+														<button
+															on:click={() => {
+																if (choice.constraint.emoji == emoji) {
+																	choice.constraint.emoji == '';
+																	return;
+																}
+																choice.constraint.emoji = emoji;
+															}}
+															class="rounded-md p-1 hover:bg-base-200"
+														>
+															<i class="twa twa-{emoji}" />
+														</button>
+													{:else}
+														<div class="rounded-md p-1">
+															No effectors defined.
+														</div>
+													{/each}
+												</ul>
+											</div>
+											<select
+												class="select-bordered select select-sm"
+												name="constraint"
+												bind:value={choice.constraint.count}
+											>
+												{#each [0, 1, 2, 3, 4, 5, 6, 7, 8] as value}
+													<option {value}>{value}</option>
+												{/each}
+											</select>
 											<button class="btn-primary btn" type="submit">SAVE</button
 											>
 										</form>

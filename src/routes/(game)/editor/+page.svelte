@@ -40,6 +40,7 @@
 	import type { CopyMode, SkinTone } from '$src/types';
 	import RecentlyUsed from './RecentlyUsed.svelte';
 	import Publish from '$src/views/Publish.svelte';
+	import { Canvas } from '@threlte/core';
 
 	onMount(() => {
 		if ($saves.currentSaveID === '') {
@@ -64,7 +65,7 @@
 			sequencers,
 			rbxStore,
 			dialogueTree,
-			recentlyUsed
+			recentlyUsed,
 		]) {
 			store.useStorage($saves.currentSaveID);
 		}
@@ -128,7 +129,7 @@
 		editor: 'world-map|Map Editor',
 		rules: 'books|Ruleboxes',
 		dialogue: 'speech-balloon|Dialogue Editor',
-		publish: 'floppy-disk|Publish'
+		publish: 'floppy-disk|Publish',
 	};
 
 	let viewKey: ViewKey = 'editor';
@@ -139,7 +140,7 @@
 
 	function toggleTest() {
 		if (!map.hasControllable()) {
-			notifications.warning("No controllable found in the starting section.");
+			notifications.warning('No controllable found in the starting section.');
 			return;
 		}
 
@@ -191,23 +192,25 @@
 			<button on:click={toggleTest} class="absolute right-4 top-4 z-10 text-4xl"
 				>{CROSS}</button
 			>
-			<Game
-				map={structuredClone($map)}
-				pushers={$pushers}
-				mergers={$mergers}
-				controllables={$controllables}
-				interactables={$interactables}
-				sequencers={$sequencers}
-				effectors={$effectors}
-				dt={$dialogueTree}
-				on:noPlayer={() => {
-					test = false;
-					notifications.warning('No controllable player in the map.');
-				}}
-				on:quit={() => {
-					test = false;
-				}}
-			/>
+			<Canvas>
+				<Game
+					map={structuredClone($map)}
+					pushers={$pushers}
+					mergers={$mergers}
+					controllables={$controllables}
+					interactables={$interactables}
+					sequencers={$sequencers}
+					effectors={$effectors}
+					dt={$dialogueTree}
+					on:noPlayer={() => {
+						test = false;
+						notifications.warning('No controllable player in the map.');
+					}}
+					on:quit={() => {
+						test = false;
+					}}
+				/>
+			</Canvas>
 			<div
 				class="absolute bottom-8 left-8 flex flex-row items-center md:bottom-4 md:left-4"
 			>
@@ -234,7 +237,7 @@
 			{#if viewKey === 'dialogue'}
 				<DialogueEditor />
 			{:else if viewKey == 'publish'}
-				<Publish></Publish>
+				<Publish />
 			{:else}
 				<div
 					class="relative box-border flex flex-row items-center justify-center"

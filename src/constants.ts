@@ -5,12 +5,10 @@ export const DEFAULT_MAP_CLASS = 'map';
 
 export const MIN_INDEX = 0;
 export const MAX_INDEX = DEFAULT_SIDE_LENGTH * DEFAULT_SIDE_LENGTH;
-export const MIN_DURATION = 50;
 export const MAX_DURATION = 10000;
 export const MIN_ITERATION = 1;
 export const MAX_ITERATION = DEFAULT_SIDE_LENGTH;
 export const MAX_SIDE_EFFECT = 9;
-export const DURATIONS = [50, 100, 200, 500, 1000, 2000, 5000, 10000];
 
 export const DEFAULT_BG = '#718096';
 export const GRAPH_SIZE_2XL = 720;

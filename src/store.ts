@@ -453,7 +453,7 @@ function createRecentlyUsed() {
 				);
 			});
 		},
-		add: (emoji: string) => update((state) => {
+		add: (emoji: string) => emoji != "" && update((state) => {
 			if (state.has(emoji)) {
 				state.delete(emoji);
 				state.add(emoji);

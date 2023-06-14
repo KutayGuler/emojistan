@@ -1,7 +1,6 @@
 <script lang="ts">
 	import {
 		MIN_INDEX,
-		MIN_DURATION,
 		CROSS,
 		palette,
 		DEFAULT_SIDE_LENGTH,
@@ -14,9 +13,14 @@
 		formattedEmoji,
 		sequencers,
 		type StringedNumber,
+		effectors,
 	} from '$src/store';
-	import { SequenceItem, type Actions, Sequencer } from '$src/types';
+	import { SequenceItem, type SequenceActions, Sequencer } from '$src/types';
 	import { onMount } from 'svelte/internal';
+
+	// TODO: damage to player / interactable
+	// TODO: copy any game to your saves
+	// TODO: audio
 
 	export let id: StringedNumber;
 	export let name: string;
@@ -51,14 +55,17 @@
 	}
 
 	const types: {
-		[key in 'Map' | 'Background' | 'Game']: Array<keyof Actions>;
+		[key in 'Map' | 'Background' | 'Game' | 'Inventory']: Array<
+			keyof SequenceActions
+		>;
 	} = {
 		Map: ['spawn', 'destroy'], // 'spawnRTP'
 		Background: ['paint', 'erase'],
 		Game: ['reset', 'complete'],
+		Inventory: ['drop'],
 	};
 
-	const typeDescriptions: { [key in keyof Actions]: string } = {
+	const typeDescriptions: { [key in keyof SequenceActions]: string } = {
 		paint: 'paint\n\nPaint the specificied cell in the current section.',
 		erase:
 			'erase\n\nErase a color from the specified cell in the current section.',
@@ -68,15 +75,17 @@
 		destroy: 'destory\n\nDestroy the emoji in the specified cell.',
 		reset: 'reset\n\nReset the game state to default.',
 		complete: 'complete\n\nComplete the game.',
+		drop: 'drop\n\nDrop an item to players inventory.',
 	};
 
 	const typeIcons: {
-		[key in 'Map' | 'Background' | 'Game']: string;
+		[key in 'Map' | 'Background' | 'Game' | 'Inventory']: string;
 	} = {
 		// Player: '👾',
 		Map: '🗺️',
 		Background: '🖌️',
 		Game: '🎬',
+		Inventory: '🎒',
 	};
 
 	// SEQUENCE RELATED
@@ -86,10 +95,7 @@
 	let background = '';
 
 	function addToSequence() {
-		sequence = [
-			...sequence,
-			new SequenceItem(type, MIN_INDEX, '', 1, MIN_DURATION, ''),
-		];
+		sequence = [...sequence, new SequenceItem(type, MIN_INDEX, '', 1, '')];
 		updateStore();
 		[type, duration, index, background] = [types.Map[0], 0, 0, ''];
 	}
@@ -123,6 +129,8 @@
 		updateStore();
 		openNameEdit = false;
 	}
+
+	$: droppables = [...$effectors].filter(([id, e]) => e.emoji != '');
 </script>
 
 <div class="flex w-full flex-col gap-2 p-4">
@@ -210,6 +218,23 @@
 					{#each indexes as j}
 						<option value={j}>{j}</option>
 					{/each}
+				</select>
+			{:else if s.type === 'drop'}
+				<button class="slot" on:click={() => updateSlot(i)}>
+					<i class="twa twa-{s.emoji}" />
+				</button>
+				{CROSS}
+				<select
+					class="select-bordered select"
+					title="index"
+					id="index"
+					bind:value={s.index}
+					on:change={updateStore}
+				>
+					{#each [1, 2, 3, 4, 5, 6, 7, 8] as j}
+						<option value={j}>{j}</option>
+					{/each}
+					<!-- TODO: turn this into droppables -->
 				</select>
 			{:else if s.type === 'destroy' || s.type === 'erase'}
 				<select

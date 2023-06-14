@@ -6,6 +6,9 @@ const config = {
   resolve: {
     alias: [{ find: "$lib", replacement: "/src/lib" }],
   },
+  ssr: {
+    noExternal: ['three']
+  }
 };
 
 export default config;

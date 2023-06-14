@@ -236,9 +236,7 @@
 					<label
 						for=""
 						tabindex="0"
-						class="btn text-2xl {emoji
-							? 'bg-purple-500'
-							: 'pointer-events bg-purple-100'}"
+						class="btn text-2xl {emoji ? 'bg-purple-500' : 'bg-purple-100'}"
 						style:background={EFFECTOR_BORDER}>+</label
 					>
 					<!-- svelte-ignore a11y-no-noninteractive-tabindex -->

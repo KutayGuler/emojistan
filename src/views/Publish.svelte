@@ -61,6 +61,8 @@
 			return;
 		}
 
+		// TODO if status code is 409, user has to create a profile first
+
 		resolved = false;
 
 		const uuid = crypto.randomUUID();
@@ -80,7 +82,9 @@
 		}
 
 		publishes.set($saves.currentSaveID, uuid);
+		descriptions.set($saves.currentSaveID, description);
 		localStorage.setItem('publishes', JSON.stringify(Array.from(publishes)));
+		localStorage.setItem('descriptions', JSON.stringify(Array.from(descriptions)));
 		notifications.success($saves.currentSaveName + ' got published!');
 		isPublished = true;
 	}
@@ -105,7 +109,7 @@
 			return;
 		}
 
-		publishes.set($saves.currentSaveID, description);
+		descriptions.set($saves.currentSaveID, description);
 		localStorage.setItem(
 			'descriptions',
 			JSON.stringify(Array.from(descriptions))

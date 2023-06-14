@@ -7,7 +7,5 @@ export const POST: RequestHandler = async ({ locals: { supabase } }) => {
     throw error(500, 'Something went wrong logging you out.')
   }
 
-  // FIXME: redirecting also returns 500
-
   throw redirect(303, '/')
 };

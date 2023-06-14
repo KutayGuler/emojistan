@@ -120,7 +120,7 @@ export interface _Collisions {
 	};
 }
 
-export interface Actions {
+export interface SequenceActions {
 	paint(
 		{ index, background }: { index: number; background: string },
 		_start?: number
@@ -137,21 +137,13 @@ export interface Actions {
 	destroy({ index }: { index: number }): void;
 	reset: Function;
 	complete: Function;
-	// addquest
+	/**
+	 * 
+	 * @param index
+	 * index here is actually the count of the dropped item
+	 */
+	drop({ emoji, index }: { emoji: string, index: number }): void;
 }
-
-interface Quest {
-	status: "completed" | "failed" | "in progress"
-	title: string
-	description: string
-	type: string
-	checker: Function
-}
-
-// quests
-// collect 5 stars
-// dialogues will also trigger stuff
-// dialogues will branch based on quests
 
 export interface EditableMap {
 	/**
@@ -192,7 +184,7 @@ export class Sequencer {
 }
 
 export interface SequenceItem {
-	type: keyof Actions;
+	type: keyof SequenceActions;
 	index: number;
 	background: string;
 	duration: number;
@@ -202,17 +194,15 @@ export interface SequenceItem {
 
 export class SequenceItem {
 	constructor(
-		type: keyof Actions,
+		type: keyof SequenceActions,
 		index: number,
 		background: string,
-		duration: number,
 		points: number,
 		emoji: string
 	) {
 		this.type = type;
 		this.index = index;
 		this.background = background;
-		this.duration = duration;
 		this.points = points;
 		this.emoji = emoji;
 	}
@@ -305,17 +295,21 @@ export type Branch =
 	| []
 	| [...texts: Array<string>, lastItem: Array<Choice> | string];
 
+export type ChoiceConstraint = { emoji: string, count: number }
+
 export interface Choice {
 	label: string;
 	text: string;
 	next: string;
+	constraint: ChoiceConstraint
 }
 
 export class Choice {
-	constructor(label: string, text: string, next: string) {
+	constructor(label: string, text: string, next: string, constraint: ChoiceConstraint = { emoji: "", count: 0}) {
 		this.label = label;
 		this.text = text;
-		this.next = next;
+		this.next = next
+		this.constraint = constraint;
 	}
 }
 

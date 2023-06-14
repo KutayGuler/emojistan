@@ -22,6 +22,7 @@
     "@sveltejs/kit": "^1.11.0",
     "@tailwindcss/typography": "^0.5.9",
     "@tauri-apps/cli": "^1.2.3",
+    "@types/three": "^0.152.1",
     "autoprefixer": "^10.4.8",
     "daisyui": "^2.42.1",
     "postcss": "^8.4.16",
@@ -42,8 +43,11 @@
   "dependencies": {
     "@supabase/auth-helpers-sveltekit": "^0.9.4",
     "@supabase/supabase-js": "^2.1.1",
+    "@threlte/core": "^6.0.0-next.7",
+    "@threlte/extras": "^5.0.0-next.13",
     "astar-typescript": "^1.2.6",
     "d3-selection": "^3.0.0",
-    "d3-zoom": "^3.0.0"
+    "d3-zoom": "^3.0.0",
+    "three": "^0.152.2"
   }
 }

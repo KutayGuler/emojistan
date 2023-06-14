@@ -38,7 +38,7 @@ export const load: LayoutServerLoad = async ({
 
 	let games = await supabase
 		.from('games')
-		.select('id, name, profile:profiles!games_user_id_fkey(username)', { count: 'exact' })
+		.select('id, name, description, profile:profiles!games_user_id_fkey(username)', { count: 'exact' })
 		.eq('user_id', profileData[0]?.id)
 		.range(0, 9);
 
@@ -56,7 +56,7 @@ export const load: LayoutServerLoad = async ({
 
 	let likes = await supabase
 		.from('likes')
-		.select('games(id, name), profile:profiles(username)', { count: 'exact' })
+		.select('games(id, name, description), profile:profiles(username)', { count: 'exact' })
 		.eq('liker_id', profileData[0]?.id)
 		.order('created_at', { ascending: false })
 		.range(0, 9);
