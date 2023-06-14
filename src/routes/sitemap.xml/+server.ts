@@ -20,8 +20,9 @@ export async function GET() {
         xmlns:image="https://www.google.com/schemas/sitemap-image/1.1"
         xmlns:video="https://www.google.com/schemas/sitemap-video/1.1"
     >
-        ${routes.map(
-					(route) => `
+        ${routes
+					.map(
+						(route) => `
         <url>
             <loc>${baseURL}${route}</loc>
             <lastmod>2023-06-14T07:48:09Z</lastmod>
@@ -29,7 +30,8 @@ export async function GET() {
             <priority>0.8</priority>
         </url>
         `
-				)}
+					)
+					.join('')}
     </urlset>`.trim(),
 		{
 			headers: {
