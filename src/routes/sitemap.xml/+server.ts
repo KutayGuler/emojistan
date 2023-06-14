@@ -7,7 +7,7 @@ export async function GET() {
 		.filter((x) => !x.includes('[')) // filter out parameterized routes
 		.sort();
 	console.log(routes);
-	const base = import.meta.env.BASE_URL;
+	const baseURL = 'https://emojistan.app';
 
 	return new Response(
 		`
@@ -23,7 +23,7 @@ export async function GET() {
         ${routes.map(
 					(route) => `
         <url>
-            <loc>${base}${route}</loc>
+            <loc>${baseURL}${route}</loc>
             <lastmod>2023-06-14T07:48:09Z</lastmod>
             <changefreq>monthly</changefreq>
             <priority>0.8</priority>
