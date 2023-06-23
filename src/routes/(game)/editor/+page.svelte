@@ -40,7 +40,6 @@
 	import type { CopyMode, SkinTone } from '$src/types';
 	import RecentlyUsed from './RecentlyUsed.svelte';
 	import Publish from '$src/views/Publish.svelte';
-	import { Canvas } from '@threlte/core';
 
 	onMount(() => {
 		if ($saves.currentSaveID === '') {
@@ -103,7 +102,7 @@
 	function fillMap() {
 		if ($currentEmoji === '') return;
 		for (let i = 0; i < DEFAULT_SIDE_LENGTH * DEFAULT_SIDE_LENGTH; i++) {
-			$map.items.set(sectionIndex + '_' + i, $currentEmoji);
+			$map.items.set(`${sectionIndex}_${i}`, $currentEmoji);
 		}
 		$map = $map;
 	}
@@ -192,7 +191,6 @@
 			<button on:click={toggleTest} class="absolute right-4 top-4 z-10 text-4xl"
 				>{CROSS}</button
 			>
-			<Canvas>
 				<Game
 					map={structuredClone($map)}
 					pushers={$pushers}
@@ -210,7 +208,6 @@
 						test = false;
 					}}
 				/>
-			</Canvas>
 			<div
 				class="absolute bottom-8 left-8 flex flex-row items-center md:bottom-4 md:left-4"
 			>
