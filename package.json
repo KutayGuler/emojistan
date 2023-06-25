@@ -24,7 +24,7 @@
     "@tauri-apps/cli": "^1.2.3",
     "@types/three": "^0.152.1",
     "autoprefixer": "^10.4.8",
-    "daisyui": "^3.1.6",
+    "daisyui": "^2.42.1",
     "postcss": "^8.4.16",
     "prettier": "^2.7.1",
     "prettier-plugin-svelte": "^2.8.1",
