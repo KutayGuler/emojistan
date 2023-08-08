@@ -7,7 +7,7 @@ const config = {
   // for more information about preprocessors
   preprocess: preprocess({
     postcss: true,
-    preserve: ['ld+json']
+    preserve: ["ld+json"],
   }),
 
   kit: {
@@ -16,6 +16,14 @@ const config = {
       $api: "src/api",
       $rbx: "src/ruleboxes",
       $src: "src",
+    },
+  },
+
+  vitePlugin: {
+    inspector: {
+      toggleKeyCombo: "control-alt",
+      showToggleButton: "active",
+      toggleButtonPos: "bottom-right",
     },
   },
 };

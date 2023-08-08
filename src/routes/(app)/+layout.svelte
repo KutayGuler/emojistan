@@ -87,36 +87,35 @@
 				{@const isRulebox =
 					href.includes('rule') && $page.url.pathname.includes('rule')}
 				<a
-					class:loading
 					{href}
 					class="btn {isRulebox ? 'glass' : ''}"
 					style:background={href == $page.url.pathname ? background : ''}
-					>{href.replace('/tutorial/', '')}</a
+					>{href.replace('/tutorial/', '')} <span class:loading /></a
 				>
 			{/each}
 			<p class="text-warning">
 				Tutorial is not up to date! New documentation will come soon.
 			</p>
 		{:else}
-			<a
-				href="/saves"
-				class="btn-primary btn w-full {$navigating?.to?.url.pathname.includes(
-					'saves'
-				)
-					? 'loading'
-					: ''}">PLAY</a
+			<a href="/saves" class="btn-primary btn w-full"
+				>PLAY
+				<span
+					class={$navigating?.to?.url.pathname.includes('saves')
+						? 'loading'
+						: ''}
+				/></a
 			>
-			<a
-				href="/tutorial/controls"
-				class="btn-secondary btn {$navigating?.to?.url.pathname.includes('tut')
-					? 'loading'
-					: ''}">TUTORIAL</a
+			<a href="/tutorial/controls" class="btn-secondary btn"
+				>TUTORIAL <span
+					class={$navigating?.to?.url.pathname.includes('tut') ? 'loading' : ''}
+				/></a
 			>
-			<a
-				href="/discover"
-				class="btn-accent btn {$navigating?.to?.url.pathname.includes('disc')
-					? 'loading'
-					: ''}">DISCOVER</a
+			<a href="/discover" class="btn-accent btn"
+				>DISCOVER <span
+					class={$navigating?.to?.url.pathname.includes('disc')
+						? 'loading'
+						: ''}
+				/></a
 			>
 		{/if}
 
