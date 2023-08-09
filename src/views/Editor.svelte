@@ -9,7 +9,7 @@
 		recentlyUsed,
 	} from '../store';
 
-	export let sectionIndex = 0;
+	export let sectionIndex: number;
 	export let copyMode: CopyMode;
 	export let emojiMode: 'Foreground' | 'Background';
 

@@ -7,7 +7,7 @@
 </script>
 
 <label for="recently-used" class="label">
-	<span class="label-text text-xs text-neutral-content 2xl:text-base"
+	<span class="label-text text-xs text-neutral-content md:text-base"
 		>Recently Used
 	</span>
 </label>

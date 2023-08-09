@@ -24,14 +24,13 @@
 		sequencers,
 		recentlyUsed,
 	} from '$src/store';
-	import { CROSS, DEFAULT_SIDE_LENGTH } from '$src/constants';
+	import { CROSS } from '$src/constants';
 	import { notifications } from '../../notifications';
 	import { rbxStore } from '$lib/stores/store';
 
 	import Svelvet from '$lib';
 	import DialogueEditor from './DialogueEditor.svelte';
-	import type { CopyMode, SkinTone } from '$src/types';
-	import RecentlyUsed from './RecentlyUsed.svelte';
+	import type { CopyMode } from '$src/types';
 	import Publish from '$src/views/Publish.svelte';
 	import EmojiSelector from './EmojiSelector.svelte';
 	import Toolbar from './Toolbar.svelte';
@@ -86,28 +85,6 @@
 
 	let copyMode = copyModes[2];
 	let emojiMode: 'Foreground' | 'Background' = 'Foreground';
-
-	function fillMap() {
-		if ($currentEmoji === '') return;
-		for (let i = 0; i < DEFAULT_SIDE_LENGTH * DEFAULT_SIDE_LENGTH; i++) {
-			$map.items.set(`${sectionIndex}_${i}`, $currentEmoji);
-		}
-		$map = $map;
-	}
-
-	function clearMap() {
-		switch (copyMode) {
-			case 'Emoji':
-				map.clearItems(sectionIndex);
-				break;
-			case 'Color':
-				map.clearColors(sectionIndex);
-				break;
-			case 'Both':
-				map.clearAll(sectionIndex);
-				break;
-		}
-	}
 
 	let test = false;
 
@@ -195,7 +172,7 @@
 			</div>
 		{:else}
 			<div
-				class="flex h-full w-full flex-row items-center justify-center gap-4 text-lg 2xl:top-8 2xl:text-2xl"
+				class="flex hidden h-full w-full flex-row items-center justify-center gap-4 text-lg sm:block 2xl:top-8 2xl:text-2xl"
 			>
 				{#each Object.entries(views) as [key, data]}
 					{@const [icon, title] = data.split('|')}
@@ -218,22 +195,28 @@
 				<div
 					class="relative box-border flex flex-row items-center justify-center"
 				>
-					<Toolbar {viewKey} />
+					<Toolbar
+						{deleteTexts}
+						{copyModes}
+						bind:viewKey
+						bind:copyMode
+						bind:emojiMode
+						bind:sectionIndex
+						on:test={toggleTest}
+					/>
 					{#if viewKey === 'editor'}
-						<div class="flex flex-col justify-center px-8">
+						<div class="flex flex-col justify-center px-4 md:x-8">
 							<Editor {sectionIndex} {copyMode} {emojiMode} />
 						</div>
 					{:else if viewKey === 'rules'}
-						<div class="flex flex-col justify-center px-8">
+						<div class="flex flex-col justify-center px-4 md:px-8">
 							<Svelvet />
 						</div>
 					{/if}
 					<EmojiSelector />
 				</div>
 			{/if}
-			<div
-				class="relative flex h-full w-full flex-col items-center justify-center"
-			/>
+			<div class="hidden h-full sm:block" />
 		{/if}
 	</main>
 {/if}
@@ -247,13 +230,8 @@
 		z-index: 10;
 	}
 
-	.selected,
-	#world-map > button:hover {
+	.selected {
 		outline: solid 2px black;
 		z-index: 2;
-	}
-
-	#world-map > button:hover:not(.selected) {
-		scale: 110%;
 	}
 </style>

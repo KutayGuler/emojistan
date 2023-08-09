@@ -1,23 +1,17 @@
 <script lang="ts">
 	import { palette, DEFAULT_BG, DEFAULT_SIDE_LENGTH } from '$src/constants';
-	import { notifications } from '$src/routes/notifications';
 	import { currentEmoji, formattedEmoji, map, currentColor } from '$src/store';
 	import type { CopyMode } from '$src/types';
+	import { createEventDispatcher } from 'svelte';
 	import RecentlyUsed from './RecentlyUsed.svelte';
+	const dispatch = createEventDispatcher();
 
+	export let deleteTexts: { [key in CopyMode]: string };
+	export let copyModes: Array<CopyMode>;
 	export let viewKey: 'editor' | 'rules' | 'dialogue' | 'publish';
-
-	let sectionIndex = 0;
-
-	const copyModes: Array<CopyMode> = ['Emoji', 'Color', 'Both'];
-	const deleteTexts: { [key in CopyMode]: string } = {
-		Emoji: 'EMOJIS',
-		Color: 'COLORS',
-		Both: 'ALL',
-	};
-
-	let copyMode = copyModes[2];
-	let emojiMode: 'Foreground' | 'Background' = 'Foreground';
+	export let sectionIndex: number;
+	export let copyMode: CopyMode;
+	export let emojiMode: 'Foreground' | 'Background' = 'Foreground';
 
 	function fillMap() {
 		if ($currentEmoji === '') return;
@@ -40,54 +34,36 @@
 				break;
 		}
 	}
-
-	let test = false;
-
-	function toggleTest() {
-		if (!map.hasControllable()) {
-			notifications.warning('No controllable found in the starting section.');
-			return;
-		}
-
-		test = !test;
-		if (!test) {
-			$currentEmoji = '';
-		}
-	}
 </script>
 
 <aside class="aside overflow-y-auto overflow-x-visible">
 	{#if viewKey === 'editor'}
 		<div class="flex flex-col">
 			<button
-				class="btn mb-8 bg-primary text-lg text-primary-content 2xl:btn-md hover:bg-primary-focus"
-				on:click={toggleTest}>TEST</button
+				class="btn mb-4 bg-primary text-primary-content 2xl:btn-md hover:bg-primary-focus md:mb-8"
+				on:click={() => dispatch('test')}>TEST</button
 			>
 			<div class="flex flex-col gap-2">
 				<div class="form-control">
 					<RecentlyUsed />
-					<label for="emoji-mode" class="label">
-						<span class="label-text text-xs text-neutral-content 2xl:text-base"
-							>Emoji Mode
-						</span>
-					</label>
+					<span class="text-xs text-neutral-content md:label-text"
+						>Emoji Mode
+					</span>
 					<select
 						id="emoji-mode"
-						class="select-bordered select 2xl:text-base"
+						class="select-bordered select select-xs md:select-md"
 						bind:value={emojiMode}
 					>
 						{#each ['Foreground', 'Background'] as mode}
 							<option value={mode}>{mode}</option>
 						{/each}
 					</select>
-					<label for="copy-delete-mode" class="label">
-						<span class="label-text text-xs text-neutral-content 2xl:text-base"
-							>Copy / Delete Mode
-						</span>
-					</label>
+					<span class="text-xs text-neutral-content md:label-text"
+						>Copy / Delete Mode
+					</span>
 					<select
 						id="copy-delete-mode"
-						class="select-bordered select 2xl:text-base"
+						class="select-bordered select select-xs md:select-md"
 						bind:value={copyMode}
 					>
 						{#each copyModes as mode}
@@ -96,24 +72,20 @@
 					</select>
 				</div>
 				<button
-					class="btn bg-accent text-lg text-accent-content 2xl:btn-md hover:bg-accent-focus"
+					class="btn-xs btn bg-accent text-accent-content md:btn-md hover:bg-accent-focus"
 					on:click={clearMap}
 					>CLEAR {deleteTexts[copyMode]}
 				</button>
 				<button
 					id="filler"
 					disabled={$currentEmoji === ''}
-					class="btn w-full text-lg 2xl:btn-md"
+					class="btn w-full text-xs md:text-base"
 					on:click={fillMap}
 					>Fill With &nbsp;<i class="twa twa-{$formattedEmoji}" /></button
 				>
-				<label class="label pt-8">
-					<span class="label-text text-xs text-neutral-content 2xl:text-base"
-						>Palette
-					</span></label
-				>
+				<span class="text-xs text-neutral-content md:label-text">Palette </span>
 				<div
-					class="grid grid-cols-9 grid-rows-10 items-center justify-center gap-1"
+					class="grid-rows-10 grid grid-cols-9 items-center justify-center gap-1"
 				>
 					{#each palette as color}
 						{@const disabled = color === $map.dbg}
@@ -122,7 +94,7 @@
 							on:click={() => {
 								$currentColor = $currentColor === color ? '' : color;
 							}}
-							class="h-5 w-5 rounded-sm border border-black duration-75 ease-out {disabled
+							class="h-3 w-3 rounded-sm border border-black duration-75 ease-out md:h-5 md:w-5 {disabled
 								? ''
 								: 'hover:scale-125'}  2xl:h-6 2xl:w-6"
 							style:background-color={color}
@@ -144,26 +116,21 @@
 					class="btn flex w-full flex-row items-center"
 				>
 					Set <div
-						class="m-1 h-4 w-4 rounded 2xl:h-6 2xl:w-6"
+						class="m-1 h-3 w-3 rounded md:h-4 md:w-4 2xl:h-6 2xl:w-6"
 						style:background={$currentColor}
 					/>
 					as default
 				</button>
-				<label class="label pt-8">
-					<span class="label-text text-xs text-neutral-content 2xl:text-base"
-						>World Map
-					</span></label
+				<label for="world-map" class="label pt-8">
+					<span class="label-text text-neutral-content">World Map </span></label
 				>
-				<div
-					id="world-map"
-					class="grid h-[166px] w-[166px] grid-cols-12 grid-rows-12 gap-0.5 self-center"
-				>
+				<div id="world-map" class="grid grid-cols-12 grid-rows-12 self-center">
 					{#each { length: DEFAULT_SIDE_LENGTH * DEFAULT_SIDE_LENGTH } as _, i}
 						{@const selected = i == sectionIndex}
 						<button
 							on:click={() => (sectionIndex = i)}
 							title={`Section #${i}`}
-							class="relative h-[16px] w-[16px] duration-75 ease-out"
+							class="relative h-4 w-4 duration-75 ease-out"
 							class:selected
 							style:background-color={$map.dbg}
 						>

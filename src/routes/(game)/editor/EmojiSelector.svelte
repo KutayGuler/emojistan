@@ -23,15 +23,15 @@
 
 <aside class="aside overflow-y-auto pt-0">
 	<div
-		class="sticky top-0 flex w-full flex-col items-center justify-center gap-4 bg-slate-500 p-4 pt-8"
+		class="sticky top-0 flex w-full flex-col items-center justify-center md:gap-4 gap-2 bg-slate-500 md:p-4 p-2 pt-4 md:pt-8"
 	>
 		<input
-			class="input-bordered input input-sm w-full 2xl:input-md"
+			class="input-bordered input input-xs w-full md:input-sm 2xl:input-md"
 			type="text"
 			placeholder="Search"
 			bind:value={filter}
 		/>
-		<div class="my-4 grid grid-cols-4 grid-rows-2 gap-4">
+		<div class="my-2 grid grid-cols-4 grid-rows-2 gap-2 md:my-4 md:gap-4">
 			{#each Object.keys(emojis) as category}
 				<button
 					class="{category === currentCategory
@@ -39,15 +39,15 @@
 						: 'opacity-50 hover:scale-125 hover:opacity-100'} duration-75 ease-out"
 					on:click={() => (currentCategory = category)}
 				>
-					<i class="twa twa-{category} text-2xl" />
+					<i class="twa twa-{category} text-xs md:text-2xl" />
 				</button>
 			{/each}
 		</div>
-		<div class="flex flex-row gap-2">
+		<div class="flex flex-row gap-1 md:gap-2">
 			{#each skins as [hexcode, skinName]}
 				{@const selected = $currentSkin === skinName}
 				<button
-					class="brutal h-6 w-6 rounded duration-75 ease-out {selected
+					class="brutal h-3 w-3 rounded duration-75 ease-out md:h-6 md:w-6 {selected
 						? 'scale-125'
 						: 'hover:scale-125'}"
 					style:background={hexcode}
