@@ -49,7 +49,7 @@
 	}
 
 	function rightClickedCell(index: number) {
-		let key = sectionIndex + '_' + index;
+		let key = `${sectionIndex}_${index}` as `${number}_${number}`;
 		let emoji = $map.items.get(key) || '';
 		switch (copyMode) {
 			case 'Emoji':
@@ -85,7 +85,7 @@
 
 <div class="map">
 	{#each { length: DEFAULT_SIDE_LENGTH * DEFAULT_SIDE_LENGTH } as _, i}
-		{@const key = sectionIndex + '_' + i}
+		{@const key = `${sectionIndex}_${i}`}
 		{@const mapItem = $map?.items.get(key)}
 		{@const background = $map?.backgrounds.get(key)}
 		<button
