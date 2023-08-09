@@ -21,7 +21,6 @@
     "@sveltejs/adapter-vercel": "^2.4.3",
     "@sveltejs/kit": "^1.11.0",
     "@tailwindcss/typography": "^0.5.9",
-    "@tauri-apps/cli": "^1.2.3",
     "@types/three": "^0.152.1",
     "autoprefixer": "^10.4.8",
     "daisyui": "^3.5.1",
