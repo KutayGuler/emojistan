@@ -141,14 +141,12 @@
 />
 
 <div class="flex h-full flex-col gap-4">
-	<h1 class="pl-4 text-6xl">Play</h1>
-	<div class="flex w-full gap-2 px-4">
+	<div class="flex w-full gap-2 px-0 md:px-4">
 		<label
 			for="save-file"
-			class="relative flex h-28 flex-grow cursor-pointer flex-col items-center justify-center gap-2 rounded border-2 border-dashed border-black hover:bg-gray-300"
+			class="relative flex h-14 cursor-pointer flex-col items-center justify-center gap-2 rounded border-2 border-dashed border-black hover:bg-gray-300 md:h-28"
 		>
-			<span class="drop-title">Drop files here</span>
-			or
+			<span class="drop-title">Drop files here or</span>
 			<input
 				type="file"
 				id="save-file"
@@ -173,14 +171,15 @@
 		<button
 			in:fly={{ x: 200 }}
 			on:click={createNewGame}
-			class="btn-primary btn h-28 flex-grow text-4xl">NEW GAME</button
+			class="btn-primary btn h-14 flex-grow text-2xl md:h-28 md:text-4xl"
+			>NEW GAME</button
 		>
 	</div>
-	<div class="h-full overflow-y-auto overflow-x-hidden px-4">
+	<div class="h-full overflow-y-auto overflow-x-hidden px-0 md:px-4">
 		{#each [...$saves.saves] as [id, name], i}
 			<div
 				in:fly={{ delay: (i + 1) * 80, x: 200 }}
-				class="brutal relative mb-2 flex h-56 flex-col rounded-lg bg-slate-300 p-4"
+				class="brutal relative mb-2 flex h-28 flex-col rounded-lg bg-slate-300 p-2 md:h-56 md:p-4"
 			>
 				{#if renameIndex === i}
 					<form

@@ -232,7 +232,7 @@
 							<i class="twa twa-{emoji}" />
 						</button>
 					{:else}
-						<div class="rounded-md p-1">No equippables defined.</div>
+						<div class="rounded-md p-1">No effectors defined.</div>
 					{/each}
 				</ul>
 			</div>

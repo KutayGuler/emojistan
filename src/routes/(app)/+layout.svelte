@@ -59,11 +59,11 @@
 </svelte:head>
 
 <main
-	class="relative flex h-screen w-screen items-start justify-start gap-4 p-4"
+	class="relative flex h-screen w-screen items-start justify-start gap-2 p-2 md:gap-4 md:p-4"
 >
 	<aside
 		in:fly|local={{ x: -100 }}
-		class="aside z-10 flex h-full w-96 flex-col gap-2 overflow-y-auto bg-neutral bg-opacity-95 shadow-xl"
+		class="aside z-10 flex h-full min-w-[25vw] flex-col gap-2 overflow-y-auto bg-neutral bg-opacity-95 shadow-xl md:w-72 2xl:w-80"
 	>
 		{#if $page.route.id?.includes('tutorial')}
 			<a class="btn" href="/"
@@ -170,15 +170,12 @@
 					<i class="twa twa-alien text-4xl" />
 				</a>
 			</div>
-		{:else}
+		{:else if !$page.route.id?.includes('tutorial')}
 			<div class="flex w-full flex-col items-end gap-2 text-neutral-content">
 				<a href="/login" class="btn-ghost btn-xs btn w-fit">Login</a>
 				<a href="/signup" class="btn-ghost btn-xs btn w-fit">Sign Up</a>
 			</div>
 		{/if}
-		<div class="absolute bottom-0 left-1 text-xs text-base-300">
-			Emojistan v0.0.1
-		</div>
 	</aside>
 	{#if $page.route.id == '/(app)'}
 		<slot />
@@ -189,7 +186,7 @@
 				$page.url.pathname
 			)
 				? 'bg-neutral'
-				: 'bg-base-200'} bg-opacity-95 p-8"
+				: 'bg-base-200'} bg-opacity-95 p-4 md:p-8"
 		>
 			<a
 				href="/"
@@ -201,9 +198,3 @@
 	{/if}
 </main>
 <Background />
-
-<style>
-	aside {
-		min-width: 384px;
-	}
-</style>

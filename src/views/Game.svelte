@@ -18,7 +18,7 @@
 		Sequencer,
 		type ArrowKey,
 		type CollisionType,
-		type Actions,
+		type SequenceActions,
 		type Wasd,
 		type _Collisions,
 		type _Interactable,
@@ -483,7 +483,7 @@
 	}
 
 	// Actions
-	const m: Actions = {
+	const m: SequenceActions = {
 		paint({ index, background }) {
 			colors.set(`${currentSection}_${index}`, background);
 			colors = colors;
@@ -509,6 +509,9 @@
 			initEntities();
 			entities = entities;
 			levelCompleted = false;
+		},
+		drop: () => {
+			// TODO
 		},
 		complete: () => (levelCompleted = true),
 	};
@@ -617,8 +620,11 @@
 		}
 	}
 
-	async function handle(e: KeyboardEvent) {
+	async function handle(
+		e: KeyboardEvent | { code: ArrowKey | 'Space' | `Digit${string}` | Wasd }
+	) {
 		// e.preventDefault();
+		console.log(e.code);
 		handDirection = '';
 		if (
 			!entities.has(currentSection + '_' + ac) ||
@@ -836,7 +842,6 @@
 			}
 
 			let droppedItem = player?.inventory.get(currentInventoryIndex);
-
 			if (!droppedItem) return;
 
 			if (droppedItem.type == 'equippable') {
@@ -866,63 +871,153 @@
 		{#if ac != -2 && showHP}
 			{@const playerHP = $progress * (player?.hp?.max || 1)}
 			<div
-				class=" flex h-full w-64 flex-grow flex-row items-center justify-center"
+				class="flex h-full w-64 flex-grow flex-row items-center justify-center"
 			>
-				<i class="twa z-10 text-2xl twa-{player?.emoji}" />
-				<progress title="Health Bar" class="progress h-8" value={$progress} />
-				<p class="absolute pl-6">
+				<i class="twa z-10 text-base md:text-2xl twa-{player?.emoji}" />
+				<progress
+					title="Health Bar"
+					class="progress h-4 md:h-8"
+					value={$progress}
+				/>
+				<p class="absolute pl-6 text-xs md:text-base">
 					{Number.isInteger(playerHP) ? playerHP : playerHP.toFixed(1)}
 				</p>
 			</div>
 		{/if}
 	{/key}
-	<div class={mapClass}>
-		{#if chatting}
-			<Chat
-				isTutorial={SIZE === 4}
-				history={entities.get(currentSection + '_' + ac)?.history}
-				{character}
-				{dialogueID}
-				dialogueTree={dt}
-				on:end={(e) => {
-					// @ts-expect-error
-					entities.get(`${currentSection}_${ac}`).history = e.detail.history;
-					chatting = false;
-				}}
-			/>
-		{/if}
-		{#each { length: SIZE * SIZE } as _, i}
-			{@const active = ac === i}
-			{@const item = entities.get(currentSection + '_' + i)}
-			{@const collideable = collideables.get(`${currentSection}_${i}`)}
-			{@const background = backgrounds.get(`${currentSection}_${i}`)}
-			{@const hand =
-				player?.inventory?.get(currentInventoryIndex)?.emoji ||
-				keys[directionKey].emoji}
-			<div
-				class="cell"
-				style:background={colors.get(`${currentSection}_${i}`) || map.dbg}
-			>
-				{#if collideable}
-					<div class="absolute z-[2] scale-150">
-						<i class="twa twa-{collideable.emoji}" />
-					</div>
-				{/if}
-				{#if active}
-					<div class="absolute z-[3] text-base {directionKey} {handDirection}">
-						<i class="twa twa-{hand}" />
-					</div>
-				{/if}
-				{#if item}
-					{@const effector = item instanceof Effector}
-					<span class:effector>
-						<i class="twa twa-{item.emoji}" />
-					</span>
-				{:else}
-					<i class="twa scale-75 opacity-50 twa-{background}" />
-				{/if}
+	<div class="flex w-full flex-row items-center justify-center">
+		<div class={mapClass}>
+			{#if chatting}
+				<Chat
+					isTutorial={SIZE === 4}
+					history={entities.get(currentSection + '_' + ac)?.history}
+					{character}
+					{dialogueID}
+					dialogueTree={dt}
+					on:end={(e) => {
+						// @ts-expect-error
+						entities.get(`${currentSection}_${ac}`).history = e.detail.history;
+						chatting = false;
+					}}
+				/>
+			{/if}
+			{#each { length: SIZE * SIZE } as _, i}
+				{@const active = ac === i}
+				{@const item = entities.get(currentSection + '_' + i)}
+				{@const collideable = collideables.get(`${currentSection}_${i}`)}
+				{@const background = backgrounds.get(`${currentSection}_${i}`)}
+				{@const hand =
+					player?.inventory?.get(currentInventoryIndex)?.emoji ||
+					keys[directionKey].emoji}
+				<div
+					class="cell"
+					style:background={colors.get(`${currentSection}_${i}`) || map.dbg}
+				>
+					{#if collideable}
+						<div class="absolute z-[2] scale-150">
+							<i class="twa twa-{collideable.emoji}" />
+						</div>
+					{/if}
+					{#if active}
+						<div
+							class="absolute z-[3] text-xs md:text-base {directionKey} {handDirection}"
+						>
+							<i class="twa twa-{hand}" />
+						</div>
+					{/if}
+					{#if item}
+						{@const effector = item instanceof Effector}
+						<span class:effector>
+							<i class="twa twa-{item.emoji}" />
+						</span>
+					{:else if background}
+						<i class="twa scale-75 opacity-50 twa-{background}" />
+					{/if}
+				</div>
+			{/each}
+		</div>
+		<div
+			class="absolute flex h-full w-screen flex-col items-center justify-center"
+		>
+			<!-- LEFT -->
+			<div class="absolute bottom-52 left-8">
+				<kbd
+					class="kbd"
+					on:click={() => {
+						currentInventoryIndex = -1;
+					}}
+					><svg
+						xmlns="http://www.w3.org/2000/svg"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke-width="1.5"
+						stroke="currentColor"
+						class="h-6 w-6"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							d="M9 3.75H6.912a2.25 2.25 0 00-2.15 1.588L2.35 13.177a2.25 2.25 0 00-.1.661V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 00-2.15-1.588H15M2.25 13.5h3.86a2.25 2.25 0 012.012 1.244l.256.512a2.25 2.25 0 002.013 1.244h3.218a2.25 2.25 0 002.013-1.244l.256-.512a2.25 2.25 0 012.013-1.244h3.859M12 3v8.25m0 0l-3-3m3 3l3-3"
+						/>
+					</svg>
+				</kbd>
 			</div>
-		{/each}
+			<div class="absolute bottom-40 left-8 flex flex-row items-start">
+				<kbd
+					class="kbd"
+					on:click={() => {
+						if (currentInventoryIndex == 0) return;
+						currentInventoryIndex -= 1;
+					}}>◀︎</kbd
+				>
+				<kbd
+					class="kbd"
+					on:click={() => {
+						if (currentInventoryIndex == 7) return;
+						currentInventoryIndex += 1;
+					}}>▶︎</kbd
+				>
+			</div>
+			<div class="absolute bottom-8 left-8 flex flex-col items-start">
+				<kbd class="kbd" on:click={() => handle({ code: 'KeyW' })}>▲</kbd>
+				<div class="flex flex-row">
+					<kbd class="kbd" on:click={() => handle({ code: 'KeyA' })}>◀︎</kbd>
+					<kbd class="kbd" on:click={() => handle({ code: 'KeyD' })}>▶︎</kbd>
+				</div>
+				<kbd class="kbd" on:click={() => handle({ code: 'KeyS' })}>▼</kbd>
+			</div>
+			<!-- RIGHT -->
+			<div class="absolute bottom-40 right-8">
+				<kbd class="kbd" on:click={() => handle({ code: 'Space' })}
+					><svg
+						xmlns="http://www.w3.org/2000/svg"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke-width="1.5"
+						stroke="currentColor"
+						class="h-6 w-6"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							d="M10.05 4.575a1.575 1.575 0 10-3.15 0v3m3.15-3v-1.5a1.575 1.575 0 013.15 0v1.5m-3.15 0l.075 5.925m3.075.75V4.575m0 0a1.575 1.575 0 013.15 0V15M6.9 7.575a1.575 1.575 0 10-3.15 0v8.175a6.75 6.75 0 006.75 6.75h2.018a5.25 5.25 0 003.712-1.538l1.732-1.732a5.25 5.25 0 001.538-3.712l.003-2.024a.668.668 0 01.198-.471 1.575 1.575 0 10-2.228-2.228 3.818 3.818 0 00-1.12 2.687M6.9 7.575V12m6.27 4.318A4.49 4.49 0 0116.35 15m.002 0h-.002"
+						/>
+					</svg>
+				</kbd>
+			</div>
+			<div class="absolute bottom-8 right-8 flex flex-col items-end">
+				<kbd class="kbd" on:click={() => handle({ code: 'ArrowUp' })}>▲</kbd>
+				<div class="flex flex-row">
+					<kbd class="kbd" on:click={() => handle({ code: 'ArrowLeft' })}
+						>◀︎</kbd
+					>
+					<kbd class="kbd" on:click={() => handle({ code: 'ArrowRight' })}
+						>▶︎</kbd
+					>
+				</div>
+				<kbd class="kbd" on:click={() => handle({ code: 'ArrowDown' })}>▼</kbd>
+			</div>
+		</div>
 	</div>
 	{#key ac}
 		{#if ac != -2 && showInventory}
@@ -936,7 +1031,7 @@
 					{@const isEffector = item instanceof Effector}
 					<div
 						class:equipped
-						class="relative flex h-10 w-10 flex-col items-center justify-center rounded border {isEffector
+						class="relative flex h-5 w-5 flex-col items-center justify-center rounded border md:h-10 md:w-10 {isEffector
 							? 'border-purple-500 bg-purple-50'
 							: 'border-black bg-base-300'} p-2 2xl:h-12 2xl:w-12"
 					>
@@ -1047,5 +1142,10 @@
 
 	progress::-webkit-progress-value {
 		background: var(--controllable);
+	}
+
+	kbd {
+		width: 2.5rem; /* 40px */
+		height: 2.5rem; /* 40px */
 	}
 </style>

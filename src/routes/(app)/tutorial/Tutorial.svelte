@@ -50,9 +50,9 @@
 	<div class="relative flex w-1/2 flex-col items-center justify-center">
 		<div class="self-start">
 			{#if header}
-				<h1 class="text-6xl">{header}</h1>
+				<h1 class="text-2xl md:text-6xl">{header}</h1>
 			{/if}
-			<div class="pb-4 pt-2">
+			<div class="pb-4 pt-2 text-xs md:text-base">
 				<slot name="description">
 					{@html description}
 				</slot>
@@ -64,7 +64,7 @@
 				aria-hidden="true"
 				id="rbx"
 				style="width: {rbx.width}px; height: {rbx.height}px;"
-				class="pointer-events-none relative mb-24 mt-12 flex flex-col justify-center"
+				class="pointer-events-none relative mb-12 mt-6 flex scale-75 flex-col justify-center md:mb-24 md:mt-12 md:scale-100"
 			>
 				<Rulebox {rbx} {props} />
 				<div

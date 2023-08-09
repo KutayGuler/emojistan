@@ -141,7 +141,7 @@
 
 {#if $saves.currentSaveID != ''}
 	<main
-		class="editor relative box-border flex h-screen flex-col-reverse items-center justify-center overflow-hidden sm:flex-col"
+		class="editor relative box-border flex h-screen flex-col-reverse items-center justify-center overflow-hidden md:flex-col"
 	>
 		{#if test}
 			<button on:click={toggleTest} class="absolute right-4 top-4 z-10 text-4xl"
@@ -164,15 +164,9 @@
 					test = false;
 				}}
 			/>
-			<div
-				class="absolute bottom-8 left-8 flex flex-row items-center md:bottom-4 md:left-4"
-			>
-				<kbd class="kbd kbd-sm mr-2 2xl:kbd-md">Esc</kbd>
-				<p class="2xl:text-md text-sm">Exit test mode</p>
-			</div>
 		{:else}
 			<div
-				class="flex hidden h-full w-full flex-row items-center justify-center gap-4 text-lg sm:block 2xl:top-8 2xl:text-2xl"
+				class="flex h-full w-full flex-row items-center justify-center gap-4 text-lg 2xl:top-8 2xl:text-2xl"
 			>
 				{#each Object.entries(views) as [key, data]}
 					{@const [icon, title] = data.split('|')}
@@ -180,7 +174,7 @@
 						{title}
 						class="{viewKey === key
 							? 'scale-125 bg-primary'
-							: 'bg-neutral'} btn-square rounded duration-200 ease-out hover:scale-125"
+							: 'bg-neutral'} btn-square btn-xs rounded duration-200 ease-out md:btn-md hover:scale-125"
 						on:click={() => changeViewTo(key)}
 					>
 						<i class="twa twa-{icon}" />
@@ -205,7 +199,7 @@
 						on:test={toggleTest}
 					/>
 					{#if viewKey === 'editor'}
-						<div class="flex flex-col justify-center px-4 md:x-8">
+						<div class="md:x-8 flex flex-col justify-center px-4">
 							<Editor {sectionIndex} {copyMode} {emojiMode} />
 						</div>
 					{:else if viewKey === 'rules'}

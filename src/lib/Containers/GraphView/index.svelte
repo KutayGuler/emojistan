@@ -130,16 +130,3 @@
 		<rect width="100%" height="100%" style="fill: url(#background);" />
 	{/if}
 </svg>
-
-<style>
-	.Ruleboxes {
-		position: absolute;
-		width: 100%;
-		height: 100%;
-	}
-	.Rbx {
-		color: black; /* remove this once color is set to default via types */
-		width: 100%;
-		height: 100%;
-	}
-</style>
