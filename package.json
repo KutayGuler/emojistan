@@ -22,6 +22,7 @@
     "@sveltejs/kit": "^1.11.0",
     "@tailwindcss/typography": "^0.5.9",
     "@types/three": "^0.152.1",
+    "@vite-pwa/sveltekit": "^0.2.5",
     "autoprefixer": "^10.4.8",
     "daisyui": "^3.5.1",
     "postcss": "^8.4.16",

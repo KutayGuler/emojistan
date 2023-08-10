@@ -142,36 +142,31 @@
 
 <div class="flex h-full flex-col gap-4">
 	<div class="flex w-full gap-2 px-0 md:px-4">
-		<label
-			for="save-file"
-			class="relative flex h-14 cursor-pointer flex-col items-center justify-center gap-2 rounded border-2 border-dashed border-black hover:bg-gray-300 md:h-28"
-		>
-			<span class="drop-title">Drop files here or</span>
-			<input
-				type="file"
-				id="save-file"
-				accept="application/json"
-				required
-				bind:files
-				bind:this={fileElement}
-				on:change={() => {
-					if (files[0].type != 'application/json') {
-						fileElement.value = '';
-						files = false;
-						notifications.danger(
-							'Wrong file type. Save files should be in JSON format.'
-						);
-					}
-				}}
-			/>
-			{#if files}
-				<button class="btn" on:click={openUploadedSave}>OPEN</button>
-			{/if}
-		</label>
+		<input
+			class="file-input-bordered file-input"
+			type="file"
+			id="save-file"
+			accept="application/json"
+			required
+			bind:files
+			bind:this={fileElement}
+			on:change={() => {
+				if (files[0].type != 'application/json') {
+					fileElement.value = '';
+					files = false;
+					notifications.danger(
+						'Wrong file type. Save files should be in JSON format.'
+					);
+				}
+			}}
+		/>
+		{#if files}
+			<button class="btn" on:click={openUploadedSave}>OPEN</button>
+		{/if}
 		<button
 			in:fly={{ x: 200 }}
 			on:click={createNewGame}
-			class="btn-primary btn h-14 flex-grow text-2xl md:h-28 md:text-4xl"
+			class="btn-primary btn h-10 flex-grow text-lg md:h-28 md:text-4xl"
 			>NEW GAME</button
 		>
 	</div>
@@ -203,7 +198,7 @@
 								viewBox="0 0 24 24"
 								stroke-width="1.5"
 								stroke="currentColor"
-								class="h-6 w-6"
+								class="h-3 w-3 md:h-6 md:w-6"
 							>
 								<path
 									stroke-linecap="round"
@@ -215,7 +210,7 @@
 					</form>
 				{:else}
 					<div class="flex gap-2 pb-4">
-						<h3>{name}</h3>
+						<div>{name}</div>
 						<button
 							on:click={() => {
 								newName = name;
@@ -257,7 +252,7 @@
 							viewBox="0 0 24 24"
 							stroke-width="1.5"
 							stroke="currentColor"
-							class="h-6 w-6"
+							class="h-4 w-4 md:h-6 md:w-6"
 						>
 							<path
 								stroke-linecap="round"
@@ -274,10 +269,10 @@
 								location.reload();
 							}}
 						>
-							<button class="btn-error btn-sm btn">CONFIRM</button>
+							<button class="btn-error btn-xs btn md:btn-sm">CONFIRM</button>
 						</form>
 						<button
-							class="btn-sm btn"
+							class="btn-xs btn md:btn-sm"
 							on:click={() => {
 								deleteIndex = -1;
 							}}>CANCEL</button
@@ -287,11 +282,13 @@
 							on:click={() => {
 								deleteIndex = i;
 							}}
-							class="btn-ghost btn-sm btn border-none hover:border-none hover:bg-error"
+							class="btn-ghost btn-xs btn border-none md:btn-sm hover:border-none hover:bg-error"
 							>DELETE</button
 						>
 					{/if}
-					<button on:click={() => openSave(id)} class="btn-sm btn">OPEN</button>
+					<button on:click={() => openSave(id)} class="btn-xs btn md:btn-sm"
+						>OPEN</button
+					>
 				</div>
 			</div>
 		{/each}

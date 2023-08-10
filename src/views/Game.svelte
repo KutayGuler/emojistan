@@ -937,7 +937,7 @@
 			{/each}
 		</div>
 		<div
-			class="absolute flex h-full w-screen flex-col items-center justify-center"
+			class="absolute flex h-full w-screen flex-col items-center justify-center md:hidden"
 		>
 			<!-- LEFT -->
 			<div class="absolute bottom-52 left-8">

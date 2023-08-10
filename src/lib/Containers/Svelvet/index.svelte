@@ -10,8 +10,10 @@
 	function resize() {
 		if (innerWidth >= 1536) {
 			graphSize = GRAPH_SIZE_2XL;
-		} else {
+		} else if (innerWidth >= 768) {
 			graphSize = GRAPH_SIZE_MD;
+		} else {
+			graphSize = innerWidth / 2.13;
 		}
 	}
 
@@ -25,10 +27,15 @@
 	style={`width: ${graphSize}px; height: ${graphSize}px`}
 >
 	<GraphView {graphSize} />
-	<p class="absolute bottom-0 right-0 pr-1 text-xs">
+	<p class="absolute bottom-0 right-0 hidden pr-1 text-xs md:block">
 		Right click to spawn a Rulebox
 	</p>
-	<p class="absolute bottom-0 left-0 pl-1 text-xs">Press R to unstuck</p>
+	<p class="absolute bottom-0 right-0 block pr-1 text-xs md:hidden">
+		Hold on canvas to spawn a Rulebox
+	</p>
+	<p class="absolute bottom-0 left-0 hidden pl-1 text-xs md:block">
+		Press R to unstuck
+	</p>
 </div>
 
 <style>

@@ -63,7 +63,7 @@
 >
 	<aside
 		in:fly|local={{ x: -100 }}
-		class="aside z-10 flex h-full min-w-[25vw] flex-col gap-2 overflow-y-auto bg-neutral bg-opacity-95 shadow-xl md:w-72 2xl:w-80"
+		class="aside min-w-48 z-10 flex h-full flex-col gap-2 overflow-y-auto bg-neutral bg-opacity-95 shadow-xl md:w-72 2xl:w-80"
 	>
 		{#if $page.route.id?.includes('tutorial')}
 			<a class="btn" href="/"
@@ -190,7 +190,7 @@
 		>
 			<a
 				href="/"
-				class="btn-ghost btn absolute right-4 top-4 border-none text-2xl hover:border-none"
+				class="btn-ghost btn absolute right-4 top-4 hidden border-none text-2xl hover:border-none md:block"
 				>{CROSS}</a
 			>
 			<slot><!-- optional fallback --></slot>
