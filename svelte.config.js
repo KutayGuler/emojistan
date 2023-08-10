@@ -17,6 +17,9 @@ const config = {
       $rbx: "src/ruleboxes",
       $src: "src",
     },
+    serviceWorker: {
+      register: false,
+    },
   },
 
   vitePlugin: {
