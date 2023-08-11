@@ -46,6 +46,7 @@
     "@supabase/supabase-js": "^2.1.1",
     "astar-typescript": "^1.2.6",
     "d3-selection": "^3.0.0",
-    "d3-zoom": "^3.0.0"
+    "d3-zoom": "^3.0.0",
+    "motion": "^10.16.2"
   }
 }

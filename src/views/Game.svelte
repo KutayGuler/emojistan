@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { animate } from 'motion';
 	import { tweened } from 'svelte/motion';
 	import { cubicOut } from 'svelte/easing';
 	import { createEventDispatcher, onMount } from 'svelte/internal';
@@ -223,21 +224,39 @@
 					);
 			  };
 
+	let clientWidth: number;
+	let animating = false;
+	let staggering = false;
+
 	/**
 	 * function mutates ac if it is equal to "from" parameter
 	 * Transfers an item from "from" to "to"
 	 */
-	function transferItem(from: number, to: number) {
+	async function transferEntity(from: number, to: number) {
 		let _to = currentSection + '_' + to;
 		let _from = currentSection + '_' + from;
+
+		// animating = true;
+		// let operation = from - to;
+		// let axis = operation % SIZE == 0 ? 'translateY' : 'translateX';
+		// let value = operation > 0 ? -1 : 1;
+		// let animation = animate(
+		// 	'#' + entities.get(_from)?.id,
+		// 	{ transform: `${axis}(${value * (clientWidth / SIZE)}px)` },
+		// 	{ duration: 0.1, easing: 'ease-out' }
+		// );
+		// await animation.finished;
+
 		entities.set(_to, entities.get(_from) as Effector | Entity);
 		entities.delete(_from);
 		entities = entities; // MAGIC UPDATE, NECESSARY FOR REACTIVITY
+		console.log(entities);
 
 		if (ac === from) {
 			ac = to;
 			ic = ac + keys[directionKey].operation;
 		}
+		// animating = false;
 	}
 
 	function deleteFromInventory(index: number) {
@@ -383,7 +402,7 @@
 	// 	let to = pathway[1][1] * SIZE + pathway[1][0];
 
 	// 	if (!entities.has(currentSection + '_' + to)) {
-	// 		transferItem(from, to);
+	// 		transferEntity(from, to);
 	// 		enemyIndexes[relativeIndex] = to;
 	// 	}
 	// }
@@ -566,10 +585,12 @@
 			let length = collisionChain.length;
 			collisionChain.reverse();
 
+			staggering = true;
+
 			for (let i = length - 1; i >= 0; i--) {
 				let from = ac + i * operation;
 				let to = ac + (i + 1) * operation;
-				transferItem(from, to);
+				transferEntity(from, to);
 			}
 		} else {
 			if (collisionTypeSequence.includes('bump')) {
@@ -597,7 +618,7 @@
 				if (collisionTypeSequence[i] != 'push') {
 					transferAndMerge(from, to, collisionTypeSequence[i]);
 				} else {
-					transferItem(from, to);
+					transferEntity(from, to);
 				}
 			}
 		}
@@ -623,13 +644,13 @@
 	async function handle(
 		e: KeyboardEvent | { code: ArrowKey | 'Space' | `Digit${string}` | Wasd }
 	) {
-		// e.preventDefault();
-		console.log(e.code);
 		handDirection = '';
 		if (
 			!entities.has(currentSection + '_' + ac) ||
 			(player?.hp?.current || -1) <= 0 ||
-			chatting
+			chatting ||
+			animating ||
+			staggering
 		) {
 			return;
 		}
@@ -640,7 +661,7 @@
 			let facingItem = entities.get(currentSection + '_' + (ac + operation));
 
 			if (!facingItem) {
-				transferItem(ac, ac + operation);
+				transferEntity(ac, ac + operation);
 
 				// A-STAR
 				// for (let i = 0; i < enemyIndexes.length; i++) {
@@ -867,26 +888,24 @@
 <svelte:window on:keydown={handle} />
 
 <div class="relative flex h-full flex-col items-center justify-center">
-	{#key ac}
-		{#if ac != -2 && showHP}
-			{@const playerHP = $progress * (player?.hp?.max || 1)}
-			<div
-				class="flex h-full w-64 flex-grow flex-row items-center justify-center"
-			>
-				<i class="twa z-10 text-base md:text-2xl twa-{player?.emoji}" />
-				<progress
-					title="Health Bar"
-					class="progress h-4 md:h-8"
-					value={$progress}
-				/>
-				<p class="absolute pl-6 text-xs md:text-base">
-					{Number.isInteger(playerHP) ? playerHP : playerHP.toFixed(1)}
-				</p>
-			</div>
-		{/if}
-	{/key}
+	{#if ac != -2 && showHP}
+		{@const playerHP = $progress * (player?.hp?.max || 1)}
+		<div
+			class="flex h-full w-64 flex-grow flex-row items-center justify-center"
+		>
+			<i class="twa z-10 text-base md:text-2xl twa-{player?.emoji}" />
+			<progress
+				title="Health Bar"
+				class="progress h-4 md:h-8"
+				value={$progress}
+			/>
+			<p class="absolute pl-6 text-xs md:text-base">
+				{Number.isInteger(playerHP) ? playerHP : playerHP.toFixed(1)}
+			</p>
+		</div>
+	{/if}
 	<div class="flex w-full flex-row items-center justify-center">
-		<div class={mapClass}>
+		<div class={mapClass} bind:clientWidth>
 			{#if chatting}
 				<Chat
 					isTutorial={SIZE === 4}
@@ -903,7 +922,7 @@
 			{/if}
 			{#each { length: SIZE * SIZE } as _, i}
 				{@const active = ac === i}
-				{@const item = entities.get(currentSection + '_' + i)}
+				{@const entity = entities.get(currentSection + '_' + i)}
 				{@const collideable = collideables.get(`${currentSection}_${i}`)}
 				{@const background = backgrounds.get(`${currentSection}_${i}`)}
 				{@const hand =
@@ -925,10 +944,9 @@
 							<i class="twa twa-{hand}" />
 						</div>
 					{/if}
-					{#if item}
-						{@const effector = item instanceof Effector}
-						<span class:effector>
-							<i class="twa twa-{item.emoji}" />
+					{#if entity}
+						<span class="z-[4]" class:effector={entity instanceof Effector}>
+							<i class="twa twa-{entity.emoji}" />
 						</span>
 					{:else if background}
 						<i class="twa scale-75 opacity-50 twa-{background}" />
@@ -1019,47 +1037,47 @@
 			</div>
 		</div>
 	</div>
-	{#key ac}
-		{#if ac != -2 && showInventory}
-			<div
-				title="Inventory"
-				class="relative flex h-full w-full flex-row items-center justify-center gap-2"
-			>
-				{#each { length: MAX_INVENTORY_SIZE } as _, i}
-					{@const item = player?.inventory.get(i)}
-					{@const equipped = i === currentInventoryIndex}
-					{@const isEffector = item instanceof Effector}
-					<div
-						class:equipped
-						class="relative flex h-5 w-5 flex-col items-center justify-center rounded border md:h-10 md:w-10 {isEffector
-							? 'border-purple-500 bg-purple-50'
-							: 'border-black bg-base-300'} p-2 2xl:h-12 2xl:w-12"
-					>
-						{#if item && item.hp !== 'Infinite'}
-							<i class="twa twa-{item.emoji || ''}" />
-							<div
-								class="{isEffector
-									? ''
-									: 'hidden'} absolute -top-0.5 right-0.5 text-sm"
-							>
-								{item.hp > 1 ? item.hp : ''}
-							</div>
-						{/if}
-					</div>
-					{#if isEffector && equipped}
+	<!-- {#key ac} -->
+	{#if ac != -2 && showInventory}
+		<div
+			title="Inventory"
+			class="relative flex h-full w-full flex-row items-center justify-center gap-2"
+		>
+			{#each { length: MAX_INVENTORY_SIZE } as _, i}
+				{@const item = player?.inventory.get(i)}
+				{@const equipped = i === currentInventoryIndex}
+				{@const isEffector = item instanceof Effector}
+				<div
+					class:equipped
+					class="relative flex h-5 w-5 flex-col items-center justify-center rounded border md:h-10 md:w-10 {isEffector
+						? 'border-purple-500 bg-purple-50'
+						: 'border-black bg-base-300'} p-2 2xl:h-12 2xl:w-12"
+				>
+					{#if item && item.hp !== 'Infinite'}
+						<i class="twa twa-{item.emoji || ''}" />
 						<div
-							class="absolute {SIZE == DEFAULT_SIDE_LENGTH
-								? 'bottom-4'
-								: '-bottom-12'}"
+							class="{isEffector
+								? ''
+								: 'hidden'} absolute -top-0.5 right-0.5 text-sm"
 						>
-							<kbd class="kbd">F</kbd> to apply
-							<i class="twa twa-{item.emoji}" /> on self.
+							{item.hp > 1 ? item.hp : ''}
 						</div>
 					{/if}
-				{/each}
-			</div>
-		{/if}
-	{/key}
+				</div>
+				{#if isEffector && equipped}
+					<div
+						class="absolute {SIZE == DEFAULT_SIDE_LENGTH
+							? 'bottom-4'
+							: '-bottom-12'}"
+					>
+						<kbd class="kbd">F</kbd> to apply
+						<i class="twa twa-{item.emoji}" /> on self.
+					</div>
+				{/if}
+			{/each}
+		</div>
+	{/if}
+	<!-- {/key} -->
 </div>
 
 <style>

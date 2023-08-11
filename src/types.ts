@@ -54,7 +54,7 @@ export class Entity {
 	}
 }
 
-export type EffectorType = 'equippable' | 'collideable' | 'both'
+export type EffectorType = 'equippable' | 'collideable' | 'both';
 
 export interface Effector {
 	emoji: string;
@@ -138,11 +138,11 @@ export interface SequenceActions {
 	reset: Function;
 	complete: Function;
 	/**
-	 * 
+	 *
 	 * @param index
 	 * index here is actually the count of the dropped item
 	 */
-	drop({ emoji, index }: { emoji: string, index: number }): void;
+	drop({ emoji, index }: { emoji: string; index: number }): void;
 }
 
 export interface EditableMap {
@@ -235,7 +235,13 @@ export type _Drops = [id: string, amount: number];
 
 // Array<SequenceItem> is required for type-safety inside Game component
 export type SideEffect = number | 'talk' | 'trigger' | Array<SequenceItem>;
-export type SideEffectArray = Array<[effectorID: StringedNumber | 'any', sideEffect: SideEffect, triggerID: StringedNumber | "none"]> 
+export type SideEffectArray = Array<
+	[
+		effectorID: StringedNumber | 'any',
+		sideEffect: SideEffect,
+		triggerID: StringedNumber | 'none'
+	]
+>;
 
 export interface Interactable {
 	emoji: string;
@@ -295,20 +301,25 @@ export type Branch =
 	| []
 	| [...texts: Array<string>, lastItem: Array<Choice> | string];
 
-export type ChoiceConstraint = { emoji: string, count: number }
+export type ChoiceConstraint = { emoji: string; count: number };
 
 export interface Choice {
 	label: string;
 	text: string;
 	next: string;
-	constraint: ChoiceConstraint
+	constraint: ChoiceConstraint;
 }
 
 export class Choice {
-	constructor(label: string, text: string, next: string, constraint: ChoiceConstraint = { emoji: "", count: 0}) {
+	constructor(
+		label: string,
+		text: string,
+		next: string,
+		constraint: ChoiceConstraint = { emoji: '', count: 0 }
+	) {
 		this.label = label;
 		this.text = text;
-		this.next = next
+		this.next = next;
 		this.constraint = constraint;
 	}
 }
