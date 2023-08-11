@@ -170,11 +170,11 @@
 					<i class="twa twa-alien text-4xl" />
 				</a>
 			</div>
-		{:else if !$page.route.id?.includes('tutorial')}
+			<!-- {:else if !$page.route.id?.includes('tutorial')}
 			<div class="flex w-full flex-col items-end gap-2 text-neutral-content">
 				<a href="/login" class="btn-ghost btn-xs btn w-fit">Login</a>
 				<a href="/signup" class="btn-ghost btn-xs btn w-fit">Sign Up</a>
-			</div>
+			</div> -->
 		{/if}
 	</aside>
 	{#if $page.route.id == '/(app)'}

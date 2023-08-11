@@ -1,11 +1,12 @@
-import { redirect, error, type RequestHandler } from "@sveltejs/kit";
+import { redirect, error, type RequestHandler } from '@sveltejs/kit';
 
 export const POST: RequestHandler = async ({ locals: { supabase } }) => {
-  const { error: err } = await supabase.auth.signOut()
+	throw redirect(302, '/');
+	const { error: err } = await supabase.auth.signOut();
 
-  if (err) {
-    throw error(500, 'Something went wrong logging you out.')
-  }
+	if (err) {
+		throw error(500, 'Something went wrong logging you out.');
+	}
 
-  throw redirect(303, '/')
+	throw redirect(303, '/');
 };
