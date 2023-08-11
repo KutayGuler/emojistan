@@ -61,7 +61,7 @@
 			return;
 		}
 
-		// TODO if status code is 409, user has to create a profile first
+		// if status code is 409, user has to create a profile first
 
 		resolved = false;
 

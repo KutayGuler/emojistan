@@ -18,10 +18,6 @@
 	import { SequenceItem, type SequenceActions, Sequencer } from '$src/types';
 	import { onMount } from 'svelte/internal';
 
-	// TODO: damage to player / interactable
-	// TODO: copy any game to your saves
-	// TODO: audio
-
 	export let id: StringedNumber;
 	export let name: string;
 	export let sequence: Array<SequenceItem> = [];
