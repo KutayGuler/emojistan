@@ -4,9 +4,6 @@
 	import { saves } from '$src/store';
 	import { fly } from 'svelte/transition';
 	import { notifications } from '$src/routes/notifications';
-	import type { PageData } from './$types';
-
-	export let data: PageData;
 
 	let emojiFreqs = new Map<string, Set<string>>();
 
@@ -15,7 +12,7 @@
 		for (let [saveID, _] of $saves.saves) {
 			let items = JSON.parse(localStorage.getItem(saveID + '_items') as string);
 			let set = new Set<string>(
-				items.map(([key, val]: [string, string]) => val)
+				items?.map(([key, val]: [string, string]) => val)
 			);
 			while (set.size > 8) {
 				set.delete(set.values().next().value);
@@ -153,6 +150,7 @@
 			on:change={() => {
 				if (files[0].type != 'application/json') {
 					fileElement.value = '';
+					// @ts-expect-error
 					files = false;
 					notifications.danger(
 						'Wrong file type. Save files should be in JSON format.'
@@ -210,7 +208,7 @@
 					</form>
 				{:else}
 					<div class="flex gap-2 pb-4">
-						<div>{name}</div>
+						<h3>{name}</h3>
 						<button
 							on:click={() => {
 								newName = name;

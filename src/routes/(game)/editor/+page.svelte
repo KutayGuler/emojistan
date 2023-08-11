@@ -88,12 +88,12 @@
 
 	let test = false;
 
-	type ViewKey = 'editor' | 'rules' | 'dialogue' | 'publish';
+	type ViewKey = 'editor' | 'rules' | 'dialogue'; // | 'publish'
 	const views: { [key in ViewKey]: string } = {
 		editor: 'world-map|Map Editor',
 		rules: 'books|Ruleboxes',
 		dialogue: 'speech-balloon|Dialogue Editor',
-		publish: 'floppy-disk|Publish',
+		// publish: 'floppy-disk|Publish',
 	};
 
 	let viewKey: ViewKey = 'editor';
@@ -183,8 +183,8 @@
 			</div>
 			{#if viewKey === 'dialogue'}
 				<DialogueEditor />
-			{:else if viewKey == 'publish'}
-				<Publish />
+			<!-- {:else if viewKey == 'publish'}
+				<Publish /> -->
 			{:else}
 				<div
 					class="relative box-border flex flex-row items-center justify-center"
