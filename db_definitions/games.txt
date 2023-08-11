@@ -1,0 +1,17 @@
+create table
+  public.games (
+    id uuid not null default gen_random_uuid (),
+    data json null,
+    user_id uuid null,
+    created_at timestamp with time zone null default now(),
+    name text null,
+    description text null,
+    constraint games_pkey primary key (id),
+    constraint games_user_id_fkey foreign key (user_id) references profiles (id) on delete cascade,
+    constraint games_name_check check (
+      (
+        (length(name) > 3)
+        and (length(name) < 36)
+      )
+    )
+  ) tablespace pg_default;

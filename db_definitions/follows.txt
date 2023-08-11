@@ -1,0 +1,9 @@
+create table
+  public.follows (
+    follower_id uuid not null,
+    following_id uuid not null,
+    created_at timestamp with time zone null default now(),
+    constraint follows_pkey primary key (follower_id, following_id),
+    constraint follows_follower_id_fkey foreign key (follower_id) references profiles (id) on delete cascade,
+    constraint follows_following_id_fkey foreign key (following_id) references profiles (id) on delete cascade
+  ) tablespace pg_default;

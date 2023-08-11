@@ -1,0 +1,17 @@
+create table
+  public.profiles (
+    id uuid not null,
+    username text null,
+    created_at timestamp with time zone null default now(),
+    avatar_url text null,
+    bio text null,
+    constraint users_pkey primary key (id),
+    constraint users_username_key unique (username),
+    constraint profiles_id_fkey foreign key (id) references auth.users (id),
+    constraint profiles_username_check check (
+      (
+        (length(username) >= 3)
+        and (length(username) <= 24)
+      )
+    )
+  ) tablespace pg_default;

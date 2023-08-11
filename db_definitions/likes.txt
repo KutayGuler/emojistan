@@ -1,0 +1,9 @@
+create table
+  public.likes (
+    liker_id uuid not null,
+    game_id uuid not null,
+    created_at timestamp with time zone null default now(),
+    constraint likes_pkey primary key (liker_id, game_id),
+    constraint likes_game_id_fkey foreign key (game_id) references games (id) on delete cascade,
+    constraint likes_liker_id_fkey foreign key (liker_id) references profiles (id) on delete cascade
+  ) tablespace pg_default;
