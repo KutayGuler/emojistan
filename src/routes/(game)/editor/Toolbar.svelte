@@ -40,15 +40,13 @@
 	{#if viewKey === 'editor'}
 		<div class="flex flex-col">
 			<button
-				class="btn mb-4 bg-primary text-primary-content 2xl:btn-md hover:bg-primary-focus md:mb-8"
+				class="btn bg-primary text-primary-content 2xl:btn-md hover:bg-primary-focus"
 				on:click={() => dispatch('test')}>TEST</button
 			>
 			<div class="flex flex-col gap-2">
 				<div class="form-control">
 					<RecentlyUsed />
-					<span class="text-xs text-neutral-content md:label-text"
-						>Emoji Mode
-					</span>
+					<span class="pt-4 text-xs text-neutral-content pb-1">Emoji Mode </span>
 					<select
 						id="emoji-mode"
 						class="select-bordered select select-xs md:select-md"
@@ -58,7 +56,7 @@
 							<option value={mode}>{mode}</option>
 						{/each}
 					</select>
-					<span class="text-xs text-neutral-content md:label-text"
+					<span class="pb-1 pt-4 text-xs text-neutral-content"
 						>Copy / Delete Mode
 					</span>
 					<select
@@ -83,7 +81,7 @@
 					on:click={fillMap}
 					>Fill With &nbsp;<i class="twa twa-{$formattedEmoji}" /></button
 				>
-				<span class="text-xs text-neutral-content md:label-text">Palette </span>
+				<span class="pt-4 text-xs text-neutral-content">Palette </span>
 				<div
 					class="grid-rows-10 grid grid-cols-9 items-center justify-center gap-1"
 				>
@@ -121,9 +119,7 @@
 					/>
 					as default
 				</button>
-				<label for="world-map" class="label pt-8">
-					<span class="label-text text-neutral-content">World Map </span></label
-				>
+				<span class="text-xs text-neutral-content pt-4">World Map </span>
 				<div id="world-map" class="grid grid-cols-12 grid-rows-12 self-center">
 					{#each { length: DEFAULT_SIDE_LENGTH * DEFAULT_SIDE_LENGTH } as _, i}
 						{@const selected = i == sectionIndex}

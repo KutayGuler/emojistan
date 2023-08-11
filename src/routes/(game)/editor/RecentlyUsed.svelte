@@ -6,11 +6,7 @@
 	}
 </script>
 
-<label for="recently-used" class="label">
-	<span class="label-text text-xs text-neutral-content md:text-base"
-		>Recently Used
-	</span>
-</label>
+<span class="pb-1 pt-4 text-xs text-neutral-content">Recently Used </span>
 <div class="emojis flex flex-wrap-reverse justify-center">
 	{#each [...$recentlyUsed] as name}
 		{@const title = name.replaceAll('-', ' ')}
