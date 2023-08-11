@@ -2,8 +2,6 @@
   "name": "emojistan",
   "version": "0.0.1",
   "scripts": {
-    "update-types": "npx supabase gen types typescript --project-id \"vuiyurkhfceaoxddvvnf\" > types/supabase.ts",
-    "tauri": "tauri",
     "help": "svelte-kit dev --help",
     "dev": "vite dev --open",
     "build": "vite build",

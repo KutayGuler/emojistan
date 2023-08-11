@@ -5,11 +5,7 @@ import preprocess from "svelte-preprocess";
 const config = {
   // Consult https://github.com/sveltejs/svelte-preprocess
   // for more information about preprocessors
-  preprocess: preprocess({
-    postcss: true,
-    preserve: ["ld+json"],
-  }),
-
+  preprocess: preprocess({ postcss: true }),
   kit: {
     adapter: adapter(),
     alias: {
@@ -17,11 +13,7 @@ const config = {
       $rbx: "src/ruleboxes",
       $src: "src",
     },
-    serviceWorker: {
-      register: false,
-    },
   },
-
   vitePlugin: {
     inspector: {
       toggleKeyCombo: "control-alt",
