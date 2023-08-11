@@ -110,13 +110,13 @@
 					class={$navigating?.to?.url.pathname.includes('tut') ? 'loading' : ''}
 				/></a
 			>
-			<a href="/discover" class="btn-accent btn"
+			<!-- <a href="/discover" class="btn-accent btn"
 				>DISCOVER <span
 					class={$navigating?.to?.url.pathname.includes('disc')
 						? 'loading'
 						: ''}
 				/></a
-			>
+			> -->
 		{/if}
 
 		<div class="flex flex-grow" />
