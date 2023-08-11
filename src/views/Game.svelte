@@ -226,7 +226,6 @@
 
 	let clientWidth: number;
 	let animating = false;
-	let staggering = false;
 
 	/**
 	 * function mutates ac if it is equal to "from" parameter
@@ -250,7 +249,6 @@
 		entities.set(_to, entities.get(_from) as Effector | Entity);
 		entities.delete(_from);
 		entities = entities; // MAGIC UPDATE, NECESSARY FOR REACTIVITY
-		console.log(entities);
 
 		if (ac === from) {
 			ac = to;
@@ -585,8 +583,6 @@
 			let length = collisionChain.length;
 			collisionChain.reverse();
 
-			staggering = true;
-
 			for (let i = length - 1; i >= 0; i--) {
 				let from = ac + i * operation;
 				let to = ac + (i + 1) * operation;
@@ -649,8 +645,7 @@
 			!entities.has(currentSection + '_' + ac) ||
 			(player?.hp?.current || -1) <= 0 ||
 			chatting ||
-			animating ||
-			staggering
+			animating
 		) {
 			return;
 		}
