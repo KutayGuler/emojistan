@@ -22,7 +22,7 @@ export interface Dimensions {
 }
 
 // interface of Rect divs in zoompane
-export interface Rect extends Dimensions, XYPosition {}
+export interface Rect extends Dimensions, XYPosition { }
 
 // interface of Box using XYPosition of nodes
 export interface Box extends XYPosition {
