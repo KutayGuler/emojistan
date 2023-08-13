@@ -1,3 +1,5 @@
+# Emojistan 🏝️
+
 Emojistan is a game that lets you create your own interactive world with emojis. Create colorful maps, define custom behaviors and write branching dialogues.
 
 ## 🎮️ Features
