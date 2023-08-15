@@ -8,6 +8,7 @@ import {
 	Controllable,
 	Sequencer,
 	Interactable,
+	StringedNumber,
 	type Branch,
 	type Merger,
 	type Pusher,
@@ -493,8 +494,6 @@ export const formattedEmoji = derived(
 // CUSTOM
 export const saves = createSaves();
 export const map = createEditableMap();
-
-export type StringedNumber = `${number}`;
 
 // MAPS
 export const pushers = createMapStore<StringedNumber, Pusher>('pushers');

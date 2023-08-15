@@ -2,6 +2,7 @@
 	import {
 		type Effector as TEffector,
 		EditableMap,
+		type StringedNumber,
 		Controllable,
 		Devolve,
 		Evolve,
@@ -17,7 +18,6 @@
 	import Tutorial from '../Tutorial.svelte';
 	import Effector from '$rbx/Effector.svelte';
 	import type { TutorialProps } from '../types';
-	import type { StringedNumber } from '$src/store';
 
 	const tutorialProps: Array<TutorialProps<Effector>> = [
 		{

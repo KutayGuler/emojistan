@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { effectors, formattedEmoji, type StringedNumber } from '$src/store';
-	import { Effector, type EffectorType } from '$src/types';
+	import { effectors, formattedEmoji, } from '$src/store';
+	import { Effector, type EffectorType, type StringedNumber } from '$src/types';
 	import { onDestroy, onMount } from 'svelte';
 	import { hasDuplicateIn, hasDuplicate } from './utils';
 

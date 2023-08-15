@@ -4,6 +4,7 @@
 		EditableMap,
 		Controllable,
 		Devolve,
+		type StringedNumber,
 		Evolve,
 		type MapLocation,
 	} from '$src/types';
@@ -11,7 +12,6 @@
 	import Tutorial from '../Tutorial.svelte';
 	import Merger from '$rbx/Merger.svelte';
 	import type { TutorialProps } from '../types';
-	import type { StringedNumber } from '$src/store';
 
 	const tutorialProps: TutorialProps<Merger> = {
 		header: 'Merger',

@@ -12,6 +12,7 @@
 		type Drops,
 		type SideEffect,
 		type SideEffectArray,
+		type StringedNumber,
 	} from '$src/types';
 	import { onDestroy, onMount } from 'svelte';
 	import { notifications } from '../routes/notifications';
@@ -19,7 +20,6 @@
 		formattedEmoji,
 		interactables,
 		effectors,
-		type StringedNumber,
 		sequencers,
 	} from '../store';
 	import { hasDuplicateIn, hasDuplicate } from './utils';

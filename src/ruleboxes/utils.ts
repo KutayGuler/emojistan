@@ -1,7 +1,7 @@
 import { get, type Readable } from 'svelte/store';
-import { formattedEmoji, type StringedNumber } from '$src/store';
+import { formattedEmoji, } from '$src/store';
 import { notifications } from '$src/routes/notifications';
-import type { Controllable, Effector, Interactable } from '$src/types';
+import type { Controllable, Effector, Interactable, StringedNumber } from '$src/types';
 import { controllables, effectors, interactables } from '$src/store';
 import type { RuleboxType } from '$src/lib';
 

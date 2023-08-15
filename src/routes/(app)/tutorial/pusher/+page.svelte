@@ -4,6 +4,7 @@
 		EditableMap,
 		Controllable,
 		Evolve,
+		type StringedNumber,
 		Devolve,
 		type MapLocation,
 	} from '$src/types';
@@ -11,7 +12,7 @@
 	import Tutorial from '../Tutorial.svelte';
 	import Pusher from '$rbx/Pusher.svelte';
 	import type { TutorialProps } from '../types';
-	import type { StringedNumber } from '$src/store';
+	import type {  } from '$src/store';
 
 	const tutorialProps: TutorialProps<Pusher> = {
 		header: 'Pusher',

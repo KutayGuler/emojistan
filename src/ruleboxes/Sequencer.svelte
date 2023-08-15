@@ -12,10 +12,9 @@
 		map,
 		formattedEmoji,
 		sequencers,
-		type StringedNumber,
 		effectors,
 	} from '$src/store';
-	import { SequenceItem, type SequenceActions, Sequencer } from '$src/types';
+	import { SequenceItem, type SequenceActions, Sequencer, type StringedNumber } from '$src/types';
 	import { onMount } from 'svelte/internal';
 
 	export let id: StringedNumber;

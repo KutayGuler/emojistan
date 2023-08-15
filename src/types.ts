@@ -1,3 +1,6 @@
+// CUSTOM TYPES
+export type StringedNumber = `${number}`;
+
 // EDITOR TYPES
 
 export type CopyMode = 'Emoji' | 'Color' | 'Both';
@@ -6,7 +9,6 @@ export type EmojiMode = 'Foreground' | 'Background';
 // GAME TYPES
 
 import { DEFAULT_BG } from './constants';
-import type { StringedNumber } from './store';
 
 export type MapLocation = `${number}_${number}`;
 export type CollisionType = 'bump' | 'push' | string;

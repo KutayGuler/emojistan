@@ -6,7 +6,6 @@
 		effectors,
 		controllables,
 		sequencers,
-		type StringedNumber,
 	} from '../store';
 	import type { RuleboxType } from '$lib/types';
 	import { rbxStore } from '$lib/stores/store';
@@ -17,6 +16,7 @@
 		Controllable,
 		Effector,
 		Sequencer,
+		type StringedNumber,
 	} from '$src/types';
 
 	export let position: { x: number; y: number };
