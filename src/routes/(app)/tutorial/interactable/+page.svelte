@@ -18,7 +18,6 @@
 	} from '$src/constants';
 	import Tutorial from '../Tutorial.svelte';
 	import type { TutorialProps } from '../types';
-	import type {  } from '$src/store';
 	import Interactable from '$rbx/Interactable.svelte';
 
 	const tutorialProps: Array<TutorialProps<Interactable>> = [

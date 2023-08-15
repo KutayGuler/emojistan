@@ -12,7 +12,6 @@
 	import Tutorial from '../Tutorial.svelte';
 	import Pusher from '$rbx/Pusher.svelte';
 	import type { TutorialProps } from '../types';
-	import type {  } from '$src/store';
 
 	const tutorialProps: TutorialProps<Pusher> = {
 		header: 'Pusher',
