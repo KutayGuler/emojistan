@@ -1,6 +1,6 @@
 <script lang="ts">
-	import type { StringedNumber } from '$src/store';
 	import {
+		type StringedNumber, 
 		Controllable,
 		Devolve,
 		EditableMap,

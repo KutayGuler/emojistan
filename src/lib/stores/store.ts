@@ -1,6 +1,6 @@
 import { writable, get } from 'svelte/store';
 import { Rulebox, type RuleboxType } from '../types/types';
-import type { StringedNumber } from '$src/store';
+import type { StringedNumber } from '$src/types';
 
 function createRuleboxes() {
 	const arr: Array<Rulebox> = [];

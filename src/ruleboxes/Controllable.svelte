@@ -5,14 +5,13 @@
 		MAX_SIDE_EFFECT,
 		EFFECTOR_BORDER,
 	} from '$src/constants';
-	import { Devolve, Evolve, Controllable } from '$src/types';
+	import { Devolve, Evolve, Controllabletype, type StringedNumber } from '$src/types';
 	import { onDestroy, onMount } from 'svelte';
 	import { notifications } from '../routes/notifications';
 	import {
 		formattedEmoji,
 		controllables,
 		effectors,
-		type StringedNumber,
 	} from '../store';
 	import { hasDuplicate, hasDuplicateIn } from './utils';
 

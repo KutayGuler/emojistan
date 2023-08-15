@@ -25,7 +25,7 @@ import {
 	SEQUENCER_H,
 	SEQUENCER_W,
 } from '$src/constants';
-import type { StringedNumber } from '$src/store';
+import type { StringedNumber } from '$src/types';
 import type { XYPosition, Position } from './utils';
 
 export type RuleboxType =

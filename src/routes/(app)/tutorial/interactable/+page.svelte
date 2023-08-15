@@ -5,6 +5,7 @@
 		Evolve,
 		Devolve,
 		Effector,
+		type StringedNumber,
 		Controllable,
 		type Branch,
 		type MapLocation,
@@ -17,7 +18,7 @@
 	} from '$src/constants';
 	import Tutorial from '../Tutorial.svelte';
 	import type { TutorialProps } from '../types';
-	import type { StringedNumber } from '$src/store';
+	import type {  } from '$src/store';
 	import Interactable from '$rbx/Interactable.svelte';
 
 	const tutorialProps: Array<TutorialProps<Interactable>> = [

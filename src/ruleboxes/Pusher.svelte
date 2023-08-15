@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { onDestroy, onMount } from 'svelte';
-	import { pushers, formattedEmoji, type StringedNumber } from '../store';
+	import { pushers, formattedEmoji, } from '../store';
 	import { notifications } from '../routes/notifications';
 	import { rbxStore } from '$src/lib/stores/store';
-	import type { Pusher } from '$src/types';
+	import type { Pusher, StringedNumber } from '$src/types';
 
 	export let id: StringedNumber;
 	export let slots: Pusher = ['', '', 'push'];

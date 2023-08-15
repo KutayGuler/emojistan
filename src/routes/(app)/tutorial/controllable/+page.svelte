@@ -15,7 +15,7 @@
 	} from '$src/constants';
 	import Tutorial from '../Tutorial.svelte';
 	import Controllable from '$rbx/Controllable.svelte';
-	import type { StringedNumber } from '$src/store';
+	import type { StringedNumber } from '$src/types';
 	import type { TutorialProps } from '../types';
 
 	const tutorialProps: Array<TutorialProps<Controllable>> = [

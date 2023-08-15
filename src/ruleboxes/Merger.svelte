@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { onDestroy, onMount } from 'svelte';
-	import { mergers, pushers, formattedEmoji, type StringedNumber } from '../store';
+	import { mergers, pushers, formattedEmoji, } from '../store';
 	import { notifications } from '../routes/notifications';
 	import { rbxStore } from '$src/lib/stores/store';
-	import type { Merger } from '$src/types';
+	import type { Merger,  StringedNumber } from '$src/types';
 
 	export let id: StringedNumber;
 	export let slots: Merger = ['', '', ''];
