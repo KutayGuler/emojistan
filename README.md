@@ -1,5 +1,7 @@
 # Emojistan 🏝️
 
+[Why I Made a Pseudo Game Engine with SvelteKit](https://dev.to/kutayguler/why-i-made-a-pseudo-game-engine-with-sveltekit-31gp)
+
 Emojistan is a game that lets you create your own interactive world with emojis. Create colorful maps, define custom behaviors and write branching dialogues.
 
 ## 🎮️ Features
