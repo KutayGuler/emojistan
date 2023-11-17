@@ -8,7 +8,7 @@ import {
 	Controllable,
 	Sequencer,
 	Interactable,
-	StringedNumber,
+	type StringedNumber,
 	type Branch,
 	type Merger,
 	type Pusher,
@@ -28,7 +28,6 @@ function createMapStore<K, V>(name: `${RuleboxType}s`) {
 			const val = JSON.parse(localStorage.getItem(id + '_' + name) as string);
 			set(new Map(val) || new Map<number, V>());
 			subscribe((state) => {
-				
 				localStorage.setItem(
 					id + '_' + name,
 					JSON.stringify(Array.from(state.entries()))
@@ -215,20 +214,21 @@ function createEditableMap() {
 				state.backgrounds.delete(`${sectionIndex}_${index}`);
 				return state;
 			}),
-		clearBackgrounds: (sectionIndex: number) => update((state) => {
-			let keys = [];
+		clearBackgrounds: (sectionIndex: number) =>
+			update((state) => {
+				let keys = [];
 
-			for (let key of state.backgrounds.keys()) {
-				if (+key.split('_')[0] == sectionIndex) {
-					keys.push(key);
+				for (let key of state.backgrounds.keys()) {
+					if (+key.split('_')[0] == sectionIndex) {
+						keys.push(key);
+					}
 				}
-			}
 
-			for (let key of keys) {
-				state.items.delete(key as MapLocation);
-			}
-			return state;
-		}),
+				for (let key of keys) {
+					state.items.delete(key as MapLocation);
+				}
+				return state;
+			}),
 		addEmoji: (sectionIndex: number, index: number, emoji: string) =>
 			update((state) => {
 				state.items.set(`${sectionIndex}_${index}`, emoji);
@@ -297,24 +297,27 @@ function createEditableMap() {
 			let _hasControllable = false;
 
 			update((state) => {
-				let controllableEmojis = []
-	
+				let controllableEmojis = [];
+
 				for (let { emoji } of get(controllables).values()) {
-					controllableEmojis.push(emoji)
+					controllableEmojis.push(emoji);
 				}
-				
+
 				for (let [key, val] of state.items.entries()) {
-					if (state.ssi == +key.split("_")[0] && controllableEmojis.includes(val)) {
+					if (
+						state.ssi == +key.split('_')[0] &&
+						controllableEmojis.includes(val)
+					) {
 						_hasControllable = true;
 						return state;
 					}
 				}
-				
-				return state;
-			})
 
-			return _hasControllable
-		}
+				return state;
+			});
+
+			return _hasControllable;
+		},
 	};
 }
 
@@ -374,8 +377,11 @@ function createDialogueTree() {
 			}),
 		removeChoice: (parentBranchName: string, choiceID: string) =>
 			update((state) => {
-				let length = state.get(parentBranchName)?.length 
-				state.get(parentBranchName)[length - 1] = state.get(parentBranchName)?.at(-1).filter(({ next }) => next != choiceID);;
+				let length = state.get(parentBranchName)?.length;
+				state.get(parentBranchName)[length - 1] = state
+					.get(parentBranchName)
+					?.at(-1)
+					.filter(({ next }) => next != choiceID);
 				state.delete(choiceID);
 				if (typeof state.get(choiceID)?.at(-1) !== 'string') {
 					// delete all related subbranches
@@ -387,7 +393,7 @@ function createDialogueTree() {
 				}
 				return state;
 			}),
-		remove: (id: string,) =>
+		remove: (id: string) =>
 			update((state) => {
 				state.delete(id);
 				if (typeof state.get(id)?.at(-1) !== 'string') {
@@ -399,7 +405,7 @@ function createDialogueTree() {
 					});
 				}
 				return state;
-		}),
+			}),
 		addTextTo: (id: string, text: string) =>
 			update((state) => {
 				if (typeof state.get(id)?.at(-1) !== 'string') {
@@ -438,7 +444,7 @@ function createDialogueTree() {
 }
 
 function createRecentlyUsed() {
-	const { set, subscribe, update } = writable(new Set<string>())
+	const { set, subscribe, update } = writable(new Set<string>());
 
 	return {
 		set,
@@ -454,27 +460,28 @@ function createRecentlyUsed() {
 				);
 			});
 		},
-		add: (emoji: string) => emoji != "" && update((state) => {
-			if (state.has(emoji)) {
-				state.delete(emoji);
-				state.add(emoji);
-			} else {
-				state.add(emoji);
-			}
+		add: (emoji: string) =>
+			emoji != '' &&
+			update((state) => {
+				if (state.has(emoji)) {
+					state.delete(emoji);
+					state.add(emoji);
+				} else {
+					state.add(emoji);
+				}
 
-			if (state.size > 16) {
-				for (let _emoji of state) {
-					if (emoji != _emoji) {
-						state.delete(_emoji);
-						break;
+				if (state.size > 16) {
+					for (let _emoji of state) {
+						if (emoji != _emoji) {
+							state.delete(_emoji);
+							break;
+						}
 					}
 				}
-			}
 
-			return state;
-		})
-	}
-
+				return state;
+			}),
+	};
 }
 
 export const showLoading = writable(false);
@@ -498,7 +505,9 @@ export const map = createEditableMap();
 // MAPS
 export const pushers = createMapStore<StringedNumber, Pusher>('pushers');
 export const mergers = createMapStore<StringedNumber, Merger>('mergers');
-export const effectors = createMapStore<StringedNumber | 'any', Effector>('effectors');
+export const effectors = createMapStore<StringedNumber | 'any', Effector>(
+	'effectors'
+);
 export const interactables = createMapStore<StringedNumber, Interactable>(
 	'interactables'
 );
