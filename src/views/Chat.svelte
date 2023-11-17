@@ -140,7 +140,7 @@
 	bind:this={container}
 	style="background-color: rgba(0, 0, 0.5, 0.8);"
 	class="absolute z-50 flex flex-col items-start justify-start {isTutorial
-		? 'h-[204px] w-[204px] 2xl:h-[236px] 2xl:w-[236px]'
+		? 'mt-4 h-[208px] w-[208px] 2xl:h-[240px] 2xl:w-[240px]'
 		: 'h-[624px] w-[624px] 2xl:h-[720px] 2xl:w-[720px]'} overflow-y-auto overflow-x-hidden backdrop-blur"
 	transition:fly|local={{ x: -100 }}
 >

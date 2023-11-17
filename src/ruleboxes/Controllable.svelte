@@ -5,14 +5,15 @@
 		MAX_SIDE_EFFECT,
 		EFFECTOR_BORDER,
 	} from '$src/constants';
-	import { Devolve, Evolve, Controllabletype, type StringedNumber } from '$src/types';
+	import {
+		Devolve,
+		Evolve,
+		Controllable,
+		type StringedNumber,
+	} from '$src/types';
 	import { onDestroy, onMount } from 'svelte';
 	import { notifications } from '../routes/notifications';
-	import {
-		formattedEmoji,
-		controllables,
-		effectors,
-	} from '../store';
+	import { formattedEmoji, controllables, effectors } from '../store';
 	import { hasDuplicate, hasDuplicateIn } from './utils';
 
 	let indexes: Array<number> = [];
